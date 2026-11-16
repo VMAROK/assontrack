@@ -1025,6 +1025,7 @@ aside{background:rgba(var(--tD),calc(.82*var(--go)))!important;backdrop-filter:b
 .cm-edit,.cm-add{display:flex;align-items:center;gap:8px;padding:0;border:0}.cm-edit input,.cm-add input{flex:1;min-width:0;padding:8px 11px}
 .cm-add{margin-top:2px}.cm-plus{flex:none;width:30px;height:30px;display:grid;place-items:center;color:var(--muted);border:1px dashed rgba(var(--lr),.35);border-radius:7px}
 .cat-mgr .cat-theme{margin:0}
+.cat-mgr,.cat-mgr>*,.cat-mgr .cat-theme,.cat-mgr .theme-look,.cat-mgr .lk-row{min-width:0;max-width:100%}.cat-mgr .theme-strip{max-width:100%;overflow-x:auto}.cat-mgr .glass-row{min-width:0}.cat-mgr .glass-row input{min-width:0;width:100%}.cm-row,.cm-name{min-width:0}.cm-name{overflow:hidden;text-overflow:ellipsis}
 .cat-theme{margin:-4px 0 14px;padding:12px;border:1px solid rgba(var(--lr),.25);border-radius:12px;background:rgba(var(--tX),calc(.4*var(--go)));animation:stripin .3s cubic-bezier(.2,.9,.25,1)}
 .ct-head{display:grid;gap:2px;margin-bottom:10px}.ct-head b{font-size:14.5px}.ct-head small{font-size:12.5px;color:var(--muted)}
 .ct-apply{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;margin-top:6px;padding-top:10px;border-top:1px solid rgba(var(--lr),.14);font-size:12.5px;color:var(--muted)}
@@ -1487,7 +1488,7 @@ function modelPane(a){const m=a.model;
     <div class="seg2" role="group" aria-label="Figure"><button data-usemodel="0" aria-pressed="${!a.useModel}">Built-in figure</button><button data-usemodel="1" aria-pressed="${a.useModel}">My model</button></div>
     <div class="mdl-btns"><label class="mv mdl-up">Replace<input type="file" accept=".glb,.gltf,.fbx,.obj,.mtl" multiple data-modelup></label><button class="mv ${mdlDelArm?"armed":""}" data-modeldel>${mdlDelArm?"Tap again to remove":"Remove"}</button></div>`
    :`<label class="btn mdl-up mdl-add">Import a 3D model<input type="file" accept=".glb,.gltf,.fbx,.obj,.mtl" multiple data-modelup></label>`}
-   <p class="avnote">GLB works best. FBX and OBJ work too, up to 50 MB. For an OBJ, pick its .mtl file at the same time to bring in the clothing colors. Your model gets the Shadow, Hologram and Alive looks and spins like the built-in figure. Outfit colors don't apply to it.</p></div>`}
+   <p class="avnote">GLB works best. FBX and OBJ work too, up to 50 MB. For an OBJ, pick its .mtl file at the same time to bring in the clothing colors. Your model gets the Shadow, Hologram and Alive looks and spins like the built-in figure. The hat, coat and boots from Customize outfit go on it too, sized to fit as closely as the shape allows.</p></div>`}
 function avEditor(){const a=avatarOf(),cats=[["hat","Hat"],["top","Top"],["shoes","Shoes"],["model","3D model"]];if(avCat==="model")return `<div class="aved"><div class="avcats">${cats.map(([k,l])=>`<button class="avcat" data-avcat="${k}" aria-pressed="${avCat===k}">${l}</button>`).join("")}</div>${modelPane(a)}</div>`;
   return `<div class="aved"><div class="avcats">${cats.map(([k,l])=>`<button class="avcat" data-avcat="${k}" aria-pressed="${avCat===k}">${l}</button>`).join("")}</div>
     <div class="avopts">${AV_ITEMS[avCat].map(([v,l])=>`<button class="fchip" data-avset="${avCat}:${v}" aria-pressed="${a[avCat]===v}">${l}</button>`).join("")}</div>
@@ -1613,16 +1614,57 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
     if(avg)return base?avg.multiply(base):avg;
     const plain=!base||base.getHex()===0xffffff;if(!plain)return base;
     const hay=nm+" "+mesh.name;for(const [re,c] of NAMECOL)if(re.test(hay))return new T.Color(c);return new T.Color(0x9aa3b5)}
+  /* measure an imported model once: where its head, chest and feet are */
+  function measure(o){o.updateMatrixWorld(true);o.traverse(m=>{if(m.isSkinnedMesh)m.skeleton.update()});const P=[],v=new T.Vector3();let tot=0;o.traverse(m=>{if(m.isMesh&&m.visible&&m.geometry.attributes.position)tot+=m.geometry.attributes.position.count});const step=Math.max(1,Math.floor(tot/40000));
+    o.traverse(m=>{if(!(m.isMesh&&m.visible))return;const pa=m.geometry.attributes.position;if(!pa)return;for(let i=0;i<pa.count;i+=step){m.getVertexPosition(i,v);v.applyMatrix4(m.matrixWorld);P.push(v.x,v.y,v.z)}});
+    let top=-1e9;for(let i=1;i<P.length;i+=3)top=Math.max(top,P[i]);
+    const band=(y0,y1)=>{const a=[];for(let i=0;i<P.length;i+=3)if(P[i+1]>=y0&&P[i+1]<=y1)a.push([P[i],P[i+2]]);return a};
+    const ctr=a=>{let x=0,z=0;a.forEach(p=>{x+=p[0];z+=p[1]});return a.length?[x/a.length,z/a.length]:[0,0]};
+    const pct=(arr,q)=>{if(!arr.length)return 0;arr.sort((x,y)=>x-y);return arr[Math.min(arr.length-1,Math.floor(arr.length*q))]};
+    const hd=band(top-.24,top),[hx,hz]=ctr(hd),hw=Math.max(pct(hd.map(p=>Math.abs(p[0]-hx)),.95),pct(hd.map(p=>Math.abs(p[1]-hz)),.95))*2;
+    const ch=band(top-.78,top-.56),[cx,cz]=ctr(ch),chw=pct(ch.map(p=>Math.abs(p[0]-cx)),.72),chd=pct(ch.map(p=>Math.abs(p[1]-cz)),.8);
+    const ft=band(-1,.1),L=ft.filter(p=>p[0]<cx),Rr=ft.filter(p=>p[0]>=cx);
+    return {top,head:[hx,top-.22,hz],hw:hw||.37,chest:[cx,cz],chw:chw||.2,chd:chd||.14,feet:[L.length?ctr(L):[cx-.1,cz],Rr.length?ctr(Rr):[cx+.1,cz]]}}
+  function modelClothes(av,stage,ms,o){const real=stage==="real",holo=stage==="holo";
+    const cmode=av.cmode||"solid",col=Object.assign({hat:"#16171c",top:"#16171c",shoes:"#16171c"},av.colors||{});
+    const fig=real?null:holo?holoMat(true):shadowMat();
+    const C=hex=>cmode==="figure"&&!real?fig:toon(hex,cmode==="glass"?{transparent:true,opacity:.42,depthWrite:false}:{});
+    const out=[];
+    const bone=re=>{let b=null;o.traverse(x=>{if(!b&&x.isBone&&re.test(x.name)&&!/end|top|nub/i.test(x.name))b=x});return b};
+    if(av.hat==="fedora"){const hat=new T.Group(),felt=C(col.hat);
+      const crown=new T.Mesh(new T.CylinderGeometry(.155,.19,.16,28),felt);crown.position.y=.205;const dent=new T.Mesh(new T.BoxGeometry(.04,.03,.24),felt);dent.position.y=.29;
+      const brim=new T.Mesh(new T.CylinderGeometry(.34,.34,.02,36),felt);brim.scale.z=.88;brim.position.y=.135;brim.rotation.x=-.06;
+      const band=new T.Mesh(new T.CylinderGeometry(.19,.193,.04,28),C(tone(col.hat,.45).lerp(new T.Color(0x5a1b25),.5)));band.position.y=.16;hat.add(crown,dent,brim,band);
+      const k=Math.max(.6,Math.min(1.8,ms.hw/.37));hat.scale.setScalar(k);hat.position.set(ms.head[0],ms.top-.22*k+.02,ms.head[2]);hat.userData.slot="hat";out.push([hat,bone(/head/i)])}
+    if(av.top==="trench"){const coat=new T.Group(),cm=C(col.top),dk=C(tone(col.top,.6));
+      const sx=Math.max(.8,Math.min(1.9,ms.chw/.19)),sz=Math.max(.8,Math.min(1.9,ms.chd/.14)),Y=y=>y-ms.top;
+      const shell=cap(.19,.34,cm);shell.scale.set(1.2*sx,1,.88*sz);shell.position.y=Y(ms.top-.75);coat.add(shell);
+      const pts=[[.2,1.25],[.235,1.08],[.255,.95],[.29,.75],[.33,.52],[.335,.48]].map(([r,y])=>new T.Vector2(r,y));
+      const skirt=new T.Mesh(new T.LatheGeometry(pts,32),cm);skirt.material.side=T.DoubleSide;skirt.scale.set(1.08*sx,1,.86*sz);skirt.position.y=Y(0)+(ms.top-2.05);coat.add(skirt);
+      const belt=new T.Mesh(new T.TorusGeometry(.24,.022,8,32),dk);belt.rotation.x=Math.PI/2;belt.scale.set(1.08*sx,.86*sz,1);belt.position.y=Y(1.08+(ms.top-2.05));coat.add(belt);
+      const buck=new T.Mesh(new T.BoxGeometry(.07,.05,.02),C(0x9a8a6a));buck.position.set(0,Y(1.08+(ms.top-2.05)),.21*sz);coat.add(buck);
+      [-1,1].forEach(sd=>{const lap=new T.Mesh(new T.BoxGeometry(.09,.2,.02),dk);lap.position.set(sd*.07*sx,Y(ms.top-.6),.155*sz);lap.rotation.set(-.15,0,sd*-.45);coat.add(lap)});
+      coat.position.set(ms.chest[0],ms.top,ms.chest[1]);coat.userData.slot="coat";out.push([coat,bone(/spine2|upperchest|chest|spine1|spine/i)])}
+    if(av.shoes==="boots"){const bm=C(col.shoes);ms.feet.forEach(([x,z],i)=>{const bt=new T.Group();const foot=new T.Mesh(new T.BoxGeometry(.18,.16,.31,2,2,2),bm);foot.position.set(0,.085,.04);
+      const toe=sph(.09,bm);toe.scale.set(1,.85,1);toe.position.set(0,.09,.17);const cuff=new T.Mesh(new T.CylinderGeometry(.105,.105,.07,16),bm);cuff.position.y=.19;bt.add(foot,toe,cuff);
+      bt.position.set(x,0,z);bt.userData.slot="boot"+i;out.push([bt,bone(i?/right.?foot|foot.?r\b|r.?foot/i:/left.?foot|foot.?l\b|l.?foot/i)])})}
+    return out}
   function fromModel(md,stage){const o=md.obj;if(!md.fit){o.updateMatrixWorld(true);o.traverse(m=>{if(m.isSkinnedMesh)m.skeleton.update()});const b=new T.Box3().setFromObject(o,true),sz=b.getSize(new T.Vector3());const k=2.05/Math.max(sz.y,1e-6);o.scale.multiplyScalar(k);o.updateMatrixWorld(true);
       const b2=new T.Box3().setFromObject(o,true),c=b2.getCenter(new T.Vector3());o.position.x-=c.x;o.position.z-=c.z;o.position.y-=b2.min.y;md.fit=true;
+      md.ms=measure(o);
       if(md.clips&&md.clips.length){md.mixer=new T.AnimationMixer(o);const cl=md.clips.find(c=>/idle/i.test(c.name))||md.clips[0];md.mixer.clipAction(cl).play()}}
     const hb=holoMat(false,MVS),sh=shadowMat(MVS);
     o.traverse(m=>{if((m.isLine||m.isPoints)&&!m.isMesh){m.visible=false;return}if(!m.isMesh)return;if(!m.userData.orig)m.userData.orig=m.material;m.frustumCulled=false;
       if(!m.userData.flat){const om=m.userData.orig;m.userData.flat=Array.isArray(om)?om.map(x=>toon(flatColor(x,m,md.mtl))):toon(flatColor(om,m,md.mtl))}
       m.material=stage==="real"?m.userData.flat:stage==="holo"?hb:sh});
-    const g=new T.Group();g.add(o);mixer=md.mixer||null;return {g,torso:null,arms:[],head:null}}
+    const g=new T.Group();g.add(o);mixer=md.mixer||null;
+    (md.worn||[]).forEach(c=>c.parent&&c.parent.remove(c));md.worn=[];
+    if(!md.ms){o.updateMatrixWorld(true);md.ms=measure(o)}
+    g.updateMatrixWorld(true);md.local=md.local||{};modelClothes(md.av||{},stage,md.ms,o).forEach(([c,b],i)=>{const key=(c.userData.slot||i)+"";
+      if(b&&md.local[key]){b.add(c);md.local[key].decompose(c.position,c.quaternion,c.scale)}else{g.add(c);c.updateMatrixWorld(true);if(b){b.attach(c);md.local[key]=c.matrix.clone()}}md.worn.push(c)});
+    return {g,torso:null,arms:[],head:null}}
   let mixer=null,lastT=0;
-  function set(av,stage,md){const k=JSON.stringify(av)+stage+(md?md.key:"");if(k===figKey)return;figKey=k;
+  function set(av,stage,md){const k=JSON.stringify(av)+stage+(md?md.key:"");if(k===figKey)return;figKey=k;if(md)md.av=av;
     root.clear();parts=md?fromModel(md,stage):build(av,stage);if(!md)mixer=null;fig=parts.g;root.add(fig);base=makeBase(stage);scene.add(base);
     scene.children.filter(o=>o.userData.isBase&&o!==base).forEach(o=>scene.remove(o));base.userData.isBase=true;
     if(smoke){scene.remove(smoke);smoke=null}if(stage==="shadow"){smoke=makeSmoke();scene.add(smoke)}
@@ -2125,7 +2167,7 @@ function vPass(){
   const pn=id=>(P.find(p=>p.id===id)||{name:"Removed"}).name;
   const fk=(data.profile&&data.profile.figure)||"woman";
   return banner()+`<div class="passtop">
-    <div class="panel holopanel"><div class="ph"><span>Your hologram</span><span class="sexsw" role="group" aria-label="Hologram body">${[["woman","♀","Woman"],["man","♂","Man"],["neither",`<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="12" r="5"/><path d="M14.5 8.5 L19 4 M15 4 h4 v4"/><path d="M11 17 v5 M8.5 19.5 h5"/></svg>`,"Neither"]].map(([k,sym,l])=>`<button data-sex="${k}" aria-pressed="${avatarOf().body===k}" aria-label="${l}" title="${l}">${sym}</button>`).join("")}</span></div>${holoView()}<div class="avfoot">${avEdit?avEditor():""}<button class="avbtn${avEdit?" on":""}" data-avedit aria-expanded="${avEdit}">${avEdit?`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"/></svg>Done`:`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6a2 2 0 1 1 2 2c-1 0-2 .7-2 1.7V11"/><path d="M12 11L3 17.5c-.8.6-.4 1.5.5 1.5h17c.9 0 1.3-.9.5-1.5z"/></svg>Customize outfit`}</button></div></div>
+    <div class="panel holopanel"><div class="ph"><span>Your hologram</span>${avatarOf().useModel&&avatarOf().model?"":`<span class="sexsw" role="group" aria-label="Hologram body">${[["woman","♀","Woman"],["man","♂","Man"],["neither",`<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="12" r="5"/><path d="M14.5 8.5 L19 4 M15 4 h4 v4"/><path d="M11 17 v5 M8.5 19.5 h5"/></svg>`,"Neither"]].map(([k,sym,l])=>`<button data-sex="${k}" aria-pressed="${avatarOf().body===k}" aria-label="${l}" title="${l}">${sym}</button>`).join("")}</span>`}</div>${holoView()}<div class="avfoot">${avEdit?avEditor():""}<button class="avbtn${avEdit?" on":""}" data-avedit aria-expanded="${avEdit}">${avEdit?`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"/></svg>Done`:`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6a2 2 0 1 1 2 2c-1 0-2 .7-2 1.7V11"/><path d="M12 11L3 17.5c-.8.6-.4 1.5.5 1.5h17c.9 0 1.3-.9.5-1.5z"/></svg>Customize outfit`}</button></div></div>
     <div class="stack" style="grid-template-rows:auto 1fr;align-content:stretch">${commitPanel(d,P,wk)}${passList(d,P,wk)}</div>
   </div>
   ${passDetail(d)}
