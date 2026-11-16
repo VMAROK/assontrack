@@ -1,5 +1,5 @@
 // Offline support: the app opens without a connection; data syncs when back online.
-const VERSION = "aot-v20";
+const VERSION = "aot-v21";
 const LIB = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4";
 const SHELL = ["./", "./index.html", "./config.js", "./ramsau.jpg", "./manifest.webmanifest",
   "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", LIB];
@@ -22,7 +22,7 @@ self.addEventListener("fetch", e => {
   }
   if (url.origin !== location.origin) return;
   // wallpapers never change under the same name: keep them on the device so switching is instant
-  if (/\/wp\/|ramsau\.jpg$/.test(url.pathname)) {
+  if (/\/wp\/|\/lib\/|ramsau\.jpg$/.test(url.pathname)) {
     e.respondWith(caches.open("aot-img").then(c => c.match(req).then(hit => hit || fetch(req).then(res => { if (res.ok) c.put(req, res.clone()); return res; }))));
     return;
   }

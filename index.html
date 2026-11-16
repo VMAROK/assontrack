@@ -211,6 +211,13 @@ aside{background:rgba(5,10,26,.82)!important;backdrop-filter:blur(10px);-webkit-
 .holo{width:100%;max-width:260px;height:auto;margin:auto;display:block;overflow:visible}
 .holo{transform-origin:50% 50%;touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;will-change:transform}.holo.grab{cursor:grabbing}
 .holopanel{align-self:start}
+.holo3d{width:100%;max-width:260px;aspect-ratio:300/470;margin:0 auto;position:relative}.holo3d canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hstage{display:flex;justify-content:center;margin:10px auto 0;border:1px solid rgba(var(--lr),.25);border-radius:8px;overflow:hidden;width:max-content}
+.hstage button{font:inherit;font-size:12px;font-weight:600;color:var(--muted);background:none;border:0;border-left:1px solid rgba(var(--lr),.18);padding:6px 11px;cursor:pointer;position:relative}.hstage button:first-child{border-left:0}
+.hstage button.is::after{content:"";position:absolute;left:50%;bottom:3px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:currentColor}
+.hstage button[aria-pressed="true"]{color:#fff;background:rgba(var(--tL),.16)}
+.hstage button[data-hstage="shadow"][aria-pressed="true"]{color:#ff6b8a;background:rgba(155,29,74,.25)}.hstage button[data-hstage="real"][aria-pressed="true"]{color:#58f0a8;background:rgba(88,240,168,.14)}
+.hcap{margin:8px 0 0;text-align:center;font-size:12.5px;color:var(--muted);line-height:1.4}
 .holo-fig{animation:hfloat 5s ease-in-out infinite,hflick 7s steps(1) infinite}
 .holo-bar{animation:hscan 3.2s linear infinite}
 .holo-ring{transform-origin:100px 378px;animation:hpulse 2.8s ease-out infinite}
@@ -1461,6 +1468,129 @@ let avEdit=false,avCat="hat";
 function avEditor(){const a=avatarOf(),cats=[["hat","Hat"],["top","Top"],["shoes","Shoes"]];
   return `<div class="aved"><div class="avcats">${cats.map(([k,l])=>`<button class="avcat" data-avcat="${k}" aria-pressed="${avCat===k}">${l}</button>`).join("")}</div>
     <div class="avopts">${AV_ITEMS[avCat].map(([v,l])=>`<button class="fchip" data-avset="${avCat}:${v}" aria-pressed="${a[avCat]===v}">${l}</button>`).join("")}</div></div>`}
+/* ---------- 3D hologram (three.js) ---------- */
+function h3Init(T){
+  const canvas=document.createElement("canvas");canvas.className="h3c";
+  let ren;try{ren=new T.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:"low-power",preserveDrawingBuffer:true})}catch(_){return null}
+  ren.setPixelRatio(Math.min(devicePixelRatio||1,2));ren.setClearColor(0x000000,0);
+  const scene=new T.Scene(),cam=new T.PerspectiveCamera(28,.6,.1,50);cam.position.set(0,1.12,5.6);cam.lookAt(0,1.02,0);
+  const U={t:{value:0},flick:{value:1}};
+  // lights for the living figure
+  const hemi=new T.HemisphereLight(0xcfe6ff,0x1a1730,2.2),key=new T.DirectionalLight(0xffffff,2.6),rim=new T.DirectionalLight(0x6fd6ff,2.4),fill=new T.DirectionalLight(0xffc9a0,.7);
+  key.position.set(2.2,3.2,3.4);rim.position.set(-2.6,2.2,-3);fill.position.set(-3,1,2);scene.add(hemi,key,rim,fill);
+  const grad=new T.DataTexture(new Uint8Array([70,70,70,255,160,160,160,255,255,255,255,255]),3,1,T.RGBAFormat);grad.minFilter=grad.magFilter=T.NearestFilter;grad.needsUpdate=true;
+  const toon=(c,o={})=>new T.MeshToonMaterial(Object.assign({color:c,gradientMap:grad},o));
+  const VS=`uniform float t;varying vec3 vN;varying vec3 vV;varying float vY;uniform float wob;
+    void main(){vec3 p=position+normal*wob*sin(position.y*14.+t*3.)*.012;vec4 w=modelMatrix*vec4(p,1.);vY=w.y;vN=normalize(mat3(modelMatrix)*normal);vV=normalize(cameraPosition-w.xyz);gl_Position=projectionMatrix*viewMatrix*w;}`;
+  const holoMat=(dark)=>new T.ShaderMaterial({uniforms:{t:U.t,flick:U.flick,wob:{value:0},dark:{value:dark?1:0}},vertexShader:VS,transparent:true,depthWrite:false,blending:T.AdditiveBlending,side:T.DoubleSide,
+    fragmentShader:`uniform float t,flick,dark;varying vec3 vN;varying vec3 vV;varying float vY;
+    void main(){float f=pow(1.-abs(dot(normalize(vN),normalize(vV))),2.2);float scan=.55+.45*step(.5,fract(vY*55.-t*1.6));float bar=smoothstep(.0,.08,.08-abs(fract(vY*.35-t*.22)-.5)*.16);
+    vec3 c=mix(vec3(.18,.62,1.),vec3(.75,.95,1.),f);float a=(dark>.5?.07:.16)+f*(dark>.5?.55:.85);a*=scan;a+=bar*.25;gl_FragColor=vec4(c,clamp(a*flick,0.,1.));}`});
+  const shadowMat=()=>new T.ShaderMaterial({uniforms:{t:U.t,wob:{value:1}},vertexShader:VS,transparent:true,
+    fragmentShader:`uniform float t;varying vec3 vN;varying vec3 vV;varying float vY;
+    void main(){float f=pow(1.-abs(dot(normalize(vN),normalize(vV))),2.);float n=.5+.5*sin(vY*30.+t*2.);vec3 c=mix(vec3(.01,.0,.02),vec3(.45,.05,.22),f*(.6+.4*n));gl_FragColor=vec4(c,.94);}`});
+  // soft sprite for glow and smoke
+  const spr=(()=>{const c=document.createElement("canvas");c.width=c.height=64;const x=c.getContext("2d"),g=x.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,"rgba(255,255,255,1)");g.addColorStop(.4,"rgba(255,255,255,.35)");g.addColorStop(1,"rgba(255,255,255,0)");x.fillStyle=g;x.fillRect(0,0,64,64);const tx=new T.CanvasTexture(c);return tx})();
+  let fig=null,figKey="",parts=null,smoke=null,base=null;
+  const cap=(r,l,m)=>new T.Mesh(new T.CapsuleGeometry(r,l,6,16),m);
+  const sph=(r,m,ws=20,hs=14)=>new T.Mesh(new T.SphereGeometry(r,ws,hs),m);
+  function build(av,stage){
+    const g=new T.Group(),real=stage==="real",holo=stage==="holo",shadow=stage==="shadow",body=av.body;
+    const man=body==="man",woman=body==="woman";
+    const sh=shadow?shadowMat():null,hb=holo?holoMat(false):null,hd=holo?holoMat(true):null;
+    const M=(c,dark)=>real?toon(c):holo?(dark?hd:hb):sh;
+    const SKIN=0xd8a07a,HAIR=woman?0x3a2418:0x22160f,COAT=0x1b1d24,FELT=0x141519,BOOT=0x121212,PANTS=0x2a3550,TEE=0x3c4f6e;
+    const trench=av.top==="trench",fed=av.hat==="fedora",boots=av.shoes==="boots";
+    const skin=M(SKIN),coat=M(COAT,true),pants=M(PANTS,true),tee=M(TEE),hair=M(HAIR,true);
+    const sw=man?1.32:woman?1.05:1.16,hipW=woman?1.28:man?1.08:1.15,lx=woman?.095:.105;
+    // legs
+    [-1,1].forEach(s=>{const leg=cap(.085,.62,pants);leg.position.set(s*lx,.56,0);g.add(leg);
+      const foot=boots?new T.Mesh(new T.BoxGeometry(.17,.15,.3,2,2,2),M(BOOT,true)):sph(.075,skin);
+      if(boots){foot.position.set(s*lx,.085,.04);const toe=sph(.085,M(BOOT,true));toe.scale.set(1,.85,1);toe.position.set(s*lx,.09,.17);g.add(toe);const cuff=new T.Mesh(new T.CylinderGeometry(.1,.1,.06,16),M(BOOT,true));cuff.position.set(s*lx,.18,0);g.add(cuff)}else{foot.scale.set(1,.5,1.6);foot.position.set(s*lx,.04,.05)}
+      g.add(foot)});
+    const hips=sph(.17,pants);hips.scale.set(hipW,.72,.85);hips.position.y=.98;g.add(hips);
+    // torso
+    const torso=new T.Group();torso.position.y=1.3;g.add(torso);
+    const chest=cap(.17,.34,trench?coat:tee);chest.scale.set(sw,1,.78);torso.add(chest);
+    if(woman){const w=sph(.15,trench?coat:tee);w.scale.set(1.15,.9,.8);w.position.y=-.16;torso.add(w)}
+    const neck=new T.Mesh(new T.CylinderGeometry(.055,.06,.14,14),skin);neck.position.y=1.62;g.add(neck);
+    // arms
+    const arms=[];[-1,1].forEach(s=>{const a=new T.Group();a.position.set(s*(.205*sw),1.53,0);a.rotation.z=s*.1;g.add(a);
+      const up=cap(.062,.22,trench?coat:tee);up.position.y=-.16;a.add(up);
+      const fo=cap(.056,.22,trench?coat:skin);fo.position.y=-.44;a.add(fo);
+      const hand=sph(.062,skin);hand.scale.set(.9,1.15,.8);hand.position.y=-.62;a.add(hand);arms.push(a)});
+    // trench coat skirt, belt, lapels, buttons
+    if(trench){const pts=[[.2,1.25],[.235,1.08],[.255,.95],[.29,.75],[.33,.52],[.335,.48]].map(([r,y])=>new T.Vector2(r,y));
+      const skirt=new T.Mesh(new T.LatheGeometry(pts,28),coat);skirt.scale.set(sw*.92,1,.78);g.add(skirt);
+      const belt=new T.Mesh(new T.TorusGeometry(.232,.022,8,32),M(0x0d0e12,true));belt.rotation.x=Math.PI/2;belt.scale.set(sw*.92,.78,1);belt.position.y=1.08;g.add(belt);
+      if(real){const buck=new T.Mesh(new T.BoxGeometry(.07,.05,.02),toon(0x9a8a6a));buck.position.set(0,1.08,.19);g.add(buck);
+        [[-.06,1.38],[.06,1.38],[-.06,1.24],[.06,1.24],[-.07,.92],[.07,.92]].forEach(([x,y])=>{const b=sph(.014,toon(0x555a66),8,6);b.position.set(x,y,y>1?.135:.2);g.add(b)});
+        [-1,1].forEach(s=>{const lap=new T.Mesh(new T.BoxGeometry(.09,.2,.02),toon(0x23262e));lap.position.set(s*.07,1.45,.125);lap.rotation.set(-.15,0,s*-.45);g.add(lap)})}}
+    // head
+    const head=new T.Group();head.position.y=1.84;g.add(head);
+    const skull=sph(.2,skin,28,20);skull.scale.set(.94,1.06,.98);head.add(skull);
+    [-1,1].forEach(s=>{const ear=sph(.042,skin,10,8);ear.scale.set(.5,1,.8);ear.position.set(s*.188,0,0);head.add(ear)});
+    if(real){const W=toon(0xffffff),P=toon(0x1f2b3d);
+      [-1,1].forEach(s=>{const e=sph(.036,W,14,10);e.scale.set(1,1.15,.5);e.position.set(s*.07,.015,.172);head.add(e);
+        const p=sph(.02,P,10,8);p.position.set(s*.07,.012,.19);head.add(p);
+        const hl=sph(.006,toon(0xffffff),6,4);hl.position.set(s*.07+.008,.022,.198);head.add(hl);
+        const br=new T.Mesh(new T.BoxGeometry(.075,.016,.02),toon(HAIR));br.position.set(s*.072,.075,.18);br.rotation.z=s*-.12;head.add(br)});
+      const nose=sph(.024,skin,10,8);nose.scale.set(.8,1,1);nose.position.set(0,-.025,.2);head.add(nose);
+      const mouth=new T.Mesh(new T.TorusGeometry(.04,.009,6,16,Math.PI),toon(0x8f3a3a));mouth.rotation.z=Math.PI;mouth.position.set(0,-.085,.178);head.add(mouth);
+      if(woman){[-1,1].forEach(s=>{const l=new T.Mesh(new T.BoxGeometry(.03,.006,.01),toon(0x1a1a1a));l.position.set(s*.098,.04,.168);l.rotation.z=s*.5;head.add(l)})}}
+    // hair
+    if(!shadow||true){const capG=new T.SphereGeometry(.212,28,16,0,Math.PI*2,0,Math.PI*.52);const hc=new T.Mesh(capG,hair);hc.position.set(0,.01,-.012);hc.rotation.x=-.18;head.add(hc);
+      if(woman){const back=cap(.16,.3,hair);back.scale.set(1.2,1,.6);back.position.set(0,-.2,-.1);head.add(back);
+        [-1,1].forEach(s=>{const side=cap(.05,.26,hair);side.position.set(s*.17,-.13,.03);head.add(side)})}
+      else if(!man){const sw2=cap(.07,.12,hair);sw2.rotation.z=1.2;sw2.position.set(.08,.16,.1);head.add(sw2)}}
+    if(fed){const felt=M(FELT,true);const crown=new T.Mesh(new T.CylinderGeometry(.155,.19,.16,28),felt);crown.position.y=.205;head.add(crown);
+      const dent=new T.Mesh(new T.BoxGeometry(.04,.03,.24),felt);dent.position.y=.29;head.add(dent);
+      const brim=new T.Mesh(new T.CylinderGeometry(.34,.34,.02,36),felt);brim.scale.z=.88;brim.position.y=.135;brim.rotation.x=-.06;head.add(brim);
+      const band=new T.Mesh(new T.CylinderGeometry(.188,.191,.04,28),M(0x5a1b25,true));band.position.y=.16;head.add(band)}
+    if(shadow){g.traverse(o=>{if(o.isMesh)o.material=sh})}
+    return {g,torso,arms,head}}
+  function makeBase(stage){const grp=new T.Group(),col=stage==="shadow"?0x9b1d4a:stage==="real"?0x58f0a8:0x4cc9ff;
+    const ring=new T.Mesh(new T.TorusGeometry(.5,.012,8,64),new T.MeshBasicMaterial({color:col,transparent:true,opacity:.9}));ring.rotation.x=Math.PI/2;ring.position.y=.005;
+    const ring2=new T.Mesh(new T.TorusGeometry(.62,.006,8,64),new T.MeshBasicMaterial({color:col,transparent:true,opacity:.45}));ring2.rotation.x=Math.PI/2;
+    const glow=new T.Mesh(new T.PlaneGeometry(1.8,1.8),new T.MeshBasicMaterial({map:spr,color:col,transparent:true,opacity:.55,depthWrite:false,blending:T.AdditiveBlending}));glow.rotation.x=-Math.PI/2;glow.position.y=.002;
+    grp.add(glow,ring,ring2);
+    if(stage!=="real"){const beam=new T.Mesh(new T.CylinderGeometry(.28,.5,2.3,32,1,true),new T.ShaderMaterial({uniforms:{c:{value:new T.Color(col)}},transparent:true,depthWrite:false,blending:T.AdditiveBlending,side:T.DoubleSide,
+      vertexShader:`varying float y;void main(){y=uv.y;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:`uniform vec3 c;varying float y;void main(){gl_FragColor=vec4(c,(1.-y)*.16);}`}));beam.position.y=1.15;grp.add(beam)}
+    return grp}
+  function makeSmoke(){const N=140,pos=new Float32Array(N*3),seed=new Float32Array(N);for(let i=0;i<N;i++){seed[i]=Math.random();pos[i*3]=(Math.random()-.5)*.8;pos[i*3+1]=Math.random()*2.2;pos[i*3+2]=(Math.random()-.5)*.5}
+    const geo=new T.BufferGeometry();geo.setAttribute("position",new T.BufferAttribute(pos,3));
+    const pts=new T.Points(geo,new T.PointsMaterial({map:spr,color:0x5a1640,size:.32,transparent:true,opacity:.5,depthWrite:false,blending:T.AdditiveBlending}));pts.userData.seed=seed;return pts}
+  const root=new T.Group();scene.add(root);
+  function set(av,stage){const k=JSON.stringify(av)+stage;if(k===figKey)return;figKey=k;
+    root.clear();parts=build(av,stage);fig=parts.g;root.add(fig);base=makeBase(stage);scene.add(base);
+    scene.children.filter(o=>o.userData.isBase&&o!==base).forEach(o=>scene.remove(o));base.userData.isBase=true;
+    if(smoke){scene.remove(smoke);smoke=null}if(stage==="shadow"){smoke=makeSmoke();scene.add(smoke)}
+    [hemi,key,rim,fill].forEach(l=>l.visible=stage==="real");cur=stage}
+  let cur="holo",raf=0,last=0,host=null,t0=performance.now();
+  function size(){if(!host)return;const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;if(canvas.width!==Math.round(w*ren.getPixelRatio())||canvas.height!==Math.round(h*ren.getPixelRatio())){ren.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}}
+  function frame(now){raf=requestAnimationFrame(frame);if(!host||!host.isConnected){stop();return}if(now-last<24)return;last=now;size();
+    const t=(now-t0)/1000;U.t.value=t;U.flick.value=cur==="holo"?(Math.random()<.03?.55:1):1;
+    if(fig){fig.rotation.y=(typeof holoRot==="number"?holoRot:0)*Math.PI/180;fig.position.y=cur==="holo"?Math.sin(t*1.3)*.035:cur==="shadow"?Math.sin(t*.8)*.02:0;
+      parts.torso.scale.set(1,1+Math.sin(t*1.6)*.012,1+Math.sin(t*1.6)*.02);parts.arms.forEach((a,i)=>{a.rotation.z=(i?1:-1)*(.1+Math.sin(t*1.6)*.015);a.rotation.x=Math.sin(t*.9+i)*.03});
+      parts.head.rotation.y=Math.sin(t*.45)*.08;parts.head.rotation.x=Math.sin(t*.7)*.02}
+    if(smoke){const p=smoke.geometry.attributes.position,s=smoke.userData.seed;for(let i=0;i<s.length;i++){let y=p.getY(i)+.004+s[i]*.006;if(y>2.4)y=0;p.setY(i,y);p.setX(i,p.getX(i)+Math.sin(t+s[i]*20)*.0015)}p.needsUpdate=true;smoke.rotation.y=fig?fig.rotation.y:0}
+    ren.render(scene,cam)}
+  function start(){if(!raf){last=0;raf=requestAnimationFrame(frame)}}
+  function stop(){cancelAnimationFrame(raf);raf=0}
+  return {canvas,set,start,stop,mount(el){host=el;if(canvas.parentNode!==el)el.appendChild(canvas);size();start()},renderNow(){size();last=0;frame(performance.now());cancelAnimationFrame(raf);raf=0}}}
+
+let H3=null,h3Load=null,h3Fail=false,holoPreview=null,holoPrevTimer=0;
+function h3Ensure(){if(h3Load||h3Fail)return;h3Load=import("./lib/three-r160.module.js").then(T=>{H3=h3Init(T);if(!H3)h3Fail=true;if(tab==="pass")render()}).catch(()=>{h3Fail=true})}
+function commitScore(){const d=D(),P=d.passions,W={Priority:3,Moderate:2,Bonus:1};let sw=0,ss=0;
+  P.forEach(p=>{const sc0=schedStats(d,p),tk=taskStats(p),dn=sc0.done+tk.done,ms=sc0.missed+tk.missed,gm=(p.goal||0)*60,tot=d.sessions.filter(s=>s.pid===p.id&&!s.planned).reduce((a,s)=>a+(+s.mins||0),0);
+    const pct=dn+ms>0?dn/(dn+ms):(gm?tot/gm:null);if(pct==null)return;const w=W[p.lvl]||2;sw+=w;ss+=w*Math.min(pct,1)});return sw?Math.round(ss/sw*100):null}
+const realStage=()=>{const s=commitScore();return s==null?"holo":s>=65?"real":s>=40?"holo":"shadow"};
+const holoStage=()=>holoPreview||realStage();
+const HSTAGE={shadow:["Shadow","Below 40%. Get back on track to bring your figure back."],holo:["Hologram","Reach 65% to bring your figure to life."],real:["Alive","On track. Your figure is alive."]};
+function holoView(){const a=avatarOf(),st=holoStage(),rs=realStage();
+  const fig=H3?`<div class="holo holo3d" data-h3 role="img" aria-label="${HSTAGE[st][0]} figure. Drag to spin."></div>`:(h3Ensure(),hologram(a));
+  return fig+`<div class="hstage" role="group" aria-label="Figure stages">${["shadow","holo","real"].map(k=>`<button data-hstage="${k}" aria-pressed="${st===k}" class="${rs===k?"is":""}" title="${rs===k?"Your current stage":"Preview"}">${HSTAGE[k][0]}</button>`).join("")}</div><p class="hcap">${holoPreview&&holoPreview!==rs?"Preview. Yours is "+HSTAGE[rs][0]+".":HSTAGE[st][1]}</p>`}
+function holoMount(){const el=document.querySelector("[data-h3]");if(el&&H3){H3.set(avatarOf(),holoStage());H3.mount(el)}else if(H3)H3.stop()}
 function hologram(a){
   const A=typeof a==="string"?Object.assign({},AV_DEF,{body:a}):Object.assign({},AV_DEF,a||{});
   const K=A.body||"woman",M=K==="man",N=K==="neither";
@@ -1536,11 +1666,11 @@ let addingP=false;
 const LVR={Priority:0,Moderate:1,Bonus:2};
 const sortPass=P=>P.map((p,i)=>[p,i]).sort((a,b)=>((LVR[a[0].lvl]??3)-(LVR[b[0].lvl]??3))||((a[0].order??a[1])-(b[0].order??b[1]))).map(x=>x[0]);
 let holoRot=0,holoV=0,holoDrag=null,holoRAF=0;
-function holoApply(){const h=document.querySelector(".holo");if(h)h.style.transform=`perspective(900px) rotateY(${holoRot.toFixed(2)}deg)`}
+function holoApply(){const h=document.querySelector(".holo");if(h&&!h.classList.contains("holo3d"))h.style.transform=`perspective(900px) rotateY(${holoRot.toFixed(2)}deg)`}
 function holoTick(now){holoRAF=0;let more=true;
   if(holoDrag){if(!holoDrag.moved&&now-holoDrag.t0>280)holoRot+=Math.min(4.5,(now-holoDrag.t0-280)/120)}
   else if(Math.abs(holoV)>.06){holoRot+=holoV;holoV*=.94}
-  else{holoV=0;const tgt=Math.round(holoRot/180)*180,d=tgt-holoRot;if(Math.abs(d)<.15){holoRot=((tgt%360)+360)%360;more=false}else holoRot+=d*.07}
+  else{holoV=0;const per=document.querySelector(".holo3d")?360:180,tgt=Math.round(holoRot/per)*per,d=tgt-holoRot;if(Math.abs(d)<.15){holoRot=((tgt%360)+360)%360;more=false}else holoRot+=d*.07}
   holoApply();if(more)holoRAF=requestAnimationFrame(holoTick)}
 const holoGo=()=>{if(!holoRAF)holoRAF=requestAnimationFrame(holoTick)};
 document.addEventListener("pointerdown",e=>{const h=e.target.closest&&e.target.closest(".holo");if(!h)return;holoDrag={x0:e.clientX,x:e.clientX,t0:performance.now(),moved:false,id:e.pointerId};holoV=0;h.classList.add("grab");try{h.setPointerCapture(e.pointerId)}catch(_){}holoGo()});
@@ -1884,7 +2014,7 @@ function vPass(){
   const pn=id=>(P.find(p=>p.id===id)||{name:"Removed"}).name;
   const fk=(data.profile&&data.profile.figure)||"woman";
   return banner()+`<div class="passtop">
-    <div class="panel holopanel"><div class="ph"><span>Your hologram</span><span class="sexsw" role="group" aria-label="Hologram body">${[["woman","♀","Woman"],["man","♂","Man"],["neither",`<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="12" r="5"/><path d="M14.5 8.5 L19 4 M15 4 h4 v4"/><path d="M11 17 v5 M8.5 19.5 h5"/></svg>`,"Neither"]].map(([k,sym,l])=>`<button data-sex="${k}" aria-pressed="${avatarOf().body===k}" aria-label="${l}" title="${l}">${sym}</button>`).join("")}</span></div>${hologram(avatarOf())}<div class="avfoot">${avEdit?avEditor():""}<button class="avbtn${avEdit?" on":""}" data-avedit aria-expanded="${avEdit}">${avEdit?`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"/></svg>Done`:`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6a2 2 0 1 1 2 2c-1 0-2 .7-2 1.7V11"/><path d="M12 11L3 17.5c-.8.6-.4 1.5.5 1.5h17c.9 0 1.3-.9.5-1.5z"/></svg>Customize outfit`}</button></div></div>
+    <div class="panel holopanel"><div class="ph"><span>Your hologram</span><span class="sexsw" role="group" aria-label="Hologram body">${[["woman","♀","Woman"],["man","♂","Man"],["neither",`<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="12" r="5"/><path d="M14.5 8.5 L19 4 M15 4 h4 v4"/><path d="M11 17 v5 M8.5 19.5 h5"/></svg>`,"Neither"]].map(([k,sym,l])=>`<button data-sex="${k}" aria-pressed="${avatarOf().body===k}" aria-label="${l}" title="${l}">${sym}</button>`).join("")}</span></div>${holoView()}<div class="avfoot">${avEdit?avEditor():""}<button class="avbtn${avEdit?" on":""}" data-avedit aria-expanded="${avEdit}">${avEdit?`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"/></svg>Done`:`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6a2 2 0 1 1 2 2c-1 0-2 .7-2 1.7V11"/><path d="M12 11L3 17.5c-.8.6-.4 1.5.5 1.5h17c.9 0 1.3-.9.5-1.5z"/></svg>Customize outfit`}</button></div></div>
     <div class="stack" style="grid-template-rows:auto 1fr;align-content:stretch">${commitPanel(d,P,wk)}${passList(d,P,wk)}</div>
   </div>
   ${passDetail(d)}
@@ -2038,7 +2168,7 @@ function render(){
   v.scrollTop=y;
   $("#ttl").innerHTML=`${TITLES[tab][0]}<small>${TITLES[tab][1]}</small>`;
   document.querySelectorAll(".navbtn").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab));
-  placeBranch();applyWall();applyLook();preloadWalls();
+  placeBranch();applyWall();applyLook();preloadWalls();holoMount();
 }
 function placeBranch(){const br=document.querySelector(".tkf-branch"),ch=document.querySelector(".tk-top-band .tkfilter .fchip.open");if(!br||!ch)return;const c=ch.getBoundingClientRect(),b=br.getBoundingClientRect();br.style.setProperty("--cx",Math.round(c.left+c.width/2-b.left)+"px");br.style.setProperty("--up",Math.round(b.top-c.bottom)+"px")}
 addEventListener("resize",()=>placeBranch());
@@ -2136,6 +2266,7 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
   else if(b.dataset.mv){const[id,k]=b.dataset.mv.split(":");const x=(data.projects||[]).find(q=>q.id===id);if(x){const i=STAT.findIndex(s=>s[0]===x.status);x.status=STAT[Math.max(0,Math.min(2,i+ +k))][0];render();save();if(x.status==="done")toast("Project done")}}
   else if(b.hasAttribute("data-addp")){addingP=!addingP;render();if(addingP){const n=$("#pName");n&&n.focus()}}
   else if(b.dataset.sex){const a=avatarOf();a.body=b.dataset.sex;data.profile=Object.assign({},data.profile,{avatar:a,figure:a.body});render();save()}
+  else if(b.dataset.hstage){const k=b.dataset.hstage;clearTimeout(holoPrevTimer);holoPreview=k===realStage()?null:k;if(holoPreview)holoPrevTimer=setTimeout(()=>{holoPreview=null;if(tab==="pass")render()},6000);render()}
   else if(b.hasAttribute("data-avedit")){avEdit=!avEdit;render()}
   else if(b.dataset.avcat){avCat=b.dataset.avcat;render()}
   else if(b.dataset.avset){const[k,v]=b.dataset.avset.split(":");const a=avatarOf();a[k]=v;data.profile=Object.assign({},data.profile,{avatar:a,figure:a.body});render();save()}
