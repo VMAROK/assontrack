@@ -1044,7 +1044,7 @@ aside{background:rgba(var(--tD),calc(.82*var(--go)))!important;backdrop-filter:b
 .lines-sw{display:inline-flex}
 
 /* ===== standalone app ===== */
-#auth{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:max(24px,env(safe-area-inset-top)) 20px max(24px,env(safe-area-inset-bottom));background:radial-gradient(120% 80% at 50% 0%,rgba(30,80,170,.35),rgba(3,6,18,.96) 60%),#03060f;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overflow-y:auto}
+#auth{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:max(24px,env(safe-area-inset-top)) 20px max(24px,env(safe-area-inset-bottom));background:radial-gradient(120% 80% at 50% 0%,rgba(30,80,170,.35),rgba(3,6,18,.96) 60%),#03060f;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .auth-card{width:min(100%,380px);display:grid;gap:12px;padding:26px 22px 18px;border-radius:20px;border:1px solid rgba(76,170,255,.28);background:linear-gradient(180deg,rgba(22,52,120,.55),rgba(6,12,32,.9));box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 40px rgba(30,110,255,.12)}
 .auth-logo{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:4px}
 .auth-logo b{font-size:20px;font-weight:700}.auth-logo b span{color:var(--cyan)}
@@ -1181,8 +1181,8 @@ async function onSession(session){
   if(sbUser){if(recovering)showAuth("reset");else hideAuth();await pull()}else render();
 }
 const touchUI=()=>{try{return matchMedia("(pointer:coarse)").matches||navigator.maxTouchPoints>0}catch(e){return false}};
-function showAuth(mode){if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();const a=$("#auth");if(!a)return;a.hidden=false;a.dataset.mode=mode||"in";$("#authMsg").textContent="";paintAuth();if(!touchUI())setTimeout(()=>{const i=$("#authEmail");i&&i.focus()},50)}
-function hideAuth(){const a=$("#auth");if(a)a.hidden=true}
+function showAuth(mode){document.body.classList.add("authing");if(typeof pauseHeavy==="function")pauseHeavy(true);if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();const a=$("#auth");if(!a)return;a.hidden=false;a.dataset.mode=mode||"in";$("#authMsg").textContent="";paintAuth();if(!touchUI())setTimeout(()=>{const i=$("#authEmail");i&&i.focus()},50)}
+function hideAuth(){const a=$("#auth");if(a)a.hidden=true;document.body.classList.remove("authing");if(typeof pauseHeavy==="function")pauseHeavy(false)}
 function paintAuth(){const a=$("#auth"),m=a.dataset.mode,up=m==="up",fg=m==="forgot",rs=m==="reset";
   $("#authTitle").textContent=up?"Create your account":fg?"Reset your password":rs?"Choose a new password":"Welcome back";
   $("#authSub").textContent=up?"Your logs will sync between your phone and computer.":fg?"Enter your email and we'll send you a link to set a new password.":rs?"Type your new password twice, then you're back in.":"Sign in to sync your logs across your devices.";
@@ -1736,7 +1736,7 @@ function holoMount(){const el=document.querySelector("[data-h3]");if(!el||!H3){i
   const a=figAv(),m=a.useModel&&a.model;
   if(m){const k=mKey(m);if(mdl.key!==k)loadModel(m);if(mdl.key===k&&mdl.obj){mdl.mtl=m.mtl||null;H3.set(a,holoStage(),mdl);el.classList.remove("loading")}else{H3.set(a,holoStage());el.classList.toggle("loading",!mdl.fail)}}
   else{H3.set(a,holoStage());el.classList.remove("loading")}
-  H3.mount(el)}
+  H3.mount(el);if(heavyPaused)H3.stop()}
 function parseMtl(t){const out={};let cur=null;t.split(/\r?\n/).forEach(l=>{const a=l.trim().split(/\s+/);if(a[0]==="newmtl")cur=a.slice(1).join(" ");else if(a[0]==="Kd"&&cur)out[cur]=a.slice(1,4).map(Number)});return out}
 async function addModel(f,mtlFile){const ext=(f.name.split(".").pop()||"").toLowerCase();
   if(!MODEL_EXT.includes(ext)){toast("Use a .glb, .gltf, .fbx or .obj file");return}
@@ -2258,6 +2258,11 @@ let liveEng=null,liveRAF=0,liveKey=null,liveFail=false,liveLast=0;const liveT0=p
 function liveSize(){const c=$("#bglive");if(!c)return;const k=Math.min(devicePixelRatio||1,2)*.6;c.width=Math.round(innerWidth*k);c.height=Math.round(innerHeight*k)}
 function liveOn(key){const c=$("#bglive");if(!c||liveFail)return false;if(!liveEng){liveSize();liveEng=liveStart(c,key);if(!liveEng){liveFail=true;return false}addEventListener("resize",()=>{if(liveEng)liveSize()})}
   if(liveKey!==key){liveEng.setPal(key);liveKey=key}cancelAnimationFrame(liveRAF);const loop=now=>{liveRAF=requestAnimationFrame(loop);if(now-liveLast<32)return;liveLast=now;liveEng.draw((now-liveT0)/1000*1.4)};liveRAF=requestAnimationFrame(loop);c.classList.add("on");return true}
+/* while typing (and on the sign-in screen) pause the live wallpaper and the 3D figure, so the phone has room for its keyboard */
+let heavyPaused=false;const isField=el=>el&&el.matches&&el.matches("input:not([type=range]):not([type=file]):not([type=checkbox]):not([type=radio]),textarea,select");
+function pauseHeavy(on){if(on===heavyPaused)return;heavyPaused=on;if(on){cancelAnimationFrame(liveRAF);liveRAF=0;if(typeof H3!=="undefined"&&H3)H3.stop()}else{const c=$("#bglive");if(liveKey&&c&&c.classList.contains("on"))liveOn(liveKey);if(typeof holoMount==="function")holoMount()}}
+document.addEventListener("focusin",e=>{if(isField(e.target))pauseHeavy(true)});
+document.addEventListener("focusout",()=>{setTimeout(()=>{if(!isField(document.activeElement)&&!document.body.classList.contains("authing"))pauseHeavy(false)},150)});
 function liveOff(){const c=$("#bglive");if(c)c.classList.remove("on");const k=liveRAF;setTimeout(()=>{if(liveRAF===k)cancelAnimationFrame(k)},450)}
 let wallTok=0,bgFront=0;
 function applyWall(){const w=passWall()||wallOf(),spin=animOn()&&KALEI.has(w.id),key=w.id+(spin?"*":"");if(wallShown===key)return;wallShown=key;
