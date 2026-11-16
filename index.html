@@ -1738,6 +1738,7 @@ function vPass(){
 }
 const WALLS=[
   {id:"alpine",name:"Alpine",src:"ramsau.jpg",pos:"42% 55%",shade:.1},
+  {id:"moonlit",name:"Moonlit",src:"wp/moonlit.jpg",pos:"62% 40%",shade:0},
   {id:"fire",name:"Fire",src:"wp/fire.jpg",pos:"50% 50%",shade:0},
   {id:"aurora",name:"Aurora",src:"wp/aurora.jpg",pos:"50% 40%",shade:0},
   {id:"nebula",name:"Nebula",src:"wp/nebula.jpg",pos:"50% 50%",shade:0},
@@ -1770,19 +1771,19 @@ document.addEventListener("change",async e=>{const inp=e.target;if(!inp.dataset|
     if(inp.dataset.wallup==="passion"){const p=data.passions.find(x=>x.id===selP);if(p)p.wall=id;themeOpen=false}else data.profile=Object.assign({},data.profile,{wallpaper:id});
     render();save();toast("Your wallpaper is set")}catch(_){toast("Couldn't read that image. Try a JPG or PNG")}});
 /* ---------- box color + glass ---------- */
-const LOOKS=[{id:"blue",name:"Ocean blue",h:223,s:.69},{id:"violet",name:"Violet",h:268,s:.55},{id:"rose",name:"Rose",h:335,s:.6},{id:"ember",name:"Ember",h:16,s:.78},{id:"gold",name:"Gold",h:40,s:.72},{id:"forest",name:"Forest",h:152,s:.5},{id:"teal",name:"Teal",h:186,s:.65},{id:"graphite",name:"Graphite",h:220,s:.08}];
+const LOOKS=[{id:"blue",name:"Ocean blue",h:223,s:.69},{id:"violet",name:"Violet",h:268,s:.55},{id:"rose",name:"Rose",h:335,s:.6},{id:"ember",name:"Ember",h:16,s:.78},{id:"gold",name:"Gold",h:40,s:.72},{id:"forest",name:"Forest",h:152,s:.5},{id:"teal",name:"Teal",h:186,s:.65},{id:"graphite",name:"Graphite",h:220,s:.08},{id:"obsidian",name:"Obsidian",h:245,s:.18,l:.1}];
 const lookOf=()=>Object.assign({color:"blue",glass:35},(data.profile||{}).look||{});
 const hsl2rgb=(h,s,l)=>{s=Math.max(0,Math.min(1,s));const k=n=>(n+h/30)%12,a=s*Math.min(l,1-l),f=n=>l-a*Math.max(-1,Math.min(k(n)-3,9-k(n),1));return [f(0),f(8),f(4)].map(v=>Math.round(v*255)).join(",")};
 const wallColor=new Map();
 function sampleColor(src){if(wallColor.has(src))return Promise.resolve(wallColor.get(src));return new Promise(ok=>{const i=new Image();i.onload=()=>{try{const c=document.createElement("canvas");c.width=c.height=32;const x=c.getContext("2d");x.drawImage(i,0,0,32,32);const d=x.getImageData(0,0,32,32).data;let vx=0,vy=0,sw=0,ss=0;
   for(let j=0;j<d.length;j+=4){const r=d[j]/255,g=d[j+1]/255,b=d[j+2]/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,dl=mx-mn;if(!dl)continue;const s=dl/(1-Math.abs(2*l-1));let h=mx===r?((g-b)/dl)%6:mx===g?(b-r)/dl+2:(r-g)/dl+4;h=h*60;if(h<0)h+=360;const w=s*s*(l>.1&&l<.88?1:.15);vx+=Math.cos(h*Math.PI/180)*w;vy+=Math.sin(h*Math.PI/180)*w;sw+=w;ss+=s*w}
   let h=Math.atan2(vy,vx)*180/Math.PI;if(h<0)h+=360;const res=sw?{h,s:Math.max(.08,Math.min(.75,(ss/sw)*Math.min(1,Math.hypot(vx,vy)/sw*1.4)))}:{h:220,s:.08};wallColor.set(src,res);ok(res)}catch(_){ok({h:223,s:.69})}};i.onerror=()=>ok({h:223,s:.69});i.src=src})}
-function setTint(h,s){const r=document.documentElement.style;r.setProperty("--tA",hsl2rgb(h,Math.min(s,.75),.27));r.setProperty("--tD",hsl2rgb(h,s*.75,.075));r.setProperty("--tX",hsl2rgb(h,s*.8,.045));r.setProperty("--tL",hsl2rgb(h,Math.max(.35,Math.min(1,s*1.4)),.66));r.setProperty("--tB",hsl2rgb(h,Math.min(.65,s),.59))}
+function setTint(h,s,l=.27){const r=document.documentElement.style;r.setProperty("--tA",hsl2rgb(h,Math.min(s,.75),l));r.setProperty("--tD",hsl2rgb(h,s*.75,.075));r.setProperty("--tX",hsl2rgb(h,s*.8,.045));r.setProperty("--tL",hsl2rgb(h,Math.max(.35,Math.min(1,s*1.4)),.66));r.setProperty("--tB",hsl2rgb(h,Math.min(.65,s),.59))}
 function applyLook(tmpGlass){const L=lookOf(),g=(tmpGlass??L.glass)/100,r=document.documentElement.style;r.setProperty("--go",(1.35-g).toFixed(3));r.setProperty("--gb",(4+g*24).toFixed(1)+"px");
-  if(L.color==="auto"){const w=passWall()||wallOf();sampleColor(w.src).then(c=>{if(lookOf().color==="auto"&&(passWall()||wallOf()).src===w.src)setTint(c.h,c.s)})}else{const P=LOOKS.find(x=>x.id===L.color)||LOOKS[0];setTint(P.h,P.s)}}
+  if(L.color==="auto"){const w=passWall()||wallOf();sampleColor(w.src).then(c=>{if(lookOf().color==="auto"&&(passWall()||wallOf()).src===w.src)setTint(c.h,c.s)})}else{const P=LOOKS.find(x=>x.id===L.color)||LOOKS[0];setTint(P.h,P.s,P.l)}}
 function lookPanel(){const L=lookOf();return `<div class="panel" style="margin-top:18px"><div class="ph"><span>Boxes</span><i>${L.color==="auto"?"Matches wallpaper":esc((LOOKS.find(x=>x.id===L.color)||LOOKS[0]).name)}</i></div>
   <div class="lk-label">Color</div>
-  <div class="lk-row" role="radiogroup" aria-label="Box color"><button class="lk" role="radio" aria-checked="${L.color==="auto"}" data-look="auto" title="Match wallpaper"><span class="lk-sw auto"></span><span>Match<br>wallpaper</span></button>${LOOKS.map(x=>`<button class="lk" role="radio" aria-checked="${L.color===x.id}" data-look="${x.id}" title="${esc(x.name)}"><span class="lk-sw" style="background:hsl(${x.h} ${Math.round(x.s*100)}% 42%)"></span><span>${esc(x.name)}</span></button>`).join("")}</div>
+  <div class="lk-row" role="radiogroup" aria-label="Box color"><button class="lk" role="radio" aria-checked="${L.color==="auto"}" data-look="auto" title="Match wallpaper"><span class="lk-sw auto"></span><span>Match<br>wallpaper</span></button>${LOOKS.map(x=>`<button class="lk" role="radio" aria-checked="${L.color===x.id}" data-look="${x.id}" title="${esc(x.name)}"><span class="lk-sw" style="background:hsl(${x.h} ${Math.round(x.s*100)}% ${x.l?Math.round(x.l*100+4):42}%)"></span><span>${esc(x.name)}</span></button>`).join("")}</div>
   <div class="lk-label" style="margin-top:18px">Glass</div>
   <div class="glass-row"><span>Solid</span><input type="range" id="glassIn" min="0" max="100" step="1" value="${L.glass}" aria-label="Glass intensity"><span>Clear</span><b id="glassVal">${L.glass}%</b></div>
   <p class="note">Higher glass lets more of the wallpaper show through the boxes.</p></div>`}
