@@ -1485,9 +1485,9 @@ const AV_DEFCOL={hat:"#16171c",top:"#16171c",shoes:"#16171c"};
 function modelPane(a){const m=a.model;
   return `<div class="mdl">${avEditMsg?`<p class="mdl-msg"><span class="mini-spin"></span>${esc(avEditMsg)}</p>`:m?`<div class="mdl-cur"><span class="mdl-ic">3D</span><span class="mdl-nm">${esc(m.name)}<i>${(m.size/1048576).toFixed(1)} MB · ${m.path==="local"?"this device only":"synced"}</i></span></div>
     <div class="seg2" role="group" aria-label="Figure"><button data-usemodel="0" aria-pressed="${!a.useModel}">Built-in figure</button><button data-usemodel="1" aria-pressed="${a.useModel}">My model</button></div>
-    <div class="mdl-btns"><label class="mv mdl-up">Replace<input type="file" accept=".glb,.gltf,.fbx,.obj" data-modelup></label><button class="mv ${mdlDelArm?"armed":""}" data-modeldel>${mdlDelArm?"Tap again to remove":"Remove"}</button></div>`
-   :`<label class="btn mdl-up mdl-add">Import a 3D model<input type="file" accept=".glb,.gltf,.fbx,.obj" data-modelup></label>`}
-   <p class="avnote">GLB works best. FBX and OBJ work too, up to 50 MB. Your model gets the Shadow, Hologram and Alive looks and spins like the built-in figure. Outfit colors don't apply to it.</p></div>`}
+    <div class="mdl-btns"><label class="mv mdl-up">Replace<input type="file" accept=".glb,.gltf,.fbx,.obj,.mtl" multiple data-modelup></label><button class="mv ${mdlDelArm?"armed":""}" data-modeldel>${mdlDelArm?"Tap again to remove":"Remove"}</button></div>`
+   :`<label class="btn mdl-up mdl-add">Import a 3D model<input type="file" accept=".glb,.gltf,.fbx,.obj,.mtl" multiple data-modelup></label>`}
+   <p class="avnote">GLB works best. FBX and OBJ work too, up to 50 MB. For an OBJ, pick its .mtl file at the same time to bring in the clothing colors. Your model gets the Shadow, Hologram and Alive looks and spins like the built-in figure. Outfit colors don't apply to it.</p></div>`}
 function avEditor(){const a=avatarOf(),cats=[["hat","Hat"],["top","Top"],["shoes","Shoes"],["model","3D model"]];if(avCat==="model")return `<div class="aved"><div class="avcats">${cats.map(([k,l])=>`<button class="avcat" data-avcat="${k}" aria-pressed="${avCat===k}">${l}</button>`).join("")}</div>${modelPane(a)}</div>`;
   return `<div class="aved"><div class="avcats">${cats.map(([k,l])=>`<button class="avcat" data-avcat="${k}" aria-pressed="${avCat===k}">${l}</button>`).join("")}</div>
     <div class="avopts">${AV_ITEMS[avCat].map(([v,l])=>`<button class="fchip" data-avset="${avCat}:${v}" aria-pressed="${a[avCat]===v}">${l}</button>`).join("")}</div>
@@ -1606,12 +1606,20 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
     const geo=new T.BufferGeometry();geo.setAttribute("position",new T.BufferAttribute(pos,3));
     const pts=new T.Points(geo,new T.PointsMaterial({map:spr,color:0x5a1640,size:.32,transparent:true,opacity:.5,depthWrite:false,blending:T.AdditiveBlending}));pts.userData.seed=seed;return pts}
   const root=new T.Group();scene.add(root);
+  const NAMECOL=[[/skin|body|face|head|flesh|hand|arm|leg|neck/i,0xd8a07a],[/hair|brow|lash/i,0x2b1d14],[/denim|jean/i,0x2a3550],[/leather/i,0x4a3020],[/navy/i,0x1f2f5a],[/brown|tan|khaki|wood/i,0x6b4a2f],[/black|dark/i,0x1c1d22],[/white|ivory|cream/i,0xe6e4df],[/red|crimson|maroon/i,0xb8282f],[/blue/i,0x2b56c6],[/green|olive/i,0x3a6b40],[/gr[ae]y|silver|metal/i,0x8a9099],[/yellow|gold/i,0xc8a040],[/orange/i,0xd9772b],[/pink/i,0xd86a9a],[/purple|violet/i,0x5b2a7e]];
+  const avgMap=mp=>{try{const im=mp&&mp.image;if(!im||!(im.width||im.videoWidth))return null;const c=document.createElement("canvas");c.width=c.height=8;const x=c.getContext("2d");x.drawImage(im,0,0,8,8);const d=x.getImageData(0,0,8,8).data;let r=0,g=0,b=0,n=0;for(let i=0;i<d.length;i+=4){if(d[i+3]<40)continue;r+=d[i];g+=d[i+1];b+=d[i+2];n++}return n?new T.Color(r/n/255,g/n/255,b/n/255).convertSRGBToLinear():null}catch(_){return null}};
+  function flatColor(mat,mesh,mtl){const nm=(mat&&mat.name)||mesh.userData.mtlName||"",kd=mtl&&mtl[nm];if(kd)return new T.Color().fromArray(kd).convertSRGBToLinear();
+    const base=mat&&mat.color?mat.color.clone():null,avg=avgMap(mat&&mat.map);
+    if(avg)return base?avg.multiply(base):avg;
+    const plain=!base||base.getHex()===0xffffff;if(!plain)return base;
+    const hay=nm+" "+mesh.name;for(const [re,c] of NAMECOL)if(re.test(hay))return new T.Color(c);return new T.Color(0x9aa3b5)}
   function fromModel(md,stage){const o=md.obj;if(!md.fit){o.updateMatrixWorld(true);o.traverse(m=>{if(m.isSkinnedMesh)m.skeleton.update()});const b=new T.Box3().setFromObject(o,true),sz=b.getSize(new T.Vector3());const k=2.05/Math.max(sz.y,1e-6);o.scale.multiplyScalar(k);o.updateMatrixWorld(true);
       const b2=new T.Box3().setFromObject(o,true),c=b2.getCenter(new T.Vector3());o.position.x-=c.x;o.position.z-=c.z;o.position.y-=b2.min.y;md.fit=true;
       if(md.clips&&md.clips.length){md.mixer=new T.AnimationMixer(o);const cl=md.clips.find(c=>/idle/i.test(c.name))||md.clips[0];md.mixer.clipAction(cl).play()}}
-    const hb=holoMat(false,MVS),sh=shadowMat(MVS),grey=toon(0x9aa3b5);
-    o.traverse(m=>{if(!m.isMesh)return;if(!m.userData.orig)m.userData.orig=m.material;m.frustumCulled=false;
-      m.material=stage==="real"?(m.userData.orig&&!(m.userData.orig.isMeshPhongMaterial&&m.userData.orig.color&&m.userData.orig.color.getHex()===0xffffff&&!m.userData.orig.map)?m.userData.orig:grey):stage==="holo"?hb:sh});
+    const hb=holoMat(false,MVS),sh=shadowMat(MVS);
+    o.traverse(m=>{if((m.isLine||m.isPoints)&&!m.isMesh){m.visible=false;return}if(!m.isMesh)return;if(!m.userData.orig)m.userData.orig=m.material;m.frustumCulled=false;
+      if(!m.userData.flat){const om=m.userData.orig;m.userData.flat=Array.isArray(om)?om.map(x=>toon(flatColor(x,m,md.mtl))):toon(flatColor(om,m,md.mtl))}
+      m.material=stage==="real"?m.userData.flat:stage==="holo"?hb:sh});
     const g=new T.Group();g.add(o);mixer=md.mixer||null;return {g,torso:null,arms:[],head:null}}
   let mixer=null,lastT=0;
   function set(av,stage,md){const k=JSON.stringify(av)+stage+(md?md.key:"");if(k===figKey)return;figKey=k;
@@ -1661,7 +1669,9 @@ async function modelBuffer(m){const hit=await IDB.get(mKey(m));if(hit)return hit
 async function parseModel(buf,ext){const L="./lib/jsm/loaders/";
   if(ext==="glb"||ext==="gltf"){const {GLTFLoader}=await import(L+"GLTFLoader.js");return await new Promise((ok,no)=>new GLTFLoader().parse(buf,"",g=>ok({obj:g.scene,clips:g.animations||[]}),no))}
   if(ext==="fbx"){const {FBXLoader}=await import(L+"FBXLoader.js");const o=new FBXLoader().parse(buf,"");return {obj:o,clips:o.animations||[]}}
-  if(ext==="obj"){const {OBJLoader}=await import(L+"OBJLoader.js");return {obj:new OBJLoader().parse(new TextDecoder().decode(buf)),clips:[]}}
+  if(ext==="obj"){const {OBJLoader}=await import(L+"OBJLoader.js");const txt=new TextDecoder().decode(buf).replace(/^l\s.*$/gm,"");
+    const om={};let cur=null;for(const m of txt.matchAll(/^(o|g|usemtl)\s+(.+)$/gm)){if(m[1]!=="usemtl")cur=m[2].trim();else if(cur&&!om[cur])om[cur]=m[2].trim()}
+    const o=new OBJLoader().parse(txt);o.traverse(x=>{if(x.isMesh)x.userData.mtlName=om[x.name]||""});return {obj:o,clips:[]}}
   throw new Error("type")}
 let mdl={key:null,obj:null,busy:false,fail:false},mdlBusy=false;
 async function loadModel(m){const k=mKey(m);mdl={key:k,obj:null,busy:true,fail:false};
@@ -1671,10 +1681,11 @@ async function loadModel(m){const k=mKey(m);mdl={key:k,obj:null,busy:true,fail:f
 const figAv=()=>{const a=avatarOf();if(realStage()!=="real")a.cmode="figure";return a};
 function holoMount(){const el=document.querySelector("[data-h3]");if(!el||!H3){if(H3)H3.stop();return}
   const a=figAv(),m=a.useModel&&a.model;
-  if(m){const k=mKey(m);if(mdl.key!==k)loadModel(m);if(mdl.key===k&&mdl.obj){H3.set(a,holoStage(),mdl);el.classList.remove("loading")}else{H3.set(a,holoStage());el.classList.toggle("loading",!mdl.fail)}}
+  if(m){const k=mKey(m);if(mdl.key!==k)loadModel(m);if(mdl.key===k&&mdl.obj){mdl.mtl=m.mtl||null;H3.set(a,holoStage(),mdl);el.classList.remove("loading")}else{H3.set(a,holoStage());el.classList.toggle("loading",!mdl.fail)}}
   else{H3.set(a,holoStage());el.classList.remove("loading")}
   H3.mount(el)}
-async function addModel(f){const ext=(f.name.split(".").pop()||"").toLowerCase();
+function parseMtl(t){const out={};let cur=null;t.split(/\r?\n/).forEach(l=>{const a=l.trim().split(/\s+/);if(a[0]==="newmtl")cur=a.slice(1).join(" ");else if(a[0]==="Kd"&&cur)out[cur]=a.slice(1,4).map(Number)});return out}
+async function addModel(f,mtlFile){const ext=(f.name.split(".").pop()||"").toLowerCase();
   if(!MODEL_EXT.includes(ext)){toast("Use a .glb, .gltf, .fbx or .obj file");return}
   if(f.size>MODEL_MAX){toast("That model is over 50 MB. Try a smaller one");return}
   if(mdlBusy)return;mdlBusy=true;avEditMsg="Checking your model…";render();
@@ -1685,9 +1696,11 @@ async function addModel(f){const ext=(f.name.split(".").pop()||"").toLowerCase()
     else note=" Saved on this device. Sign in to sync it.";
     await IDB.put(path+"@"+v,buf);
     const a=avatarOf();if(a.model&&a.model.path!=="local"&&path!=="local"&&a.model.path!==path&&sbOn())sb.storage.from("models").remove([a.model.path]);
-    a.model={name:f.name.slice(0,60),ext,path,v,size:f.size};a.useModel=true;data.profile=Object.assign({},data.profile,{avatar:a});avEditMsg=null;render();save();toast("Your 3D model is in."+note)}
+    let mtl=null;if(mtlFile){try{mtl=parseMtl(await mtlFile.text());if(!Object.keys(mtl).length)mtl=null}catch(_){}}
+    a.model={name:f.name.slice(0,60),ext,path,v,size:f.size};if(mtl)a.model.mtl=mtl;a.useModel=true;data.profile=Object.assign({},data.profile,{avatar:a});avEditMsg=null;render();save();toast("Your 3D model is in."+note)}
   catch(e){avEditMsg=null;render();toast("Couldn't open that file as a 3D model")}finally{mdlBusy=false}}
-document.addEventListener("change",e=>{const i=e.target;if(!i.matches||!i.matches("[data-modelup]"))return;const f=i.files&&i.files[0];i.value="";if(f)addModel(f)});
+document.addEventListener("change",e=>{const i=e.target;if(!i.matches||!i.matches("[data-modelup]"))return;const fs=[...(i.files||[])];i.value="";const f=fs.find(x=>/\.(glb|gltf|fbx|obj)$/i.test(x.name)),m=fs.find(x=>/\.mtl$/i.test(x.name));
+  if(!f){if(m){const a=avatarOf();if(a.model){m.text().then(t=>{const c=parseMtl(t);if(Object.keys(c).length){a.model.mtl=c;data.profile=Object.assign({},data.profile,{avatar:a});mdl={key:null};render();save();toast("Colors added from "+m.name)}})}else toast("Pick the model file too")}else toast("Use a .glb, .gltf, .fbx or .obj file");return}addModel(f,m)});
 function hologram(a){
   const A=typeof a==="string"?Object.assign({},AV_DEF,{body:a}):Object.assign({},AV_DEF,a||{});
   const K=A.body||"woman",M=K==="man",N=K==="neither";
