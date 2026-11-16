@@ -1742,6 +1742,7 @@ const WALLS=[
   {id:"snow",name:"Snow",src:"wp/snow.jpg",pos:"55% 45%",shade:.12},
   {id:"hyperspace",name:"Hyperspace",src:"wp/hyperspace.jpg",pos:"50% 50%",shade:.12},
   {id:"portal",name:"Portal",src:"wp/portal.jpg",pos:"50% 50%",shade:.12},
+  {id:"liminal",name:"Liminal",src:"wp/liminal.jpg",pos:"50% 46%",shade:.12},
   {id:"royalgold",name:"Royal gold",src:"wp/royalgold.jpg",pos:"50% 50%",shade:.15},
   {id:"gilded",name:"Gilded",src:"wp/gilded.jpg",pos:"50% 50%",shade:.15},
   {id:"moonlit",name:"Moonlit",src:"wp/moonlit.jpg",pos:"62% 40%",shade:0},
@@ -1777,7 +1778,7 @@ document.addEventListener("change",async e=>{const inp=e.target;if(!inp.dataset|
     if(inp.dataset.wallup==="passion"){const p=data.passions.find(x=>x.id===selP);if(p)p.wall=id;themeOpen=false}else data.profile=Object.assign({},data.profile,{wallpaper:id});
     render();save();toast("Your wallpaper is set")}catch(_){toast("Couldn't read that image. Try a JPG or PNG")}});
 /* ---------- box color + glass ---------- */
-const LOOKS=[{id:"blue",name:"Ocean blue",h:223,s:.69},{id:"violet",name:"Violet",h:268,s:.55},{id:"rose",name:"Rose",h:335,s:.6},{id:"ember",name:"Ember",h:16,s:.78},{id:"gold",name:"Gold",h:40,s:.72},{id:"sage",name:"Sage",h:138,s:.22},{id:"forest",name:"Forest",h:152,s:.5},{id:"teal",name:"Teal",h:186,s:.65},{id:"graphite",name:"Graphite",h:220,s:.08},{id:"obsidian",name:"Obsidian",h:245,s:.18,l:.1}];
+const LOOKS=[{id:"blue",name:"Ocean blue",h:223,s:.69},{id:"violet",name:"Violet",h:268,s:.55},{id:"rose",name:"Rose",h:335,s:.6},{id:"ember",name:"Ember",h:16,s:.78},{id:"gold",name:"Gold",h:40,s:.72},{id:"sage",name:"Sage",h:138,s:.22},{id:"forest",name:"Forest",h:152,s:.5},{id:"teal",name:"Teal",h:186,s:.65},{id:"dream",name:"Dream",h:250,s:.38},{id:"graphite",name:"Graphite",h:220,s:.08},{id:"obsidian",name:"Obsidian",h:245,s:.18,l:.1}];
 const lookOf=()=>Object.assign({color:"blue",glass:35},(data.profile||{}).look||{});
 const hsl2rgb=(h,s,l)=>{s=Math.max(0,Math.min(1,s));const k=n=>(n+h/30)%12,a=s*Math.min(l,1-l),f=n=>l-a*Math.max(-1,Math.min(k(n)-3,9-k(n),1));return [f(0),f(8),f(4)].map(v=>Math.round(v*255)).join(",")};
 const wallColor=new Map();
