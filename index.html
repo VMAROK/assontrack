@@ -209,13 +209,18 @@ aside{background:rgba(5,10,26,.82)!important;backdrop-filter:blur(10px);-webkit-
 .avbtn:hover{background:rgba(76,201,255,.16);box-shadow:0 0 14px rgba(76,201,255,.25)}
 .avbtn.on{color:#04101f;background:var(--cyan);border-color:var(--cyan)}
 .holo{width:100%;max-width:260px;height:auto;margin:auto;display:block;overflow:visible}
-.holo{transform-origin:50% 50%;touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;will-change:transform}.holo.grab{cursor:grabbing}
+.holo{transform-origin:50% 50%;touch-action:none;overscroll-behavior:contain;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;will-change:transform}.holo.grab{cursor:grabbing}
 .holopanel{align-self:start}
 .holo3d{width:100%;max-width:260px;aspect-ratio:300/470;margin:0 auto;position:relative}.holo3d canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .hstage{display:flex;justify-content:center;margin:10px auto 0;border:1px solid rgba(var(--lr),.25);border-radius:8px;overflow:hidden;width:max-content}
 .hstage button{font:inherit;font-size:12px;font-weight:600;color:var(--muted);background:none;border:0;border-left:1px solid rgba(var(--lr),.18);padding:6px 11px;cursor:pointer;position:relative}.hstage button:first-child{border-left:0}
 .hstage button{display:inline-flex;align-items:center;gap:5px}.hstage button.locked{opacity:.55}.hstage button.locked[aria-pressed="true"]{opacity:1}
 .avcols{display:flex;flex-wrap:wrap;gap:7px}.avsw{width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.18);background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.35),transparent 55%),var(--sw);cursor:pointer;padding:0}.avsw[aria-checked="true"]{border-color:#fff;box-shadow:0 0 0 2px rgba(var(--tL),.6),0 0 10px rgba(var(--tL),.5)}
+.holo3d.loading::after{content:"";position:absolute;left:50%;top:45%;width:38px;height:38px;margin:-19px 0 0 -19px;border-radius:50%;border:3px solid rgba(255,255,255,.14);border-top-color:rgba(var(--tL),.95);animation:bgspin .8s linear infinite}
+.mdl{display:grid;gap:10px}.mdl-add{display:block;text-align:center;position:relative;overflow:hidden;cursor:pointer}.mdl-up input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+.mdl-up{position:relative;overflow:hidden}.mdl-cur{display:flex;align-items:center;gap:10px}.mdl-ic{width:36px;height:36px;display:grid;place-items:center;border-radius:8px;font-weight:800;font-size:12px;color:rgba(var(--tL),1);border:1px solid rgba(var(--tL),.4);background:rgba(var(--tL),.1)}
+.mdl-nm{display:grid;font-weight:600;font-size:13.5px;min-width:0;word-break:break-all}.mdl-nm i{font-style:normal;font-weight:500;font-size:12px;color:var(--muted)}.mdl-btns{display:flex;gap:8px}.mdl-btns .mv.armed{color:#ff5d6c;border-color:rgba(255,93,108,.5)}
+.mdl-msg{display:flex;align-items:center;gap:10px;margin:0;font-size:13px;color:var(--muted)}.mini-spin{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.15);border-top-color:rgba(var(--tL),1);animation:bgspin .8s linear infinite}
 .avnote{margin:-4px 0 0;font-size:12px;color:var(--muted);line-height:1.4}
 .avglass{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;font-weight:600;color:var(--muted)}.avglass small{display:block;font-weight:500;font-size:11.5px;opacity:.85;margin-top:2px}
 .hstage button[aria-pressed="true"]{color:#fff;background:rgba(var(--tL),.16)}
@@ -1466,16 +1471,22 @@ const mirP=path=>path.replace(/([MLCQ])([^MLCQZ]*)/g,(m,c,args)=>c+args.trim().s
 const AV_ITEMS={hat:[["none","None"],["fedora","Fedora"]],top:[["none","None"],["trench","Trench coat"]],shoes:[["none","Barefoot"],["boots","Boots"]]};
 const AV_DEF={hat:"fedora",top:"trench",shoes:"boots"};
 function avatarOf(){const pr=data.profile||{},av=pr.avatar||{},a={body:av.body||pr.figure||"woman"};
-  for(const k in AV_ITEMS)a[k]=AV_ITEMS[k].some(o=>o[0]===av[k])?av[k]:AV_DEF[k];a.colors=Object.assign({},av.colors||{});a.cmode=["solid","glass","figure"].includes(av.cmode)?av.cmode:av.blend?"figure":av.glass?"glass":"solid";if(av.stage)a.stage=av.stage;return a}
-let avEdit=false,avCat="hat";
+  for(const k in AV_ITEMS)a[k]=AV_ITEMS[k].some(o=>o[0]===av[k])?av[k]:AV_DEF[k];a.colors=Object.assign({},av.colors||{});a.cmode=["solid","glass","figure"].includes(av.cmode)?av.cmode:av.blend?"figure":av.glass?"glass":"solid";if(av.stage)a.stage=av.stage;if(av.model)a.model=av.model;a.useModel=!!(av.useModel&&av.model);return a}
+let avEdit=false,avCat="hat",avEditMsg=null,mdlDelArm=false;
 const AV_COLORS=[["#16171c","Black"],["#3a3d45","Charcoal"],["#e6e4df","White"],["#b0814f","Camel"],["#5a3a26","Brown"],["#6e1a2a","Burgundy"],["#c0282f","Red"],["#d86a9a","Pink"],["#1f2f5a","Navy"],["#2b56c6","Royal blue"],["#1f4a33","Forest"],["#5b5f2e","Olive"],["#4b2a6e","Purple"],["#c8a040","Gold"]];
 const AV_DEFCOL={hat:"#16171c",top:"#16171c",shoes:"#16171c"};
-function avEditor(){const a=avatarOf(),cats=[["hat","Hat"],["top","Top"],["shoes","Shoes"]];
+function modelPane(a){const m=a.model;
+  return `<div class="mdl">${avEditMsg?`<p class="mdl-msg"><span class="mini-spin"></span>${esc(avEditMsg)}</p>`:m?`<div class="mdl-cur"><span class="mdl-ic">3D</span><span class="mdl-nm">${esc(m.name)}<i>${(m.size/1048576).toFixed(1)} MB · ${m.path==="local"?"this device only":"synced"}</i></span></div>
+    <div class="seg2" role="group" aria-label="Figure"><button data-usemodel="0" aria-pressed="${!a.useModel}">Built-in figure</button><button data-usemodel="1" aria-pressed="${a.useModel}">My model</button></div>
+    <div class="mdl-btns"><label class="mv mdl-up">Replace<input type="file" accept=".glb,.gltf,.fbx,.obj" data-modelup></label><button class="mv ${mdlDelArm?"armed":""}" data-modeldel>${mdlDelArm?"Tap again to remove":"Remove"}</button></div>`
+   :`<label class="btn mdl-up mdl-add">Import a 3D model<input type="file" accept=".glb,.gltf,.fbx,.obj" data-modelup></label>`}
+   <p class="avnote">GLB works best. FBX and OBJ work too, up to 50 MB. Your model gets the Shadow, Hologram and Alive looks and spins like the built-in figure. Outfit colors don't apply to it.</p></div>`}
+function avEditor(){const a=avatarOf(),cats=[["hat","Hat"],["top","Top"],["shoes","Shoes"],["model","3D model"]];if(avCat==="model")return `<div class="aved"><div class="avcats">${cats.map(([k,l])=>`<button class="avcat" data-avcat="${k}" aria-pressed="${avCat===k}">${l}</button>`).join("")}</div>${modelPane(a)}</div>`;
   return `<div class="aved"><div class="avcats">${cats.map(([k,l])=>`<button class="avcat" data-avcat="${k}" aria-pressed="${avCat===k}">${l}</button>`).join("")}</div>
     <div class="avopts">${AV_ITEMS[avCat].map(([v,l])=>`<button class="fchip" data-avset="${avCat}:${v}" aria-pressed="${a[avCat]===v}">${l}</button>`).join("")}</div>
     ${a[avCat]!=="none"?`<div class="avcols" role="radiogroup" aria-label="Color">${AV_COLORS.map(([h,n])=>`<button class="avsw" role="radio" style="--sw:${h}" data-avcol="${avCat}:${h}" aria-checked="${(a.colors[avCat]||AV_DEFCOL[avCat]).toLowerCase()===h}" aria-label="${n}" title="${n}"></button>`).join("")}</div>`:""}
     <div class="avglass"><span>Clothes</span><span class="seg2" role="group" aria-label="Clothes look">${[["solid","Solid"],["glass","See-through"],["figure","Figure only"]].map(([k,l])=>`<button data-avcmode="${k}" aria-pressed="${a.cmode===k}">${l}</button>`).join("")}</span></div>
-    <p class="avnote">${a.cmode==="figure"?"No clothes showing, just the figure's shape: blue in Hologram, dark in Shadow, plain body when Alive.":a.cmode==="glass"?"Clothes keep their color but you can see the body through them.":"Clothes in full color in every stage."}</p></div>`}
+    <p class="avnote">${a.cmode==="figure"?"Clothes take on the figure's look: blue in Hologram, dark in Shadow. When Alive they stay in color.":a.cmode==="glass"?"Clothes keep their color but you can see the body through them.":"Clothes in full color in every stage."}</p></div>`}
 /* ---------- 3D hologram (three.js) ---------- */
 function h3Init(T){
   const canvas=document.createElement("canvas");canvas.className="h3c";
@@ -1490,11 +1501,21 @@ function h3Init(T){
   const toon=(c,o={})=>new T.MeshToonMaterial(Object.assign({color:c,gradientMap:grad},o));
   const VS=`uniform float t;varying vec3 vN;varying vec3 vV;varying float vY;uniform float wob;
     void main(){vec3 p=position+normal*wob*sin(position.y*14.+t*3.)*.012;vec4 w=modelMatrix*vec4(p,1.);vY=w.y;vN=normalize(mat3(modelMatrix)*normal);vV=normalize(cameraPosition-w.xyz);gl_Position=projectionMatrix*viewMatrix*w;}`;
-  const holoMat=(dark)=>new T.ShaderMaterial({uniforms:{t:U.t,flick:U.flick,wob:{value:0},dark:{value:dark?1:0}},vertexShader:VS,transparent:true,depthWrite:false,blending:T.AdditiveBlending,side:T.DoubleSide,
+  const MVS=`#include <common>
+#include <skinning_pars_vertex>
+uniform float t;uniform float wob;varying vec3 vN;varying vec3 vV;varying float vY;
+void main(){
+#include <beginnormal_vertex>
+#include <skinbase_vertex>
+#include <skinnormal_vertex>
+#include <begin_vertex>
+#include <skinning_vertex>
+vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objectNormal)*wob*sin(w.y*14.+t*3.)*.012;vY=w.y;vN=normalize(mat3(modelMatrix)*objectNormal);vV=normalize(cameraPosition-w.xyz);gl_Position=projectionMatrix*viewMatrix*w;}`;
+  const holoMat=(dark,vs)=>new T.ShaderMaterial({uniforms:{t:U.t,flick:U.flick,wob:{value:0},dark:{value:dark?1:0}},vertexShader:vs||VS,transparent:true,depthWrite:false,blending:T.AdditiveBlending,side:T.DoubleSide,
     fragmentShader:`uniform float t,flick,dark;varying vec3 vN;varying vec3 vV;varying float vY;
     void main(){float f=pow(1.-abs(dot(normalize(vN),normalize(vV))),2.2);float scan=.55+.45*step(.5,fract(vY*55.-t*1.6));float bar=smoothstep(.0,.08,.08-abs(fract(vY*.35-t*.22)-.5)*.16);
     vec3 c=mix(vec3(.18,.62,1.),vec3(.75,.95,1.),f);float a=(dark>.5?.07:.16)+f*(dark>.5?.55:.85);a*=scan;a+=bar*.25;gl_FragColor=vec4(c,clamp(a*flick,0.,1.));}`});
-  const shadowMat=()=>new T.ShaderMaterial({uniforms:{t:U.t,wob:{value:1}},vertexShader:VS,transparent:true,
+  const shadowMat=(vs)=>new T.ShaderMaterial({uniforms:{t:U.t,wob:{value:1}},vertexShader:vs||VS,transparent:true,
     fragmentShader:`uniform float t;varying vec3 vN;varying vec3 vV;varying float vY;
     void main(){float f=pow(1.-abs(dot(normalize(vN),normalize(vV))),2.);float n=.5+.5*sin(vY*30.+t*2.);vec3 c=mix(vec3(.01,.0,.02),vec3(.45,.05,.22),f*(.6+.4*n));gl_FragColor=vec4(c,.94);}`});
   // soft sprite for glow and smoke
@@ -1509,7 +1530,7 @@ function h3Init(T){
     const sh=shadow?shadowMat():null,hb=holo?holoMat(false):null,hd=holo?holoMat(true):null;
     const B=(c,dark)=>real?toon(c):holo?(dark?hd:hb):sh;           // body layer follows the stage
     const cmode=av.cmode||"solid",col=Object.assign({hat:"#16171c",top:"#16171c",shoes:"#16171c"},av.colors||{});
-    const C=(hex)=>cmode==="figure"?(holo?hd:sh):toon(hex,cmode==="glass"?{transparent:true,opacity:.42,depthWrite:false}:{});   // solid, see-through, or part of the figure
+    const C=(hex)=>cmode==="figure"&&!real?(holo?hd:sh):toon(hex,cmode==="glass"?{transparent:true,opacity:.42,depthWrite:false}:{});   // solid, see-through, or part of the figure
     const SKIN=0xd8a07a,HAIR=woman?0x3a2418:0x22160f,PANTS=0x2a3550,TEE=0x3c4f6e;
     const trench=av.top==="trench",fed=av.hat==="fedora",boots=av.shoes==="boots";
     const skin=B(SKIN),pants=B(PANTS,true),tee=B(TEE),hair=B(HAIR,true);
@@ -1548,8 +1569,8 @@ function h3Init(T){
         [-1,1].forEach(s=>{const side=cap(.05,.26,hair);side.position.set(s*.17,-.13,.03);head.add(side)})}
       else if(!man){const sw2=cap(.07,.12,hair);sw2.rotation.z=1.2;sw2.position.set(.08,.16,.1);head.add(sw2)}
       else{const fr=cap(.05,.16,hair);fr.rotation.z=Math.PI/2;fr.position.set(0,.165,.12);fr.rotation.x=.5;head.add(fr)}}
-    /* ---- clothes layer: solid or see-through in their colors, or blended into the figure (none when Alive) ---- */
-    if(!(cmode==="figure"&&real)){
+    /* ---- clothes layer: solid or see-through in their colors, or blended into the figure (Alive keeps them in color) ---- */
+    {
     if(trench){const coat=C(col.top),dk=C(tone(col.top,.6));
       const shell=cap(.185,.34,coat);shell.scale.set(sw,1,.82);shell.position.y=1.3;g.add(shell);
       [-1,1].forEach((s,i)=>{const a=arms[i];const up=cap(.07,.22,coat);up.position.y=-.16;a.add(up);const fo=cap(.064,.2,coat);fo.position.y=-.43;a.add(fo)});
@@ -1578,8 +1599,16 @@ function h3Init(T){
     const geo=new T.BufferGeometry();geo.setAttribute("position",new T.BufferAttribute(pos,3));
     const pts=new T.Points(geo,new T.PointsMaterial({map:spr,color:0x5a1640,size:.32,transparent:true,opacity:.5,depthWrite:false,blending:T.AdditiveBlending}));pts.userData.seed=seed;return pts}
   const root=new T.Group();scene.add(root);
-  function set(av,stage){const k=JSON.stringify(av)+stage;if(k===figKey)return;figKey=k;
-    root.clear();parts=build(av,stage);fig=parts.g;root.add(fig);base=makeBase(stage);scene.add(base);
+  function fromModel(md,stage){const o=md.obj;if(!md.fit){o.updateMatrixWorld(true);o.traverse(m=>{if(m.isSkinnedMesh)m.skeleton.update()});const b=new T.Box3().setFromObject(o,true),sz=b.getSize(new T.Vector3());const k=2.05/Math.max(sz.y,1e-6);o.scale.multiplyScalar(k);o.updateMatrixWorld(true);
+      const b2=new T.Box3().setFromObject(o,true),c=b2.getCenter(new T.Vector3());o.position.x-=c.x;o.position.z-=c.z;o.position.y-=b2.min.y;md.fit=true;
+      if(md.clips&&md.clips.length){md.mixer=new T.AnimationMixer(o);const cl=md.clips.find(c=>/idle/i.test(c.name))||md.clips[0];md.mixer.clipAction(cl).play()}}
+    const hb=holoMat(false,MVS),sh=shadowMat(MVS),grey=toon(0x9aa3b5);
+    o.traverse(m=>{if(!m.isMesh)return;if(!m.userData.orig)m.userData.orig=m.material;m.frustumCulled=false;
+      m.material=stage==="real"?(m.userData.orig&&!(m.userData.orig.isMeshPhongMaterial&&m.userData.orig.color&&m.userData.orig.color.getHex()===0xffffff&&!m.userData.orig.map)?m.userData.orig:grey):stage==="holo"?hb:sh});
+    const g=new T.Group();g.add(o);mixer=md.mixer||null;return {g,torso:null,arms:[],head:null}}
+  let mixer=null,lastT=0;
+  function set(av,stage,md){const k=JSON.stringify(av)+stage+(md?md.key:"");if(k===figKey)return;figKey=k;
+    root.clear();parts=md?fromModel(md,stage):build(av,stage);if(!md)mixer=null;fig=parts.g;root.add(fig);base=makeBase(stage);scene.add(base);
     scene.children.filter(o=>o.userData.isBase&&o!==base).forEach(o=>scene.remove(o));base.userData.isBase=true;
     if(smoke){scene.remove(smoke);smoke=null}if(stage==="shadow"){smoke=makeSmoke();scene.add(smoke)}
     cur=stage}
@@ -1588,8 +1617,9 @@ function h3Init(T){
   function frame(now){raf=requestAnimationFrame(frame);if(!host||!host.isConnected){stop();return}if(now-last<24)return;last=now;size();
     const t=(now-t0)/1000;U.t.value=t;U.flick.value=cur==="holo"?(Math.random()<.03?.55:1):1;
     if(fig){fig.rotation.y=(typeof holoRot==="number"?holoRot:0)*Math.PI/180;fig.position.y=cur==="holo"?Math.sin(t*1.3)*.035:cur==="shadow"?Math.sin(t*.8)*.02:0;
-      parts.torso.scale.set(1,1+Math.sin(t*1.6)*.012,1+Math.sin(t*1.6)*.02);parts.arms.forEach((a,i)=>{a.rotation.z=(i?1:-1)*(.1+Math.sin(t*1.6)*.015);a.rotation.x=Math.sin(t*.9+i)*.03});
-      parts.head.rotation.y=Math.sin(t*.45)*.08;parts.head.rotation.x=Math.sin(t*.7)*.02}
+      if(mixer){mixer.update(Math.min(.1,t-lastT))}lastT=t;
+      if(parts.torso){parts.torso.scale.set(1,1+Math.sin(t*1.6)*.012,1+Math.sin(t*1.6)*.02);parts.head.rotation.y=Math.sin(t*.45)*.08;parts.head.rotation.x=Math.sin(t*.7)*.02}parts.arms.forEach((a,i)=>{a.rotation.z=(i?1:-1)*(.1+Math.sin(t*1.6)*.015);a.rotation.x=Math.sin(t*.9+i)*.03});
+}
     if(smoke){const p=smoke.geometry.attributes.position,s=smoke.userData.seed;for(let i=0;i<s.length;i++){let y=p.getY(i)+.004+s[i]*.006;if(y>2.4)y=0;p.setY(i,y);p.setX(i,p.getX(i)+Math.sin(t+s[i]*20)*.0015)}p.needsUpdate=true;smoke.rotation.y=fig?fig.rotation.y:0}
     ren.render(scene,cam)}
   function start(){if(!raf){last=0;raf=requestAnimationFrame(frame)}}
@@ -1611,7 +1641,45 @@ function holoView(){const a=avatarOf(),st=holoStage(),rs=realStage();
   const lock=`<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`;
   const cap=holoPreview?`Preview. ${HSTAGE[holoPreview][0]} unlocks at ${HSTAGE[holoPreview][1]}%.`:rs==="real"?"All stages unlocked. Pick any look.":rs==="holo"?"Reach 65% to unlock Alive.":"Reach 40% to unlock Hologram.";
   return fig+`<div class="hstage" role="group" aria-label="Figure stages">${["shadow","holo","real"].map(k=>{const locked=SRANK[k]>SRANK[rs];return `<button data-hstage="${k}" aria-pressed="${st===k}" class="${locked?"locked":""}" title="${locked?"Locked. Tap to preview":"Use this look"}">${locked?lock:""}${HSTAGE[k][0]}</button>`}).join("")}</div><p class="hcap">${cap}</p>`}
-function holoMount(){const el=document.querySelector("[data-h3]");if(el&&H3){H3.set(avatarOf(),holoStage());H3.mount(el)}else if(H3)H3.stop()}
+/* ---------- your own 3D model: stored in Supabase Storage, cached on the device ---------- */
+const MODEL_EXT=["glb","gltf","fbx","obj"],MODEL_MAX=50*1024*1024;
+const IDB={db:null,open(){return this.db||(this.db=new Promise((ok,no)=>{const r=indexedDB.open("aot-models",1);r.onupgradeneeded=()=>r.result.createObjectStore("m");r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)}))},
+  async get(k){try{const d=await this.open();return await new Promise(ok=>{const q=d.transaction("m").objectStore("m").get(k);q.onsuccess=()=>ok(q.result||null);q.onerror=()=>ok(null)})}catch(_){return null}},
+  async put(k,v){try{const d=await this.open();return await new Promise(ok=>{const tx=d.transaction("m","readwrite");tx.objectStore("m").put(v,k);tx.oncomplete=()=>ok(true);tx.onerror=()=>ok(false)})}catch(_){return false}},
+  async clear(){try{const d=await this.open();await new Promise(ok=>{const tx=d.transaction("m","readwrite");tx.objectStore("m").clear();tx.oncomplete=ok;tx.onerror=ok})}catch(_){}}};
+const sbOn=()=>typeof sb!=="undefined"&&sb&&typeof sbUser!=="undefined"&&sbUser;
+const mKey=m=>m.path+"@"+m.v;
+async function modelBuffer(m){const hit=await IDB.get(mKey(m));if(hit)return hit;if(m.path==="local"||!sbOn())return null;
+  const {data:blob,error}=await sb.storage.from("models").download(m.path);if(error||!blob)throw error||new Error("missing");const buf=await blob.arrayBuffer();IDB.put(mKey(m),buf);return buf}
+async function parseModel(buf,ext){const L="./lib/jsm/loaders/";
+  if(ext==="glb"||ext==="gltf"){const {GLTFLoader}=await import(L+"GLTFLoader.js");return await new Promise((ok,no)=>new GLTFLoader().parse(buf,"",g=>ok({obj:g.scene,clips:g.animations||[]}),no))}
+  if(ext==="fbx"){const {FBXLoader}=await import(L+"FBXLoader.js");const o=new FBXLoader().parse(buf,"");return {obj:o,clips:o.animations||[]}}
+  if(ext==="obj"){const {OBJLoader}=await import(L+"OBJLoader.js");return {obj:new OBJLoader().parse(new TextDecoder().decode(buf)),clips:[]}}
+  throw new Error("type")}
+let mdl={key:null,obj:null,busy:false,fail:false},mdlBusy=false;
+async function loadModel(m){const k=mKey(m);mdl={key:k,obj:null,busy:true,fail:false};
+  try{const buf=await modelBuffer(m);if(!buf)throw new Error("nofile");const r=await parseModel(buf,m.ext);if(mdl.key!==k)return;mdl={key:k,obj:r.obj,clips:r.clips,busy:false}}
+  catch(e){if(mdl.key===k){mdl={key:k,obj:null,busy:false,fail:true};toast(m.path==="local"&&!(await IDB.get(k))?"Your 3D model is on the device you added it from":"Couldn't load your 3D model")}}
+  if(tab==="pass")render()}
+function holoMount(){const el=document.querySelector("[data-h3]");if(!el||!H3){if(H3)H3.stop();return}
+  const a=avatarOf(),m=a.useModel&&a.model;
+  if(m){const k=mKey(m);if(mdl.key!==k)loadModel(m);if(mdl.key===k&&mdl.obj){H3.set(a,holoStage(),mdl);el.classList.remove("loading")}else{H3.set(a,holoStage());el.classList.toggle("loading",!mdl.fail)}}
+  else{H3.set(a,holoStage());el.classList.remove("loading")}
+  H3.mount(el)}
+async function addModel(f){const ext=(f.name.split(".").pop()||"").toLowerCase();
+  if(!MODEL_EXT.includes(ext)){toast("Use a .glb, .gltf, .fbx or .obj file");return}
+  if(f.size>MODEL_MAX){toast("That model is over 50 MB. Try a smaller one");return}
+  if(mdlBusy)return;mdlBusy=true;avEditMsg="Checking your model…";render();
+  try{const buf=await f.arrayBuffer();await import("./lib/three-r160.module.js");await parseModel(buf,ext);   // make sure it opens before keeping it
+    const v=Date.now();let path="local",note="";
+    if(sbOn()){avEditMsg="Uploading…";render();const pth=sbUser.id+"/model."+ext;const {error}=await sb.storage.from("models").upload(pth,f,{upsert:true,contentType:"application/octet-stream",cacheControl:"3600"});
+      if(error){note=/bucket|not found|policy|security/i.test(error.message||"")?" Saved on this device only: model storage isn't set up in Supabase yet.":" Saved on this device only: the upload didn't go through."}else path=pth}
+    else note=" Saved on this device. Sign in to sync it.";
+    await IDB.put(path+"@"+v,buf);
+    const a=avatarOf();if(a.model&&a.model.path!=="local"&&path!=="local"&&a.model.path!==path&&sbOn())sb.storage.from("models").remove([a.model.path]);
+    a.model={name:f.name.slice(0,60),ext,path,v,size:f.size};a.useModel=true;data.profile=Object.assign({},data.profile,{avatar:a});avEditMsg=null;render();save();toast("Your 3D model is in."+note)}
+  catch(e){avEditMsg=null;render();toast("Couldn't open that file as a 3D model")}finally{mdlBusy=false}}
+document.addEventListener("change",e=>{const i=e.target;if(!i.matches||!i.matches("[data-modelup]"))return;const f=i.files&&i.files[0];i.value="";if(f)addModel(f)});
 function hologram(a){
   const A=typeof a==="string"?Object.assign({},AV_DEF,{body:a}):Object.assign({},AV_DEF,a||{});
   const K=A.body||"woman",M=K==="man",N=K==="neither";
@@ -1699,6 +1767,7 @@ document.addEventListener("pointermove",e=>{if(!holoDrag||e.pointerId!==holoDrag
 const holoUp=e=>{if(!holoDrag||e.pointerId!==holoDrag.id)return;if(!holoDrag.moved)holoV=4.5;holoDrag=null;const h=document.querySelector(".holo");h&&h.classList.remove("grab");holoGo()};
 document.addEventListener("pointerup",holoUp);document.addEventListener("pointercancel",holoUp);
 document.addEventListener("contextmenu",e=>{if(e.target.closest&&e.target.closest(".holo"))e.preventDefault()});
+document.addEventListener("touchmove",e=>{if(holoDrag||(e.target.closest&&e.target.closest(".holo")))e.preventDefault()},{passive:false});
 let passCat="all",catAdding=false,catEditing=null,catThemeOpen=false,catMgr=false,catDelArm=null;try{passCat=localStorage.getItem("aot-pcat")||"all"}catch(_){}
 const cats=()=>(D().categories||[]);
 const catName=id=>(cats().find(c=>c.id===id)||{}).name||"";
@@ -2291,6 +2360,8 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
   else if(b.hasAttribute("data-avedit")){avEdit=!avEdit;render()}
   else if(b.dataset.avcat){avCat=b.dataset.avcat;render()}
   else if(b.dataset.avcol){const[k,v]=b.dataset.avcol.split(":");const a=avatarOf();a.colors[k]=v;data.profile=Object.assign({},data.profile,{avatar:a});render();save()}
+  else if(b.dataset.usemodel!==undefined){const a=avatarOf();a.useModel=b.dataset.usemodel==="1";data.profile=Object.assign({},data.profile,{avatar:a});render();save()}
+  else if(b.dataset.modeldel!==undefined){if(!mdlDelArm){mdlDelArm=true;render();return}mdlDelArm=false;const a=avatarOf();if(a.model&&a.model.path!=="local"&&sbOn())sb.storage.from("models").remove([a.model.path]);delete a.model;a.useModel=false;data.profile=Object.assign({},data.profile,{avatar:a});render();save();toast("3D model removed")}
   else if(b.dataset.avcmode){const a=avatarOf();a.cmode=b.dataset.avcmode;delete a.blend;delete a.glass;data.profile=Object.assign({},data.profile,{avatar:a});render();save()}
   else if(b.dataset.avset){const[k,v]=b.dataset.avset.split(":");const a=avatarOf();a[k]=v;data.profile=Object.assign({},data.profile,{avatar:a,figure:a.body});render();save()}
   else if(b.dataset.day){calSel=b.dataset.day;const x=new Date(calSel+"T12:00");calMonth=new Date(x.getFullYear(),x.getMonth(),1);render()}
