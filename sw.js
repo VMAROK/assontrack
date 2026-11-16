@@ -1,5 +1,5 @@
 // Offline support: the app opens without a connection; data syncs when back online.
-const VERSION = "aot-v17";
+const VERSION = "aot-v18";
 const LIB = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4";
 const SHELL = ["./", "./index.html", "./config.js", "./ramsau.jpg", "./manifest.webmanifest",
   "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", LIB];
@@ -8,7 +8,7 @@ self.addEventListener("install", e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
 });
 self.addEventListener("activate", e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== VERSION).map(k => caches.delete(k))))
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== VERSION && k !== "aot-img").map(k => caches.delete(k))))
     .then(() => self.clients.claim()));
 });
 self.addEventListener("fetch", e => {
@@ -21,6 +21,11 @@ self.addEventListener("fetch", e => {
     return;
   }
   if (url.origin !== location.origin) return;
+  // wallpapers never change under the same name: keep them on the device so switching is instant
+  if (/\/wp\/|ramsau\.jpg$/.test(url.pathname)) {
+    e.respondWith(caches.open("aot-img").then(c => c.match(req).then(hit => hit || fetch(req).then(res => { if (res.ok) c.put(req, res.clone()); return res; }))));
+    return;
+  }
   // app files: newest from the network, cached copy when offline
   // always ask the server for the newest copy (skip the browser's 10-minute cache)
   e.respondWith(fetch(req, { cache: "no-store" }).then(res => {
