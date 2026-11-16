@@ -1,5 +1,5 @@
 // Offline support: the app opens without a connection; data syncs when back online.
-const VERSION = "aot-v8";
+const VERSION = "aot-v9";
 const LIB = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4";
 const SHELL = ["./", "./index.html", "./config.js", "./ramsau.jpg", "./manifest.webmanifest",
   "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", LIB];
@@ -22,7 +22,8 @@ self.addEventListener("fetch", e => {
   }
   if (url.origin !== location.origin) return;
   // app files: newest from the network, cached copy when offline
-  e.respondWith(fetch(req).then(res => {
+  // always ask the server for the newest copy (skip the browser's 10-minute cache)
+  e.respondWith(fetch(req, { cache: "no-store" }).then(res => {
     if (res.ok) { const copy = res.clone(); caches.open(VERSION).then(c => c.put(req, copy)); }
     return res;
   }).catch(() => caches.match(req).then(hit => hit || (req.mode === "navigate" ? caches.match("./index.html") : undefined))));
