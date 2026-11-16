@@ -1052,6 +1052,7 @@ aside{background:rgba(var(--tD),calc(.82*var(--go)))!important;backdrop-filter:b
 .pwform{padding:14px;border:1px solid rgba(var(--tL),.3);border-radius:12px;background:rgba(var(--tX),.4)}
 .pw-btns{display:flex;gap:10px;align-items:center}.pw-btns .btn{flex:1}
 .imp input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0!important}
+.snaps{display:grid;gap:8px}.snap{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:9px 11px;border:1px solid rgba(var(--lr),.2);border-radius:10px}.snap span{display:grid;font-size:13px}.snap small{color:var(--muted);font-size:12px}.snap .mv.armed{color:#ffb648;border-color:rgba(255,182,72,.5)}
 </style>
 
 <div id="bgimg" class="on" aria-hidden="true"></div><div id="bgimg2" aria-hidden="true"></div><canvas id="bglive" aria-hidden="true"></canvas><div id="bgspin" aria-hidden="true"></div>
@@ -1140,19 +1141,24 @@ try{const s=localStorage.getItem("aot");if(s)data=Object.assign(EMPTY(),JSON.par
 /* ---------- account sync (Supabase) ---------- */
 const CFG=window.AOT_CONFIG||{};
 const sb=(CFG.supabaseUrl&&CFG.supabaseAnonKey&&window.supabase&&supabase.createClient)?supabase.createClient(CFG.supabaseUrl,CFG.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,storageKey:"aot-auth"}}):null;
-let sbUser=null,syncDirty=false,pulling=false,pwOpen=false,recovering=/type=recovery/.test(location.hash);
+let snapArm=null,sbUser=null,syncDirty=false,pulling=false,pwOpen=false,recovering=/type=recovery/.test(location.hash);
 const skipAuth=()=>{try{return localStorage.getItem("aot-skip-auth")==="1"}catch(e){return false}};
 function setUplink(){const u=$("#uplink");if(u){u.textContent=sbUser?"your account":"this device";u.className=sbUser?"ok":""}}
+function snapshot(d,why){try{const L=JSON.parse(localStorage.getItem("aot-snaps")||"[]");L.unshift({at:Date.now(),why,data:d});while(L.length>8)L.pop();localStorage.setItem("aot-snaps",JSON.stringify(L))}catch(e){try{const L=JSON.parse(localStorage.getItem("aot-snaps")||"[]").slice(0,3);localStorage.setItem("aot-snaps",JSON.stringify(L))}catch(_){}}}
 async function pull(){
   if(!sb||!sbUser||pulling)return;pulling=true;
   try{
     const {data:row,error}=await sb.from("trackers").select("data").eq("user_id",sbUser.id).maybeSingle();
     if(error)throw error;
     if(storeNote){storeNote=""}
+    const owner=(()=>{try{return localStorage.getItem("aot-owner")}catch(e){return null}})(),mine=owner===sbUser.id;
     if(row&&row.data){const inc=row.data;
-      if(!writing&&!pending&&(inc._rev||0)>(data._rev||0)){data=Object.assign(EMPTY(),inc);stripCanceled(data);try{localStorage.setItem("aot",JSON.stringify(data))}catch(e){}}
+      // a copy that was never synced with this account must never replace the account: the account wins, the device copy is kept aside
+      if(!mine){if(!isEmpty(data)&&JSON.stringify(data)!==JSON.stringify(inc))snapshot(data,"Before signing in on this device");data=Object.assign(EMPTY(),inc);stripCanceled(data);syncDirty=false;try{localStorage.setItem("aot",JSON.stringify(data))}catch(e){}}
+      else if(!writing&&!pending&&(inc._rev||0)>(data._rev||0)){snapshot(data,"Before an update from another device");data=Object.assign(EMPTY(),inc);stripCanceled(data);try{localStorage.setItem("aot",JSON.stringify(data))}catch(e){}}
       else if((data._rev||0)>(inc._rev||0)||syncDirty)save()}
     else if(!isEmpty(data))save();
+    try{localStorage.setItem("aot-owner",sbUser.id)}catch(e){}
   }catch(e){storeNote=navigator.onLine?"Couldn't reach your account. Changes are kept on this device and will sync later.":"You're offline. Changes are kept on this device and will sync when you're back online.";syncDirty=true}
   pulling=false;render();
 }
@@ -1209,7 +1215,7 @@ document.addEventListener("submit",async e=>{if(e.target.id!=="authForm")return;
   }catch(err){msg.className="auth-msg";msg.textContent=/invalid login/i.test(err.message)?"That email and password don't match.":/already registered/i.test(err.message)?"That email already has an account. Sign in instead.":err.message||"Something went wrong. Try again."}
   go.disabled=false;paintAuth();
 },true);
-document.addEventListener("click",async e=>{const t=e.target.closest&&e.target.closest("[data-auth],#signInBtn,#signOutBtn,#exportBtn,#pwBtn,#pwCancel");if(!t)return;
+document.addEventListener("click",async e=>{const t=e.target.closest&&e.target.closest("[data-auth],#signInBtn,#signOutBtn,#exportBtn,#pwBtn,#pwCancel,[data-snap]");if(!t)return;
   if(t.id==="pwBtn"){pwOpen=true;render();setTimeout(()=>{const i=$("#pwCur");i&&i.focus()},50);return}
   if(t.id==="pwCancel"){pwOpen=false;render();return}
   if(t.dataset.auth==="swap"){const a=$("#auth"),m=a.dataset.mode;a.dataset.mode=m==="up"||m==="forgot"?"in":"up";$("#authMsg").textContent="";paintAuth()}
@@ -1217,7 +1223,8 @@ document.addEventListener("click",async e=>{const t=e.target.closest&&e.target.c
   else if(t.dataset.auth==="skip"){try{localStorage.setItem("aot-skip-auth","1")}catch(_){}hideAuth();toast("Saving on this device only")}
   else if(t.id==="signInBtn")showAuth("in");
   else if(t.id==="signOutBtn"){if(t.dataset.armed!=="1"){t.dataset.armed="1";t.textContent=syncDirty?"Unsynced changes will be lost. Tap again":"Tap again to sign out";return}
-    await sb.auth.signOut();data=EMPTY();try{localStorage.removeItem("aot")}catch(_){}sbUser=null;saveRef=null;setUplink();render();showAuth("in")}
+    await sb.auth.signOut();if(!isEmpty(data))snapshot(data,"Before signing out");data=EMPTY();try{localStorage.removeItem("aot");localStorage.removeItem("aot-owner")}catch(_){}sbUser=null;saveRef=null;setUplink();render();showAuth("in")}
+  else if(t.dataset&&t.dataset.snap!==undefined){const i=+t.dataset.snap;if(snapArm!==i){snapArm=i;render();return}snapArm=null;let L=[];try{L=JSON.parse(localStorage.getItem("aot-snaps")||"[]")}catch(e){}const x=L[i];if(!x)return;snapshot(data,"Before restoring an earlier version");data=Object.assign(EMPTY(),x.data);stripCanceled(data);render();save();toast("Earlier version restored")}
   else if(t.id==="exportBtn"){const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),u=URL.createObjectURL(blob),l=document.createElement("a");l.href=u;l.download="assontrack-backup-"+today()+".json";document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);toast("Backup downloaded")}
 });
 document.addEventListener("change",async e=>{if(e.target.id!=="importIn")return;const f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;
@@ -2245,7 +2252,7 @@ function vSet(){
       :`<p class="note" style="margin-top:0">You're saving on this device only. Sign in to keep your logs safe and synced between your phone and computer.</p><div class="stack" style="margin-top:14px;gap:10px"><button class="btn" id="signInBtn">Sign in or create account</button></div>`)
       :`<p class="note" style="margin-top:0">Your logs are saved on this device.</p>`}
     <div class="ph" style="margin:20px 0 10px"><span>Backup</span></div>
-    <div class="stack" style="gap:10px"><button class="btn mag" id="exportBtn">Download a backup</button><label class="btn mag imp">Import from a backup file<input id="importIn" type="file" accept="application/json,.json"></label></div>
+    <div class="stack" style="gap:10px"><button class="btn mag" id="exportBtn">Download a backup</button><label class="btn mag imp">Import from a backup file<input id="importIn" type="file" accept="application/json,.json"></label></div>${(()=>{let L=[];try{L=JSON.parse(localStorage.getItem("aot-snaps")||"[]")}catch(e){}return L.length?`<div class="ph" style="margin:20px 0 10px"><span>Earlier versions on this device</span></div><div class="snaps">${L.map((x,i)=>`<div class="snap"><span><b>${new Date(x.at).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</b><small>${esc(x.why||"")} · ${(x.data.passions||[]).length} passions${(x.data.categories||[]).length?", "+x.data.categories.length+" categories":""}</small></span><button class="mv${snapArm===i?" armed":""}" data-snap="${i}">${snapArm===i?"Tap again to restore":"Restore"}</button></div>`).join("")}</div><p class="note">The app keeps the last few copies it replaced, so nothing is lost if a sync goes the wrong way.</p>`:""})()}
     <p class="note">A backup is a file with everything you've logged. Importing one replaces what's in the app.</p>
     <div class="stack" style="margin-top:16px;gap:12px"><button class="btn red" id="clearBtn">Clear all my data</button></div></div>
   </div>`;
