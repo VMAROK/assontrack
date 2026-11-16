@@ -964,6 +964,9 @@ aside{background:rgba(var(--tD),calc(.82*var(--go)))!important;backdrop-filter:b
 .auth-link{font:inherit;font-size:14px;font-weight:600;color:var(--cyan);background:none;border:0;padding:8px;cursor:pointer}
 .auth-link.dim{color:var(--muted);font-weight:500;font-size:13px;padding-top:0}
 .imp{position:relative;display:block;text-align:center;overflow:hidden}
+.pw-match{margin:-4px 0 0;font-size:13px;font-weight:600}.pw-match:empty{display:none}.pw-match.ok{color:#3ddc84}.pw-match.no{color:#ffb648}
+.pwform{padding:14px;border:1px solid rgba(var(--tL),.3);border-radius:12px;background:rgba(var(--tX),.4)}
+.pw-btns{display:flex;gap:10px;align-items:center}.pw-btns .btn{flex:1}
 .imp input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0!important}
 </style>
 
@@ -1007,6 +1010,8 @@ aside{background:rgba(var(--tD),calc(.82*var(--go)))!important;backdrop-filter:b
   <h2 id="authTitle">Welcome back</h2><p id="authSub" class="auth-sub"></p>
   <form id="authForm" novalidate><label>Email<input id="authEmail" type="email" autocomplete="email" inputmode="email" autocapitalize="off" required></label>
   <label>Password<input id="authPw" type="password" autocomplete="current-password" required minlength="6"></label>
+  <label id="authPw2L" hidden>Confirm password<input id="authPw2" type="password" autocomplete="new-password" minlength="6"></label>
+  <p id="pwMatch" class="pw-match" aria-live="polite"></p>
   <p id="authMsg" class="auth-msg" role="alert"></p>
   <button class="btn" id="authGo">Sign in</button></form>
   <button type="button" class="auth-link" id="authSwap" data-auth="swap">Create an account</button>
@@ -1048,7 +1053,7 @@ try{const s=localStorage.getItem("aot");if(s)data=Object.assign(EMPTY(),JSON.par
 /* ---------- account sync (Supabase) ---------- */
 const CFG=window.AOT_CONFIG||{};
 const sb=(CFG.supabaseUrl&&CFG.supabaseAnonKey&&window.supabase&&supabase.createClient)?supabase.createClient(CFG.supabaseUrl,CFG.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,storageKey:"aot-auth"}}):null;
-let sbUser=null,syncDirty=false,pulling=false;
+let sbUser=null,syncDirty=false,pulling=false,pwOpen=false;
 const skipAuth=()=>{try{return localStorage.getItem("aot-skip-auth")==="1"}catch(e){return false}};
 function setUplink(){const u=$("#uplink");if(u){u.textContent=sbUser?"your account":"this device";u.className=sbUser?"ok":""}}
 async function pull(){
@@ -1073,10 +1078,24 @@ async function onSession(session){
 }
 function showAuth(mode){const a=$("#auth");if(!a)return;a.hidden=false;a.dataset.mode=mode||"in";$("#authMsg").textContent="";paintAuth();setTimeout(()=>{const i=$("#authEmail");i&&i.focus()},50)}
 function hideAuth(){const a=$("#auth");if(a)a.hidden=true}
-function paintAuth(){const a=$("#auth"),up=a.dataset.mode==="up";$("#authTitle").textContent=up?"Create your account":"Welcome back";$("#authSub").textContent=up?"Your logs will sync between your phone and computer.":"Sign in to sync your logs across your devices.";$("#authGo").textContent=up?"Create account":"Sign in";$("#authSwap").textContent=up?"I already have an account":"Create an account";$("#authPw").autocomplete=up?"new-password":"current-password"}
+function paintAuth(){const a=$("#auth"),up=a.dataset.mode==="up";$("#authTitle").textContent=up?"Create your account":"Welcome back";$("#authSub").textContent=up?"Your logs will sync between your phone and computer.":"Sign in to sync your logs across your devices.";$("#authGo").textContent=up?"Create account":"Sign in";$("#authSwap").textContent=up?"I already have an account":"Create an account";$("#authPw").autocomplete=up?"new-password":"current-password";$("#authPw2L").hidden=!up;if(!up)$("#authPw2").value="";matchHint("authPw","authPw2","pwMatch")}
+function matchHint(a,b,o){const A=$("#"+a),B_=$("#"+b),O=$("#"+o);if(!A||!B_||!O)return true;const x=A.value,y=B_.value;if(!y||B_.closest("[hidden]")){O.textContent="";O.className="pw-match";return x===y}const ok=x===y;O.textContent=ok?"✓ Passwords match":"Passwords don't match yet";O.className="pw-match "+(ok?"ok":"no");return ok}
+document.addEventListener("input",e=>{const id=e.target.id;if(id==="authPw"||id==="authPw2")matchHint("authPw","authPw2","pwMatch");if(id==="pwNew"||id==="pwNew2")matchHint("pwNew","pwNew2","pwMatch2")});
+document.addEventListener("submit",async e=>{if(e.target.id!=="pwForm")return;e.preventDefault();e.stopImmediatePropagation();if(!sb||!sbUser)return;
+  const cur=$("#pwCur").value,n1=$("#pwNew").value,n2=$("#pwNew2").value,msg=$("#pwMsg"),go=$("#pwGo");msg.className="auth-msg";
+  if(n1.length<6){msg.textContent="Use a new password with at least 6 characters.";return}
+  if(n1!==n2){msg.textContent="The new passwords don't match.";matchHint("pwNew","pwNew2","pwMatch2");return}
+  if(n1===cur){msg.textContent="That's the same as your current password.";return}
+  go.disabled=true;go.textContent="Saving…";
+  try{const {error:e1}=await sb.auth.signInWithPassword({email:sbUser.email,password:cur});if(e1){msg.textContent=/invalid login/i.test(e1.message)?"Your current password isn't right.":e1.message;go.disabled=false;go.textContent="Save new password";return}
+    const {error:e2}=await sb.auth.updateUser({password:n1});if(e2)throw e2;
+    pwOpen=false;render();toast("Password changed")}
+  catch(err){msg.textContent=err.message||"Couldn't change the password. Try again.";go.disabled=false;go.textContent="Save new password"}
+},true);
 document.addEventListener("submit",async e=>{if(e.target.id!=="authForm")return;e.preventDefault();e.stopImmediatePropagation();if(!sb)return;
   const a=$("#auth"),up=a.dataset.mode==="up",email=$("#authEmail").value.trim(),pw=$("#authPw").value,msg=$("#authMsg"),go=$("#authGo");
-  if(pw.length<6){msg.textContent="Use a password with at least 6 characters.";return}
+  if(pw.length<6){msg.className="auth-msg";msg.textContent="Use a password with at least 6 characters.";return}
+  if(up&&pw!==$("#authPw2").value){msg.className="auth-msg";msg.textContent="The two passwords don't match.";matchHint("authPw","authPw2","pwMatch");$("#authPw2").focus();return}
   go.disabled=true;go.textContent=up?"Creating…":"Signing in…";msg.textContent="";
   try{
     if(up){const {data:r,error}=await sb.auth.signUp({email,password:pw});if(error)throw error;
@@ -1088,7 +1107,9 @@ document.addEventListener("submit",async e=>{if(e.target.id!=="authForm")return;
   }catch(err){msg.className="auth-msg";msg.textContent=/invalid login/i.test(err.message)?"That email and password don't match.":/already registered/i.test(err.message)?"That email already has an account. Sign in instead.":err.message||"Something went wrong. Try again."}
   go.disabled=false;paintAuth();
 },true);
-document.addEventListener("click",async e=>{const t=e.target.closest&&e.target.closest("[data-auth],#signInBtn,#signOutBtn,#exportBtn");if(!t)return;
+document.addEventListener("click",async e=>{const t=e.target.closest&&e.target.closest("[data-auth],#signInBtn,#signOutBtn,#exportBtn,#pwBtn,#pwCancel");if(!t)return;
+  if(t.id==="pwBtn"){pwOpen=true;render();setTimeout(()=>{const i=$("#pwCur");i&&i.focus()},50);return}
+  if(t.id==="pwCancel"){pwOpen=false;render();return}
   if(t.dataset.auth==="swap"){const a=$("#auth");a.dataset.mode=a.dataset.mode==="up"?"in":"up";$("#authMsg").textContent="";paintAuth()}
   else if(t.dataset.auth==="skip"){try{localStorage.setItem("aot-skip-auth","1")}catch(_){}hideAuth();toast("Saving on this device only")}
   else if(t.id==="signInBtn")showAuth("in");
@@ -1804,7 +1825,7 @@ function vSet(){
     
     <button class="btn">Save goals</button></form></div>
    <div class="panel"><div class="ph"><span>Account &amp; sync</span><i>${sbUser?"Synced":"This device"}</i></div>
-    ${sb?(sbUser?`<p class="note" style="margin-top:0">Signed in as <b style="color:var(--fg)">${esc(sbUser.email||"")}</b>. Your logs sync between your devices.</p><div class="stack" style="margin-top:14px;gap:10px"><button class="btn" id="signOutBtn">Sign out</button></div>`
+    ${sb?(sbUser?`<p class="note" style="margin-top:0">Signed in as <b style="color:var(--fg)">${esc(sbUser.email||"")}</b>. Your logs sync between your devices.</p><div class="stack" style="margin-top:14px;gap:10px">${pwOpen?`<form class="f pwform" id="pwForm"><label>Current password<input id="pwCur" type="password" autocomplete="current-password" required></label><label>New password<input id="pwNew" type="password" autocomplete="new-password" required minlength="6"></label><label>Confirm new password<input id="pwNew2" type="password" autocomplete="new-password" required minlength="6"></label><p id="pwMatch2" class="pw-match" aria-live="polite"></p><p id="pwMsg" class="auth-msg" role="alert"></p><div class="pw-btns"><button class="btn" id="pwGo">Save new password</button><button type="button" class="mv" id="pwCancel">Cancel</button></div></form>`:`<button class="btn mag" id="pwBtn">Change password</button>`}<button class="btn" id="signOutBtn">Sign out</button></div>`
       :`<p class="note" style="margin-top:0">You're saving on this device only. Sign in to keep your logs safe and synced between your phone and computer.</p><div class="stack" style="margin-top:14px;gap:10px"><button class="btn" id="signInBtn">Sign in or create account</button></div>`)
       :`<p class="note" style="margin-top:0">Your logs are saved on this device.</p>`}
     <div class="ph" style="margin:20px 0 10px"><span>Backup</span></div>
