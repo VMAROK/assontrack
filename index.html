@@ -2122,7 +2122,7 @@ function schedView(d,p){
   return `<div class="wknav"><b>This week</b><small>${fmtDate(ymd(mon))} – ${fmtDate(ymd(end))}</small>
      <span class="seg2" role="group" aria-label="Layout"><button data-slay="rows" aria-pressed="${lay==="rows"}">Rows</button><button data-slay="cols" aria-pressed="${lay==="cols"}">Columns</button></span>
      <span class="wsum">${slots.length?`${doneN} done${missN?` · <b class="miss">${missN} missed</b>`:""} · ${fmtH(doneM)} of ${fmtH(planned)}`:"No time slots yet"}</span></div>
-   ${slots.length?`<div class="week${lay==="rows"?" rows":""}">${cols.join("")}</div>`:`<div class="empty" style="padding:22px 10px">Add the times you want to commit to ${esc(p.name)} each week</div>`}
+   <div class="week${lay==="rows"?" rows":""}">${cols.join("")}</div>${slots.length?"":`<p class="note" style="text-align:center;margin:10px 0 0">No time slots yet. Add the times you want to commit to ${esc(p.name)} each week.</p>`}
    ${(()=>{const sl=(p.slots||[]).find(x=>x.id===editSlot);if(!sl)return "";const fr=sl.once||((sl.from&&sl.from>today())?sl.from:today());
      return `<form class="slotform editform" id="slotEditForm"><div class="ef-title">Edit time slot</div>
      <label>Repeats<select id="seR"><option value="weekly" ${sl.once?"":"selected"}>Every week</option><option value="once" ${sl.once?"selected":""}>One time</option></select></label>
