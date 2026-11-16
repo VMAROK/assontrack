@@ -900,7 +900,7 @@ label.dim{opacity:.4}
 .wcard[aria-checked="true"] .wimg{border:2px solid var(--cyan);box-shadow:0 0 0 3px rgba(76,201,255,.18),0 0 18px rgba(76,201,255,.4)}
 .wname{font-size:12.5px;font-weight:600;padding-left:2px}
 .wcard[aria-checked="true"] .wname{color:var(--fg)}
-@media (max-width:760px){.wgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}}
+@media (max-width:760px){.wgrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.wname{font-size:11px}.wdel{width:22px;height:22px;top:4px;right:4px;font-size:14px}.lk{width:60px}.lk-sw{width:38px;height:38px}}
 
 /* per-passion theme */
 .theme-btn{display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:13px;font-weight:600;color:var(--muted);background:rgba(4,10,28,.5);border:1px solid rgba(76,170,255,.25);border-radius:99px;padding:4px 12px 4px 5px;cursor:pointer;transition:all .15s}
@@ -916,6 +916,40 @@ label.dim{opacity:.4}
 .tcard[aria-checked="true"] .timg{border:2px solid var(--cyan);box-shadow:0 0 0 3px rgba(76,201,255,.18),0 0 16px rgba(76,201,255,.4)}
 .tname{font-size:11.5px;font-weight:600;text-align:center}
 .tcard[aria-checked="true"] .tname{color:var(--fg)}
+
+.wcell{position:relative;display:grid}
+.wdel{position:absolute;top:6px;right:6px;width:26px;height:26px;display:grid;place-items:center;border-radius:99px;border:1px solid rgba(255,255,255,.25);background:rgba(4,8,20,.7);color:#fff;font-size:16px;line-height:1;cursor:pointer;padding:0;backdrop-filter:blur(6px)}
+.wdel:hover,.wdel.armed{background:#ff5d6c;border-color:#ff5d6c}.wdel.armed{width:auto;padding:0 9px;font-size:11.5px;font-weight:700}
+.wadd{position:relative;cursor:pointer}
+.wadd input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0!important;width:100%;height:100%}
+.wadd-i{display:grid!important;place-items:center;color:var(--cyan);background:rgba(76,201,255,.06)!important;border:1.5px dashed rgba(76,201,255,.45)!important}
+.wadd:hover .wadd-i{background:rgba(76,201,255,.14)!important;box-shadow:0 0 14px rgba(76,201,255,.25)}
+
+/* ===== themeable boxes ===== */
+:root{--tA:22,52,120;--tD:6,12,32;--tX:2,6,20;--tL:76,170,255;--tB:80,130,220;--go:1;--gb:12px;
+  --d1:rgba(var(--tX),calc(.34*var(--go)))!important;--d2:rgba(var(--tD),calc(.36*var(--go)))!important;--d3:rgba(var(--tB),calc(.15*var(--go)))!important}
+.panel{background:linear-gradient(180deg,rgba(var(--tA),calc(.55*var(--go))),rgba(var(--tD),calc(.82*var(--go))))!important;border-color:rgba(var(--tL),.24)!important;backdrop-filter:blur(var(--gb))!important;-webkit-backdrop-filter:blur(var(--gb))!important}
+aside{background:rgba(var(--tD),calc(.82*var(--go)))!important;backdrop-filter:blur(var(--gb))!important;-webkit-backdrop-filter:blur(var(--gb))!important}
+.topbar{background:rgba(var(--tD),calc(.55*var(--go)))!important}
+.pd-hero{background:linear-gradient(180deg,rgba(var(--tX),calc(.72*var(--go))),rgba(var(--tX),calc(.62*var(--go))))!important;border-bottom-color:rgba(var(--tL),.22)!important}
+.pstats div,.cs-stats div,.lstats div,.wday,.week:not(.rows),.pj-next,.pj-subs{background:rgba(var(--tX),calc(.5*var(--go)))!important}
+.tkg-b .tkrow,.tklist>.tkrow{background:rgba(var(--tD),calc(.26*var(--go)))!important}
+.tkg-b .tkcard,.tklist>.tkcard{background:rgba(var(--tD),calc(.14*var(--go)))!important}
+.tkcard>.tk-top{background:rgba(var(--tD),calc(.24*var(--go)))!important}
+.addform,.slotform,.prjform{background:rgba(var(--tX),calc(.45*var(--go)))!important}
+.ptabs{background:rgba(var(--tX),calc(.65*var(--go)))!important}
+/* settings controls */
+.lk-label{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:10px}
+.lk-row{display:flex;flex-wrap:wrap;gap:10px}
+.lk{display:grid;justify-items:center;gap:6px;width:72px;padding:0;background:none;border:0;cursor:pointer;color:var(--muted);font:inherit;font-size:11.5px;font-weight:600;line-height:1.25;text-align:center}
+.lk-sw{width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,255,255,.12);box-shadow:inset 0 2px 6px rgba(255,255,255,.15);transition:transform .15s,box-shadow .2s}
+.lk-sw.auto{background:conic-gradient(from 210deg,#4cc9ff,#8b5cf6,#ff5d8f,#ffb648,#2ee6a6,#4cc9ff)}
+.lk:hover .lk-sw{transform:scale(1.06)}
+.lk[aria-checked="true"]{color:var(--fg)}
+.lk[aria-checked="true"] .lk-sw{border-color:#fff;box-shadow:0 0 0 3px rgba(var(--tL),.35),0 0 16px rgba(var(--tL),.5)}
+.glass-row{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted)}
+.glass-row input{flex:1;accent-color:var(--cyan);height:28px;padding:0;background:none;border:0;box-shadow:none}
+.glass-row b{min-width:42px;text-align:right;color:var(--fg);font-variant-numeric:tabular-nums}
 
 /* ===== standalone app ===== */
 #auth{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:max(24px,env(safe-area-inset-top)) 20px max(24px,env(safe-area-inset-bottom));background:radial-gradient(120% 80% at 50% 0%,rgba(30,80,170,.35),rgba(3,6,18,.96) 60%),#03060f;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overflow-y:auto}
@@ -1599,8 +1633,8 @@ function passDetail(d){
   const MN={schedule:"Weekly schedule",tasks:"Tasks",projects:"Projects"},on=modesOf(p).includes("schedule"),st=passStats(d,p);
   return `<div class="panel pdetail" style="margin-top:18px">
     <div class="pd-hero"><div class="pd-head"><div class="pd-title"><h2>${esc(p.name)}</h2><span class="lvlsw" role="group" aria-label="Priority level">${["Priority","Moderate","Bonus"].map(l=>`<button data-setlvl="${l}" data-lvl="${l}" aria-pressed="${p.lvl===l}" title="Press and hold to ${p.lvl===l?"clear":"set "+l}"><span>${l}</span></button>`).join("")}</span></div>
-      <div class="pd-modes"><button class="theme-btn${themeOpen?" on":""}" data-theme aria-expanded="${themeOpen}" title="Theme for this passion">${p.wall&&WALLS.find(w=>w.id===p.wall)?`<span class="theme-sw" style="background-image:url('wp/t/${p.wall}.jpg')"></span>`:`<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>`}<span>Theme</span></button><button class="fchip" data-mode="schedule" aria-pressed="${on}">${on?"Weekly schedule on":"Weekly schedule off"}</button><button class="x" data-closep aria-label="Close">×</button></div></div>
-    ${themeOpen?`<div class="theme-strip" role="radiogroup" aria-label="Theme for ${esc(p.name)}"><button class="tcard" role="radio" aria-checked="${!p.wall}" data-pwall=""><span class="timg none">Main<br>wallpaper</span></button>${WALLS.map(w=>`<button class="tcard" role="radio" aria-checked="${p.wall===w.id}" data-pwall="${w.id}"><span class="timg" style="background-image:url('wp/t/${w.id}.jpg')"></span><span class="tname">${esc(w.name)}</span></button>`).join("")}</div>`:""}
+      <div class="pd-modes"><button class="theme-btn${themeOpen?" on":""}" data-theme aria-expanded="${themeOpen}" title="Theme for this passion">${p.wall&&allWalls().find(w=>w.id===p.wall)?`<span class="theme-sw" style="background-image:url('${thumbOf(allWalls().find(w=>w.id===p.wall))}')"></span>`:`<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>`}<span>Theme</span></button><button class="fchip" data-mode="schedule" aria-pressed="${on}">${on?"Weekly schedule on":"Weekly schedule off"}</button><button class="x" data-closep aria-label="Close">×</button></div></div>
+    ${themeOpen?`<div class="theme-strip" role="radiogroup" aria-label="Theme for ${esc(p.name)}"><button class="tcard" role="radio" aria-checked="${!p.wall}" data-pwall=""><span class="timg none">Main<br>wallpaper</span></button>${allWalls().map(w=>`<button class="tcard" role="radio" aria-checked="${p.wall===w.id}" data-pwall="${w.id}"><span class="timg" style="background-image:url('${thumbOf(w)}')"></span><span class="tname">${esc(w.name)}</span></button>`).join("")}<label class="tcard wadd" title="Use your own photo"><span class="timg wadd-i"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span class="tname">Add your own</span><input type="file" accept="image/*" data-wallup="passion"></label></div>`:""}
     <div class="pstats"><div><b>${fmtH(st.tot)}</b><small>Total hours</small></div><div><b>${fmtH(st.month)}</b><small>This month</small></div><div><b>${st.n}</b><small>Sessions</small></div><div><b class="${st.missed?"miss":""}">${st.missed}</b><small>Missed</small></div></div>
     <div class="tabs ptabs" role="tablist">${tabs.map(m=>`<button class="tab" role="tab" data-ptab="${m}" aria-selected="${pTab===m}">${PTI[m]||""}<span>${MN[m]}</span>${m==="tasks"&&(p.tasks||[]).some(t=>!t.doneAt)?` <span class="tcount">${(p.tasks||[]).filter(t=>!t.doneAt).length}</span>`:""}${m==="projects"&&topsOf(d,p).some(x=>prjStats(p,x).status!=="done")?` <span class="tcount">${topsOf(d,p).filter(x=>prjStats(p,x).status!=="done").length}</span>`:""}</button>`).join("")}</div></div>
     ${pTab==="tasks"?taskView(d,p):pTab==="projects"?projView(d,p):schedView(d,p)}
@@ -1704,6 +1738,7 @@ function vPass(){
 }
 const WALLS=[
   {id:"alpine",name:"Alpine",src:"ramsau.jpg",pos:"42% 55%",shade:.1},
+  {id:"fire",name:"Fire",src:"wp/fire.jpg",pos:"50% 50%",shade:0},
   {id:"aurora",name:"Aurora",src:"wp/aurora.jpg",pos:"50% 40%",shade:0},
   {id:"nebula",name:"Nebula",src:"wp/nebula.jpg",pos:"50% 50%",shade:0},
   {id:"sunset",name:"Sunset",src:"wp/sunset.jpg",pos:"50% 62%",shade:.15},
@@ -1712,18 +1747,48 @@ const WALLS=[
   {id:"dunes",name:"Desert",src:"wp/dunes.jpg",pos:"60% 55%",shade:.25},
   {id:"sakura",name:"Sakura",src:"wp/sakura.jpg",pos:"50% 50%",shade:.3},
   {id:"midnight",name:"Midnight",src:"wp/midnight.jpg",pos:"50% 50%",shade:0}];
-const wallOf=()=>WALLS.find(w=>w.id===((data.profile||{}).wallpaper))||WALLS[0];
-const passWall=()=>{if(tab!=="pass"||!selP)return null;const p=D().passions.find(x=>x.id===selP);return p&&p.wall&&WALLS.find(w=>w.id===p.wall)||null};
+const allWalls=()=>[...WALLS,...((D().customWalls)||[]).map(c=>({id:c.id,name:c.name||"My wallpaper",src:c.src,thumb:c.thumb,pos:"50% 50%",shade:.15,custom:true}))];
+const thumbOf=w=>w.thumb||`wp/t/${w.id}.jpg`;
+const wallOf=()=>allWalls().find(w=>w.id===((data.profile||{}).wallpaper))||WALLS[0];
+const passWall=()=>{if(tab!=="pass"||!selP)return null;const p=D().passions.find(x=>x.id===selP);return p&&p.wall&&allWalls().find(w=>w.id===p.wall)||null};
 let themeOpen=false;
 let wallShown=null;
 function applyWall(){const w=passWall()||wallOf();if(wallShown===w.id)return;wallShown=w.id;const bg=$("#bgimg"),sh=document.querySelector(".bgshade");if(!bg)return;
   const img=new Image();img.onload=()=>{bg.style.backgroundImage=`url("${w.src}")`;bg.style.backgroundPosition=w.pos;bg.classList.remove("fading")};bg.classList.add("fading");img.src=w.src;
   if(sh)sh.style.setProperty("--wshade",w.shade)}
 function wallPanel(){const cur=wallOf().id;return `<div class="panel wallp"><div class="ph"><span>Wallpaper</span><i>${esc(wallOf().name)}</i></div>
-  <div class="wgrid" role="radiogroup" aria-label="Wallpaper">${WALLS.map(w=>`<button class="wcard" role="radio" aria-checked="${w.id===cur}" data-wall="${w.id}"><span class="wimg" style="background-image:url('wp/t/${w.id}.jpg')"></span><span class="wname">${esc(w.name)}</span></button>`).join("")}</div></div>`}
+  <div class="wgrid" role="radiogroup" aria-label="Wallpaper">${allWalls().map(w=>`<div class="wcell"><button class="wcard" role="radio" aria-checked="${w.id===cur}" data-wall="${w.id}"><span class="wimg" style="background-image:url('${thumbOf(w)}')"></span><span class="wname">${esc(w.name)}</span></button>${w.custom?`<button class="wdel" data-walldel="${w.id}" aria-label="Remove ${esc(w.name)}" title="Remove">×</button>`:""}</div>`).join("")}<label class="wcard wadd" title="Use your own photo"><span class="wimg wadd-i"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span class="wname">Add your own</span><input type="file" accept="image/*" data-wallup="main"></label></div></div>`}
+async function shrinkImage(file,max,q){const url=URL.createObjectURL(file);try{const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=url});
+  const out=(m,qq,square)=>{let w=img.naturalWidth,h=img.naturalHeight,sx=0,sy=0,sw=w,sh=h;if(square){const s=Math.min(w,h);sx=(w-s)/2;sy=(h-s)/2;sw=sh=s}const k=Math.min(1,m/Math.max(sw,sh)),c=document.createElement("canvas");c.width=Math.round(sw*k);c.height=Math.round(sh*k);c.getContext("2d").drawImage(img,sx,sy,sw,sh,0,0,c.width,c.height);return c.toDataURL("image/jpeg",qq)};
+  return {src:out(max,q),thumb:out(200,.75,true)}}finally{URL.revokeObjectURL(url)}}
+document.addEventListener("change",async e=>{const inp=e.target;if(!inp.dataset||inp.dataset.wallup===undefined)return;const f=inp.files&&inp.files[0];inp.value="";if(!f)return;
+  if(f.type&&!/^image\//.test(f.type)){toast("Pick a photo or image file");return}
+  if((data.customWalls||[]).length>=6){toast("You can keep up to 6 of your own. Remove one first");return}
+  toast("Adding your wallpaper…");
+  try{const {src,thumb}=await shrinkImage(f,1400,.74);const id="c_"+uid(),name=(f.name.replace(/\.[^.]+$/,"").slice(0,24))||"My wallpaper";
+    data.customWalls=[...(data.customWalls||[]),{id,name,src,thumb}];
+    if(inp.dataset.wallup==="passion"){const p=data.passions.find(x=>x.id===selP);if(p)p.wall=id;themeOpen=false}else data.profile=Object.assign({},data.profile,{wallpaper:id});
+    render();save();toast("Your wallpaper is set")}catch(_){toast("Couldn't read that image. Try a JPG or PNG")}});
+/* ---------- box color + glass ---------- */
+const LOOKS=[{id:"blue",name:"Ocean blue",h:223,s:.69},{id:"violet",name:"Violet",h:268,s:.55},{id:"rose",name:"Rose",h:335,s:.6},{id:"ember",name:"Ember",h:16,s:.78},{id:"gold",name:"Gold",h:40,s:.72},{id:"forest",name:"Forest",h:152,s:.5},{id:"teal",name:"Teal",h:186,s:.65},{id:"graphite",name:"Graphite",h:220,s:.08}];
+const lookOf=()=>Object.assign({color:"blue",glass:35},(data.profile||{}).look||{});
+const hsl2rgb=(h,s,l)=>{s=Math.max(0,Math.min(1,s));const k=n=>(n+h/30)%12,a=s*Math.min(l,1-l),f=n=>l-a*Math.max(-1,Math.min(k(n)-3,9-k(n),1));return [f(0),f(8),f(4)].map(v=>Math.round(v*255)).join(",")};
+const wallColor=new Map();
+function sampleColor(src){if(wallColor.has(src))return Promise.resolve(wallColor.get(src));return new Promise(ok=>{const i=new Image();i.onload=()=>{try{const c=document.createElement("canvas");c.width=c.height=32;const x=c.getContext("2d");x.drawImage(i,0,0,32,32);const d=x.getImageData(0,0,32,32).data;let vx=0,vy=0,sw=0,ss=0;
+  for(let j=0;j<d.length;j+=4){const r=d[j]/255,g=d[j+1]/255,b=d[j+2]/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,dl=mx-mn;if(!dl)continue;const s=dl/(1-Math.abs(2*l-1));let h=mx===r?((g-b)/dl)%6:mx===g?(b-r)/dl+2:(r-g)/dl+4;h=h*60;if(h<0)h+=360;const w=s*s*(l>.1&&l<.88?1:.15);vx+=Math.cos(h*Math.PI/180)*w;vy+=Math.sin(h*Math.PI/180)*w;sw+=w;ss+=s*w}
+  let h=Math.atan2(vy,vx)*180/Math.PI;if(h<0)h+=360;const res=sw?{h,s:Math.max(.08,Math.min(.75,(ss/sw)*Math.min(1,Math.hypot(vx,vy)/sw*1.4)))}:{h:220,s:.08};wallColor.set(src,res);ok(res)}catch(_){ok({h:223,s:.69})}};i.onerror=()=>ok({h:223,s:.69});i.src=src})}
+function setTint(h,s){const r=document.documentElement.style;r.setProperty("--tA",hsl2rgb(h,Math.min(s,.75),.27));r.setProperty("--tD",hsl2rgb(h,s*.75,.075));r.setProperty("--tX",hsl2rgb(h,s*.8,.045));r.setProperty("--tL",hsl2rgb(h,Math.max(.35,Math.min(1,s*1.4)),.66));r.setProperty("--tB",hsl2rgb(h,Math.min(.65,s),.59))}
+function applyLook(tmpGlass){const L=lookOf(),g=(tmpGlass??L.glass)/100,r=document.documentElement.style;r.setProperty("--go",(1.35-g).toFixed(3));r.setProperty("--gb",(4+g*24).toFixed(1)+"px");
+  if(L.color==="auto"){const w=passWall()||wallOf();sampleColor(w.src).then(c=>{if(lookOf().color==="auto"&&(passWall()||wallOf()).src===w.src)setTint(c.h,c.s)})}else{const P=LOOKS.find(x=>x.id===L.color)||LOOKS[0];setTint(P.h,P.s)}}
+function lookPanel(){const L=lookOf();return `<div class="panel" style="margin-top:18px"><div class="ph"><span>Boxes</span><i>${L.color==="auto"?"Matches wallpaper":esc((LOOKS.find(x=>x.id===L.color)||LOOKS[0]).name)}</i></div>
+  <div class="lk-label">Color</div>
+  <div class="lk-row" role="radiogroup" aria-label="Box color"><button class="lk" role="radio" aria-checked="${L.color==="auto"}" data-look="auto" title="Match wallpaper"><span class="lk-sw auto"></span><span>Match<br>wallpaper</span></button>${LOOKS.map(x=>`<button class="lk" role="radio" aria-checked="${L.color===x.id}" data-look="${x.id}" title="${esc(x.name)}"><span class="lk-sw" style="background:hsl(${x.h} ${Math.round(x.s*100)}% 42%)"></span><span>${esc(x.name)}</span></button>`).join("")}</div>
+  <div class="lk-label" style="margin-top:18px">Glass</div>
+  <div class="glass-row"><span>Solid</span><input type="range" id="glassIn" min="0" max="100" step="1" value="${L.glass}" aria-label="Glass intensity"><span>Clear</span><b id="glassVal">${L.glass}%</b></div>
+  <p class="note">Higher glass lets more of the wallpaper show through the boxes.</p></div>`}
 function vSet(){
   const g=data.goals;
-  return banner()+wallPanel()+`<div class="grid cols2" style="margin-top:18px">
+  return banner()+wallPanel()+lookPanel()+`<div class="grid cols2" style="margin-top:18px">
    <div class="panel"><div class="ph"><span>Goals</span><i>Goals</i></div>
     <form class="f" id="gForm"><div class="f2"><label>Daily calories<input id="gK" type="number" inputmode="numeric" min="0" value="${g.kcal}"></label><label>Daily protein (g)<input id="gP" type="number" inputmode="numeric" min="0" value="${g.protein}"></label></div>
     <label>Goal weight (${g.unit})<input id="gW" type="number" step="0.1" inputmode="decimal" value="${g.weight??""}" placeholder="Optional"></label>
@@ -1748,7 +1813,7 @@ function render(){
   v.scrollTop=y;
   $("#ttl").innerHTML=`${TITLES[tab][0]}<small>${TITLES[tab][1]}</small>`;
   document.querySelectorAll(".navbtn").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab));
-  placeBranch();applyWall();
+  placeBranch();applyWall();applyLook();
 }
 function placeBranch(){const br=document.querySelector(".tkf-branch"),ch=document.querySelector(".tk-top-band .tkfilter .fchip.open");if(!br||!ch)return;const c=ch.getBoundingClientRect(),b=br.getBoundingClientRect();br.style.setProperty("--cx",Math.round(c.left+c.width/2-b.left)+"px");br.style.setProperty("--up",Math.round(b.top-c.bottom)+"px")}
 addEventListener("resize",()=>placeBranch());
@@ -1759,9 +1824,10 @@ function go(t){tab=t;confirmClear=false;render();$("#view").scrollTop=0}
 document.addEventListener("change",e=>{const t=e.target;if(!t.dataset||!t.dataset.tkproj)return;const p=data.passions.find(x=>x.id===selP);const k=p&&(p.tasks||[]).find(x=>x.id===t.dataset.tkproj);if(!k)return;k.proj=t.value||null;render();save();toast(t.value?"Moved to "+t.options[t.selectedIndex].text:"Removed from project")});
 document.addEventListener("focusout",e=>{if(e.target.id==="slH"||e.target.id==="seH"){const m=parseHM(e.target.value);if(m!=null)e.target.value=String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&renaming&&e.target.id==="rnIn"){renaming=null;render()}});
-document.addEventListener("change",e=>{if(e.target.id==="slK"||e.target.id==="seK"){const f=e.target.closest("form"),d=e.target.value==="dur";f.querySelectorAll(".kt").forEach(l=>l.hidden=d);f.querySelectorAll(".kd").forEach(l=>l.hidden=!d);if(d){const i=f.querySelector(".kd input");i&&i.focus()}}
+document.addEventListener("change",e=>{if(e.target.id==="glassIn"){data.profile=Object.assign({},data.profile,{look:Object.assign(lookOf(),{glass:+e.target.value})});save();return}
+  if(e.target.id==="slK"||e.target.id==="seK"){const f=e.target.closest("form"),d=e.target.value==="dur";f.querySelectorAll(".kt").forEach(l=>l.hidden=d);f.querySelectorAll(".kd").forEach(l=>l.hidden=!d);if(d){const i=f.querySelector(".kd input");i&&i.focus()}}
   if(e.target.id==="slR"){const dd=$("#slD");if(dd){dd.disabled=e.target.value!=="weekly";dd.closest("label").classList.toggle("dim",dd.disabled)}}});
-document.addEventListener("input",e=>{if(e.target.id==="slH"||e.target.id==="seH"){let v=e.target.value.replace(/[^\d:]/g,"");if(/^\d{3,4}$/.test(v))v=v.slice(0,-2)+":"+v.slice(-2);e.target.value=v.slice(0,5)}if(e.target.id==="delIn"){const ok=e.target.value.trim().toLowerCase()==="delete";$("#delGo").disabled=!ok;e.target.classList.toggle("ok",ok)}});
+document.addEventListener("input",e=>{if(e.target.id==="glassIn"){const v=+e.target.value;applyLook(v);const o=$("#glassVal");if(o)o.textContent=v+"%";return}if(e.target.id==="slH"||e.target.id==="seH"){let v=e.target.value.replace(/[^\d:]/g,"");if(/^\d{3,4}$/.test(v))v=v.slice(0,-2)+":"+v.slice(-2);e.target.value=v.slice(0,5)}if(e.target.id==="delIn"){const ok=e.target.value.trim().toLowerCase()==="delete";$("#delGo").disabled=!ok;e.target.classList.toggle("ok",ok)}});
 document.addEventListener("click",e=>{if(e.target.closest("select"))return;
   const b=e.target.closest("button,[data-selp]");if(!b)return;
   if(b.dataset.selp&&b.tagName!=="BUTTON"){selP=selP===b.dataset.selp?null:b.dataset.selp;delOpen=false;themeOpen=false;renaming=null;tkFilter="all";addingPrj=false;prjFocus=null;addingSub=null;wkOff=0;render();if(selP){const el=$(".pdetail");el&&el.scrollIntoView({behavior:"smooth",block:"start"})}return}
@@ -1777,8 +1843,10 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
   else if(b.dataset.rncancel!==undefined){renaming=null;render()}
   else if(b.dataset.delopen!==undefined){delOpen=!delOpen;render();if(delOpen){const i=$("#delIn");i&&(i.focus({preventScroll:true}),$("#delForm").scrollIntoView({behavior:"smooth",block:"center"}))}}
   else if(b.dataset.delgrp){const p=data.passions.find(x=>x.id===selP);if(!p)return;if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="Remove all 7?";b.classList.add("armed");return}p.slots=(p.slots||[]).filter(x=>x.grp!==b.dataset.delgrp);render();save();toast("Daily time slot removed")}
+  else if(b.dataset.look){data.profile=Object.assign({},data.profile,{look:Object.assign(lookOf(),{color:b.dataset.look})});render();save();toast(b.dataset.look==="auto"?"Boxes match your wallpaper":(LOOKS.find(x=>x.id===b.dataset.look)||{}).name+" boxes")}
+  else if(b.dataset.walldel){if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="Remove?";b.classList.add("armed");return}const id=b.dataset.walldel;data.customWalls=(data.customWalls||[]).filter(c=>c.id!==id);if((data.profile||{}).wallpaper===id)data.profile.wallpaper="alpine";data.passions.forEach(p=>{if(p.wall===id)delete p.wall});render();save();toast("Wallpaper removed")}
   else if(b.dataset.theme!==undefined){themeOpen=!themeOpen;render()}
-  else if(b.dataset.pwall!==undefined){const p=data.passions.find(x=>x.id===selP);if(p){if(b.dataset.pwall)p.wall=b.dataset.pwall;else delete p.wall;themeOpen=false;render();save();toast(p.wall?p.name+" · "+WALLS.find(w=>w.id===p.wall).name+" theme":p.name+" uses the main wallpaper")}}
+  else if(b.dataset.pwall!==undefined){const p=data.passions.find(x=>x.id===selP);if(p){if(b.dataset.pwall)p.wall=b.dataset.pwall;else delete p.wall;themeOpen=false;render();save();toast(p.wall?p.name+" · "+allWalls().find(w=>w.id===p.wall).name+" theme":p.name+" uses the main wallpaper")}}
   else if(b.dataset.wall){data.profile=Object.assign({},data.profile,{wallpaper:b.dataset.wall});render();save();toast(wallOf().name+" wallpaper")}
   else if(b.dataset.addsub){addingSub=addingSub===b.dataset.addsub?null:b.dataset.addsub;render();if(addingSub){const i=$("#sbT");i&&i.focus()}}
   else if(b.dataset.tkf){tkFilter=b.dataset.tkf;render()}
