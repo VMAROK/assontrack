@@ -889,6 +889,19 @@ label.dim{opacity:.4}
   .rnform{flex-wrap:wrap!important}.rnform>input{flex:1 1 100%!important}.rnform>select{flex:1 1 auto!important}
 }
 
+/* wallpapers */
+#bgimg{transition:opacity .45s ease}
+#bgimg.fading{opacity:.35}
+.bgshade{background:linear-gradient(90deg,rgba(4,8,20,calc(.45 + var(--wshade,0))),rgba(4,8,20,calc(.05 + var(--wshade,0))) 45%,rgba(4,8,20,calc(.05 + var(--wshade,0))) 60%,rgba(4,8,20,calc(.3 + var(--wshade,0))))!important}
+.wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:12px}
+.wcard{display:grid;gap:7px;padding:0;background:none;border:0;cursor:pointer;color:var(--muted);font:inherit;text-align:left}
+.wimg{display:block;aspect-ratio:1;border-radius:12px;background-size:cover;background-position:center;border:1px solid rgba(76,170,255,.2);transition:transform .2s,box-shadow .2s,border-color .2s}
+.wcard:hover .wimg{transform:translateY(-2px);border-color:rgba(76,201,255,.5)}
+.wcard[aria-checked="true"] .wimg{border:2px solid var(--cyan);box-shadow:0 0 0 3px rgba(76,201,255,.18),0 0 18px rgba(76,201,255,.4)}
+.wname{font-size:12.5px;font-weight:600;padding-left:2px}
+.wcard[aria-checked="true"] .wname{color:var(--fg)}
+@media (max-width:760px){.wgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}}
+
 /* ===== standalone app ===== */
 #auth{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:max(24px,env(safe-area-inset-top)) 20px max(24px,env(safe-area-inset-bottom));background:radial-gradient(120% 80% at 50% 0%,rgba(30,80,170,.35),rgba(3,6,18,.96) 60%),#03060f;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overflow-y:auto}
 .auth-card{width:min(100%,380px);display:grid;gap:12px;padding:26px 22px 18px;border-radius:20px;border:1px solid rgba(76,170,255,.28);background:linear-gradient(180deg,rgba(22,52,120,.55),rgba(6,12,32,.9));box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 40px rgba(30,110,255,.12)}
@@ -1673,9 +1686,26 @@ function vPass(){
   ${passDetail(d)}
 `;
 }
+const WALLS=[
+  {id:"alpine",name:"Alpine",src:"ramsau.jpg",pos:"42% 55%",shade:.1},
+  {id:"aurora",name:"Aurora",src:"wp/aurora.jpg",pos:"50% 40%",shade:0},
+  {id:"nebula",name:"Nebula",src:"wp/nebula.jpg",pos:"50% 50%",shade:0},
+  {id:"sunset",name:"Sunset",src:"wp/sunset.jpg",pos:"50% 62%",shade:.15},
+  {id:"ocean",name:"Deep ocean",src:"wp/ocean.jpg",pos:"50% 30%",shade:0},
+  {id:"forest",name:"Misty forest",src:"wp/forest.jpg",pos:"50% 55%",shade:.3},
+  {id:"dunes",name:"Desert",src:"wp/dunes.jpg",pos:"60% 55%",shade:.25},
+  {id:"sakura",name:"Sakura",src:"wp/sakura.jpg",pos:"50% 50%",shade:.3},
+  {id:"midnight",name:"Midnight",src:"wp/midnight.jpg",pos:"50% 50%",shade:0}];
+const wallOf=()=>WALLS.find(w=>w.id===((data.profile||{}).wallpaper))||WALLS[0];
+let wallShown=null;
+function applyWall(){const w=wallOf();if(wallShown===w.id)return;wallShown=w.id;const bg=$("#bgimg"),sh=document.querySelector(".bgshade");if(!bg)return;
+  const img=new Image();img.onload=()=>{bg.style.backgroundImage=`url("${w.src}")`;bg.style.backgroundPosition=w.pos;bg.classList.remove("fading")};bg.classList.add("fading");img.src=w.src;
+  if(sh)sh.style.setProperty("--wshade",w.shade)}
+function wallPanel(){const cur=wallOf().id;return `<div class="panel wallp"><div class="ph"><span>Wallpaper</span><i>${esc(wallOf().name)}</i></div>
+  <div class="wgrid" role="radiogroup" aria-label="Wallpaper">${WALLS.map(w=>`<button class="wcard" role="radio" aria-checked="${w.id===cur}" data-wall="${w.id}"><span class="wimg" style="background-image:url('wp/t/${w.id}.jpg')"></span><span class="wname">${esc(w.name)}</span></button>`).join("")}</div></div>`}
 function vSet(){
   const g=data.goals;
-  return banner()+`<div class="grid cols2">
+  return banner()+wallPanel()+`<div class="grid cols2" style="margin-top:18px">
    <div class="panel"><div class="ph"><span>Goals</span><i>Goals</i></div>
     <form class="f" id="gForm"><div class="f2"><label>Daily calories<input id="gK" type="number" inputmode="numeric" min="0" value="${g.kcal}"></label><label>Daily protein (g)<input id="gP" type="number" inputmode="numeric" min="0" value="${g.protein}"></label></div>
     <label>Goal weight (${g.unit})<input id="gW" type="number" step="0.1" inputmode="decimal" value="${g.weight??""}" placeholder="Optional"></label>
@@ -1700,7 +1730,7 @@ function render(){
   v.scrollTop=y;
   $("#ttl").innerHTML=`${TITLES[tab][0]}<small>${TITLES[tab][1]}</small>`;
   document.querySelectorAll(".navbtn").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab));
-  placeBranch();
+  placeBranch();applyWall();
 }
 function placeBranch(){const br=document.querySelector(".tkf-branch"),ch=document.querySelector(".tk-top-band .tkfilter .fchip.open");if(!br||!ch)return;const c=ch.getBoundingClientRect(),b=br.getBoundingClientRect();br.style.setProperty("--cx",Math.round(c.left+c.width/2-b.left)+"px");br.style.setProperty("--up",Math.round(b.top-c.bottom)+"px")}
 addEventListener("resize",()=>placeBranch());
@@ -1729,6 +1759,7 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
   else if(b.dataset.rncancel!==undefined){renaming=null;render()}
   else if(b.dataset.delopen!==undefined){delOpen=!delOpen;render();if(delOpen){const i=$("#delIn");i&&(i.focus({preventScroll:true}),$("#delForm").scrollIntoView({behavior:"smooth",block:"center"}))}}
   else if(b.dataset.delgrp){const p=data.passions.find(x=>x.id===selP);if(!p)return;if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="Remove all 7?";b.classList.add("armed");return}p.slots=(p.slots||[]).filter(x=>x.grp!==b.dataset.delgrp);render();save();toast("Daily time slot removed")}
+  else if(b.dataset.wall){data.profile=Object.assign({},data.profile,{wallpaper:b.dataset.wall});render();save();toast(wallOf().name+" wallpaper")}
   else if(b.dataset.addsub){addingSub=addingSub===b.dataset.addsub?null:b.dataset.addsub;render();if(addingSub){const i=$("#sbT");i&&i.focus()}}
   else if(b.dataset.tkf){tkFilter=b.dataset.tkf;render()}
   else if(b.dataset.prjgo){tkFilter=b.dataset.prjgo;pTab="tasks";render()}
