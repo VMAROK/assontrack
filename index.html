@@ -1043,6 +1043,7 @@ aside{background:rgba(var(--tD),calc(.82*var(--go)))!important;backdrop-filter:b
 .dayform .df-btns{display:flex;gap:6px}.dayform .df-btns .btn{flex:1;padding:8px 6px;font-size:13px}.dayform .df-btns .mv{padding:8px 9px;font-size:12.5px}
 .week.rows .dayform{flex:1 1 100%;grid-template-columns:repeat(auto-fit,minmax(118px,1fr))!important;align-items:end}.week.rows .dayform .df-btns{align-self:end}
 .dayform.wide{grid-template-columns:repeat(2,minmax(0,1fr))!important;margin-top:12px!important;padding:12px!important;border:1px solid rgba(var(--tL),.35)!important;border-radius:10px}.dayform.wide .df-btns,.dayform.wide .ef-title{grid-column:1/-1}
+.avcats{flex-wrap:wrap}.aved .sexsw{display:inline-flex;gap:6px}.addp.avgear.on{rotate:none}
 .cm-delink{justify-self:start;font:inherit;font-size:12.5px;font-weight:600;color:rgba(255,93,108,.75);background:none;border:0;padding:4px 2px;cursor:pointer}.cm-delink:hover{color:#ff5d6c}
 .cat-mgr,.cat-mgr>*,.cat-mgr .cat-theme,.cat-mgr .theme-look,.cat-mgr .lk-row{min-width:0;max-width:100%}.cat-mgr .theme-strip{max-width:100%;overflow-x:auto}.cat-mgr .glass-row{min-width:0}.cat-mgr .glass-row input{min-width:0;width:100%}.cm-row,.cm-name{min-width:0}.cm-name{overflow:hidden;text-overflow:ellipsis}
 .cat-theme{margin:-4px 0 14px;padding:12px;border:1px solid rgba(var(--lr),.25);border-radius:12px;background:rgba(var(--tX),calc(.4*var(--go)));animation:stripin .3s cubic-bezier(.2,.9,.25,1)}
@@ -1499,8 +1500,8 @@ const mirP=path=>path.replace(/([MLCQ])([^MLCQZ]*)/g,(m,c,args)=>c+args.trim().s
 const AV_ITEMS={hat:[["none","None"],["fedora","Fedora"]],top:[["none","None"],["trench","Trench coat"]],shoes:[["none","Barefoot"],["boots","Boots"]]};
 const AV_DEF={hat:"fedora",top:"trench",shoes:"boots"};
 function avatarOf(){const pr=data.profile||{},av=pr.avatar||{},a={body:av.body||pr.figure||"woman"};
-  for(const k in AV_ITEMS)a[k]=AV_ITEMS[k].some(o=>o[0]===av[k])?av[k]:AV_DEF[k];a.colors=Object.assign({},av.colors||{});a.cmode=["solid","glass","figure"].includes(av.cmode)?av.cmode:av.blend?"figure":av.glass?"glass":"solid";if(av.stage)a.stage=av.stage;if(av.model)a.model=av.model;a.useModel=!!(av.useModel&&av.model);return a}
-let avEdit=false,avCat="hat",avEditMsg=null,mdlDelArm=false;
+  for(const k in AV_ITEMS)a[k]=AV_ITEMS[k].some(o=>o[0]===av[k])?av[k]:AV_DEF[k];a.colors=Object.assign({},av.colors||{});a.cmode=["solid","glass","figure"].includes(av.cmode)?av.cmode:av.blend?"figure":av.glass?"glass":"solid";if(av.stage)a.stage=av.stage;if(av.skin)a.skin=av.skin;a.fx=Object.assign({kind:"auto",color:"#4cc9ff",amount:2},av.fx||{});if(av.model)a.model=av.model;a.useModel=!!(av.useModel&&av.model);return a}
+let avEdit=false,avCat="body",avEditMsg=null,mdlDelArm=false;
 const AV_COLORS=[["#16171c","Black"],["#3a3d45","Charcoal"],["#e6e4df","White"],["#b0814f","Camel"],["#5a3a26","Brown"],["#6e1a2a","Burgundy"],["#c0282f","Red"],["#d86a9a","Pink"],["#1f2f5a","Navy"],["#2b56c6","Royal blue"],["#1f4a33","Forest"],["#5b5f2e","Olive"],["#4b2a6e","Purple"],["#c8a040","Gold"]];
 const AV_DEFCOL={hat:"#16171c",top:"#16171c",shoes:"#16171c"};
 function modelPane(a){const m=a.model;
@@ -1509,7 +1510,16 @@ function modelPane(a){const m=a.model;
     <div class="mdl-btns"><label class="mv mdl-up">Replace<input type="file" accept=".glb,.gltf,.fbx,.obj,.mtl" multiple data-modelup></label><button class="mv ${mdlDelArm?"armed":""}" data-modeldel>${mdlDelArm?"Tap again to remove":"Remove"}</button></div>`
    :`<label class="btn mdl-up mdl-add">Import a 3D model<input type="file" accept=".glb,.gltf,.fbx,.obj,.mtl" multiple data-modelup></label>`}
    <p class="avnote">GLB works best. FBX and OBJ work too, up to 50 MB. For an OBJ, pick its .mtl file at the same time to bring in the clothing colors. Your model gets the Disturbed, Ghost and Alive looks and spins like the built-in figure. It shows as it is, without the hat, coat or boots. Switch to the built-in figure to use the outfit.</p></div>`}
-function avEditor(){const a=avatarOf(),um=a.useModel&&a.model,cats=um?[["model","3D model"]]:[["hat","Hat"],["top","Top"],["shoes","Shoes"],["model","3D model"]];if(um||avCat==="model")return `<div class="aved"><div class="avcats">${cats.map(([k,l])=>`<button class="avcat" data-avcat="${k}" aria-pressed="${avCat===k}">${l}</button>`).join("")}</div>${modelPane(a)}</div>`;
+const AV_SKINS=[["#f6d7c3", "Porcelain"], ["#eec1a2", "Fair"], ["#d8a07a", "Tan"], ["#c08a5e", "Honey"], ["#a56e45", "Bronze"], ["#80502f", "Brown"], ["#5c3a22", "Deep brown"], ["#3d2616", "Espresso"]],FX_COLORS=[["#4cc9ff", "Cyan"], ["#ffffff", "White"], ["#ffd36b", "Gold"], ["#ff8a3d", "Ember"], ["#ff4d6d", "Rose"], ["#b07bff", "Violet"], ["#58f0a8", "Mint"], ["#7dff5a", "Lime"]],FX_KINDS=[["auto","Auto"],["none","None"],["sparks","Sparks"],["snow","Snow"],["fireflies","Fireflies"],["stars","Stars"],["smoke","Smoke"]];
+function bodyPane(a){return `<div class="avglass"><span>Body</span><span class="sexsw" role="group" aria-label="Body">${[["woman","♀","Woman"],["man","♂","Man"],["neither",`<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="12" r="5"/><path d="M14.5 8.5 L19 4 M15 4 h4 v4"/><path d="M11 17 v5 M8.5 19.5 h5"/></svg>`,"Neither"]].map(([k,sym,l])=>`<button data-sex="${k}" aria-pressed="${a.body===k}" aria-label="${l}" title="${l}">${sym}</button>`).join("")}</span></div>
+    <div class="lk-label" style="margin:2px 0 -2px">Skin tone</div><div class="avcols" role="radiogroup" aria-label="Skin tone">${AV_SKINS.map(([h,n])=>`<button class="avsw" role="radio" style="--sw:${h}" data-avskin="${h}" aria-checked="${(a.skin||"#d8a07a")===h}" aria-label="${n}" title="${n}"></button>`).join("")}</div>
+    ${realStage()!=="real"?`<p class="avnote">Skin tone shows once your figure is Alive, at 65%.</p>`:""}`}
+function scenePane(a){const f=a.fx;return `<div class="lk-label" style="margin:0 0 -2px">Background particles</div><div class="avopts">${FX_KINDS.map(([k,l])=>`<button class="fchip" data-fxkind="${k}" aria-pressed="${f.kind===k}">${l}</button>`).join("")}</div>
+    ${f.kind==="auto"?`<p class="avnote">Auto: dark smoke when Disturbed, nothing otherwise.</p>`:f.kind==="none"?"":`<div class="avcols" role="radiogroup" aria-label="Particle color">${FX_COLORS.map(([h,n])=>`<button class="avsw" role="radio" style="--sw:${h}" data-fxcol="${h}" aria-checked="${f.color===h}" aria-label="${n}" title="${n}"></button>`).join("")}</div>
+    <div class="avglass"><span>Amount</span><span class="seg2" role="group" aria-label="Amount">${[[1,"Few"],[2,"Some"],[3,"Lots"]].map(([k,l])=>`<button data-fxamt="${k}" aria-pressed="${f.amount===k}">${l}</button>`).join("")}</span></div>`}`}
+function avEditor(){const a=avatarOf(),um=a.useModel&&a.model,cats=um?[["scene","Scene"],["model","3D model"]]:[["body","Body"],["hat","Hat"],["top","Top"],["shoes","Shoes"],["scene","Scene"],["model","3D model"]];
+  if(!cats.some(c=>c[0]===avCat))avCat=cats[0][0];const tabsH=`<div class="avcats">${cats.map(([k,l])=>`<button class="avcat" data-avcat="${k}" aria-pressed="${avCat===k}">${l}</button>`).join("")}</div>`;
+  if(avCat==="model")return `<div class="aved">${tabsH}${modelPane(a)}</div>`;if(avCat==="body")return `<div class="aved">${tabsH}${bodyPane(a)}</div>`;if(avCat==="scene")return `<div class="aved">${tabsH}${scenePane(a)}</div>`;
   return `<div class="aved"><div class="avcats">${cats.map(([k,l])=>`<button class="avcat" data-avcat="${k}" aria-pressed="${avCat===k}">${l}</button>`).join("")}</div>
     <div class="avopts">${AV_ITEMS[avCat].map(([v,l])=>`<button class="fchip" data-avset="${avCat}:${v}" aria-pressed="${a[avCat]===v}">${l}</button>`).join("")}</div>
     ${realStage()!=="real"?`<p class="avnote">Clothing colors and looks unlock at 65%, when your figure is Alive.</p>`:a[avCat]!=="none"?`<div class="avcols" role="radiogroup" aria-label="Color">${AV_COLORS.map(([h,n])=>`<button class="avsw" role="radio" style="--sw:${h}" data-avcol="${avCat}:${h}" aria-checked="${(a.colors[avCat]||AV_DEFCOL[avCat]).toLowerCase()===h}" aria-label="${n}" title="${n}"></button>`).join("")}</div>`:""}
@@ -1559,7 +1569,7 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
     const B=(c,dark)=>real?toon(c):holo?(dark?hd:hb):sh;           // body layer follows the stage
     const cmode=av.cmode||"solid",col=Object.assign({hat:"#16171c",top:"#16171c",shoes:"#16171c"},av.colors||{});
     const C=(hex)=>cmode==="figure"&&!real?(holo?hd:sh):toon(hex,cmode==="glass"?{transparent:true,opacity:.42,depthWrite:false}:{});   // solid, see-through, or part of the figure
-    const SKIN=0xd8a07a,HAIR=woman?0x3a2418:0x22160f,PANTS=0x2a3550,TEE=0x3c4f6e;
+    const SKIN=av.skin?new T.Color(av.skin).getHex():0xd8a07a,HAIR=woman?0x3a2418:0x22160f,PANTS=0x2a3550,TEE=0x3c4f6e;
     const trench=av.top==="trench",fed=av.hat==="fedora",boots=av.shoes==="boots";
     const skin=B(SKIN),pants=B(PANTS,true),tee=B(TEE),hair=B(HAIR,true);
     const sw=man?1.32:woman?1.05:1.16,hipW=woman?1.28:man?1.08:1.15,lx=woman?.095:.105;
@@ -1589,7 +1599,7 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
         
         const br=cap(.009,.06,BR);br.rotation.z=Math.PI/2+s*.18;br.position.set(s*.004,.066,.012);eg.add(br);
         if(woman){const la=cap(.004,.03,PU);la.rotation.z=Math.PI/2+s*-.5;la.position.set(s*.04,.026,.012);eg.add(la)}});
-      const nose=sph(.022,toon(0xcf9570),12,10);nose.scale.set(.9,.75,.9);nose.position.set(0,-.045,.192);head.add(nose);
+      const nose=sph(.022,toon(tone(SKIN,.93)),12,10);nose.scale.set(.9,.75,.9);nose.position.set(0,-.045,.192);head.add(nose);
       const sm=new T.Mesh(new T.TorusGeometry(.042,.0075,6,20,Math.PI*.8),LIP);sm.rotation.z=Math.PI+Math.PI*.1;sm.position.set(0,-.1,.17);sm.scale.set(1,.6,1);head.add(sm);
       [-1,1].forEach(s=>{const ck=sph(.03,toon(0xe08f7c,{transparent:true,opacity:.35}),10,8);ck.scale.set(1,.6,.3);ck.position.set(s*.11,-.055,.155);head.add(ck)})}
     { const capG=new T.SphereGeometry(.212,28,16,0,Math.PI*2,0,Math.PI*.52);const hc=new T.Mesh(capG,hair);hc.position.set(0,.045,-.03);hc.rotation.x=.08;head.add(hc);
@@ -1623,9 +1633,11 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
     if(stage!=="real"){const beam=new T.Mesh(new T.CylinderGeometry(.28,.5,2.3,32,1,true),new T.ShaderMaterial({uniforms:{c:{value:new T.Color(col)}},transparent:true,depthWrite:false,blending:T.AdditiveBlending,side:T.DoubleSide,
       vertexShader:`varying float y;void main(){y=uv.y;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:`uniform vec3 c;varying float y;void main(){gl_FragColor=vec4(c,(1.-y)*.16);}`}));beam.position.y=1.15;grp.add(beam)}
     return grp}
-  function makeSmoke(){const N=140,pos=new Float32Array(N*3),seed=new Float32Array(N);for(let i=0;i<N;i++){seed[i]=Math.random();pos[i*3]=(Math.random()-.5)*.8;pos[i*3+1]=Math.random()*2.2;pos[i*3+2]=(Math.random()-.5)*.5}
+  function makeFx(kind,color,amt){const N=({smoke:[70,140,220],sparks:[50,110,200],snow:[60,130,240],fireflies:[14,28,50],stars:[50,110,200]})[kind][amt-1],pos=new Float32Array(N*3),seed=new Float32Array(N);
+    const wide=kind==="stars"||kind==="snow"||kind==="fireflies";for(let i=0;i<N;i++){seed[i]=Math.random();pos[i*3]=(Math.random()-.5)*(wide?2.4:.9);pos[i*3+1]=Math.random()*2.4;pos[i*3+2]=(Math.random()-.5)*(wide?1.4:.5)-(kind==="stars"?.6:0)}
     const geo=new T.BufferGeometry();geo.setAttribute("position",new T.BufferAttribute(pos,3));
-    const pts=new T.Points(geo,new T.PointsMaterial({map:spr,color:0x5a1640,size:.32,transparent:true,opacity:.5,depthWrite:false,blending:T.AdditiveBlending}));pts.userData.seed=seed;return pts}
+    const size=({smoke:.32,sparks:.07,snow:.06,fireflies:.13,stars:.05})[kind],op=({smoke:.5,sparks:.95,snow:.85,fireflies:.95,stars:.9})[kind];
+    const pts=new T.Points(geo,new T.PointsMaterial({map:spr,color:new T.Color(color),size,transparent:true,opacity:op,depthWrite:false,blending:T.AdditiveBlending}));pts.userData.seed=seed;pts.userData.kind=kind;pts.userData.op=op;return pts}
   const root=new T.Group();scene.add(root);
   const NAMECOL=[[/skin|body|face|head|flesh|hand|arm|leg|neck/i,0xd8a07a],[/hair|brow|lash/i,0x2b1d14],[/denim|jean/i,0x2a3550],[/leather/i,0x4a3020],[/navy/i,0x1f2f5a],[/brown|tan|khaki|wood/i,0x6b4a2f],[/black|dark/i,0x1c1d22],[/white|ivory|cream/i,0xe6e4df],[/red|crimson|maroon/i,0xb8282f],[/blue/i,0x2b56c6],[/green|olive/i,0x3a6b40],[/gr[ae]y|silver|metal/i,0x8a9099],[/yellow|gold/i,0xc8a040],[/orange/i,0xd9772b],[/pink/i,0xd86a9a],[/purple|violet/i,0x5b2a7e]];
   const avgMap=mp=>{try{const im=mp&&mp.image;if(!im||!(im.width||im.videoWidth))return null;const c=document.createElement("canvas");c.width=c.height=8;const x=c.getContext("2d");x.drawImage(im,0,0,8,8);const d=x.getImageData(0,0,8,8).data;let r=0,g=0,b=0,n=0;for(let i=0;i<d.length;i+=4){if(d[i+3]<40)continue;r+=d[i];g+=d[i+1];b+=d[i+2];n++}return n?new T.Color(r/n/255,g/n/255,b/n/255).convertSRGBToLinear():null}catch(_){return null}};
@@ -1687,7 +1699,7 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
   function set(av,stage,md){const k=JSON.stringify(av)+stage+(md?md.key:"");if(k===figKey)return;figKey=k;if(md)md.av=av;
     root.clear();parts=md?fromModel(md,stage):build(av,stage);if(!md)mixer=null;fig=parts.g;root.add(fig);base=makeBase(stage);scene.add(base);
     scene.children.filter(o=>o.userData.isBase&&o!==base).forEach(o=>scene.remove(o));base.userData.isBase=true;
-    if(smoke){scene.remove(smoke);smoke=null}if(stage==="shadow"){smoke=makeSmoke();scene.add(smoke)}
+    if(smoke){scene.remove(smoke);smoke=null}{const fx=av.fx||{kind:"auto"};let kind=fx.kind,col=fx.color||"#4cc9ff";if(kind==="auto"){kind=stage==="shadow"?"smoke":"none";col="#5a1640"}if(kind&&kind!=="none"){smoke=makeFx(kind,col,Math.max(1,Math.min(3,fx.amount||2)));scene.add(smoke)}}
     cur=stage}
   let cur="holo",raf=0,last=0,host=null,t0=performance.now();
   function size(){if(!host)return;const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;if(canvas.width!==Math.round(w*ren.getPixelRatio())||canvas.height!==Math.round(h*ren.getPixelRatio())){ren.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}}
@@ -1697,7 +1709,11 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
       if(mixer){mixer.update(Math.min(.1,t-lastT))}lastT=t;
       if(parts.torso){parts.torso.scale.set(1,1+Math.sin(t*1.6)*.012,1+Math.sin(t*1.6)*.02);parts.head.rotation.y=Math.sin(t*.45)*.08;parts.head.rotation.x=Math.sin(t*.7)*.02}parts.arms.forEach((a,i)=>{a.rotation.z=(i?1:-1)*(.1+Math.sin(t*1.6)*.015);a.rotation.x=Math.sin(t*.9+i)*.03});
 }
-    if(smoke){const p=smoke.geometry.attributes.position,s=smoke.userData.seed;for(let i=0;i<s.length;i++){let y=p.getY(i)+.004+s[i]*.006;if(y>2.4)y=0;p.setY(i,y);p.setX(i,p.getX(i)+Math.sin(t+s[i]*20)*.0015)}p.needsUpdate=true;smoke.rotation.y=fig?fig.rotation.y:0}
+    if(smoke){const p=smoke.geometry.attributes.position,s=smoke.userData.seed,k=smoke.userData.kind,n=s.length;
+      if(k==="smoke"||k==="sparks"){const v=k==="sparks"?2.4:1;for(let i=0;i<n;i++){let y=p.getY(i)+(.004+s[i]*.006)*v;if(y>2.4)y=0;p.setY(i,y);p.setX(i,p.getX(i)+Math.sin(t*(k==="sparks"?3:1)+s[i]*20)*.0015)}p.needsUpdate=true;if(k==="smoke")smoke.rotation.y=fig?fig.rotation.y:0}
+      else if(k==="snow"){for(let i=0;i<n;i++){let y=p.getY(i)-(.004+s[i]*.005);if(y<0)y=2.4;p.setY(i,y);p.setX(i,p.getX(i)+Math.sin(t*.8+s[i]*20)*.0012)}p.needsUpdate=true}
+      else if(k==="fireflies"){for(let i=0;i<n;i++){p.setX(i,p.getX(i)+Math.sin(t*.7+s[i]*40)*.0025);p.setY(i,Math.max(.05,Math.min(2.35,p.getY(i)+Math.cos(t*.9+s[i]*31)*.002)))}p.needsUpdate=true;smoke.material.opacity=smoke.userData.op*(.65+.35*Math.sin(t*2.2))}
+      else if(k==="stars"){smoke.material.opacity=smoke.userData.op*(.75+.25*Math.sin(t*1.7))}}
     ren.render(scene,cam)}
   function start(){if(!raf){last=0;raf=requestAnimationFrame(frame)}}
   function stop(){cancelAnimationFrame(raf);raf=0}
@@ -2204,7 +2220,7 @@ function vPass(){
   const pn=id=>(P.find(p=>p.id===id)||{name:"Removed"}).name;
   const fk=(data.profile&&data.profile.figure)||"woman";
   return banner()+`<div class="passtop">
-    <div class="panel holopanel"><div class="ph"><span>Your figure</span>${avatarOf().useModel&&avatarOf().model?"":`<span class="sexsw" role="group" aria-label="Hologram body">${[["woman","♀","Woman"],["man","♂","Man"],["neither",`<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="12" r="5"/><path d="M14.5 8.5 L19 4 M15 4 h4 v4"/><path d="M11 17 v5 M8.5 19.5 h5"/></svg>`,"Neither"]].map(([k,sym,l])=>`<button data-sex="${k}" aria-pressed="${avatarOf().body===k}" aria-label="${l}" title="${l}">${sym}</button>`).join("")}</span>`}</div>${holoView()}<div class="avfoot">${avEdit?avEditor():""}<button class="avbtn${avEdit?" on":""}" data-avedit aria-expanded="${avEdit}">${avEdit?`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"/></svg>Done`:`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6a2 2 0 1 1 2 2c-1 0-2 .7-2 1.7V11"/><path d="M12 11L3 17.5c-.8.6-.4 1.5.5 1.5h17c.9 0 1.3-.9.5-1.5z"/></svg>Customize outfit`}</button></div></div>
+    <div class="panel holopanel"><div class="ph"><span>Your figure</span><button class="addp gear avgear${avEdit?" on":""}" data-avedit aria-expanded="${avEdit}" aria-label="Customize" title="Customize"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button></div>${holoView()}<div class="avfoot">${avEdit?avEditor():""}</div></div>
     <div class="stack" style="grid-template-rows:auto 1fr;align-content:stretch">${commitPanel(d,P,wk)}${passList(d,P,wk)}</div>
   </div>
   ${passDetail(d)}
@@ -2468,6 +2484,8 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
   else if(b.dataset.hstage){const k=b.dataset.hstage;clearTimeout(holoPrevTimer);if(SRANK[k]<=SRANK[realStage()]){holoPreview=null;const a=avatarOf();a.stage=k;data.profile=Object.assign({},data.profile,{avatar:a});render();save()}}
   else if(b.hasAttribute("data-avedit")){avEdit=!avEdit;render()}
   else if(b.dataset.avcat){avCat=b.dataset.avcat;render()}
+  else if(b.dataset.avskin){const a=avatarOf();a.skin=b.dataset.avskin;data.profile=Object.assign({},data.profile,{avatar:a});render();save()}
+  else if(b.dataset.fxkind||b.dataset.fxcol||b.dataset.fxamt){const a=avatarOf();if(b.dataset.fxkind)a.fx.kind=b.dataset.fxkind;if(b.dataset.fxcol)a.fx.color=b.dataset.fxcol;if(b.dataset.fxamt)a.fx.amount=+b.dataset.fxamt;data.profile=Object.assign({},data.profile,{avatar:a});render();save()}
   else if(b.dataset.avcol){const[k,v]=b.dataset.avcol.split(":");const a=avatarOf();a.colors[k]=v;data.profile=Object.assign({},data.profile,{avatar:a});render();save()}
   else if(b.dataset.usemodel!==undefined){const a=avatarOf();a.useModel=b.dataset.usemodel==="1";data.profile=Object.assign({},data.profile,{avatar:a});render();save()}
   else if(b.dataset.modeldel!==undefined){if(!mdlDelArm){mdlDelArm=true;render();return}mdlDelArm=false;const a=avatarOf();if(a.model&&a.model.path!=="local"&&sbOn())sb.storage.from("models").remove([a.model.path]);delete a.model;a.useModel=false;data.profile=Object.assign({},data.profile,{avatar:a});render();save();toast("3D model removed")}
