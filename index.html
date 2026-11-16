@@ -158,6 +158,7 @@ label{font-size:13px;font-weight:500}
 .navbtn{border-radius:10px}
 #bgimg,#bgimg2{position:fixed;inset:0;z-index:0;pointer-events:none;background:#05060c no-repeat 50% 50%/cover;opacity:0;transition:opacity .35s ease,filter .45s ease}
 #bgimg.on,#bgimg2.on{opacity:1}
+#bglive{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0;transition:opacity .45s ease;background:#000}#bglive.on{opacity:1}
 .bgshade{position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(90deg,rgba(4,8,20,.45),rgba(4,8,20,.05) 45%,rgba(4,8,20,.05) 60%,rgba(4,8,20,.3))}
 aside{background:rgba(5,10,26,.82)!important;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .topbar{background:rgba(5,10,26,.55)}
@@ -208,6 +209,8 @@ aside{background:rgba(5,10,26,.82)!important;backdrop-filter:blur(10px);-webkit-
 .avbtn:hover{background:rgba(76,201,255,.16);box-shadow:0 0 14px rgba(76,201,255,.25)}
 .avbtn.on{color:#04101f;background:var(--cyan);border-color:var(--cyan)}
 .holo{width:100%;max-width:260px;height:auto;margin:auto;display:block;overflow:visible}
+.holo{transform-origin:50% 50%;touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;will-change:transform}.holo.grab{cursor:grabbing}
+.holopanel{align-self:start}
 .holo-fig{animation:hfloat 5s ease-in-out infinite,hflick 7s steps(1) infinite}
 .holo-bar{animation:hscan 3.2s linear infinite}
 .holo-ring{transform-origin:100px 378px;animation:hpulse 2.8s ease-out infinite}
@@ -233,7 +236,7 @@ aside{background:rgba(5,10,26,.82)!important;backdrop-filter:blur(10px);-webkit-
 .cs-stats small{font-size:12px;color:var(--muted)}
 @media (max-width:1400px){.cs{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:520px){.cs-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.cs-ring{width:90px;height:90px}}
-.passtop{display:grid;grid-template-columns:300px minmax(0,1fr);gap:18px;align-items:stretch}
+.passtop{display:grid;grid-template-columns:300px minmax(0,1fr);gap:18px;align-items:start}
 .plrow{cursor:pointer;border-radius:10px;padding-left:8px;padding-right:8px;transition:background .15s}
 .plrow:hover{background:rgba(var(--lr),.08)}
 .plrow.on{background:rgba(76,201,255,.14);box-shadow:inset 3px 0 0 var(--cyan)}
@@ -350,7 +353,8 @@ aside{background:rgba(5,10,26,.82)!important;backdrop-filter:blur(10px);-webkit-
 .addform{padding:14px;margin-bottom:12px;border:1px solid rgba(var(--lr),.25);border-radius:10px;background:rgba(6,14,36,.6)}
 .plrow{display:flex;align-items:center;gap:14px;padding:10px 4px;border-bottom:1px solid rgba(var(--lrd),.7)}
 .plrow:last-child{border-bottom:0}
-.plrow .pie{width:46px;height:46px;flex:none}
+.plrow .pie{width:46px;height:46px;flex:none;overflow:visible}
+.pie-m .pg-g{filter:drop-shadow(0 0 2.5px rgba(61,220,132,.9)) drop-shadow(0 0 6px rgba(61,220,132,.45))}.pie-m .pg-r{filter:drop-shadow(0 0 2px rgba(255,77,94,.7)) drop-shadow(0 0 5px rgba(255,77,94,.3))}
 .plrow .m{flex:1;min-width:0}
 .plrow .m div{font-weight:600;font-size:16px;overflow-wrap:anywhere}
 .plvl{display:inline-block;vertical-align:2px;margin-left:8px;font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:99px;border:1px solid currentColor}
@@ -1035,13 +1039,15 @@ aside{background:rgba(var(--tD),calc(.82*var(--go)))!important;backdrop-filter:b
 .imp input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0!important}
 </style>
 
-<div id="bgimg" class="on" aria-hidden="true"></div><div id="bgimg2" aria-hidden="true"></div><div id="bgspin" aria-hidden="true"></div>
+<div id="bgimg" class="on" aria-hidden="true"></div><div id="bgimg2" aria-hidden="true"></div><canvas id="bglive" aria-hidden="true"></canvas><div id="bgspin" aria-hidden="true"></div>
 <div class="bgshade" aria-hidden="true"></div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
   <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   <linearGradient id="gCyan" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4cc9ff" stop-opacity=".3"/><stop offset="1" stop-color="#4cc9ff" stop-opacity="0"/></linearGradient>
   <linearGradient id="gMetal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0c6b3a"/><stop offset=".28" stop-color="#3fd98a"/><stop offset=".45" stop-color="#c9ffe2"/><stop offset=".62" stop-color="#2bbf6f"/><stop offset="1" stop-color="#0a5a31"/></linearGradient>
   <linearGradient id="gSheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".7"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></linearGradient>
+  <linearGradient id="gRedMetal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a0f1c"/><stop offset=".3" stop-color="#ff4d5e"/><stop offset=".46" stop-color="#ffc2c8"/><stop offset=".62" stop-color="#e2384a"/><stop offset="1" stop-color="#5e0a15"/></linearGradient>
+  <linearGradient id="gSteel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1c2028"/><stop offset=".3" stop-color="#4a515e"/><stop offset=".46" stop-color="#8d95a3"/><stop offset=".62" stop-color="#3b414c"/><stop offset="1" stop-color="#14171d"/></linearGradient>
   <linearGradient id="gMag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fd8ff"/><stop offset="1" stop-color="#2f7bff"/></linearGradient>
 </defs></svg>
 
@@ -1479,7 +1485,7 @@ function hologram(a){
   const brim="M64 43 Q100 32 136 43 Q132 49 118 46.5 Q100 44 82 46.5 Q68 49 64 43 Z";
   const bodyShapes=`<ellipse cx="100" cy="54" rx="${pk(19,18)}" ry="23"/><rect x="93" y="74" width="14" height="16" rx="4"/><path d="${body}"/><path d="${both(armL)}"/>`;
   const buttons=[[92,140],[108,140],[92,190],[108,190],[92,226],[108,226]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.2"/>`).join("");
-  return `<svg class="holo" viewBox="0 0 200 400" role="img" aria-label="Hologram of a ${pk("man","woman")} in a black fedora, trench coat and boots">
+  return `<svg class="holo" style="transform:perspective(900px) rotateY(${holoRot}deg)" viewBox="0 0 200 400" role="img" aria-label="Hologram of a ${pk("man","woman")} in a black fedora, trench coat and boots">
    <defs>
     <linearGradient id="hFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fe4ff" stop-opacity=".38"/><stop offset="1" stop-color="#2f7bff" stop-opacity=".1"/></linearGradient>
     <linearGradient id="hBlack" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#444b59"/><stop offset=".45" stop-color="#1b1f27"/><stop offset="1" stop-color="#08090c"/></linearGradient>
@@ -1515,14 +1521,33 @@ function hologram(a){
 }
 
 function pie(pct){
-  const r=18,C=2*Math.PI*r,p=Math.max(0,Math.min(pct,1));
-  return `<svg class="pie" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="${r}" fill="none" stroke="#ff5d6c" stroke-opacity=".8" stroke-width="7"/>
-   ${p>0?`<circle cx="24" cy="24" r="${r}" fill="none" stroke="url(#gMetal)" stroke-width="7" stroke-linecap="${p<1?"round":"butt"}" stroke-dasharray="${(p*C).toFixed(2)} ${C.toFixed(2)}" transform="rotate(-90 24 24)"/>
-   <circle cx="24" cy="24" r="${r}" fill="none" stroke="url(#gSheen)" stroke-width="7" stroke-dasharray="${(p*C).toFixed(2)} ${C.toFixed(2)}" transform="rotate(-90 24 24)" opacity=".55"/>`:""}</svg>`;
+  const r=18,C=2*Math.PI*r,p=Math.max(0,Math.min(pct,1)),D=`${(p*C).toFixed(2)} ${C.toFixed(2)}`,hl=`${(C*.16).toFixed(2)} ${C.toFixed(2)}`;
+  return `<svg class="pie pie-m" viewBox="0 0 48 48" aria-hidden="true"><circle class="pg-r" cx="24" cy="24" r="${r}" fill="none" stroke="url(#gRedMetal)" stroke-width="7"/>
+   ${p>0?`<circle class="pg-g" cx="24" cy="24" r="${r}" fill="none" stroke="url(#gMetal)" stroke-width="7" stroke-linecap="${p<1?"round":"butt"}" stroke-dasharray="${D}" transform="rotate(-90 24 24)"/>
+   <circle cx="24" cy="24" r="${r}" fill="none" stroke="url(#gSheen)" stroke-width="7" stroke-dasharray="${D}" transform="rotate(-90 24 24)" opacity=".55"/>`:""}
+   <circle cx="24" cy="24" r="${r+3.4}" fill="none" stroke="rgba(255,255,255,.22)" stroke-width=".6"/><circle cx="24" cy="24" r="${r-3.4}" fill="none" stroke="rgba(0,0,0,.45)" stroke-width=".6"/>
+   <circle cx="24" cy="24" r="${r-1.6}" fill="none" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-dasharray="${hl}" transform="rotate(-150 24 24)" opacity=".6"/></svg>`;
 }
+function emptyPie(){const r=18,C=2*Math.PI*r;
+  return `<svg class="pie" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="${r}" fill="none" stroke="url(#gSteel)" stroke-width="7"/><circle cx="24" cy="24" r="${r}" fill="none" stroke="url(#gSheen)" stroke-width="7" opacity=".35"/>
+   <circle cx="24" cy="24" r="${r+3.4}" fill="none" stroke="rgba(255,255,255,.12)" stroke-width=".6"/><circle cx="24" cy="24" r="${r-3.4}" fill="none" stroke="rgba(0,0,0,.55)" stroke-width=".6"/>
+   <circle cx="24" cy="24" r="${r-1.6}" fill="none" stroke="#fff" stroke-width="1.1" stroke-linecap="round" stroke-dasharray="${(C*.14).toFixed(2)} ${C.toFixed(2)}" transform="rotate(-150 24 24)" opacity=".22"/></svg>`}
 let addingP=false;
 const LVR={Priority:0,Moderate:1,Bonus:2};
 const sortPass=P=>P.map((p,i)=>[p,i]).sort((a,b)=>((LVR[a[0].lvl]??3)-(LVR[b[0].lvl]??3))||((a[0].order??a[1])-(b[0].order??b[1]))).map(x=>x[0]);
+let holoRot=0,holoV=0,holoDrag=null,holoRAF=0;
+function holoApply(){const h=document.querySelector(".holo");if(h)h.style.transform=`perspective(900px) rotateY(${holoRot.toFixed(2)}deg)`}
+function holoTick(now){holoRAF=0;let more=true;
+  if(holoDrag){if(!holoDrag.moved&&now-holoDrag.t0>280)holoRot+=Math.min(4.5,(now-holoDrag.t0-280)/120)}
+  else if(Math.abs(holoV)>.06){holoRot+=holoV;holoV*=.94}
+  else{holoV=0;const tgt=Math.round(holoRot/180)*180,d=tgt-holoRot;if(Math.abs(d)<.15){holoRot=((tgt%360)+360)%360;more=false}else holoRot+=d*.07}
+  holoApply();if(more)holoRAF=requestAnimationFrame(holoTick)}
+const holoGo=()=>{if(!holoRAF)holoRAF=requestAnimationFrame(holoTick)};
+document.addEventListener("pointerdown",e=>{const h=e.target.closest&&e.target.closest(".holo");if(!h)return;holoDrag={x0:e.clientX,x:e.clientX,t0:performance.now(),moved:false,id:e.pointerId};holoV=0;h.classList.add("grab");try{h.setPointerCapture(e.pointerId)}catch(_){}holoGo()});
+document.addEventListener("pointermove",e=>{if(!holoDrag||e.pointerId!==holoDrag.id)return;const dx=e.clientX-holoDrag.x;holoDrag.x=e.clientX;if(Math.abs(e.clientX-holoDrag.x0)>4)holoDrag.moved=true;if(holoDrag.moved){holoRot+=dx*.9;holoV=dx*.9;holoApply()}});
+const holoUp=e=>{if(!holoDrag||e.pointerId!==holoDrag.id)return;if(!holoDrag.moved)holoV=4.5;holoDrag=null;const h=document.querySelector(".holo");h&&h.classList.remove("grab");holoGo()};
+document.addEventListener("pointerup",holoUp);document.addEventListener("pointercancel",holoUp);
+document.addEventListener("contextmenu",e=>{if(e.target.closest&&e.target.closest(".holo"))e.preventDefault()});
 let passCat="all",catAdding=false,catEditing=null,catThemeOpen=false,catMgr=false,catDelArm=null;try{passCat=localStorage.getItem("aot-pcat")||"all"}catch(_){}
 const cats=()=>(D().categories||[]);
 const catName=id=>(cats().find(c=>c.id===id)||{}).name||"";
@@ -1531,6 +1556,7 @@ function catTabs(P){const C=cats();if(!C.length)return catMgr?"":`<div class="ca
   const n=id=>P.filter(p=>id==="all"?true:id==="none"?!p.cat||!C.some(c=>c.id===p.cat):p.cat===id).length,hasNone=C.length&&n("none")>0;
   const tabs=[["all","All"],...C.map(c=>[c.id,c.name]),...(hasNone?[["none","No category"]]:[])];
   return `<div class="cat-bar" role="tablist" aria-label="Passion categories">${tabs.map(([id,l])=>`<button class="cat-tab" role="tab" aria-selected="${passCat===id}" data-cat="${id}">${esc(l)}<i>${n(id)}</i></button>`).join("")}</div>`}
+document.addEventListener("click",e=>{if(!catMgr)return;const t=e.target;if(!t.isConnected||t.closest(".cat-mgr")||t.closest("[data-catmgr]"))return;catMgr=false;catEditing=null;catDelArm=null;catThemeOpen=false;setTimeout(render,0)},true);
 function catManager(P){if(!catMgr)return "";const C=cats(),n=id=>P.filter(p=>p.cat===id).length;
   return `<div class="cat-mgr"><div class="cm-head"><b>Categories</b><small>Rename, theme or remove your categories.</small><button class="x" data-catmgr aria-label="Close category settings">×</button></div>
   ${C.map(c=>{const w=c.wall&&allWalls().find(x=>x.id===c.wall);return catEditing===c.id?`<form class="cat-edit cm-edit" id="catEditForm" data-cid="${c.id}"><input id="catEditIn" value="${esc(c.name)}" maxlength="28" aria-label="Category name" autocomplete="off"><button class="cm-ic ok" aria-label="Save"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg></button><button type="button" class="cm-ic" data-catcancel aria-label="Cancel">×</button></form>`
@@ -1554,7 +1580,7 @@ function passList(d,P,wk){P=sortPass(P);const ALL=P;const C=cats();if(C.length&&
     <label>Label<select id="pLvl"><option>Priority</option><option selected>Moderate</option><option>Bonus</option></select></label>${cats().length?`<label>Category<select id="pCat"><option value="">No category</option>${cats().map(c=>`<option value="${c.id}" ${passCat===c.id?"selected":""}>${esc(c.name)}</option>`).join("")}</select></label>`:""}
     <button class="btn">Add passion</button></form>`:""}
    ${rows.length?`<div class="plist">${rows.map(r=>{const pc=r.pct==null?null:Math.round(Math.min(r.pct,1)*100);
-     return `<div class="plrow${selP===r.p.id?" on":""}" data-row data-group="${esc(r.p.lvl||"none")}" data-id="${r.p.id}" data-selp="${r.p.id}" role="button" tabindex="0" aria-expanded="${selP===r.p.id}"><button class="pjs-grip pl-grip" data-sort="pass" data-id="${r.p.id}" aria-label="Reorder ${esc(r.p.name)} within ${esc(r.p.lvl||"its group")}. Drag, or use the arrow keys" title="Drag to reorder within ${esc(r.p.lvl||"this group")}"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 8h14M5 12h14M5 16h14"/></svg></button>${r.pct==null?`<svg class="pie" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="none" stroke="var(--dim)" stroke-width="2" stroke-dasharray="4 4"/></svg>`:pie(r.pct)}
+     return `<div class="plrow${selP===r.p.id?" on":""}" data-row data-group="${esc(r.p.lvl||"none")}" data-id="${r.p.id}" data-selp="${r.p.id}" role="button" tabindex="0" aria-expanded="${selP===r.p.id}"><button class="pjs-grip pl-grip" data-sort="pass" data-id="${r.p.id}" aria-label="Reorder ${esc(r.p.name)} within ${esc(r.p.lvl||"its group")}. Drag, or use the arrow keys" title="Drag to reorder within ${esc(r.p.lvl||"this group")}"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 8h14M5 12h14M5 16h14"/></svg></button>${!r.last?emptyPie():r.pct==null?`<svg class="pie" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="none" stroke="var(--dim)" stroke-width="2" stroke-dasharray="4 4"/></svg>`:pie(r.pct)}
        <div class="m"><div>${esc(r.p.name)}${r.p.lvl?`<span class="plvl" data-lvl="${esc(r.p.lvl)}">${esc(r.p.lvl)}</span>`:""}</div><small>${!r.sched&&r.gm?`Goal ${r.p.goal}h`:""}${r.last?((!r.sched&&r.gm)?" · last logged ":"Last logged ")+fmtDate(r.last.d):((!r.sched&&r.gm)?" · ":"")+"Not yet logged"}</small></div>
        <div class="hrs"><b>${fmtH(r.tot)}</b><small style="color:${pc==null?"var(--muted)":pc>=100?"#3ddc84":pc>=50?"var(--amber)":"#ff5d6c"}">${pc==null?"total":pc+(r.sched?"% on track":"% of goal")}</small></div>
        </div>`}).join("")}</div>`
@@ -1882,8 +1908,11 @@ const WALLS=[
   {id:"forest",name:"Misty forest",src:"wp/forest.jpg",pos:"50% 55%",shade:.3},
   {id:"dunes",name:"Desert",src:"wp/dunes.jpg",pos:"60% 55%",shade:.25},
   {id:"sakura",name:"Sakura",src:"wp/sakura.jpg",pos:"50% 50%",shade:.3},
-  {id:"midnight",name:"Midnight",src:"wp/midnight.jpg",pos:"50% 50%",shade:0}];
-const WGROUPS=[["Landscape",["alpine","serenity","snow","moonlit","aurora","sunset","ocean","forest","dunes","sakura"]],["Kaleidoscope",["hyperspace","portal","royalgold","gilded","inferno","deepdub"]],["Fire",["fire","serpent"]],["Dream & space",["liminal","nebula","midnight"]]];
+  {id:"midnight",name:"Midnight",src:"wp/midnight.jpg",pos:"50% 50%",shade:0},
+  {id:"livefire",name:"Live inferno",live:"inferno",src:"wp/m/inferno.jpg",pos:"50% 50%",shade:.05},
+  {id:"liveportal",name:"Live portal",live:"portal",src:"wp/m/portal.jpg",pos:"50% 50%",shade:.1},
+  {id:"livedub",name:"Live dub",live:"dub",src:"wp/m/deepdub.jpg",pos:"50% 50%",shade:0}];
+const WGROUPS=[["Live · animated",["livefire","liveportal","livedub"]],["Landscape",["alpine","serenity","snow","moonlit","aurora","sunset","ocean","forest","dunes","sakura"]],["Kaleidoscope",["hyperspace","portal","royalgold","gilded","inferno","deepdub"]],["Fire",["fire","serpent"]],["Dream & space",["liminal","nebula","midnight"]]];
 const wallGroups=()=>{const A=allWalls(),out=WGROUPS.map(([n,ids])=>[n,ids.map(i=>A.find(w=>w.id===i)).filter(Boolean)]);const seen=new Set(WGROUPS.flatMap(g=>g[1]));const rest=A.filter(w=>!w.custom&&!seen.has(w.id));if(rest.length)out[out.length-1][1].push(...rest);const mine=A.filter(w=>w.custom);if(mine.length)out.push(["Yours",mine]);return out.filter(g=>g[1].length)};
 const stripWalls=f=>wallGroups().map(([n,ws])=>`<span class="tgroup">${esc(n)}</span>`+ws.map(f).join("")).join("");
 const allWalls=()=>[...WALLS,...((D().customWalls)||[]).map(c=>({id:c.id,name:c.name||"My wallpaper",src:c.src,thumb:c.thumb,pos:"50% 50%",shade:.15,custom:true}))];
@@ -1901,9 +1930,37 @@ const imgP=new Map(),loaded=new Set();
 function loadImg(src){if(!imgP.has(src))imgP.set(src,new Promise((ok,no)=>{const i=new Image();i.decoding="async";i.onload=()=>{(i.decode?i.decode():Promise.resolve()).catch(()=>{}).then(()=>{loaded.add(src);ok(src)})};i.onerror=()=>{imgP.delete(src);no()};i.src=src}));return imgP.get(src)}
 function bestSrc(w,spin){if(w.custom||!HDW.has(w.id))return w.src;const need=Math.max(innerWidth,innerHeight)*(devicePixelRatio||1);return need>2700?w.src:`wp/m/${w.id}.jpg`}
 const spinner=on=>{const e=$("#bgspin");if(e)e.classList.toggle("show",on)};
+/* live kaleidoscope: one shader, three palettes */
+const LIVE_PAL={
+  inferno:{ramp:[[.6,.03,.02],[1,.36,.05],[1,.8,.32]],gain:1.15,n:8,cx:-.55,cy:-.6},
+  portal:{a:[.5,.5,.5],b:[.5,.5,.5],c:[1,1,1],d:[0,.33,.67],gain:1,n:12,cx:-.62,cy:-.48},
+  dub:{a:[.3,.33,.45],b:[.15,.22,.2],c:[1,1,1],d:[.5,.15,.65],gain:.6,n:10,cx:-.62,cy:-.48}};
+const LIVE_FS=`precision highp float;uniform vec2 R;uniform float T;uniform vec3 A,B,C,Dd;uniform float G,N;uniform vec2 K;uniform float M;uniform vec3 Q0,Q1,Q2;
+void main(){vec2 uv=(gl_FragCoord.xy-.5*R)/min(R.x,R.y)*2.;float r=length(uv);float a=atan(uv.y,uv.x)+T*.025;
+float seg=6.2831853/N;a=mod(a,seg);a=abs(a-seg*.5);float rr=pow(r,.85)*1.35*(1.+.06*sin(T*.21));vec2 p=rr*vec2(cos(a),sin(a));
+vec2 c=K+vec2(.05*sin(T*.071),.045*cos(T*.053));float acc=0.,mn=1e9;
+for(int k=0;k<11;k++){p=abs(p);float m=dot(p,p)+1e-4;p=p/m+c;acc+=exp(-length(p)*2.2);mn=min(mn,abs(p.x*p.y));}
+float t=acc*.12+r*.55-T*.035;vec3 col;if(M>.5){float u=fract(t)*3.;float f=smoothstep(0.,1.,fract(u));col=u<1.?mix(Q0,Q1,f):u<2.?mix(Q1,Q2,f):mix(Q2,Q0,f);}else col=A+B*cos(6.2831853*(C*t+Dd));
+float g0=acc*.07+exp(-mn*160.)*1.1;float glow=1.-exp(-pow(g0,1.6)*1.6);float vig=max(0.,1.-pow(r*.78,2.6));
+float core=exp(-r*r*60.)*.22;gl_FragColor=vec4(clamp(col*glow*(.18+.95*vig)*G+core*vec3(1.,.95,.85)*G,0.,1.),1.);}`;
+function liveStart(cv,pal){const gl=cv.getContext("webgl",{antialias:false,alpha:false,powerPreference:"low-power",preserveDrawingBuffer:false});if(!gl)return null;
+  const sh=(t,src)=>{const s=gl.createShader(t);gl.shaderSource(s,src);gl.compileShader(s);return s};const pr=gl.createProgram();
+  gl.attachShader(pr,sh(gl.VERTEX_SHADER,"attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}"));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,LIVE_FS));gl.linkProgram(pr);
+  if(!gl.getProgramParameter(pr,gl.LINK_STATUS))return null;gl.useProgram(pr);
+  const bf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,bf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);const loc=gl.getAttribLocation(pr,"p");gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+  const U=n=>gl.getUniformLocation(pr,n);const setPal=k=>{const P=LIVE_PAL[k];if(P.ramp){gl.uniform1f(U("M"),1);gl.uniform3fv(U("Q0"),P.ramp[0]);gl.uniform3fv(U("Q1"),P.ramp[1]);gl.uniform3fv(U("Q2"),P.ramp[2])}else{gl.uniform1f(U("M"),0);gl.uniform3fv(U("A"),P.a);gl.uniform3fv(U("B"),P.b);gl.uniform3fv(U("C"),P.c);gl.uniform3fv(U("Dd"),P.d)}gl.uniform1f(U("G"),P.gain);gl.uniform1f(U("N"),P.n);gl.uniform2f(U("K"),P.cx,P.cy)};setPal(pal);
+  const uR=U("R"),uT=U("T");return {setPal,draw(t){gl.viewport(0,0,cv.width,cv.height);gl.uniform2f(uR,cv.width,cv.height);gl.uniform1f(uT,t);gl.drawArrays(gl.TRIANGLES,0,3)},gl}}
+
+let liveEng=null,liveRAF=0,liveKey=null,liveFail=false,liveLast=0;const liveT0=performance.now()-Math.random()*6e5;
+function liveSize(){const c=$("#bglive");if(!c)return;const k=Math.min(devicePixelRatio||1,2)*.6;c.width=Math.round(innerWidth*k);c.height=Math.round(innerHeight*k)}
+function liveOn(key){const c=$("#bglive");if(!c||liveFail)return false;if(!liveEng){liveSize();liveEng=liveStart(c,key);if(!liveEng){liveFail=true;return false}addEventListener("resize",()=>{if(liveEng)liveSize()})}
+  if(liveKey!==key){liveEng.setPal(key);liveKey=key}cancelAnimationFrame(liveRAF);const loop=now=>{liveRAF=requestAnimationFrame(loop);if(now-liveLast<32)return;liveLast=now;liveEng.draw((now-liveT0)/1000*1.4)};liveRAF=requestAnimationFrame(loop);c.classList.add("on");return true}
+function liveOff(){const c=$("#bglive");if(c)c.classList.remove("on");const k=liveRAF;setTimeout(()=>{if(liveRAF===k)cancelAnimationFrame(k)},450)}
 let wallTok=0,bgFront=0;
 function applyWall(){const w=passWall()||wallOf(),spin=animOn()&&KALEI.has(w.id),key=w.id+(spin?"*":"");if(wallShown===key)return;wallShown=key;
   const L=[$("#bgimg"),$("#bgimg2")];if(!L[0]||!L[1])return;const tok=++wallTok,sh=document.querySelector(".bgshade"),src=bestSrc(w,spin);
+  if(w.live&&liveOn(w.live)){spinner(false);L[0].classList.remove("on");L[1].classList.remove("on");if(sh)sh.style.setProperty("--wshade",w.shade);return}
+  liveOff();
   const put=(el,url,low)=>{el.style.backgroundImage=`url("${url}")`;el.style.backgroundPosition=spin?"50% 50%":w.pos;el.classList.toggle("spin",spin);el.classList.toggle("low",!!low)};
   const show=(url,low)=>{const back=L[1-bgFront],front=L[bgFront];put(back,url,low);back.classList.add("on");front.classList.remove("on");bgFront=1-bgFront;if(sh)sh.style.setProperty("--wshade",w.shade)};
   if(loaded.has(src)){spinner(false);show(src);return}
@@ -1914,7 +1971,7 @@ function applyWall(){const w=passWall()||wallOf(),spin=animOn()&&KALEI.has(w.id)
     loadImg(src).then(()=>{clearTimeout(t);if(tok!==wallTok)return;spinner(false);put(L[bgFront],src,false)}).catch(()=>{clearTimeout(t);if(tok===wallTok)spinner(false)})})}
 let preloaded=false;
 function preloadWalls(){if(preloaded)return;preloaded=true;const d=D(),ids=new Set([wallOf().id,...d.passions.map(p=>p.wall),...((d.categories)||[]).map(c=>c.wall)].filter(Boolean));
-  const list=[...ids].map(id=>allWalls().find(w=>w.id===id)).filter(Boolean).map(w=>bestSrc(w,animOn()&&KALEI.has(w.id)));
+  const list=[...ids].map(id=>allWalls().find(w=>w.id===id)).filter(w=>w&&!w.live).map(w=>bestSrc(w,animOn()&&KALEI.has(w.id)));
   let i=0;const next=()=>{if(i<list.length)loadImg(list[i++]).catch(()=>{}).then(()=>setTimeout(next,150))};setTimeout(next,1500)}
 function wallPanel(){const cur=wallOf().id;return `<div class="panel wallp"><div class="ph"><span>Wallpaper</span><i>${esc(wallOf().name)}</i></div>
   <div class="wgrid" role="radiogroup" aria-label="Wallpaper">${wallGroups().map(([n,ws])=>`<div class="wgroup">${esc(n)}</div>`+ws.map(w=>`<div class="wcell"><button class="wcard" role="radio" aria-checked="${w.id===cur}" data-wall="${w.id}"><span class="wimg" style="background-image:url('${thumbOf(w)}')"></span><span class="wname">${esc(w.name)}</span></button>${w.custom?`<button class="wdel" data-walldel="${w.id}" aria-label="Remove ${esc(w.name)}" title="Remove">×</button>`:""}</div>`).join("")).join("")}<label class="wcard wadd" title="Use your own photo"><span class="wimg wadd-i"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span class="wname">Add your own</span><input type="file" accept="image/*" data-wallup="main"></label></div>
