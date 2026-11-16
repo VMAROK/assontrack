@@ -1499,8 +1499,8 @@ function modelPane(a){const m=a.model;
     <div class="seg2" role="group" aria-label="Figure"><button data-usemodel="0" aria-pressed="${!a.useModel}">Built-in figure</button><button data-usemodel="1" aria-pressed="${a.useModel}">My model</button></div>
     <div class="mdl-btns"><label class="mv mdl-up">Replace<input type="file" accept=".glb,.gltf,.fbx,.obj,.mtl" multiple data-modelup></label><button class="mv ${mdlDelArm?"armed":""}" data-modeldel>${mdlDelArm?"Tap again to remove":"Remove"}</button></div>`
    :`<label class="btn mdl-up mdl-add">Import a 3D model<input type="file" accept=".glb,.gltf,.fbx,.obj,.mtl" multiple data-modelup></label>`}
-   <p class="avnote">GLB works best. FBX and OBJ work too, up to 50 MB. For an OBJ, pick its .mtl file at the same time to bring in the clothing colors. Your model gets the Shadow, Hologram and Alive looks and spins like the built-in figure. The hat, coat and boots from Customize outfit go on it too, sized to fit as closely as the shape allows.</p></div>`}
-function avEditor(){const a=avatarOf(),cats=[["hat","Hat"],["top","Top"],["shoes","Shoes"],["model","3D model"]];if(avCat==="model")return `<div class="aved"><div class="avcats">${cats.map(([k,l])=>`<button class="avcat" data-avcat="${k}" aria-pressed="${avCat===k}">${l}</button>`).join("")}</div>${modelPane(a)}</div>`;
+   <p class="avnote">GLB works best. FBX and OBJ work too, up to 50 MB. For an OBJ, pick its .mtl file at the same time to bring in the clothing colors. Your model gets the Shadow, Hologram and Alive looks and spins like the built-in figure. It shows as it is, without the hat, coat or boots. Switch to the built-in figure to use the outfit.</p></div>`}
+function avEditor(){const a=avatarOf(),um=a.useModel&&a.model,cats=um?[["model","3D model"]]:[["hat","Hat"],["top","Top"],["shoes","Shoes"],["model","3D model"]];if(um||avCat==="model")return `<div class="aved"><div class="avcats">${cats.map(([k,l])=>`<button class="avcat" data-avcat="${k}" aria-pressed="${avCat===k}">${l}</button>`).join("")}</div>${modelPane(a)}</div>`;
   return `<div class="aved"><div class="avcats">${cats.map(([k,l])=>`<button class="avcat" data-avcat="${k}" aria-pressed="${avCat===k}">${l}</button>`).join("")}</div>
     <div class="avopts">${AV_ITEMS[avCat].map(([v,l])=>`<button class="fchip" data-avset="${avCat}:${v}" aria-pressed="${a[avCat]===v}">${l}</button>`).join("")}</div>
     ${realStage()!=="real"?`<p class="avnote">Clothing colors and looks unlock at 65%, when your figure is Alive.</p>`:a[avCat]!=="none"?`<div class="avcols" role="radiogroup" aria-label="Color">${AV_COLORS.map(([h,n])=>`<button class="avsw" role="radio" style="--sw:${h}" data-avcol="${avCat}:${h}" aria-checked="${(a.colors[avCat]||AV_DEFCOL[avCat]).toLowerCase()===h}" aria-label="${n}" title="${n}"></button>`).join("")}</div>`:""}
@@ -1671,7 +1671,7 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
     const g=new T.Group();g.add(o);mixer=md.mixer||null;
     (md.worn||[]).forEach(c=>c.parent&&c.parent.remove(c));md.worn=[];
     if(!md.ms){o.updateMatrixWorld(true);md.ms=measure(o)}
-    g.updateMatrixWorld(true);md.local=md.local||{};modelClothes(md.av||{},stage,md.ms,o).forEach(([c,b],i)=>{const key=(c.userData.slot||i)+"";
+    g.updateMatrixWorld(true);md.local=md.local||{};[].forEach(([c,b],i)=>{const key=(c.userData.slot||i)+"";
       if(b&&md.local[key]){b.add(c);md.local[key].decompose(c.position,c.quaternion,c.scale)}else{g.add(c);c.updateMatrixWorld(true);if(b){b.attach(c);md.local[key]=c.matrix.clone()}}md.worn.push(c)});
     return {g,torso:null,arms:[],head:null}}
   let mixer=null,lastT=0;
