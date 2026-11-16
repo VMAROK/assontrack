@@ -902,6 +902,21 @@ label.dim{opacity:.4}
 .wcard[aria-checked="true"] .wname{color:var(--fg)}
 @media (max-width:760px){.wgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}}
 
+/* per-passion theme */
+.theme-btn{display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:13px;font-weight:600;color:var(--muted);background:rgba(4,10,28,.5);border:1px solid rgba(76,170,255,.25);border-radius:99px;padding:4px 12px 4px 5px;cursor:pointer;transition:all .15s}
+.theme-btn svg{margin-left:5px}
+.theme-btn:hover,.theme-btn.on{color:var(--fg);border-color:rgba(76,201,255,.55);box-shadow:0 0 12px rgba(76,201,255,.2)}
+.theme-sw{width:24px;height:24px;border-radius:50%;background-size:cover;background-position:center;border:1px solid rgba(255,255,255,.25)}
+.theme-strip{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 12px;margin-bottom:6px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;animation:stripin .3s cubic-bezier(.2,.9,.25,1)}
+@keyframes stripin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.tcard{flex:none;width:84px;display:grid;gap:5px;padding:0;background:none;border:0;cursor:pointer;color:var(--muted);font:inherit;scroll-snap-align:start}
+.timg{display:grid;place-items:center;width:84px;height:84px;border-radius:12px;background-size:cover;background-position:center;border:1px solid rgba(76,170,255,.22);transition:transform .2s,box-shadow .2s}
+.timg.none{font-size:11.5px;font-weight:600;line-height:1.3;text-align:center;color:var(--muted);background:rgba(4,10,28,.6);border-style:dashed}
+.tcard:hover .timg{transform:translateY(-2px)}
+.tcard[aria-checked="true"] .timg{border:2px solid var(--cyan);box-shadow:0 0 0 3px rgba(76,201,255,.18),0 0 16px rgba(76,201,255,.4)}
+.tname{font-size:11.5px;font-weight:600;text-align:center}
+.tcard[aria-checked="true"] .tname{color:var(--fg)}
+
 /* ===== standalone app ===== */
 #auth{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:max(24px,env(safe-area-inset-top)) 20px max(24px,env(safe-area-inset-bottom));background:radial-gradient(120% 80% at 50% 0%,rgba(30,80,170,.35),rgba(3,6,18,.96) 60%),#03060f;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overflow-y:auto}
 .auth-card{width:min(100%,380px);display:grid;gap:12px;padding:26px 22px 18px;border-radius:20px;border:1px solid rgba(76,170,255,.28);background:linear-gradient(180deg,rgba(22,52,120,.55),rgba(6,12,32,.9));box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 40px rgba(30,110,255,.12)}
@@ -1584,7 +1599,8 @@ function passDetail(d){
   const MN={schedule:"Weekly schedule",tasks:"Tasks",projects:"Projects"},on=modesOf(p).includes("schedule"),st=passStats(d,p);
   return `<div class="panel pdetail" style="margin-top:18px">
     <div class="pd-hero"><div class="pd-head"><div class="pd-title"><h2>${esc(p.name)}</h2><span class="lvlsw" role="group" aria-label="Priority level">${["Priority","Moderate","Bonus"].map(l=>`<button data-setlvl="${l}" data-lvl="${l}" aria-pressed="${p.lvl===l}" title="Press and hold to ${p.lvl===l?"clear":"set "+l}"><span>${l}</span></button>`).join("")}</span></div>
-      <div class="pd-modes"><button class="fchip" data-mode="schedule" aria-pressed="${on}">${on?"Weekly schedule on":"Weekly schedule off"}</button><button class="x" data-closep aria-label="Close">×</button></div></div>
+      <div class="pd-modes"><button class="theme-btn${themeOpen?" on":""}" data-theme aria-expanded="${themeOpen}" title="Theme for this passion">${p.wall&&WALLS.find(w=>w.id===p.wall)?`<span class="theme-sw" style="background-image:url('wp/t/${p.wall}.jpg')"></span>`:`<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>`}<span>Theme</span></button><button class="fchip" data-mode="schedule" aria-pressed="${on}">${on?"Weekly schedule on":"Weekly schedule off"}</button><button class="x" data-closep aria-label="Close">×</button></div></div>
+    ${themeOpen?`<div class="theme-strip" role="radiogroup" aria-label="Theme for ${esc(p.name)}"><button class="tcard" role="radio" aria-checked="${!p.wall}" data-pwall=""><span class="timg none">Main<br>wallpaper</span></button>${WALLS.map(w=>`<button class="tcard" role="radio" aria-checked="${p.wall===w.id}" data-pwall="${w.id}"><span class="timg" style="background-image:url('wp/t/${w.id}.jpg')"></span><span class="tname">${esc(w.name)}</span></button>`).join("")}</div>`:""}
     <div class="pstats"><div><b>${fmtH(st.tot)}</b><small>Total hours</small></div><div><b>${fmtH(st.month)}</b><small>This month</small></div><div><b>${st.n}</b><small>Sessions</small></div><div><b class="${st.missed?"miss":""}">${st.missed}</b><small>Missed</small></div></div>
     <div class="tabs ptabs" role="tablist">${tabs.map(m=>`<button class="tab" role="tab" data-ptab="${m}" aria-selected="${pTab===m}">${PTI[m]||""}<span>${MN[m]}</span>${m==="tasks"&&(p.tasks||[]).some(t=>!t.doneAt)?` <span class="tcount">${(p.tasks||[]).filter(t=>!t.doneAt).length}</span>`:""}${m==="projects"&&topsOf(d,p).some(x=>prjStats(p,x).status!=="done")?` <span class="tcount">${topsOf(d,p).filter(x=>prjStats(p,x).status!=="done").length}</span>`:""}</button>`).join("")}</div></div>
     ${pTab==="tasks"?taskView(d,p):pTab==="projects"?projView(d,p):schedView(d,p)}
@@ -1697,8 +1713,10 @@ const WALLS=[
   {id:"sakura",name:"Sakura",src:"wp/sakura.jpg",pos:"50% 50%",shade:.3},
   {id:"midnight",name:"Midnight",src:"wp/midnight.jpg",pos:"50% 50%",shade:0}];
 const wallOf=()=>WALLS.find(w=>w.id===((data.profile||{}).wallpaper))||WALLS[0];
+const passWall=()=>{if(tab!=="pass"||!selP)return null;const p=D().passions.find(x=>x.id===selP);return p&&p.wall&&WALLS.find(w=>w.id===p.wall)||null};
+let themeOpen=false;
 let wallShown=null;
-function applyWall(){const w=wallOf();if(wallShown===w.id)return;wallShown=w.id;const bg=$("#bgimg"),sh=document.querySelector(".bgshade");if(!bg)return;
+function applyWall(){const w=passWall()||wallOf();if(wallShown===w.id)return;wallShown=w.id;const bg=$("#bgimg"),sh=document.querySelector(".bgshade");if(!bg)return;
   const img=new Image();img.onload=()=>{bg.style.backgroundImage=`url("${w.src}")`;bg.style.backgroundPosition=w.pos;bg.classList.remove("fading")};bg.classList.add("fading");img.src=w.src;
   if(sh)sh.style.setProperty("--wshade",w.shade)}
 function wallPanel(){const cur=wallOf().id;return `<div class="panel wallp"><div class="ph"><span>Wallpaper</span><i>${esc(wallOf().name)}</i></div>
@@ -1746,7 +1764,7 @@ document.addEventListener("change",e=>{if(e.target.id==="slK"||e.target.id==="se
 document.addEventListener("input",e=>{if(e.target.id==="slH"||e.target.id==="seH"){let v=e.target.value.replace(/[^\d:]/g,"");if(/^\d{3,4}$/.test(v))v=v.slice(0,-2)+":"+v.slice(-2);e.target.value=v.slice(0,5)}if(e.target.id==="delIn"){const ok=e.target.value.trim().toLowerCase()==="delete";$("#delGo").disabled=!ok;e.target.classList.toggle("ok",ok)}});
 document.addEventListener("click",e=>{if(e.target.closest("select"))return;
   const b=e.target.closest("button,[data-selp]");if(!b)return;
-  if(b.dataset.selp&&b.tagName!=="BUTTON"){selP=selP===b.dataset.selp?null:b.dataset.selp;delOpen=false;renaming=null;tkFilter="all";addingPrj=false;prjFocus=null;addingSub=null;wkOff=0;render();if(selP){const el=$(".pdetail");el&&el.scrollIntoView({behavior:"smooth",block:"start"})}return}
+  if(b.dataset.selp&&b.tagName!=="BUTTON"){selP=selP===b.dataset.selp?null:b.dataset.selp;delOpen=false;themeOpen=false;renaming=null;tkFilter="all";addingPrj=false;prjFocus=null;addingSub=null;wkOff=0;render();if(selP){const el=$(".pdetail");el&&el.scrollIntoView({behavior:"smooth",block:"start"})}return}
   if(b.dataset.tab)go(b.dataset.tab);
   else if(b.dataset.go)go(b.dataset.go);
   else if(b.hasAttribute("data-closep")){selP=null;render()}
@@ -1759,6 +1777,8 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
   else if(b.dataset.rncancel!==undefined){renaming=null;render()}
   else if(b.dataset.delopen!==undefined){delOpen=!delOpen;render();if(delOpen){const i=$("#delIn");i&&(i.focus({preventScroll:true}),$("#delForm").scrollIntoView({behavior:"smooth",block:"center"}))}}
   else if(b.dataset.delgrp){const p=data.passions.find(x=>x.id===selP);if(!p)return;if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="Remove all 7?";b.classList.add("armed");return}p.slots=(p.slots||[]).filter(x=>x.grp!==b.dataset.delgrp);render();save();toast("Daily time slot removed")}
+  else if(b.dataset.theme!==undefined){themeOpen=!themeOpen;render()}
+  else if(b.dataset.pwall!==undefined){const p=data.passions.find(x=>x.id===selP);if(p){if(b.dataset.pwall)p.wall=b.dataset.pwall;else delete p.wall;themeOpen=false;render();save();toast(p.wall?p.name+" · "+WALLS.find(w=>w.id===p.wall).name+" theme":p.name+" uses the main wallpaper")}}
   else if(b.dataset.wall){data.profile=Object.assign({},data.profile,{wallpaper:b.dataset.wall});render();save();toast(wallOf().name+" wallpaper")}
   else if(b.dataset.addsub){addingSub=addingSub===b.dataset.addsub?null:b.dataset.addsub;render();if(addingSub){const i=$("#sbT");i&&i.focus()}}
   else if(b.dataset.tkf){tkFilter=b.dataset.tkf;render()}
