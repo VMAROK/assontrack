@@ -1491,9 +1491,9 @@ function modelPane(a){const m=a.model;
 function avEditor(){const a=avatarOf(),cats=[["hat","Hat"],["top","Top"],["shoes","Shoes"],["model","3D model"]];if(avCat==="model")return `<div class="aved"><div class="avcats">${cats.map(([k,l])=>`<button class="avcat" data-avcat="${k}" aria-pressed="${avCat===k}">${l}</button>`).join("")}</div>${modelPane(a)}</div>`;
   return `<div class="aved"><div class="avcats">${cats.map(([k,l])=>`<button class="avcat" data-avcat="${k}" aria-pressed="${avCat===k}">${l}</button>`).join("")}</div>
     <div class="avopts">${AV_ITEMS[avCat].map(([v,l])=>`<button class="fchip" data-avset="${avCat}:${v}" aria-pressed="${a[avCat]===v}">${l}</button>`).join("")}</div>
-    ${a[avCat]!=="none"?`<div class="avcols" role="radiogroup" aria-label="Color">${AV_COLORS.map(([h,n])=>`<button class="avsw" role="radio" style="--sw:${h}" data-avcol="${avCat}:${h}" aria-checked="${(a.colors[avCat]||AV_DEFCOL[avCat]).toLowerCase()===h}" aria-label="${n}" title="${n}"></button>`).join("")}</div>`:""}
-    <div class="avglass"><span>Clothes</span><span class="seg2" role="group" aria-label="Clothes look">${[["solid","Solid"],["glass","See-through"],["figure","Figure only"]].map(([k,l])=>`<button data-avcmode="${k}" aria-pressed="${a.cmode===k}">${l}</button>`).join("")}</span></div>
-    <p class="avnote">${a.cmode==="figure"?"Clothes take on the figure's look: blue in Hologram, dark in Shadow. When Alive they stay in color.":a.cmode==="glass"?"Clothes keep their color but you can see the body through them.":"Clothes in full color in every stage."}</p></div>`}
+    ${realStage()!=="real"?`<p class="avnote">Clothing colors and looks unlock at 65%, when your figure is Alive.</p>`:a[avCat]!=="none"?`<div class="avcols" role="radiogroup" aria-label="Color">${AV_COLORS.map(([h,n])=>`<button class="avsw" role="radio" style="--sw:${h}" data-avcol="${avCat}:${h}" aria-checked="${(a.colors[avCat]||AV_DEFCOL[avCat]).toLowerCase()===h}" aria-label="${n}" title="${n}"></button>`).join("")}</div>`:""}
+    ${realStage()!=="real"?"":`<div class="avglass"><span>Clothes</span><span class="seg2" role="group" aria-label="Clothes look">${[["solid","Solid"],["glass","See-through"],["figure","Figure only"]].map(([k,l])=>`<button data-avcmode="${k}" aria-pressed="${a.cmode===k}">${l}</button>`).join("")}</span></div>
+    <p class="avnote">${a.cmode==="figure"?"Clothes take on the figure's look: blue in Hologram, dark in Shadow. When Alive they stay in color.":a.cmode==="glass"?"Clothes keep their color but you can see the body through them.":"Clothes in full color in every stage."}</p>`}</div>`}
 /* ---------- 3D hologram (three.js) ---------- */
 function h3Init(T){
   const canvas=document.createElement("canvas");canvas.className="h3c";
@@ -1646,8 +1646,8 @@ const HSTAGE={shadow:["Shadow",40],holo:["Hologram",40],real:["Alive",65]};
 function holoView(){const a=avatarOf(),st=holoStage(),rs=realStage();
   const fig=H3?`<div class="holo holo3d" data-h3 role="img" aria-label="${HSTAGE[st][0]} figure. Drag to spin."></div>`:(h3Ensure(),hologram(a));
   const lock=`<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`;
-  const cap=holoPreview?`Preview. ${HSTAGE[holoPreview][0]} unlocks at ${HSTAGE[holoPreview][1]}%.`:rs==="real"?"All stages unlocked. Pick any look.":rs==="holo"?"Reach 65% to unlock Alive.":"Reach 40% to unlock Hologram.";
-  return fig+`<div class="hstage" role="group" aria-label="Figure stages">${["shadow","holo","real"].map(k=>{const locked=SRANK[k]>SRANK[rs];return `<button data-hstage="${k}" aria-pressed="${st===k}" class="${locked?"locked":""}" title="${locked?"Locked. Tap to preview":"Use this look"}">${locked?lock:""}${HSTAGE[k][0]}</button>`}).join("")}</div><p class="hcap">${cap}</p>`}
+  holoPreview=null;const cap=rs==="real"?"Alive unlocked. Pick any look.":rs==="holo"?"Reach 65% to unlock Alive and clothing colors.":"Reach 40% to unlock Hologram.";
+  return fig+`<div class="hstage" role="group" aria-label="Figure stages">${["shadow","holo","real"].filter(k=>SRANK[k]<=SRANK[rs]).map(k=>`<button data-hstage="${k}" aria-pressed="${st===k}" title="Use this look">${HSTAGE[k][0]}</button>`).join("")}</div><p class="hcap">${cap}</p>`}
 /* ---------- your own 3D model: stored in Supabase Storage, cached on the device ---------- */
 const MODEL_EXT=["glb","gltf","fbx","obj"],MODEL_MAX=50*1024*1024;
 const IDB={db:null,open(){return this.db||(this.db=new Promise((ok,no)=>{const r=indexedDB.open("aot-models",1);r.onupgradeneeded=()=>r.result.createObjectStore("m");r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)}))},
@@ -1668,8 +1668,9 @@ async function loadModel(m){const k=mKey(m);mdl={key:k,obj:null,busy:true,fail:f
   try{const buf=await modelBuffer(m);if(!buf)throw new Error("nofile");const r=await parseModel(buf,m.ext);if(mdl.key!==k)return;mdl={key:k,obj:r.obj,clips:r.clips,busy:false}}
   catch(e){if(mdl.key===k){mdl={key:k,obj:null,busy:false,fail:true};toast(m.path==="local"&&!(await IDB.get(k))?"Your 3D model is on the device you added it from":"Couldn't load your 3D model")}}
   if(tab==="pass")render()}
+const figAv=()=>{const a=avatarOf();if(realStage()!=="real")a.cmode="figure";return a};
 function holoMount(){const el=document.querySelector("[data-h3]");if(!el||!H3){if(H3)H3.stop();return}
-  const a=avatarOf(),m=a.useModel&&a.model;
+  const a=figAv(),m=a.useModel&&a.model;
   if(m){const k=mKey(m);if(mdl.key!==k)loadModel(m);if(mdl.key===k&&mdl.obj){H3.set(a,holoStage(),mdl);el.classList.remove("loading")}else{H3.set(a,holoStage());el.classList.toggle("loading",!mdl.fail)}}
   else{H3.set(a,holoStage());el.classList.remove("loading")}
   H3.mount(el)}
@@ -2363,7 +2364,7 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
   else if(b.dataset.mv){const[id,k]=b.dataset.mv.split(":");const x=(data.projects||[]).find(q=>q.id===id);if(x){const i=STAT.findIndex(s=>s[0]===x.status);x.status=STAT[Math.max(0,Math.min(2,i+ +k))][0];render();save();if(x.status==="done")toast("Project done")}}
   else if(b.hasAttribute("data-addp")){addingP=!addingP;render();if(addingP){const n=$("#pName");n&&n.focus()}}
   else if(b.dataset.sex){const a=avatarOf();a.body=b.dataset.sex;data.profile=Object.assign({},data.profile,{avatar:a,figure:a.body});render();save()}
-  else if(b.dataset.hstage){const k=b.dataset.hstage;clearTimeout(holoPrevTimer);if(SRANK[k]<=SRANK[realStage()]){holoPreview=null;const a=avatarOf();a.stage=k;data.profile=Object.assign({},data.profile,{avatar:a});render();save()}else{holoPreview=k;holoPrevTimer=setTimeout(()=>{holoPreview=null;if(tab==="pass")render()},6000);render()}}
+  else if(b.dataset.hstage){const k=b.dataset.hstage;clearTimeout(holoPrevTimer);if(SRANK[k]<=SRANK[realStage()]){holoPreview=null;const a=avatarOf();a.stage=k;data.profile=Object.assign({},data.profile,{avatar:a});render();save()}}
   else if(b.hasAttribute("data-avedit")){avEdit=!avEdit;render()}
   else if(b.dataset.avcat){avCat=b.dataset.avcat;render()}
   else if(b.dataset.avcol){const[k,v]=b.dataset.avcol.split(":");const a=avatarOf();a.colors[k]=v;data.profile=Object.assign({},data.profile,{avatar:a});render();save()}
