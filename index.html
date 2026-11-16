@@ -1180,7 +1180,8 @@ async function onSession(session){
   setUplink();
   if(sbUser){if(recovering)showAuth("reset");else hideAuth();await pull()}else render();
 }
-function showAuth(mode){const a=$("#auth");if(!a)return;a.hidden=false;a.dataset.mode=mode||"in";$("#authMsg").textContent="";paintAuth();setTimeout(()=>{const i=$("#authEmail");i&&i.focus()},50)}
+const touchUI=()=>{try{return matchMedia("(pointer:coarse)").matches||navigator.maxTouchPoints>0}catch(e){return false}};
+function showAuth(mode){if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();const a=$("#auth");if(!a)return;a.hidden=false;a.dataset.mode=mode||"in";$("#authMsg").textContent="";paintAuth();if(!touchUI())setTimeout(()=>{const i=$("#authEmail");i&&i.focus()},50)}
 function hideAuth(){const a=$("#auth");if(a)a.hidden=true}
 function paintAuth(){const a=$("#auth"),m=a.dataset.mode,up=m==="up",fg=m==="forgot",rs=m==="reset";
   $("#authTitle").textContent=up?"Create your account":fg?"Reset your password":rs?"Choose a new password":"Welcome back";
@@ -1227,7 +1228,7 @@ document.addEventListener("submit",async e=>{if(e.target.id!=="authForm")return;
   go.disabled=false;paintAuth();
 },true);
 document.addEventListener("click",async e=>{const t=e.target.closest&&e.target.closest("[data-auth],#signInBtn,#signOutBtn,#exportBtn,#pwBtn,#pwCancel,[data-snap]");if(!t)return;
-  if(t.id==="pwBtn"){pwOpen=true;render();setTimeout(()=>{const i=$("#pwCur");i&&i.focus()},50);return}
+  if(t.id==="pwBtn"){pwOpen=true;render();if(!touchUI())setTimeout(()=>{const i=$("#pwCur");i&&i.focus()},50);return}
   if(t.id==="pwCancel"){pwOpen=false;render();return}
   if(t.dataset.auth==="swap"){const a=$("#auth"),m=a.dataset.mode;a.dataset.mode=m==="up"||m==="forgot"?"in":"up";$("#authMsg").textContent="";paintAuth()}
   else if(t.dataset.auth==="forgot"){const a=$("#auth");a.dataset.mode="forgot";$("#authMsg").textContent="";paintAuth();$("#authEmail").focus()}
