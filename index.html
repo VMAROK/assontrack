@@ -1096,6 +1096,11 @@ aside{background:rgba(var(--tD),calc(.82*var(--go)))!important;backdrop-filter:b
 .askbox{position:fixed;inset:0;z-index:950;display:grid;place-items:center;padding:16px;background:rgba(2,6,14,.7);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);animation:askin .16s ease-out}@keyframes askin{from{opacity:0}}
 .ask-in{width:min(380px,100%);margin:0;display:grid;gap:10px;border-color:rgba(var(--tL),.45)}.ask-in b{font-size:16px}.ask-in p{margin:0;font-size:13.5px;color:var(--muted);line-height:1.45}.ask-in p span{color:#e6eeff;font-weight:600}
 .ask-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}.ask-btns .btn{flex:1 1 auto;white-space:nowrap;padding:11px 12px;font-size:14px}.ask-btns .btn.ghost{background:none;border-color:rgba(var(--lr),.3);color:var(--muted)}.ask-btns .btn.danger{color:#ff7a86;border-color:rgba(255,93,108,.45)}
+.ts-save{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-bottom:14px}.ts-save input{min-width:0;width:100%;box-sizing:border-box}.ts-save .btn{white-space:nowrap;padding:11px 16px}
+.ts-io{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.ts-io .btn{flex:0 1 auto;padding:10px 16px;font-size:14px;background:none;border-color:rgba(var(--lr),.3);color:var(--muted);cursor:pointer}.ts-io .btn:hover{color:#fff;border-color:rgba(var(--tL),.5)}.ts-io .btn[disabled]{opacity:.4;cursor:default}.ts-imp{display:inline-flex;align-items:center;position:relative;overflow:hidden}.ts-imp input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+.tsp .wimg{position:relative}.ts-dot{position:absolute;left:7px;bottom:7px;width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.85);box-shadow:0 1px 6px rgba(0,0,0,.6)}.ts-n{position:absolute;right:7px;bottom:7px;font-style:normal;font-size:10.5px;font-weight:700;color:#fff;background:rgba(4,8,20,.72);border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:1px 6px}
+.wdel.arm{width:auto;padding:0 8px;font-size:11px;font-weight:700;color:#ff8a94;border-color:rgba(255,93,108,.6)}
+@media (max-width:520px){.ts-save{grid-template-columns:minmax(0,1fr)}}
 .dtrack{position:relative;clip-path:inset(-30px 0)}.dtrack-in{position:absolute;inset:0;will-change:transform}.dpane{position:absolute!important;top:0;width:100%;margin:0!important;animation:none!important}
 .dfull{touch-action:pan-y;user-select:none;-webkit-user-select:none}.dfull input{user-select:text;-webkit-user-select:text}
 .dfull.fromR.slide{animation:dslR .38s cubic-bezier(.2,.85,.25,1) both}.dfull.fromL.slide{animation:dslL .38s cubic-bezier(.2,.85,.25,1) both}@keyframes dslR{from{opacity:0;transform:translateX(46px)}to{opacity:1;transform:none}}@keyframes dslL{from{opacity:0;transform:translateX(-46px)}to{opacity:1;transform:none}}
@@ -2684,7 +2689,7 @@ const WALLS=[
   {id:"royalgold",name:"Royal gold",src:"wp/royalgold.jpg",pos:"50% 50%",shade:.15},
   {id:"gilded",name:"Gilded",src:"wp/gilded.jpg",pos:"50% 50%",shade:.15},
   {id:"moonlit",name:"Moonlit",src:"wp/moonlit.jpg",pos:"62% 40%",shade:0},
-  {id:"fire",name:"Fire",src:"wp/fire.jpg",pos:"50% 50%",shade:0},{id:"serpent",name:"Kundalini",src:"wp/serpent.jpg",pos:"50% 50%",shade:0},{id:"deepdub",name:"Deep dub",src:"wp/deepdub.jpg",pos:"50% 50%",shade:0},{id:"inferno",name:"Inferno",src:"wp/inferno.jpg",pos:"50% 50%",shade:.1},
+  {id:"fire",name:"Fire",src:"wp/fire.jpg",pos:"50% 50%",shade:0},{id:"serpent",name:"Kundalini",src:"wp/serpent.jpg",pos:"50% 50%",shade:0},{id:"deepdub",name:"Deep dub",src:"wp/deepdub.jpg",pos:"50% 50%",shade:0},{id:"inferno",name:"Inferno",src:"wp/inferno.jpg",pos:"50% 50%",shade:.1},{id:"pearl",name:"White silver",src:"wp/pearl.jpg",pos:"50% 50%",shade:0},{id:"chrome",name:"Black silver",src:"wp/chrome.jpg",pos:"50% 50%",shade:.15},
   {id:"aurora",name:"Aurora",src:"wp/aurora.jpg",pos:"50% 40%",shade:0},
   {id:"nebula",name:"Nebula",src:"wp/nebula.jpg",pos:"50% 50%",shade:0},
   {id:"sunset",name:"Sunset",src:"wp/sunset.jpg",pos:"50% 62%",shade:.15},
@@ -2695,8 +2700,9 @@ const WALLS=[
   {id:"midnight",name:"Midnight",src:"wp/midnight.jpg",pos:"50% 50%",shade:0},
   {id:"livefire",name:"Live inferno",live:"inferno",src:"wp/m/inferno.jpg",pos:"50% 50%",shade:.05},
   {id:"liveportal",name:"Live portal",live:"portal",src:"wp/m/portal.jpg",pos:"50% 50%",shade:.1},
-  {id:"livedub",name:"Live dub",live:"dub",src:"wp/m/deepdub.jpg",pos:"50% 50%",shade:0}];
-const WGROUPS=[["Live · animated",["livefire","liveportal","livedub"]],["Landscape",["alpine","serenity","snow","moonlit","aurora","sunset","ocean","forest","dunes","sakura"]],["Kaleidoscope",["hyperspace","portal","royalgold","gilded","inferno","deepdub"]],["Fire",["fire","serpent"]],["Dream & space",["liminal","nebula","midnight"]]];
+  {id:"livedub",name:"Live dub",live:"dub",src:"wp/m/deepdub.jpg",pos:"50% 50%",shade:0},
+  {id:"livechrome",name:"Live silver",live:"chrome",src:"wp/m/pearl.jpg",pos:"50% 50%",shade:0}];
+const WGROUPS=[["Live · animated",["livefire","liveportal","livedub","livechrome"]],["Landscape",["alpine","serenity","snow","moonlit","aurora","sunset","ocean","forest","dunes","sakura"]],["Kaleidoscope",["hyperspace","portal","royalgold","gilded","inferno","deepdub","pearl","chrome"]],["Fire",["fire","serpent"]],["Dream & space",["liminal","nebula","midnight"]]];
 const wallGroups=()=>{const A=allWalls(),out=WGROUPS.map(([n,ids])=>[n,ids.map(i=>A.find(w=>w.id===i)).filter(Boolean)]);const seen=new Set(WGROUPS.flatMap(g=>g[1]));const rest=A.filter(w=>!w.custom&&!seen.has(w.id));if(rest.length)out[out.length-1][1].push(...rest);const mine=A.filter(w=>w.custom);if(mine.length)out.push(["Yours",mine]);return out.filter(g=>g[1].length)};
 const stripWalls=f=>wallGroups().map(([n,ws])=>`<span class="tgroup">${esc(n)}</span>`+ws.map(f).join("")).join("");
 const allWalls=()=>[...WALLS,...((D().customWalls)||[]).map(c=>({id:c.id,name:c.name||"My wallpaper",src:c.src,thumb:c.thumb,pos:"50% 50%",shade:.15,custom:true}))];
@@ -2707,8 +2713,8 @@ const ctxCat=()=>{if(tab!=="pass")return null;const p=ctxPass(),cid=p?p.cat:(pas
 const passWall=()=>{const p=ctxPass(),c=ctxCat(),id=(p&&p.wall)||(c&&c.wall);return id&&allWalls().find(w=>w.id===id)||null};
 let themeOpen=false;
 let wallShown=null;
-const KALEI=new Set(["hyperspace","portal","royalgold","gilded","inferno","deepdub"]);
-const HDW=new Set(["deepdub","gilded","hyperspace","inferno","liminal","portal","royalgold","serpent"]);
+const KALEI=new Set(["hyperspace","portal","royalgold","gilded","inferno","deepdub","pearl","chrome"]);
+const HDW=new Set(["pearl","chrome","deepdub","gilded","hyperspace","inferno","liminal","portal","royalgold","serpent"]);
 const animOn=()=>!!(data.profile||{}).animWall;
 const imgP=new Map(),loaded=new Set();
 function loadImg(src){if(!imgP.has(src))imgP.set(src,new Promise((ok,no)=>{const i=new Image();i.decoding="async";i.onload=()=>{(i.decode?i.decode():Promise.resolve()).catch(()=>{}).then(()=>{loaded.add(src);ok(src)})};i.onerror=()=>{imgP.delete(src);no()};i.src=src}));return imgP.get(src)}
@@ -2718,21 +2724,22 @@ const spinner=on=>{const e=$("#bgspin");if(e)e.classList.toggle("show",on)};
 const LIVE_PAL={
   inferno:{ramp:[[.6,.03,.02],[1,.36,.05],[1,.8,.32]],gain:1.15,n:8,cx:-.55,cy:-.6},
   portal:{a:[.5,.5,.5],b:[.5,.5,.5],c:[1,1,1],d:[0,.33,.67],gain:1,n:12,cx:-.62,cy:-.48},
+  chrome:{a:[.46,.47,.5],b:[.5,.5,.52],c:[1,1,1],d:[.5,.5,.51],gain:1.1,n:12,cx:-.62,cy:-.5,inv:1},
   dub:{a:[.3,.33,.45],b:[.15,.22,.2],c:[1,1,1],d:[.5,.15,.65],gain:.6,n:10,cx:-.62,cy:-.48}};
-const LIVE_FS=`precision highp float;uniform vec2 R;uniform float T;uniform vec3 A,B,C,Dd;uniform float G,N;uniform vec2 K;uniform float M;uniform vec3 Q0,Q1,Q2;
+const LIVE_FS=`precision highp float;uniform vec2 R;uniform float T;uniform vec3 A,B,C,Dd;uniform float G,N;uniform vec2 K;uniform float M,W;uniform vec3 Q0,Q1,Q2;
 void main(){vec2 uv=(gl_FragCoord.xy-.5*R)/min(R.x,R.y)*2.;float r=length(uv);float a=atan(uv.y,uv.x)+T*.025;
 float seg=6.2831853/N;a=mod(a,seg);a=abs(a-seg*.5);float rr=pow(r,.85)*1.35*(1.+.06*sin(T*.21));vec2 p=rr*vec2(cos(a),sin(a));
 vec2 c=K+vec2(.05*sin(T*.071),.045*cos(T*.053));float acc=0.,mn=1e9;
 for(int k=0;k<11;k++){p=abs(p);float m=dot(p,p)+1e-4;p=p/m+c;acc+=exp(-length(p)*2.2);mn=min(mn,abs(p.x*p.y));}
 float t=acc*.12+r*.55-T*.035;vec3 col;if(M>.5){float u=fract(t)*3.;float f=smoothstep(0.,1.,fract(u));col=u<1.?mix(Q0,Q1,f):u<2.?mix(Q1,Q2,f):mix(Q2,Q0,f);}else col=A+B*cos(6.2831853*(C*t+Dd));
 float g0=acc*.07+exp(-mn*160.)*1.1;float glow=1.-exp(-pow(g0,1.6)*1.6);float vig=max(0.,1.-pow(r*.78,2.6));
-float core=exp(-r*r*60.)*.22;gl_FragColor=vec4(clamp(col*glow*(.18+.95*vig)*G+core*vec3(1.,.95,.85)*G,0.,1.),1.);}`;
+float core=exp(-r*r*60.)*.22;vec3 o=clamp(col*glow*(.18+.95*vig)*G+core*vec3(1.,.95,.85)*G,0.,1.);if(W>.5)o=vec3(.955,.965,.99)-o*.93;gl_FragColor=vec4(o,1.);}`;
 function liveStart(cv,pal){const gl=cv.getContext("webgl",{antialias:false,alpha:false,powerPreference:"low-power",preserveDrawingBuffer:false});if(!gl)return null;
   const sh=(t,src)=>{const s=gl.createShader(t);gl.shaderSource(s,src);gl.compileShader(s);return s};const pr=gl.createProgram();
   gl.attachShader(pr,sh(gl.VERTEX_SHADER,"attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}"));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,LIVE_FS));gl.linkProgram(pr);
   if(!gl.getProgramParameter(pr,gl.LINK_STATUS))return null;gl.useProgram(pr);
   const bf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,bf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);const loc=gl.getAttribLocation(pr,"p");gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
-  const U=n=>gl.getUniformLocation(pr,n);const setPal=k=>{const P=LIVE_PAL[k];if(P.ramp){gl.uniform1f(U("M"),1);gl.uniform3fv(U("Q0"),P.ramp[0]);gl.uniform3fv(U("Q1"),P.ramp[1]);gl.uniform3fv(U("Q2"),P.ramp[2])}else{gl.uniform1f(U("M"),0);gl.uniform3fv(U("A"),P.a);gl.uniform3fv(U("B"),P.b);gl.uniform3fv(U("C"),P.c);gl.uniform3fv(U("Dd"),P.d)}gl.uniform1f(U("G"),P.gain);gl.uniform1f(U("N"),P.n);gl.uniform2f(U("K"),P.cx,P.cy)};setPal(pal);
+  const U=n=>gl.getUniformLocation(pr,n);const setPal=k=>{const P=LIVE_PAL[k];if(P.ramp){gl.uniform1f(U("M"),1);gl.uniform3fv(U("Q0"),P.ramp[0]);gl.uniform3fv(U("Q1"),P.ramp[1]);gl.uniform3fv(U("Q2"),P.ramp[2])}else{gl.uniform1f(U("M"),0);gl.uniform3fv(U("A"),P.a);gl.uniform3fv(U("B"),P.b);gl.uniform3fv(U("C"),P.c);gl.uniform3fv(U("Dd"),P.d)}gl.uniform1f(U("W"),P.inv?1:0);gl.uniform1f(U("G"),P.gain);gl.uniform1f(U("N"),P.n);gl.uniform2f(U("K"),P.cx,P.cy)};setPal(pal);
   const uR=U("R"),uT=U("T");return {setPal,draw(t){gl.viewport(0,0,cv.width,cv.height);gl.uniform2f(uR,cv.width,cv.height);gl.uniform1f(uT,t);gl.drawArrays(gl.TRIANGLES,0,3)},gl}}
 
 let liveEng=null,liveRAF=0,liveKey=null,liveFail=false,liveLast=0;const liveT0=performance.now()-Math.random()*6e5;
@@ -2855,9 +2862,47 @@ function lookPanel(){const L=lookOf();return `<div class="panel" style="margin-t
   <div class="lk-label" style="margin-top:18px">Outlines</div>
   <div class="seg2 lines-sw" role="group" aria-label="Box outlines"><button data-lines="1" aria-pressed="${L.lines!==false}">Match box color</button><button data-lines="0" aria-pressed="${L.lines===false}">Classic blue</button></div>
   <p class="note">Each slider does one thing. Blur only frosts what shows behind the boxes. Transparency only sets how see-through they are. Color depth only makes the box color softer or deeper.</p></div>`}
+
+/* ---------- saved themes: wallpaper + colors for main, every category and every passion ---------- */
+const TS_P=["wallpaper","look","wallBlur","animWall"],TS_C=["wall","look","wallBlur"],TS_S=["wall","look"];
+const tsPick=(o,ks)=>{const r={};ks.forEach(k=>{if(o&&o[k]!==undefined)r[k]=JSON.parse(JSON.stringify(o[k]))});return r};
+function themeSnap(){return {profile:tsPick(data.profile||{},TS_P),cats:Object.fromEntries((data.categories||[]).map(c=>[c.id,tsPick(c,TS_C)])),pass:Object.fromEntries(data.passions.map(p=>[p.id,tsPick(p,TS_S)]))}}
+const tsNorm=v=>v&&typeof v==="object"&&!Array.isArray(v)?Object.keys(v).sort().map(k=>[k,tsNorm(v[k])]):v;
+const tsKey=s=>{const live=(o,ids)=>Object.entries(o||{}).filter(([id,v])=>ids.has(id)&&Object.keys(v).length).sort((a,b)=>a[0]<b[0]?-1:1).map(([id,v])=>[id,tsNorm(v)]);return JSON.stringify([tsNorm(s.profile||{}),live(s.cats,new Set((data.categories||[]).map(c=>c.id))),live(s.pass,new Set(data.passions.map(p=>p.id)))])};
+function themeApply(s){const set=(o,v,ks)=>ks.forEach(k=>{if(v[k]===undefined)delete o[k];else o[k]=JSON.parse(JSON.stringify(v[k]))});data.profile=Object.assign({},data.profile);set(data.profile,s.profile||{},TS_P);
+  (data.categories||[]).forEach(c=>{const v=(s.cats||{})[c.id];if(v)set(c,v,TS_C)});data.passions.forEach(p=>{const v=(s.pass||{})[p.id];if(v)set(p,v,TS_S)})}
+const themeSets=()=>(demoOn()?[]:data.themeSets)||[];
+let tsDelArm=null;
+function themePanel(){const sets=themeSets(),cur=tsKey(themeSnap());
+  const card=t=>{const w=allWalls().find(x=>x.id===(t.snap.profile||{}).wallpaper)||WALLS[0],lk=LOOKS.find(l=>l.id===((t.snap.profile||{}).look||{}).color),on=tsKey(t.snap)===cur,n=Object.values(t.snap.cats||{}).filter(v=>Object.keys(v).length).length+Object.values(t.snap.pass||{}).filter(v=>Object.keys(v).length).length;
+    return `<div class="wcell"><button class="wcard" role="radio" aria-checked="${on}" data-tsload="${t.id}" title="Load this theme"><span class="wimg" style="background-image:url('${thumbOf(w)}')">${lk?`<i class="ts-dot" style="background:hsl(${lk.h} ${Math.round(Math.max(.3,lk.s)*100)}% ${lk.l?22:52}%)"></i>`:""}${n?`<i class="ts-n">+${n}</i>`:""}</span><span class="wname">${esc(t.name)}</span></button><button class="wdel${tsDelArm===t.id?" arm":""}" data-tsdel="${t.id}" aria-label="Delete ${esc(t.name)}" title="Delete">${tsDelArm===t.id?"Sure?":"×"}</button></div>`};
+  return `<div class="panel tsp" style="margin-top:18px"><div class="ph"><span>Saved themes</span><i>Main, categories and passions together</i></div>
+    <div class="ts-save"><input id="tsName" maxlength="28" autocomplete="off" enterkeyhint="done" placeholder="Name this look" aria-label="Theme name"><button class="btn" data-tssave>Save current theme</button></div>
+    ${sets.length?`<div class="wgrid" role="radiogroup" aria-label="Saved themes">${sets.map(card).join("")}</div>`:`<p class="note" style="margin:0">Nothing saved yet. Set up your wallpapers and colors the way you like them, then save. You can try something new and tap a saved theme to bring the old one back.</p>`}
+    <div class="ts-io"><button class="btn ghost" data-tsexport ${sets.length?"":"disabled"}>Export as a file</button><label class="btn ghost ts-imp">Import a file<input type="file" accept=".json,application/json" data-tsimport></label></div></div>`}
+function tsDownload(name,text){const f=new File([text],name,{type:"application/json"});
+  if(typeof touchUI==="function"&&touchUI()&&navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:name}).catch(()=>{});return}
+  const u=URL.createObjectURL(f),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tssave],[data-tsload],[data-tsdel],[data-tsexport]");if(!b)return;const ds=b.dataset;if(ds.tsdel==null&&tsDelArm){tsDelArm=null}
+  if(ds.tssave!=null){const i=$("#tsName"),sets=data.themeSets=(data.themeSets||[]).filter(t=>!t.auto||true),nm=((i&&i.value)||"").trim()||"Theme "+(sets.filter(t=>!t.auto).length+1);const ex=sets.find(t=>t.name.toLowerCase()===nm.toLowerCase());
+    if(ex){ex.snap=themeSnap();ex.at=Date.now();delete ex.auto;toast(nm+" updated")}else{if(sets.length>=24){toast("You can keep up to 24. Delete one first");return}sets.push({id:"t"+uid(),name:nm,at:Date.now(),snap:themeSnap()});toast(nm+" saved")}render();save();return}
+  if(ds.tsload){const t=(data.themeSets||[]).find(x=>x.id===ds.tsload);if(!t)return;const now=themeSnap(),k=tsKey(now);if(tsKey(t.snap)===k){toast(t.name+" is already on");return}
+    if(!(data.themeSets||[]).some(x=>tsKey(x.snap)===k)){data.themeSets=data.themeSets.filter(x=>!x.auto);data.themeSets.push({id:"t"+uid(),name:"Before "+t.name.slice(0,18),at:Date.now(),snap:now,auto:true})}
+    themeApply(t.snap);wallShown=null;render();save();toast(t.name+" loaded");return}
+  if(ds.tsdel){if(tsDelArm!==ds.tsdel){tsDelArm=ds.tsdel;render();return}tsDelArm=null;data.themeSets=(data.themeSets||[]).filter(x=>x.id!==ds.tsdel);render();save();toast("Theme deleted");return}
+  if(ds.tsexport!=null){const sets=data.themeSets||[];if(!sets.length)return;const used=new Set();sets.forEach(t=>{[(t.snap.profile||{}).wallpaper,...Object.values(t.snap.cats||{}).map(v=>v.wall),...Object.values(t.snap.pass||{}).map(v=>v.wall)].forEach(id=>id&&used.add(id))});
+    const names={};(data.categories||[]).forEach(c=>names[c.id]=c.name);data.passions.forEach(p=>names[p.id]=p.name);
+    tsDownload("assontrack-themes-"+today()+".json",JSON.stringify({app:"AssOnTrack",type:"themes",version:1,exported:new Date().toISOString(),names,themes:sets,walls:(data.customWalls||[]).filter(w=>used.has(w.id))},null,1));toast("Themes exported")}});
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="tsName"){e.preventDefault();const b=$("[data-tssave]");b&&b.click()}});
+document.addEventListener("change",async e=>{const inp=e.target;if(!inp.dataset||inp.dataset.tsimport===undefined)return;const f=inp.files&&inp.files[0];inp.value="";if(!f)return;
+  try{if(f.size>30*1024*1024)throw 0;const j=JSON.parse(await f.text());if(!j||j.type!=="themes"||!Array.isArray(j.themes))throw 0;data.themeSets=data.themeSets||[];const have=new Set(data.themeSets.map(t=>tsKey(t.snap)+"|"+t.name));let n=0,skipW=0;
+    (j.walls||[]).forEach(w=>{if(!w||!w.id||typeof w.src!=="string"||!/^data:image\//.test(w.src))return;data.customWalls=data.customWalls||[];if(data.customWalls.some(x=>x.id===w.id))return;if(data.customWalls.length>=6){skipW++;return}data.customWalls.push({id:String(w.id),name:String(w.name||"My wallpaper").slice(0,40),src:w.src,thumb:typeof w.thumb==="string"&&/^data:image\//.test(w.thumb)?w.thumb:w.src})});
+    j.themes.forEach(t=>{if(!t||!t.snap||typeof t.snap!=="object"||data.themeSets.length>=24)return;const snap={profile:tsPick(t.snap.profile||{},TS_P),cats:{},pass:{}};Object.entries(t.snap.cats||{}).forEach(([id,v])=>snap.cats[id]=tsPick(v,TS_C));Object.entries(t.snap.pass||{}).forEach(([id,v])=>snap.pass[id]=tsPick(v,TS_S));
+      const nm=String(t.name||"Imported theme").slice(0,28);if(have.has(tsKey(snap)+"|"+nm))return;data.themeSets.push({id:"t"+uid(),name:nm,at:Date.now(),snap});n++});
+    render();save();toast(n?`${n} theme${n===1?"":"s"} imported${skipW?" · some wallpapers skipped, you already have 6":""}`:"Those themes are already here")}catch(_){toast("That file isn't an AssOnTrack themes file")}});
 function vSet(){
   const g=data.goals;
-  return banner()+wallPanel()+lookPanel()+`<div class="grid cols2" style="margin-top:18px">
+  return banner()+wallPanel()+lookPanel()+themePanel()+`<div class="grid cols2" style="margin-top:18px">
    <div class="panel"><div class="ph"><span>Goals</span><i>Goals</i></div>
     <form class="f" id="gForm"><div class="f2"><label>Daily calories<input id="gK" type="number" inputmode="numeric" min="0" value="${g.kcal}"></label><label>Daily protein (g)<input id="gP" type="number" inputmode="numeric" min="0" value="${g.protein}"></label></div>
     <label>Goal weight (${g.unit})<input id="gW" type="number" step="0.1" inputmode="decimal" value="${g.weight??""}" placeholder="Optional"></label>
