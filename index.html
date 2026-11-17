@@ -2443,9 +2443,11 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
     vertexShader:`attribute float cmix;varying float vM;varying vec3 vN;varying vec3 vV;void main(){vec4 w=modelMatrix*vec4(position,1.);vN=normalize(mat3(modelMatrix)*normal);vV=normalize(cameraPosition-w.xyz);vM=cmix;gl_Position=projectionMatrix*viewMatrix*w;}`,
     fragmentShader:`uniform float t,hh,hh2;uniform vec3 col,col2;varying float vM;varying vec3 vN;varying vec3 vV;
       void main(){vec3 n=normalize(vN),v=normalize(vV);if(dot(n,v)<0.)n=-n;vec3 L1=normalize(vec3(-.45,.6,.75)),L2=normalize(vec3(.6,.25,.5));vec3 c=mix(col,col2,step(.5,vM));float h=mix(hh,hh2,step(.5,vM));
-        float df=max(0.,dot(n,L1)),df2=max(0.,dot(n,L2)),sp=pow(max(0.,dot(reflect(-L1,n),v)),30.)*.3,rim=pow(1.-max(0.,dot(n,v)),3.)*.15;
-        vec3 o=c*(.5+.08*n.y+.48*df+.15*df2)+vec3(sp+rim);
-        if(h>0.){float pu=.5+.5*sin(t*2.4);o+=c*(.10+.14*h)*pu;}
+        float nv=max(0.,dot(n,v)),df=max(0.,dot(n,L1)),df2=max(0.,dot(n,L2)),sp=pow(max(0.,dot(reflect(-L1,n),v)),36.)*.38;
+        /* grooves: muscle edges turn away from the eye, so darken them; sharp bends in the surface darken too */
+        float groove=mix(.38,1.,smoothstep(.04,.55,nv));float crease=1.-clamp(length(fwidth(n))*.9,0.,.22);
+        vec3 o=c*(.34+.06*n.y+.66*df+.16*df2)*groove*crease+vec3(sp*groove);
+        if(h>0.){float pu=.5+.5*sin(t*2.4);o+=c*(.10+.14*h)*pu*groove;}
         gl_FragColor=vec4(o,1.);}`})};
   function ecoPut(root,map){const wrap=new T.Group();root.updateMatrixWorld(true);const box=new T.Box3().setFromObject(root),sz=box.getSize(new T.Vector3()),ct=box.getCenter(new T.Vector3()),k=2.02/sz.y;
     root.position.set(-ct.x,-box.min.y,-ct.z);wrap.scale.setScalar(k);wrap.add(root);root.updateMatrixWorld(true);
@@ -3744,7 +3746,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="119";
+const APPV="120";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
