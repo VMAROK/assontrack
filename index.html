@@ -1595,6 +1595,7 @@ function dayItems(d,ds){
   const chips=[...ev.map(e=>({c:"var(--cyan)",t:(e.time?fmtTime(e.time)+" ":"")+e.title})),
     ...ss.map(s=>({c:"var(--amber)",t:(s.time?fmtTime(s.time)+" ":"")+pn(s.pid)+(s.planned?" (planned)":" · "+fmtH(s.mins))})),
     ...slotsOn(d,ds).map(x=>({c:x.state==="missed"?"var(--red)":"var(--amber)",t:(x.state==="missed"?"Missed · ":"")+(x.slot.dur?fmtH(x.slot.dur):fmtTime(x.slot.start))+" "+x.p.name})),
+    ...wkOn(d,ds).map(x=>({c:wkCol(x),t:(x.state==="missed"?"Missed · ":/^done/.test(x.state)?"✓ ":"")+fmtH(x.slot.dur)+"/wk "+x.p.name})),
     ...tasksDue(d,ds).map(x=>({c:x.st==="overdue"||x.st==="late"?"var(--red)":x.st==="mastered"?"#3ddc84":"var(--cyan)",t:(x.st==="starts"?"Starts · ":x.st==="mastered"?"Done · ":x.st==="overdue"||x.st==="late"?"Missed · ":"Due "+clock(x.t.due)+" · ")+x.t.title})),
     ...(wo.length?[{c:"var(--lime)",t:wo.length+" exercise"+(wo.length>1?"s":"")}]:[]),
     ...(meals.length?[{c:"var(--magenta)",t:meals.length+" meal"+(meals.length>1?"s":"")}]:[]),
@@ -1604,6 +1605,7 @@ function dayItems(d,ds){
     ...ss.map(x=>({c:"var(--amber)",t:pn(x.pid),s:x.planned?"Planned session"+(x.time?" · "+fmtTime(x.time):""):(x.slotId?"Scheduled session · done":"Passion session"),v:fmtH(x.mins)})),
     ...tasksDue(d,ds).map(x=>({c:x.st==="overdue"||x.st==="late"?"var(--red)":x.st==="mastered"?"#3ddc84":"var(--cyan)",t:x.t.title,s:x.p.name+" · "+(x.st==="starts"?"task starts today":x.st==="mastered"?"done before the deadline":x.st==="overdue"||x.st==="late"?"deadline missed":"deadline "+clock(x.t.due)),v:fmtH(Math.round(taskMs(x.t)/6e4))})),
     ...slotsOn(d,ds).map(x=>({c:x.state==="missed"?"var(--red)":"var(--amber)",t:x.p.name,s:(x.state==="missed"?"Missed · ":x.state==="open"?"Log now · ":"Scheduled · ")+(x.slot.dur?"Any time today":fmtTime(x.slot.start)+"–"+fmtTime(x.slot.end)),v:fmtH(slotMins(x.slot))})),
+    ...wkOn(d,ds).map(x=>({c:wkCol(x),t:x.p.name,s:"Every week · "+(x.state==="missed"?"missed, ":/^done/.test(x.state)?"done, ":"")+fmtH(x.lg)+" of "+fmtH(x.slot.dur)+" that week",v:fmtH(x.slot.dur)})),
     ...(wt?[{c:"var(--violet)",t:"Weigh-in",s:"Body",v:wt.v+" "+d.goals.unit}]:[])];
   return {ev,chips,logs};
 }
@@ -2591,6 +2593,9 @@ function schedStats(d,p){
 }
 const clock=ms=>new Date(ms).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"});
 function tasksDue(d,ds){const out=[];d.passions.forEach(p=>(p.tasks||[]).forEach(t=>{if(t.due&&ymd(new Date(t.due))===ds)out.push({p,t,st:taskState(t)});else if(t.startOn===ds&&!t.doneAt)out.push({p,t,st:"starts"})}));return out}
+/* weekly hours goals belong to the whole week: show them on each of its days */
+function wkOn(d,ds){const out=[],wk=wkOf(ds);d.passions.forEach(p=>{if(!modesOf(p).includes("schedule"))return;(p.slots||[]).filter(isWk).forEach(sl=>{const st=slotState(d,p,sl,wk);if(st!=="none")out.push({p,slot:sl,state:st,lg:wkLogged(d,p,sl,wk)})})});return out}
+const wkCol=x=>x.state==="missed"?"var(--red)":/^done/.test(x.state)?"#3ddc84":"var(--amber)";
 function slotsOn(d,ds){
   const out=[];
   d.passions.forEach(p=>{if(!modesOf(p).includes("schedule"))return;(p.slots||[]).forEach(sl=>{
@@ -2818,7 +2823,7 @@ function typedTime(v,ap){v=(v||"").trim();let m=v.match(/^(\d{1,2})(?::?(\d{2}))
 document.addEventListener("focusout",e=>{const t=e.target;if(t.id!=="slS1"&&t.id!=="slE1")return;const v=typedTime(t.value,"AM");if(v){const h=+v.slice(0,2)||12;t.value=h+":"+v.slice(3)}});
 /* add form, frequency first: how often it repeats, then whether it's a number of hours or a set time */
 function dayForm(i,ds,wide,wk){const fr=wk?wkOf(today()):ds>=today()?ds:(()=>{const x=new Date(ds+"T12:00");x.setDate(x.getDate()+7);return ymd(x)})();
-  return `<form class="slotform dayform${wide?" wide":""}${wk?" wkform":""}" id="slotForm" data-inline="1" data-day="${DAYSF[i]}">${wide?`<div class="ef-title">${wk?"Hours per week":"Add to "+DAYSF[i]}</div>`:""}<input type="hidden" id="slD" value="${i}"><input type="hidden" id="slR" value="${wk?"weekly":"weekly"}"><input type="hidden" id="slB" value="${wk?"week":"dow"}">
+  return `<form class="slotform dayform${wide?" wide":""}${wk?" wkform":""}" id="slotForm" data-inline="1" data-day="${DAYSF[i]}" data-fr="${fr}">${wide?`<div class="ef-title">${wk?"Hours per week":"Add to "+DAYSF[i]}</div>`:""}<input type="hidden" id="slD" value="${i}"><input type="hidden" id="slR" value="${wk?"weekly":"weekly"}"><input type="hidden" id="slB" value="${wk?"week":"dow"}">
     <label ${wk?"hidden":""}>Repeats<select id="slFq"><option value="daily">Every day</option><option value="weekly" selected>Every week</option><option value="once">Just once</option></select></label>
     <label ${wk?"hidden":""}>Goal<select id="slK"><option value="dur" ${wk?"selected":""}>Hours</option><option value="times" ${wk?"":"selected"}>Set time</option></select></label>
     <div class="kt tpair" ${wk?"hidden":""}><label>From<input id="slS1" inputmode="numeric" maxlength="5" autocomplete="off" aria-label="From time"><select id="slSa" aria-label="From AM or PM"><option>AM</option><option selected>PM</option></select></label><label>To<input id="slE1" inputmode="numeric" maxlength="5" autocomplete="off" aria-label="To time"><select id="slEa" aria-label="To AM or PM"><option>AM</option><option selected>PM</option></select></label></div>
@@ -2833,8 +2838,9 @@ function slotFormSync(f){if(!f||f.id!=="slotForm")return;const q=x=>f.querySelec
   f.querySelectorAll(".kt").forEach(l=>l.hidden=dur);f.querySelectorAll(".kd").forEach(l=>l.hidden=!dur);const dyl=q(".kdy");if(dyl)dyl.hidden=!(dur&&fq==="weekly");
   const hl=q("#slHl");if(hl)hl.textContent=fq==="daily"?"Hours per day (h:mm)":fq==="once"?"Hours (h:mm)":perWeek?"Hours per week (h:mm)":"Hours each "+day+" (h:mm)";
   const once=fq==="once";f.querySelectorAll(".du").forEach(l=>l.hidden=once||(l.classList.contains("dud")&&q("#slU").value!=="date"));const fl=q("#slFl");if(fl)fl.textContent=once?"Date":"Starts";
+  const sf=q("#slF");if(sf&&!f.dataset.frT)sf.value=fq==="daily"?today():f.dataset.fr||sf.value;   /* every day starts today unless you pick another date */
   const wkOpt=q('#slFq option[value="weekly"]');if(wkOpt)wkOpt.textContent=dur?"Every week":"Every "+day}
-document.addEventListener("change",e=>{const f=e.target.closest&&e.target.closest("#slotForm");if(f&&/^(slFq|slK|slDy|slU)$/.test(e.target.id)){slotFormSync(f);if(e.target.id==="slK"&&e.target.value==="dur"&&typeof touchUI==="function"&&!touchUI()){const i=f.querySelector("#slH");i&&i.focus()}}});
+document.addEventListener("change",e=>{const f=e.target.closest&&e.target.closest("#slotForm");if(f&&e.target.id==="slF")f.dataset.frT="1";if(f&&/^(slFq|slK|slDy|slU)$/.test(e.target.id)){slotFormSync(f);if(e.target.id==="slK"&&e.target.value==="dur"&&typeof touchUI==="function"&&!touchUI()){const i=f.querySelector("#slH");i&&i.focus()}}});
 /* how often first, then how much: "Every day · 8h", "Every week · 8h", "Every Tue · 8h" */
 const slAmt=sl=>sl.dur?fmtH(sl.dur):slRange(sl.start,sl.end);
 const slFreq=(sl,full)=>sl.once?(full?"One time":"Once"):isWk(sl)?"Every week":sl.grp?"Every day":"Every "+(full?DAYSF:DAYS)[sl.day];
@@ -3376,7 +3382,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="98";
+const APPV="99";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
