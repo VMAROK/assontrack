@@ -1116,6 +1116,7 @@ aside{background:rgba(var(--tD),calc(.82*var(--go)))!important;backdrop-filter:b
 .wflash{animation:wflash 1.6s ease-out}@keyframes wflash{0%{background:rgba(61,220,132,.28)}100%{background:transparent}}
 .bodytop{align-items:stretch}.bodytop>.stack{display:flex;flex-direction:column;min-height:0}.bodytop>.stack>.panel{flex:none}.bodytop>.stack>.wlogp{flex:1 1 0;height:0;min-height:128px;overflow:hidden;display:flex;flex-direction:column}.wlogp .wlog{flex:1;min-height:0;overflow:hidden;align-content:start}
 @media (max-width:760px){.bodytop>.stack>.wlogp{flex:none;height:auto;min-height:0}}
+.hk-steps{margin:0 0 12px;padding-left:20px;display:grid;gap:5px;font-size:13.5px;color:var(--muted);line-height:1.4}.hk-steps b{color:#e6eeff;font-weight:600}.hk-prog{height:7px;border-radius:99px;background:rgba(var(--lr),.18);overflow:hidden}.hk-prog i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,rgba(var(--tL),.55),rgba(var(--tL),1));box-shadow:0 0 8px rgba(var(--tL),.7);transition:width .2s}.ts-io .hk-btn{color:rgba(var(--tL),1);border-color:rgba(var(--tL),.5)}
 .dtrack{position:relative;clip-path:inset(-30px 0)}.dtrack-in{position:absolute;inset:0;will-change:transform}.dpane{position:absolute!important;top:0;width:100%;margin:0!important;animation:none!important}
 .dfull{touch-action:pan-y;user-select:none;-webkit-user-select:none}.dfull input{user-select:text;-webkit-user-select:text}
 .dfull.fromR.slide{animation:dslR .38s cubic-bezier(.2,.85,.25,1) both}.dfull.fromL.slide{animation:dslL .38s cubic-bezier(.2,.85,.25,1) both}@keyframes dslR{from{opacity:0;transform:translateX(46px)}to{opacity:1;transform:none}}@keyframes dslL{from{opacity:0;transform:translateX(-46px)}to{opacity:1;transform:none}}
@@ -1873,7 +1874,7 @@ function vTrain(){
      <p class="note">Volume this week: ${n0(vol)} ${u} (sets × reps × load)</p></div>
    </div></div>
    <div class="panel" style="margin-top:18px;--c:var(--lime)"><div class="ph"><span>Training log</span><i>${d.workouts.length} total</i></div>
-    <div class="rows">${WO.length?WO.slice(0,25).map(w=>`<div class="r" style="--c:var(--lime)"><span class="dot"></span><div class="m"><div>${esc(w.name)}</div><small>${fmtDate(w.d)}${w.d===today()?" · Today":""}</small></div><div class="v">${w.sets}×${w.reps}<small>${w.kg?w.kg+" "+u:"bodyweight"}</small></div>${del("workouts",w.id)}</div>`).join(""):`<div class="empty">No exercises logged</div>`}</div></div>`;
+    <div class="rows">${WO.length?WO.slice(0,25).map(w=>`<div class="r" style="--c:var(--lime)"><span class="dot"></span><div class="m"><div>${esc(w.name)}</div><small>${fmtDate(w.d)}${w.d===today()?" · Today":""}</small></div><div class="v">${w.hk?(w.mins?w.mins+" min":"Workout"):w.sets+"×"+w.reps}<small>${w.hk?"Apple Health":w.kg?w.kg+" "+u:"bodyweight"}</small></div>${del("workouts",w.id)}</div>`).join(""):`<div class="empty">No exercises logged</div>`}</div></div>`;
 }
 /* ---------- hologram: blue body with a black fedora, black trench coat and black boots ---------- */
 const mirP=path=>path.replace(/([MLCQ])([^MLCQZ]*)/g,(m,c,args)=>c+args.trim().split(/[\s,]+/).map((v,i)=>i%2===0?String(200-parseFloat(v)):v).join(" ")+" ");
@@ -2974,9 +2975,54 @@ document.addEventListener("change",async e=>{const inp=e.target;if(!inp.dataset|
     j.themes.forEach(t=>{if(!t||!t.snap||typeof t.snap!=="object"||data.themeSets.length>=24)return;const snap={profile:tsPick(t.snap.profile||{},TS_P),cats:{},pass:{}};Object.entries(t.snap.cats||{}).forEach(([id,v])=>snap.cats[id]=tsPick(v,TS_C));Object.entries(t.snap.pass||{}).forEach(([id,v])=>snap.pass[id]=tsPick(v,TS_S));
       const nm=String(t.name||"Imported theme").slice(0,28);if(have.has(tsKey(snap)+"|"+nm))return;data.themeSets.push({id:"t"+uid(),name:nm,at:Date.now(),snap});n++});
     render();save();toast(n?`${n} theme${n===1?"":"s"} imported${skipW?" · some wallpapers skipped, you already have 6":""}`:"Those themes are already here")}catch(_){toast("That file isn't an AssOnTrack themes file")}});
+
+/* ---------- Apple Health: import the Health app's export (a website can't read HealthKit directly) ---------- */
+let hkBusy=null,hkMsg="";
+function hkPanel(){const h=(demoOn()?null:data.health)||null,pc=hkBusy?Math.round(hkBusy.p*100):0;
+  return `<div class="panel hkp" style="margin-top:18px"><div class="ph"><span>Apple Health</span><i>${h?"Last import "+fmtDate(h.d):"Not imported yet"}</i></div>
+    <p class="note" style="margin:0 0 10px">Apple only lets App Store apps connect to Health live, so a web app like this one can't sync on its own. You can still bring everything over with Health's own export, and repeat it whenever you want to catch up.</p>
+    <ol class="hk-steps"><li>Open the <b>Health</b> app and tap your picture, top right.</li><li>Tap <b>Export All Health Data</b>, then <b>Save to Files</b>.</li><li>Come back here, tap the button below and pick that <b>export.zip</b>.</li></ol>
+    ${hkBusy?`<div class="hk-prog" role="progressbar" aria-valuenow="${pc}" aria-valuemin="0" aria-valuemax="100"><i id="hkBar" style="width:${pc}%"></i></div><p class="note" id="hkTxt" style="margin:6px 0 0">Reading your export… ${pc}%</p>`
+      :`<div class="ts-io" style="margin-top:4px"><label class="btn ghost ts-imp hk-btn">${h?"Import again":"Import from Apple Health"}<input type="file" accept=".zip,.xml,application/zip,text/xml" data-hkfile></label>${h?`<button class="btn ghost" data-hkclear>Remove imported data</button>`:""}</div>`}
+    ${hkMsg?`<p class="note" style="margin:10px 0 0;color:#e6eeff">${esc(hkMsg)}</p>`:h?`<p class="note" style="margin:10px 0 0">Brought in ${h.w} weigh-in${h.w===1?"":"s"}${h.wo?`, ${h.wo} workout${h.wo===1?"":"s"}`:""}${h.h?" and your height":""}. It reads weight, height and the last 90 days of workouts. Nothing leaves your device except your normal sync.</p>`:""}</div>`}
+async function hkEntry(file){if(/\.xml$/i.test(file.name))return {stream:file.stream(),size:file.size};
+  const u32=(v,o)=>v.getUint32(o,true),u16=(v,o)=>v.getUint16(o,true),big=(v,o)=>Number(v.getBigUint64(o,true));
+  const tailN=Math.min(file.size,66000),tb=await file.slice(file.size-tailN).arrayBuffer(),tv=new DataView(tb);let e=-1;for(let i=tailN-22;i>=0;i--)if(u32(tv,i)===0x06054b50){e=i;break}if(e<0)throw new Error("notzip");
+  let cdSize=u32(tv,e+12),cdOff=u32(tv,e+16);
+  if(cdOff===0xFFFFFFFF||cdSize===0xFFFFFFFF){const l=e-20;if(l<0||u32(tv,l)!==0x07064b50)throw new Error("notzip");const zo=big(tv,l+8),zb=new DataView(await file.slice(zo,zo+56).arrayBuffer());cdSize=big(zb,40);cdOff=big(zb,48)}
+  const cd=new DataView(await file.slice(cdOff,cdOff+cdSize).arrayBuffer()),dec=new TextDecoder();let o=0,best=null;
+  while(o+46<=cd.byteLength&&u32(cd,o)===0x02014b50){const method=u16(cd,o+10);let cs=u32(cd,o+20),us=u32(cd,o+24),nl=u16(cd,o+28),xl=u16(cd,o+30),cl=u16(cd,o+32),lo=u32(cd,o+42);const name=dec.decode(new Uint8Array(cd.buffer,o+46,nl));
+    let x=o+46+nl;const xe=x+xl;while(x+4<=xe){const id=u16(cd,x),sz=u16(cd,x+2);if(id===1){let q=x+4;if(us===0xFFFFFFFF){us=big(cd,q);q+=8}if(cs===0xFFFFFFFF){cs=big(cd,q);q+=8}if(lo===0xFFFFFFFF){lo=big(cd,q)}}x+=4+sz}
+    if(/\.xml$/i.test(name)&&!/cda/i.test(name)&&!/\/workout-routes\//i.test(name)&&(!best||us>best.us))best={name,method,cs,us,lo};o+=46+nl+xl+cl}
+  if(!best)throw new Error("noxml");const lh=new DataView(await file.slice(best.lo,best.lo+30).arrayBuffer());if(u32(lh,0)!==0x04034b50)throw new Error("notzip");
+  const start=best.lo+30+u16(lh,26)+u16(lh,28),raw=file.slice(start,start+best.cs).stream();
+  if(best.method===0)return {stream:raw,size:best.us};if(best.method!==8)throw new Error("method");if(typeof DecompressionStream==="undefined")throw new Error("nodecomp");
+  return {stream:raw.pipeThrough(new DecompressionStream("deflate-raw")),size:best.us}}
+async function hkImport(file){if(hkBusy)return;hkBusy={p:0};hkMsg="";render();
+  const at=(tag,k)=>{const i=tag.indexOf(" "+k+'="');if(i<0)return null;const a=i+k.length+3,b=tag.indexOf('"',a);return b<0?null:tag.slice(a,b)},ts=x=>x&&x.length>=25?Date.parse(x.slice(0,10)+"T"+x.slice(11,19)+x.slice(20,23)+":"+x.slice(23,25)):NaN;
+  const W={},WO=[];let H=null,seen=0,last=0;const cut=Date.now()-90*864e5;
+  const NEED=['HKQuantityTypeIdentifierBodyMass"','HKQuantityTypeIdentifierHeight"',"<Workout "];
+  const take=tag=>{if(tag.startsWith("<Workout ")){const sd=at(tag,"startDate"),t=ts(sd);if(!(t>cut))return;const ty=(at(tag,"workoutActivityType")||"Workout").replace("HKWorkoutActivityType","").replace(/([a-z])([A-Z])/g,"$1 $2");let m=parseFloat(at(tag,"duration"));const du=at(tag,"durationUnit");if(du==="s")m/=60;else if(du==="hr")m*=60;WO.push({d:sd.slice(0,10),name:ty,mins:isFinite(m)?Math.round(m):0,at:t});return}
+    if(!tag.startsWith("<Record "))return;const ty=at(tag,"type"),v=parseFloat(at(tag,"value")),un=at(tag,"unit"),sd=at(tag,"startDate"),t=ts(sd);if(!isFinite(v)||!(v>0)||!sd)return;
+    if(ty==="HKQuantityTypeIdentifierBodyMass"){const kg=un==="kg"?v:un==="g"?v/1000:un==="st"?v*6.35029:un==="oz"?v*.0283495:v*.45359237,d=sd.slice(0,10);if(kg<20||kg>400)return;if(!W[d]||t>=W[d].at)W[d]={kg,at:isFinite(t)?t:0}}
+    else if(ty==="HKQuantityTypeIdentifierHeight"){const cm=un==="cm"?v:un==="m"?v*100:un==="in"?v*2.54:un==="ft"?v*30.48:un==="mm"?v/10:v;if(cm>90&&cm<250&&(!H||t>=H.at))H={cm,at:isFinite(t)?t:0}}};
+  try{const {stream,size}=await hkEntry(file),rd=stream.pipeThrough(new TextDecoderStream()).getReader();let carry="";
+    for(;;){const {done,value}=await rd.read();if(done)break;seen+=value.length;let txt=carry+value;const lt=txt.lastIndexOf("<");carry=lt>=0?txt.slice(lt):"";if(lt>=0)txt=txt.slice(0,lt);if(carry.length>2e5)carry="";
+      for(const nd of NEED){let i=0;while((i=txt.indexOf(nd,i))>=0){const a=nd===NEED[2]?i:txt.lastIndexOf("<",i),b=txt.indexOf(">",i);if(a>=0&&b>a)take(txt.slice(a,b+1));i=b>i?b:i+nd.length}}
+      const now=Date.now();if(now-last>160){last=now;hkBusy.p=Math.min(.99,seen/Math.max(1,size));const bar=$("#hkBar"),t=$("#hkTxt"),pc=Math.round(hkBusy.p*100);if(bar)bar.style.width=pc+"%";if(t)t.textContent="Reading your export… "+pc+"%";await new Promise(r=>setTimeout(r,0))}}
+    const days=Object.keys(W),g=data.goals,k=g.unit==="kg"?1:2.20462;
+    if(!days.length&&!H&&!WO.length){hkMsg="That file opened, but it has no weight, height or workout entries in it.";return}
+    data.weights=(data.weights||[]).filter(w=>!w.hk);const mine=new Set(data.weights.map(w=>w.d));let nw=0;days.forEach(d=>{if(mine.has(d))return;data.weights.push({id:"hk"+d,d,v:Math.round(W[d].kg*k*10)/10,at:W[d].at,hk:1});nw++});
+    data.workouts=(data.workouts||[]).filter(w=>!w.hk);WO.forEach((w,i)=>data.workouts.push({id:"hk"+w.at+"_"+i,d:w.d,name:w.name,mins:w.mins,sets:1,reps:1,kg:null,hk:1}));
+    if(H)g.height=Math.round(H.cm*10)/10;data.health={d:today(),w:nw,wo:WO.length,h:H?1:0};
+    hkMsg=`Done. ${nw} weigh-in${nw===1?"":"s"}${days.length-nw?` (${days.length-nw} day${days.length-nw===1?"":"s"} skipped because you already logged them here)`:""}, ${WO.length} workout${WO.length===1?"":"s"} from the last 90 days${H?", and your height":""}.`;save()}
+  catch(e){const m=e&&e.message;hkMsg=m==="nodecomp"?"This phone's software is too old to open the zip here. In the Files app, tap export.zip to unzip it, then pick the export.xml inside.":m==="notzip"||m==="noxml"||m==="method"?"That isn't an Apple Health export. Pick the export.zip that Health saved to Files.":"Couldn't read that file. Try exporting from Health again."}
+  finally{hkBusy=null;render()}}
+document.addEventListener("change",e=>{const i=e.target;if(!i.dataset||i.dataset.hkfile===undefined)return;const f=i.files&&i.files[0];i.value="";if(f)hkImport(f)});
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-hkclear]");if(!b)return;const nw=(data.weights||[]).filter(w=>w.hk).length;data.weights=(data.weights||[]).filter(w=>!w.hk);data.workouts=(data.workouts||[]).filter(w=>!w.hk);delete data.health;hkMsg="";render();save();toast("Imported Health data removed")});
 function vSet(){
   const g=data.goals;
-  return banner()+wallPanel()+lookPanel()+themePanel()+`<div class="grid cols2" style="margin-top:18px">
+  return banner()+wallPanel()+lookPanel()+themePanel()+hkPanel()+`<div class="grid cols2" style="margin-top:18px">
    <div class="panel"><div class="ph"><span>Goals</span><i>Goals</i></div>
     <form class="f" id="gForm"><div class="f2"><label>Daily calories<input id="gK" type="number" inputmode="numeric" min="0" value="${g.kcal}"></label><label>Daily protein (g)<input id="gP" type="number" inputmode="numeric" min="0" value="${g.protein}"></label></div>
     <label>Goal weight (${g.unit})<input id="gW" type="number" step="0.1" inputmode="decimal" value="${g.weight??""}" placeholder="Optional"></label>
@@ -3145,7 +3191,7 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
 const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
-const APPV="85";
+const APPV="86";
 /* the weigh-in log never grows past the figure: rows that don't fit are simply not shown (the graph has them all) */
 function wlogFit(){const box=$(".wlog");if(!box)return;const p=box.closest(".panel"),rows=[...box.children].filter(r=>r.classList.contains("r")&&!r.classList.contains("wnew"));rows.forEach(r=>{r.style.display="";r.style.borderBottomColor="";r.style.paddingTop=r.style.paddingBottom=""});box.style.gridTemplateRows="";box.style.alignContent="";const nw=box.querySelector(".wnew");if(nw)nw.style.paddingTop=nw.style.paddingBottom="";
   if(getComputedStyle(p).flexGrow==="0"){rows.forEach((r,i)=>{if(i>=5)r.style.display="none"});return}
