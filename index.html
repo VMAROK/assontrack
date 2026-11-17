@@ -1242,6 +1242,15 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .mc-stats{display:flex;justify-content:space-between;gap:8px;margin:6px 0 8px;font-size:12px;color:var(--muted)}.mc-stats b{color:#e6eeff;font-size:14px}
 .mc-ex{display:flex;flex-wrap:wrap;gap:6px}.mc-ex button{font:inherit;font-size:12px;padding:4px 9px;border-radius:99px;cursor:pointer;color:#e6eeff;background:color-mix(in srgb,var(--mc) 18%,transparent);border:1px solid color-mix(in srgb,var(--mc) 50%,transparent)}
 
+.gy-box{max-width:460px}.gy-q{width:100%;margin-bottom:8px}.gy-list{display:grid;gap:4px;max-height:52vh;overflow-y:auto;overscroll-behavior:contain}
+.gy-list button{display:flex;justify-content:space-between;align-items:baseline;gap:10px;text-align:left;font:inherit;color:#e6eeff;background:rgba(var(--tX),.5);border:1px solid rgba(var(--lr),.2);border-radius:10px;padding:9px 12px;cursor:pointer}.gy-list button:hover{border-color:rgba(var(--tL),.6)}.gy-list small{color:var(--muted);font-size:12px}
+.gy-guess{display:grid;gap:8px;justify-items:center;text-align:center}.gy-guess b{font-size:17px}.gy-guess .musvg{max-height:200px}
+.gy-main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:14px;align-items:center}.gy-main .musvg{max-height:230px}
+.gy-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.gy-btns.col{flex-direction:column;align-items:stretch;margin-top:10px}.gy-btns .btn{padding:9px 12px;font-size:13.5px}
+.linkbtn{font:inherit;font-size:13px;color:rgba(var(--tL),1);background:none;border:0;padding:0;text-decoration:underline;cursor:pointer}
+.trlogp .gy-sc{margin-right:2px}.tp-addrow{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:760px){.gy-main{grid-template-columns:minmax(0,1fr)}}
+
 /* ===== standalone app ===== */
 #auth{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:max(24px,env(safe-area-inset-top)) 20px max(24px,env(safe-area-inset-bottom));background:radial-gradient(120% 80% at 50% 0%,rgba(30,80,170,.35),rgba(3,6,18,.96) 60%),#03060f;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .auth-card{width:min(100%,380px);display:grid;gap:12px;padding:26px 22px 18px;border-radius:20px;border:1px solid rgba(76,170,255,.28);background:linear-gradient(180deg,rgba(22,52,120,.55),rgba(6,12,32,.9));box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 40px rgba(30,110,255,.12)}
@@ -1944,17 +1953,17 @@ let scan=null;const libLoaded={};
 function loadLib(src){return libLoaded[src]||(libLoaded[src]=new Promise((ok,no)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=()=>{delete libLoaded[src];no(new Error("load"))};document.head.appendChild(s)}))}
 const scanMsg=t=>{const m=$("#scanMsg");if(m)m.textContent=t};
 function scanClose(){if(!scan)return;const S=scan;scan=null;try{S.stop&&S.stop()}catch(_){}S.o.remove()}
-function scanOpen(){if(scan)return;const o=document.createElement("div");o.className="scan";o.innerHTML=`<div class="scan-box panel" role="dialog" aria-label="Scan a barcode"><div class="ph"><span>Scan a barcode</span><button class="x" data-scanx aria-label="Close">×</button></div><div class="scan-view" id="scanView"><video id="scanVid" playsinline muted></video><i class="scan-line"></i></div><p class="note" id="scanMsg">Starting the camera…</p><div class="scan-man"><input id="scanCode" inputmode="numeric" autocomplete="off" placeholder="Or type the number under the bars" aria-label="Barcode number"><button class="btn" data-scango>Look up</button></div></div>`;
-  document.body.appendChild(o);scan={o,stop:null,busy:false};scanStart()}
+function scanOpen(mode){if(scan)return;const gym=mode==="gym",o=document.createElement("div");o.className="scan";o.innerHTML=`<div class="scan-box panel" role="dialog" aria-label="${gym?"Scan a gym machine":"Scan a barcode"}"><div class="ph"><span>${gym?"Scan a machine":"Scan a barcode"}</span><button class="x" data-scanx aria-label="Close">×</button></div><div class="scan-view" id="scanView"><video id="scanVid" playsinline muted></video><i class="scan-line"></i></div><p class="note" id="scanMsg">Starting the camera…</p>${gym?`<p class="note" style="margin-top:-4px">Scan the QR code or barcode on the machine (often on the frame or the serial sticker). No code? <button class="linkbtn" data-gpickopen>Pick the machine from the list</button></p>`:""}<div class="scan-man"><input id="scanCode" ${gym?"":'inputmode="numeric"'} autocomplete="off" placeholder="${gym?"Or type the code on the machine":"Or type the number under the bars"}" aria-label="Code"><button class="btn" data-scango>${gym?"Use code":"Look up"}</button></div></div>`;
+  document.body.appendChild(o);scan={o,stop:null,busy:false,mode:gym?"gym":"food"};scanStart()}
 async function scanStart(){const S=scan,md=navigator.mediaDevices;if(!md||!md.getUserMedia){scanMsg("The camera isn't available here. Type the number under the bars instead.");return}
-  try{let BD=null;if("BarcodeDetector" in window){try{const fm=await BarcodeDetector.getSupportedFormats();if(fm.includes("ean_13"))BD=new BarcodeDetector({formats:["ean_13","ean_8","upc_a","upc_e"].filter(x=>fm.includes(x))})}catch(_){}}
+  try{let BD=null;if("BarcodeDetector" in window){try{const fm=await BarcodeDetector.getSupportedFormats();const want=S.mode==="gym"?["qr_code","code_128","code_39","code_93","data_matrix","ean_13","ean_8","upc_a","upc_e","itf"]:["ean_13","ean_8","upc_a","upc_e"];if(fm.includes(S.mode==="gym"?"qr_code":"ean_13"))BD=new BarcodeDetector({formats:want.filter(x=>fm.includes(x))})}catch(_){}}
     if(BD){const st=await md.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280}},audio:false});if(scan!==S){st.getTracks().forEach(t=>t.stop());return}
       const v=$("#scanVid");v.srcObject=st;await v.play();let on=true;S.stop=()=>{on=false;st.getTracks().forEach(t=>t.stop())};scanMsg("Point the camera at the barcode.");
       const loop=async()=>{if(!on||scan!==S)return;if(!S.busy){try{const r=await BD.detect(v);if(r&&r[0]&&r[0].rawValue){scanHit(r[0].rawValue)}}catch(_){}}setTimeout(loop,170)};loop()}
-    else{await loadLib("lib/html5-qrcode.min.js");if(scan!==S)return;const F=Html5QrcodeSupportedFormats,v=$("#scanVid");v&&v.remove();const h=new Html5Qrcode("scanView",{formatsToSupport:[F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E],verbose:false});
+    else{await loadLib("lib/html5-qrcode.min.js");if(scan!==S)return;const F=Html5QrcodeSupportedFormats,v=$("#scanVid");v&&v.remove();const h=new Html5Qrcode("scanView",{formatsToSupport:S.mode==="gym"?[F.QR_CODE,F.CODE_128,F.CODE_39,F.CODE_93,F.DATA_MATRIX,F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E,F.ITF]:[F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E],verbose:false});
       S.stop=()=>{try{h.stop().then(()=>h.clear()).catch(()=>{})}catch(_){}};await h.start({facingMode:"environment"},{fps:10,qrbox:(w,hh)=>({width:Math.round(w*.86),height:Math.round(hh*.55)})},txt=>{if(scan===S&&!S.busy)scanHit(txt)},()=>{});if(scan!==S){S.stop();return}scanMsg("Point the camera at the barcode.")}
   }catch(e){if(scan!==S)return;scanMsg(e&&(e.name==="NotAllowedError"||e.name==="SecurityError")?"Camera access is blocked. Allow the camera for this app, or type the number under the bars.":"Couldn't start the camera. Type the number under the bars instead.")}}
-async function scanHit(raw){const S=scan;if(!S||S.busy)return;const code=String(raw).replace(/\D/g,"");if(code.length<6){scanMsg("That doesn't look like a barcode number.");return}S.busy=true;sfx("blip");scanMsg("Got "+code+". Looking it up…");
+async function scanHit(raw){const S=scan;if(!S||S.busy)return;if(S.mode==="gym"){const v=String(raw||"").trim();if(v.length<3){scanMsg("That code is too short.");return}S.busy=true;sfx("blip");scanClose();gymHit(v);return}const code=String(raw).replace(/\D/g,"");if(code.length<6){scanMsg("That doesn't look like a barcode number.");return}S.busy=true;sfx("blip");scanMsg("Got "+code+". Looking it up…");
   const done=f=>{scanClose();if(tab!=="fuel")go("fuel");fq="";fOn=[];if(f.kcal==null){fForm={kind:"food",name:f.name||"",code};fSel=null;toast("Found it, but it has no nutrition info. Fill it in once.")}else{const [q,u]=foodDef(f);fSel={f,q,u}}render()};
   const mine=(data.foods||[]).find(x=>x.code&&(x.code===code||x.code.replace(/^0+/,"")===code.replace(/^0+/,"")));if(mine){done(mine);return}
   try{const f=await offBarcode(code);if(scan!==S)return;if(f&&(f.name||f.kcal!=null)){done(f);return}scanClose();if(tab!=="fuel")go("fuel");fForm={kind:"food",name:"",code};fSel=null;fq="";toast("Not in the database yet. Add it once and it's saved.");render()}
@@ -2024,6 +2033,7 @@ function trLogPanel(d,T){const u=d.goals.unit,names=[...new Set([...byDate(d.wor
       <div class="tr-f"><input id="woName" list="exList" required aria-label="Exercise" autocomplete="off" enterkeyhint="next"><datalist id="exList">${names.slice(0,60).map(n=>`<option>${esc(n)}</option>`).join("")}</datalist>
       <div class="tr-nums"><input id="woSets" inputmode="numeric" value="3" aria-label="Sets"><span>×</span><input id="woReps" inputmode="numeric" value="10" aria-label="Reps"><span>@</span><input id="woKg" inputmode="decimal" aria-label="Load in ${u}"><span>${u}</span></div>
       <small class="tr-hint" id="trHint">Exercise, then sets × reps @ load. Leave load empty for bodyweight.</small></div>
+      <button type="button" class="x wok gy-sc" data-gscan aria-label="Scan a gym machine" title="Scan a machine"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2M7 8v8M10.5 8v8M13.5 8v8M17 8v8"/></svg></button>
       <button class="x wok" aria-label="Log exercise" title="Log"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></form>
     <div class="rows trlog">${rows||`<div class="empty">Your workouts show up here</div>`}</div></div>`}
 function trProgress(d,T){const u=d.goals.unit,W=T.weeks,mx=Math.max(1,...W.map(x=>x.v)),G=T.G;
@@ -2117,7 +2127,7 @@ function planForm(d){const P=tPlan,sug=sugMus(P.ex),hasSug=Object.keys(sug).leng
     <label class="tp-lab">Workout name<input id="tpName" value="${esc(P.name)}" autocomplete="off" aria-label="Workout name"></label>
     <div class="tp-lab">Exercises</div>
     <div class="tp-exl" id="tpEx">${P.ex.map((e,i)=>`<div class="tp-er"><input class="tp-en" data-tpi="${i}" data-tpk="name" list="exList" value="${esc(e.name)}" aria-label="Exercise ${i+1}" autocomplete="off"><input class="tp-n" data-tpi="${i}" data-tpk="sets" inputmode="numeric" value="${e.sets}" aria-label="Sets"><span>×</span><input class="tp-n" data-tpi="${i}" data-tpk="reps" inputmode="numeric" value="${e.reps}" aria-label="Reps"><button type="button" class="x" data-tpdel="${i}" aria-label="Remove exercise">×</button></div>`).join("")}</div>
-    <button type="button" class="tp-add" data-tpadd>＋ Add exercise</button></div>
+    <div class="tp-addrow"><button type="button" class="tp-add" data-tpadd>＋ Add exercise</button><button type="button" class="tp-add" data-gscan>Scan a machine</button></div></div>
    <div class="tp-r"><div class="tp-q"><b>Which muscles does it target?</b><span>Tap a muscle once for <i class="k2">main</i>, again for <i class="k1">also worked</i>, again to clear.</span></div>
     <div id="tpDiag">${musSvg(P.mus,{tap:true})}</div>
     <div id="tpSug">${hasSug&&!same?`<button type="button" class="tp-sug" data-tpsug>Use muscles from my exercises</button>`:""}</div>
@@ -2147,6 +2157,54 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
     if(!Object.keys(tPlan.mus).length){const sg=sugMus(ex);if(Object.keys(sg).length){tPlan.mus=sg;tpPaint();toast("Picked the muscles from your exercises. Check them, then save.");return}toast("Tap the muscles this workout targets");return}
     d.plans=d.plans||[];const pl={id:tPlan.id||uid(),name:nm,ex,mus:tPlan.mus};const i=d.plans.findIndex(x=>x.id===pl.id);if(i>=0)d.plans[i]=pl;else d.plans.push(pl);tPlan=null;toast(nm+" saved");render();save();return}
   if(t.dataset.plog){const pl=(d.plans||[]).find(x=>x.id===t.dataset.plog);if(!pl)return;let first=null;pl.ex.forEach(e=>{const last=trLast(d,e.name),n={id:uid(),d:today(),name:e.name,sets:e.sets,reps:e.reps,kg:last?last.kg:null,plan:pl.id};first=first||n.id;d.workouts.push(n)});trFlash=first;trFlashAt=Date.now();toast(pl.name+" logged · "+pl.ex.length+" exercise"+(pl.ex.length===1?"":"s"));render();save()}});
+
+/* ---------- gym machines: scan a code on the machine, know what it is, add it to a workout ---------- */
+const MACH=[["chest-press","Chest press machine",{chest:2,frontdelts:1,triceps:1},/chest.?press|seated.?press|converging.?chest/],["incline-press","Incline chest press",{chest:2,frontdelts:2,triceps:1},/incline/],["pec-fly","Pec deck / chest fly",{chest:2,frontdelts:1},/pec|fly|butterfly/],
+ ["shoulder-press","Shoulder press machine",{frontdelts:2,sidedelts:1,triceps:1},/shoulder.?press|overhead/],["lateral-raise","Lateral raise machine",{sidedelts:2,traps:1},/lateral.?raise|deltoid.?raise/],["rear-delt","Rear delt fly",{reardelts:2,upperback:2},/rear.?delt|reverse.?(pec|fly)/],
+ ["lat-pulldown","Lat pulldown",{lats:2,biceps:1,upperback:1},/pull.?down|lat\b|lats/],["seated-row","Seated row",{upperback:2,lats:2,reardelts:1,biceps:1},/row/],["assisted-pullup","Assisted pull-up / dip",{lats:2,biceps:1,triceps:1,chest:1},/assist|chin|dip/],["pullover","Pullover machine",{lats:2,chest:1},/pullover/],
+ ["bicep-curl","Biceps curl machine",{biceps:2,forearms:1},/bicep|arm.?curl|preacher/],["tricep-ext","Triceps extension machine",{triceps:2},/tricep|arm.?extension/],["ab-crunch","Ab crunch machine",{abs:2,obliques:1},/abdominal|ab.?crunch|crunch/],["torso-rotation","Torso rotation",{obliques:2,abs:1},/rotary|rotation|torso/],
+ ["back-ext","Back extension",{lowerback:2,glutes:1,hamstrings:1},/back.?ext|hyperext|lower.?back/],["leg-press","Leg press",{quads:2,glutes:2,adductors:1,hamstrings:1},/leg.?press/],["hack-squat","Hack squat",{quads:2,glutes:1},/hack|squat/],["leg-ext","Leg extension",{quads:2},/leg.?ext/],
+ ["leg-curl-seated","Seated leg curl",{hamstrings:2},/seated.?leg.?curl/],["leg-curl-lying","Lying leg curl",{hamstrings:2,calves:1},/(prone|lying).?leg.?curl|leg.?curl/],["hip-abduction","Hip abduction",{abductors:2,glutes:1},/abduct/],["hip-adduction","Hip adduction",{adductors:2},/adduct/],
+ ["glute-kick","Glute kickback machine",{glutes:2,hamstrings:1},/glute|kick/],["hip-thrust","Hip thrust machine",{glutes:2,hamstrings:1},/thrust|bridge/],["calf-standing","Standing calf raise",{calves:2},/standing.?calf|calf.?raise/],["calf-seated","Seated calf raise",{calves:2},/seated.?calf/],
+ ["shrug","Shrug machine",{traps:2,forearms:1},/shrug/],["smith","Smith machine",{quads:2,glutes:2,chest:1},/smith/],["cable","Cable machine / crossover",{chest:1,lats:1,frontdelts:1,triceps:1},/cable|crossover|functional|dual.?adjust/],
+ ["treadmill","Treadmill",{quads:1,hamstrings:1,glutes:1,calves:1},/treadmill|run/],["bike","Exercise bike",{quads:2,calves:1,glutes:1},/bike|cycle|spin/],["elliptical","Elliptical",{quads:1,glutes:1,hamstrings:1},/elliptical|cross.?trainer/],["rower","Rowing machine",{lats:2,upperback:1,quads:1,hamstrings:1},/rower|rowing/],["stair","Stair climber",{glutes:2,quads:2,calves:1},/stair|step/]];
+const MBRAND=[[/lifefitness|life-fitness/,"Life Fitness"],[/hammerstrength/,"Hammer Strength"],[/technogym/,"Technogym"],[/precor/,"Precor"],[/matrixfitness|johnsonfitness/,"Matrix"],[/cybex/,"Cybex"],[/nautilus/,"Nautilus"],[/startrac/,"Star Trac"],[/freemotion/,"Freemotion"],[/panatta/,"Panatta"],[/gym80/,"gym80"],[/egym/,"eGym"],[/keiser/,"Keiser"],[/atlantis/,"Atlantis"],[/hoist/,"Hoist"],[/primefitness/,"Prime"],[/roguefitness/,"Rogue"],[/concept2/,"Concept2"],[/peloton/,"Peloton"]];
+const machById=id=>MACH.find(m=>m[0]===id);
+function gymGuess(raw){let host="",path=raw;try{const u=new URL(raw);host=u.hostname.toLowerCase();path=decodeURIComponent(u.pathname+" "+u.search+" "+u.hash).toLowerCase().replace(/[_+]/g,"-")}catch(_){path=String(raw).toLowerCase()}
+  const b=MBRAND.find(([re])=>re.test(host)||re.test(path));let best=null;for(const m of MACH)if(m[3].test(path)){best=m;break}
+  return {brand:b?b[1]:"",m:best,url:/^https?:/i.test(raw)?raw:""}}
+let gymSheet=null;   /* {code, m (id), brand, url, guess, q} */
+const gymKey=c=>String(c||"").trim().toLowerCase();
+function gymHit(raw){const k=gymKey(raw),saved=(data.machines||{})[k];
+  if(saved&&machById(saved.m)){gymSheet={code:k,m:saved.m,brand:saved.brand||"",url:saved.url||""};gymShow();return}
+  const g=gymGuess(raw);gymSheet={code:k,m:null,guess:g.m?g.m[0]:null,brand:g.brand,url:g.url,q:""};gymShow()}
+function gymSave(id){if(!gymSheet)return;data.machines=data.machines||{};if(gymSheet.code)data.machines[gymSheet.code]={m:id,brand:gymSheet.brand||"",url:gymSheet.url||"",at:Date.now()};gymSheet.m=id;gymSheet.guess=null;save();gymShow()}
+function gymHTML(){const G=gymSheet;if(!G)return "";
+  if(!G.m){const q=(G.q||"").toLowerCase(),list=MACH.filter(m=>!q||m[1].toLowerCase().includes(q)),gu=G.guess&&machById(G.guess);
+    return `<div class="ph"><span>${gu?"Is this the machine?":"What machine is this?"}</span><button class="x" data-gclose aria-label="Close">×</button></div>
+      ${G.brand?`<p class="note" style="margin:0 0 8px">${esc(G.brand)}${G.url?` · <a href="${esc(G.url)}" target="_blank" rel="noopener">open the maker's page</a>`:""}</p>`:G.url?`<p class="note" style="margin:0 0 8px"><a href="${esc(G.url)}" target="_blank" rel="noopener">Open the link on the machine</a></p>`:""}
+      ${gu?`<div class="gy-guess"><b>${esc(gu[1])}</b>${musSvg(gu[2],{lab:false})}<div class="gy-btns"><button class="btn" data-gyes="${gu[0]}">Yes, that's it</button><button class="btn ghost" data-gno>No, pick another</button></div></div>`:
+      `<p class="note" style="margin:0 0 8px">${G.code?"This code is new. Pick the machine once and the app will know it next time.":"Pick the machine."}</p><input id="gyQ" class="gy-q" type="search" autocomplete="off" value="${esc(G.q||"")}" aria-label="Search machines"><div class="gy-list">${list.map(m=>`<button data-gyes="${m[0]}"><b>${esc(m[1])}</b><small>${Object.keys(m[2]).map(k=>MUSN[k]).slice(0,3).join(", ")}</small></button>`).join("")||`<p class="note">No machine by that name.</p>`}</div>`}`}
+  const m=machById(G.m),pls=data.plans||[],ms=Object.entries(m[2]).sort((a,b)=>b[1]-a[1]);
+  return `<div class="ph"><span>${esc(m[1])}</span><button class="x" data-gclose aria-label="Close">×</button></div>
+    ${G.brand?`<p class="note" style="margin:0 0 6px">${esc(G.brand)}${G.url?` · <a href="${esc(G.url)}" target="_blank" rel="noopener">maker's page</a>`:""}</p>`:""}
+    <div class="gy-main">${musSvg(m[2],{lab:false})}<div><div class="tp-tags">${ms.map(([k,v])=>`<span class="tp-tag l${v}">${MUSN[k]}</span>`).join("")}</div>
+      <div class="gy-btns col"><button class="btn" data-glog>Log a set on it</button>${pls.map(p=>`<button class="btn ghost" data-gadd="${p.id}">Add to ${esc(p.name)}</button>`).join("")}<button class="btn ghost" data-gnew>${tPlan?"Add to the workout I'm designing":"New workout with it"}</button></div></div></div>
+    ${G.code?`<button class="linkbtn" data-gno style="margin-top:8px">Not this machine? Change it</button>`:""}`}
+function gymShow(){let o=document.getElementById("gySheet");if(!gymSheet){o&&o.remove();return}if(!o){o=document.createElement("div");o.id="gySheet";o.className="scan";o.innerHTML=`<div class="scan-box panel gy-box" role="dialog" aria-label="Gym machine"></div>`;document.body.appendChild(o)}o.firstChild.innerHTML=gymHTML()}
+document.addEventListener("input",e=>{if(e.target.id==="gyQ"&&gymSheet){gymSheet.q=e.target.value;const pos=e.target.selectionStart;gymShow();const i=$("#gyQ");if(i){i.focus();try{i.setSelectionRange(pos,pos)}catch(_){}}}});
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-gscan],[data-gpickopen],[data-gclose],[data-gyes],[data-gno],[data-glog],[data-gadd],[data-gnew],#gySheet");if(!t)return;
+  if(t.dataset.gscan!==undefined){scanOpen("gym");return}
+  if(t.dataset.gpickopen!==undefined){scanClose();gymSheet={code:"",m:null,q:""};gymShow();return}
+  if(t.id==="gySheet"&&e.target===t||t.dataset.gclose!==undefined){gymSheet=null;gymShow();return}
+  if(t.dataset.gyes){gymSave(t.dataset.gyes);toast(gymSheet&&gymSheet.code?"Saved. Scan it any time to bring it up.":"Machine picked");return}
+  if(t.dataset.gno!==undefined){gymSheet.m=null;gymSheet.guess=null;gymShow();return}
+  const m=gymSheet&&machById(gymSheet.m);if(!m)return;
+  if(t.dataset.glog!==undefined){gymSheet=null;gymShow();if(tab!=="train")go("train");setTimeout(()=>{const i=$("#woName");if(i){i.value=m[1];i.dispatchEvent(new Event("input",{bubbles:true}));i.scrollIntoView({behavior:"smooth",block:"center"});const k=$("#woKg");k&&k.focus({preventScroll:true})}},60);return}
+  if(t.dataset.gadd){const pl=(data.plans||[]).find(x=>x.id===t.dataset.gadd);if(!pl)return;pl.ex.push({name:m[1],sets:3,reps:10});const mu=musNorm(pl.mus);Object.entries(m[2]).forEach(([k,v])=>mu[k]=Math.max(mu[k]||0,v));pl.mus=mu;save();toast(m[1]+" added to "+pl.name);gymSheet=null;gymShow();render();return}
+  if(t.dataset.gnew!==undefined&&tPlan){gymSheet=null;gymShow();const e0=tPlan.ex.find(x=>!String(x.name||"").trim());if(e0)e0.name=m[1];else tPlan.ex.push({name:m[1],sets:3,reps:10});Object.entries(m[2]).forEach(([k,v])=>tPlan.mus[k]=Math.max(tPlan.mus[k]||0,v));render();return}
+  if(t.dataset.gnew!==undefined){gymSheet=null;gymShow();if(tab!=="train")go("train");tPlan={name:"",ex:[{name:m[1],sets:3,reps:10}],mus:Object.assign({},m[2])};render();setTimeout(()=>{const i=$("#tpName");i&&(i.focus({preventScroll:true}),$(".tpp").scrollIntoView({behavior:"smooth",block:"start"}))},80)}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&gymSheet){gymSheet=null;gymShow()}});
 function vTrain(){
   const d=D(),u=d.goals.unit,T=trStats(d),F=fitLevel(d),dv=T.lastVol?Math.round((T.vol-T.lastVol)/T.lastVol*100):null,lastW=T.WO.length?T.WO[T.WO.length-1]:null;
   return banner()+`<div class="grid tiles">
@@ -3774,7 +3832,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="121";
+const APPV="122";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
