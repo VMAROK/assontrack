@@ -2439,7 +2439,8 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
   function anatFig(av){const g=new T.Group(),S=.001227,heat=av.mheat||[];
     anat.forEach(pt=>{const nv=pt.P.length/3,pos=new Float32Array(nv*3);for(let i=0;i<nv;i++){pos[i*3]=pt.P[i*3]*S;pos[i*3+1]=(pt.P[i*3+2]+12.7)*S;pos[i*3+2]=-(pt.P[i*3+1]+95)*S}
       const geo=new T.BufferGeometry();geo.setAttribute("position",new T.BufferAttribute(pos,3));geo.setIndex(new T.BufferAttribute(pt.I,1));geo.computeVertexNormals();
-      const m=new T.Mesh(geo,pt.gi<0?anatMat("#f1f2f5",0):anatMat(ACOL[pt.gi],heat[pt.gi]||0));m.renderOrder=pt.gi<0?1:2;g.add(m)});
+      const mt=pt.gi<0?anatMat("#f1f2f5",0):anatMat(ACOL[pt.gi],heat[pt.gi]||0);if(pt.gi<0){mt.polygonOffset=true;mt.polygonOffsetFactor=3;mt.polygonOffsetUnits=6}   // the body sits behind the muscles
+      const m=new T.Mesh(geo,mt);m.renderOrder=pt.gi<0?1:2;g.add(m)});
     return {g,torso:null,arms:[],head:new T.Group(),breathe:g}}
   function fitPut(g,b){const dv=new DataView(b),n=dv.getUint32(0,true),ni=dv.getUint32(4,true);let o=8;const A=new Int16Array(b,o,n*3);o+=n*6;const M=new Int16Array(b,o,n*3);o+=n*6;const F=new Int16Array(b,o,n*3);o+=n*6;const Th=new Int16Array(b,o,n*3);o+=n*6;fitData[g]={n,a:A,m:M,f:F,th:Th,idx:new Uint16Array(b,o,ni),mus:fitMus(A,n)};
     if(fitData.m&&fitData.f&&!fitData.n){const P=fitData.m,Q=fitData.f,mix=k=>{const r=new Float32Array(P.n*3);for(let i=0;i<r.length;i++)r[i]=(P[k][i]+Q[k][i])/2;return r};fitData.n={n:P.n,a:mix("a"),m:mix("m"),f:mix("f"),th:mix("th"),idx:P.idx,mus:P.mus}}}
@@ -2668,7 +2669,7 @@ function fitLevel(d){const days=new Set(d.workouts.filter(w=>{const a=(Date.now(
 const fitAv=()=>{const a=avatarOf();a.hat=a.top=a.shoes="none";a.wings="";a.cmode="solid";a.fit=fitLevel(D()).m;if(tab==="train")a.mheat=musHeat(D());const bm=bmiInfo(D());a.fitW=bm.bmi==null?null:Math.round(bmiW(bm.bmi)*40)/40;return a};
 const figAv=()=>{const a=avatarOf();if(realStage()!=="real")a.cmode="figure";return a};
 const fitLoad={};
-let musLoad=null;function musEnsure(){if(musLoad||!window.H3anatPut)return;musLoad=fetch("lib/anat-1.txt").then(r=>{if(!r.ok)throw 0;return r.text()}).then(t=>{const q=atob(t.trim()),u=new Uint8Array(q.length);for(let i=0;i<q.length;i++)u[i]=q.charCodeAt(i);window.H3anatPut(u.buffer);if(figFit())holoMount()}).catch(()=>{setTimeout(()=>{musLoad=null},6000)})}
+let musLoad=null;function musEnsure(){if(musLoad||!window.H3anatPut)return;musLoad=fetch("lib/anat-3.txt").then(r=>{if(!r.ok)throw 0;return r.text()}).then(t=>{const q=atob(t.trim()),u=new Uint8Array(q.length);for(let i=0;i<q.length;i++)u[i]=q.charCodeAt(i);return new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer()}).then(b=>{window.H3anatPut(b);if(figFit())holoMount()}).catch(()=>{setTimeout(()=>{musLoad=null},6000)})}
 function fitEnsure(g){if(tab==="train")musEnsure();if(!H3||H3.fitHas(g)||fitLoad[g])return;fitLoad[g]=fetch("lib/body2-"+g+".txt").then(r=>{if(!r.ok)throw 0;return r.text()}).then(t=>{const q=atob(t.trim()),u=new Uint8Array(q.length);for(let i=0;i<q.length;i++)u[i]=q.charCodeAt(i);H3.fitPut(g,u.buffer);if(figFit())holoMount()}).catch(()=>{setTimeout(()=>{fitLoad[g]=null;if(figFit())holoMount()},6000)})}
 function holoMount(){const el=document.querySelector("[data-h3]");if(!el||!H3){if(H3)H3.stop();return}
   const fit=figFit(),a=fit?fitAv():figAv();let hs=fit?"real":holoStage();
@@ -3716,7 +3717,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="117";
+const APPV="118";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
