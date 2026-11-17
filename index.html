@@ -1057,6 +1057,8 @@ aside{background:rgba(var(--tD),calc(.82*var(--go)))!important;backdrop-filter:b
 .pd-inline .pd-title h2{font-size:19px}.pd-inline .pstats{margin-bottom:12px}
 .pdetail .pd-hero{padding-top:14px}
 @media (max-width:760px){.pd-inline .pstats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.dashtop{margin-bottom:18px}.dcard{position:relative;transition:box-shadow .2s;touch-action:auto}.dcard .panel{margin:0}.dcard.dragging{z-index:5;transition:none}.dcard.dragging .panel{box-shadow:0 18px 40px rgba(0,0,0,.55),0 0 0 1px rgba(var(--tL),.6)}
+.dgrip{position:absolute;right:10px;top:8px;z-index:2;width:34px;height:30px;font-size:19px;line-height:1;color:var(--muted);background:none;border:0;cursor:grab;touch-action:none;border-radius:8px}.dgrip:hover{color:#fff;background:rgba(var(--tL),.12)}.dcard.dragging .dgrip{cursor:grabbing}
 .avcats{flex-wrap:wrap}.aved .sexsw{display:inline-flex;gap:6px}.addp.avgear.on{rotate:none}
 .cm-delink{justify-self:start;font:inherit;font-size:12.5px;font-weight:600;color:rgba(255,93,108,.75);background:none;border:0;padding:4px 2px;cursor:pointer}.cm-delink:hover{color:#ff5d6c}
 .cat-mgr,.cat-mgr>*,.cat-mgr .cat-theme,.cat-mgr .theme-look,.cat-mgr .lk-row{min-width:0;max-width:100%}.cat-mgr .theme-strip{max-width:100%;overflow-x:auto}.cat-mgr .glass-row{min-width:0}.cat-mgr .glass-row input{min-width:0;width:100%}.cm-row,.cm-name{min-width:0}.cm-name{overflow:hidden;text-overflow:ellipsis}
@@ -1381,11 +1383,38 @@ function banner(){
   return (demoOn()?`<div class="banner"><b>Demo data</b><span>This is sample data so you can see how it looks. Log anything and it switches to your own numbers.</span><button class="pill" data-demo-off>Start fresh</button></div>`:"")
    +(storeNote?`<div class="banner"><b>Sync</b><span>${storeNote}</span></div>`:"");
 }
+function scoreCard(o){const r=44,C=2*Math.PI*r,f=o.pct==null?0:Math.max(0,Math.min(1,o.pct));
+  const ring=`<svg class="cs-ring" viewBox="0 0 110 110" aria-hidden="true"><circle cx="55" cy="55" r="${r}" fill="none" stroke="rgba(76,170,255,.15)" stroke-width="10"/>${f>0?`<circle cx="55" cy="55" r="${r}" fill="none" stroke="${o.col}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${(f*C).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 55 55)" style="filter:drop-shadow(0 0 6px ${o.col})"/>`:""}<text x="55" y="${o.pct==null?60:58}" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700" font-size="${o.pct==null?18:26}" fill="#e6eeff">${o.pct==null?"–":Math.round(o.pct*100)+"%"}</text>${o.pct==null?"":`<text x="55" y="75" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#9aaad6">${o.unit}</text>`}</svg>`;
+  return `<div class="panel cs"><div class="cs-main">${ring}<div class="cs-txt"><small>${o.small}</small><b style="color:${o.col}">${o.label}</b><p>${o.text}</p></div></div>
+    <div class="cs-stats">${o.stats.map(([v,l,c])=>`<div><b${c?` style="color:${c}"`:""}>${v}</b><small>${l}</small></div>`).join("")}</div></div>`}
+function dietCard(d){const g=d.goals,t=today(),tm=d.meals.filter(m=>m.d===t),kcal=tm.reduce((a,m)=>a+(+m.kcal||0),0),pro=tm.reduce((a,m)=>a+(+m.protein||0),0);
+  const days=[1,2,3,4,5,6,7].map(o=>d.meals.filter(m=>m.d===dayStr(o)).reduce((a,m)=>a+(+m.kcal||0),0)).filter(x=>x>0),avg=days.length?Math.round(days.reduce((a,b)=>a+b,0)/days.length):null;
+  const pct=g.kcal?kcal/g.kcal:null;const [label,col]=pct==null?["No calorie goal","var(--muted)"]:!tm.length?["Nothing logged today","var(--muted)"]:pct>1.1?["Over target","#ffb648"]:pct>=.9?["On target","#3ddc84"]:pct>=.5?["Getting there","#4cc9ff"]:["Just started","#4cc9ff"];
+  return scoreCard({small:"Diet today",label,col,pct:pct==null?null:pct,unit:"of goal",text:g.kcal?`${n0(kcal)} of ${n0(g.kcal)} kcal eaten today${g.kcal>kcal?", "+n0(g.kcal-kcal)+" left":""}.`:"Set a daily calorie goal in Settings to track this.",
+    stats:[[n0(kcal),"Calories"],[n0(pro)+"g","Protein"+(g.protein?" of "+n0(g.protein)+"g":"")],[tm.length,"Meals today"],[avg==null?"–":n0(avg),"7-day average"]]})}
+function bodyCard(d){const g=d.goals,W=byDate(d.weights),lw=W.length?+W[W.length-1].v:null,st=W.length?+W[0].v:null,wk=d.workouts.filter(w=>(Date.now()-new Date(w.d+"T12:00"))/864e5<7),days=new Set(wk.map(w=>w.d)).size;
+  let pct=null;if(g.weight&&lw!=null&&st!=null){const need=st-g.weight;pct=Math.abs(need)<.05?1:Math.max(0,Math.min(1,(st-lw)/need))}
+  const left=g.weight&&lw!=null?Math.abs(lw-g.weight):null;const [label,col]=pct==null?[lw==null?"No weigh-in yet":"No goal weight set","var(--muted)"]:pct>=1?["Goal reached","#3ddc84"]:pct>=.5?["Closing in","#3ddc84"]:pct>0?["Making progress","#4cc9ff"]:["Starting line","#ffb648"];
+  return scoreCard({small:"Body goals",label,col,pct,unit:"to goal",text:pct==null?(lw==null?"Log a weigh-in on the Body screen to start.":"Add a goal weight in Settings to see your progress."):left<.05?"You are at your goal weight.":`${left.toFixed(1)} ${g.unit} to go, from ${st} to ${g.weight} ${g.unit}.`,
+    stats:[[lw==null?"–":lw,"Weight ("+g.unit+")"],[left==null?"–":left.toFixed(1),"To goal"],[days,"Training days this week"],[wk.length,"Exercises this week"]]})}
+const DCARDS={pass:"Passions",diet:"Diet",body:"Body goals"};
+const dashOrder=()=>{const o=((data.profile||{}).dashOrder||[]).filter(k=>DCARDS[k]);Object.keys(DCARDS).forEach(k=>{if(!o.includes(k))o.push(k)});return o};
+function dashTop(d){const wk=weekKey(today()),card={pass:()=>commitPanel(d,d.passions,wk),diet:()=>dietCard(d),body:()=>bodyCard(d)};
+  return `<div class="passtop dashtop">${figurePanel()}<div class="stack dstack">${dashOrder().map(k=>`<div class="dcard" data-dcard="${k}"><button class="dgrip" data-dgrip aria-label="Move ${DCARDS[k]}" title="Drag to reorder">≡</button>${card[k]()}</div>`).join("")}</div></div>`}
+let dDrag=null;
+document.addEventListener("pointerdown",e=>{const g=e.target.closest&&e.target.closest("[data-dgrip]");if(!g)return;const c=g.closest(".dcard");e.preventDefault();dDrag={c,y:e.clientY,id:e.pointerId};c.classList.add("dragging");try{g.setPointerCapture(e.pointerId)}catch(_){}});
+document.addEventListener("pointermove",e=>{if(!dDrag||e.pointerId!==dDrag.id)return;const c=dDrag.c,par=c.parentNode;c.style.transform=`translateY(${e.clientY-dDrag.y}px)`;
+  const sibs=[...par.children].filter(x=>x!==c);for(const s of sibs){const r=s.getBoundingClientRect(),mid=r.top+r.height/2,before=!!(c.compareDocumentPosition(s)&Node.DOCUMENT_POSITION_FOLLOWING);
+    if(before&&e.clientY>mid){const old=c.getBoundingClientRect().top;par.insertBefore(c,s.nextSibling);c.style.transform="";const nw=c.getBoundingClientRect().top;dDrag.y+=nw-old;c.style.transform=`translateY(${e.clientY-dDrag.y}px)`;break}
+    if(!before&&e.clientY<mid){const old=c.getBoundingClientRect().top;par.insertBefore(c,s);c.style.transform="";const nw=c.getBoundingClientRect().top;dDrag.y+=nw-old;c.style.transform=`translateY(${e.clientY-dDrag.y}px)`;break}}});
+const dUp=e=>{if(!dDrag||e.pointerId!==dDrag.id)return;const c=dDrag.c;dDrag=null;c.classList.remove("dragging");c.style.transform="";const ord=[...c.parentNode.children].map(x=>x.dataset.dcard).filter(Boolean);
+  if(ord.join()!==dashOrder().join()){data.profile=Object.assign({},data.profile,{dashOrder:ord});save()}};
+document.addEventListener("pointerup",dUp);document.addEventListener("pointercancel",dUp);
 function vDash(){
   const d=D(),g=d.goals,t=today(),tm=d.meals.filter(m=>m.d===t);
   const kcal=tm.reduce((s,m)=>s+(+m.kcal||0),0),pro=tm.reduce((s,m)=>s+(+m.protein||0),0);
   const P=d.passions,woT=d.workouts.filter(w=>w.d===t).length;
-  return banner()+bigCal(d)+`<div class="panel" style="margin-top:18px;--c:var(--magenta)"><div class="ph"><span>Today's targets</span><i>${new Date().toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</i></div>
+  return banner()+dashTop(d)+bigCal(d)+`<div class="panel" style="margin-top:18px;--c:var(--magenta)"><div class="ph"><span>Today's targets</span><i>${new Date().toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</i></div>
     <div class="tgrid">
       ${meter("Calories",kcal,g.kcal,"kcal","var(--cyan)")}
       ${meter("Protein",pro,g.protein,"g","var(--magenta)")}
@@ -1785,7 +1814,7 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
   return {canvas,cam,set,start,stop,mount(el){host=el;if(canvas.parentNode!==el)el.appendChild(canvas);size();start()},renderNow(){size();last=0;frame(performance.now());cancelAnimationFrame(raf);raf=0}}}
 
 let H3=null,h3Load=null,h3Fail=false,holoPreview=null,holoPrevTimer=0;
-function h3Ensure(){if(h3Load||h3Fail)return;h3Load=import("./lib/three-r160.module.js").then(T=>{H3=h3Init(T);if(!H3)h3Fail=true;if(tab==="pass")render()}).catch(()=>{h3Fail=true})}
+function h3Ensure(){if(h3Load||h3Fail)return;h3Load=import("./lib/three-r160.module.js").then(T=>{H3=h3Init(T);if(!H3)h3Fail=true;if(tab==="pass"||tab==="dash")render()}).catch(()=>{h3Fail=true})}
 function commitScore(only){const d=D(),P=only||d.passions,W={Priority:3,Moderate:2,Bonus:1};let sw=0,ss=0;
   P.forEach(p=>{const sc0=schedStats(d,p),tk=taskStats(p),dn=sc0.done+tk.done,ms=sc0.missed+tk.missed,gm=(p.goal||0)*60,tot=d.sessions.filter(s=>s.pid===p.id&&!s.planned).reduce((a,s)=>a+(+s.mins||0),0);
     const pct=dn+ms>0?dn/(dn+ms):(gm?tot/gm:null);if(pct==null)return;const w=W[p.lvl]||2;sw+=w;ss+=w*Math.min(pct,1)});return sw?Math.round(ss/sw*100):null}
@@ -2288,12 +2317,13 @@ function commitPanel(d,P,wk){
     <p>${score==null?"Add a schedule, a task or a weekly goal to a passion to start scoring.":"Average across your passions. Priority counts 3×, Moderate 2×, Bonus 1×."}</p>${lvl?`<div class="cs-lvs">${lvl}</div>`:""}</div></div>
     <div class="cs-stats"><div><b style="color:#3ddc84">${done}</b><small>On time</small></div><div><b class="${missed?"miss":""}">${missed}</b><small>Missed</small></div><div><b>${fmtH(wkM)}</b><small>This week</small></div><div><b>${stk}<span>d</span></b><small>Streak</small></div></div></div>`;
 }
+function figurePanel(){return `<div class="panel holopanel"><div class="ph"><span>Your figure</span><button class="addp gear avgear${avEdit?" on":""}" data-avedit aria-expanded="${avEdit}" aria-label="Customize" title="Customize"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button></div>${holoView()}<div class="avfoot">${avEdit?avEditor()+`<div class="av-actions"><button class="btn ghost" data-avcancel>Cancel</button><button class="btn" data-avsave>Save</button></div>`:""}</div></div>`}
 function vPass(){
   const d=D(),S=scoreAll(d),st=streak(d),wk=weekKey(today()),P=d.passions;
   const pn=id=>(P.find(p=>p.id===id)||{name:"Removed"}).name;
   const fk=(data.profile&&data.profile.figure)||"woman";
   return banner()+`<div class="passtop">
-    <div class="panel holopanel"><div class="ph"><span>Your figure</span><button class="addp gear avgear${avEdit?" on":""}" data-avedit aria-expanded="${avEdit}" aria-label="Customize" title="Customize"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button></div>${holoView()}<div class="avfoot">${avEdit?avEditor()+`<div class="av-actions"><button class="btn ghost" data-avcancel>Cancel</button><button class="btn" data-avsave>Save</button></div>`:""}</div></div>
+    ${figurePanel()}
     <div class="stack" style="grid-template-rows:auto 1fr;align-content:stretch">${commitPanel(d,P,wk)}${passList(d,P,wk)}</div>
   </div>
   ${passDetail(d)}
