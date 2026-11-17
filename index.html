@@ -1231,6 +1231,8 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .tp-wl{display:grid;gap:2px;align-content:center}.tp-wl>div{display:flex;justify-content:space-between;padding:6px 2px;border-bottom:1px solid rgba(var(--lrd),.7);font-size:13.5px}.tp-wl b{font-family:var(--mono);font-weight:500;font-size:12.5px}
 @media (max-width:760px){.tp-form,.tp-week{grid-template-columns:minmax(0,1fr)}.tp-new{min-height:220px}}
 
+.hmus{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 12px;margin:6px 0 0;font-size:11.5px;color:var(--muted)}.hmus i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px;box-shadow:0 0 6px currentColor}.hm-n{opacity:.8}
+
 /* ===== standalone app ===== */
 #auth{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:max(24px,env(safe-area-inset-top)) 20px max(24px,env(safe-area-inset-bottom));background:radial-gradient(120% 80% at 50% 0%,rgba(30,80,170,.35),rgba(3,6,18,.96) 60%),#03060f;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .auth-card{width:min(100%,380px);display:grid;gap:12px;padding:26px 22px 18px;border-radius:20px;border:1px solid rgba(76,170,255,.28);background:linear-gradient(180deg,rgba(22,52,120,.55),rgba(6,12,32,.9));box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 40px rgba(30,110,255,.12)}
@@ -2069,6 +2071,7 @@ const EXMUS=[[/bench|chest press|push.?up|press.?up|dip/,{chest:2,triceps:1,shou
 function exMus(name){const n=String(name||"").toLowerCase();for(const [re,m] of EXMUS)if(re.test(n))return m;return null}
 function sugMus(ex){const m={};(ex||[]).forEach(e=>{const g=exMus(e.name);if(g)Object.entries(g).forEach(([k,v])=>m[k]=Math.max(m[k]||0,v))});return m}
 /* sets worked per muscle over the last 7 days, from what you logged */
+function musHeat(d){const S=musWeek(d),mx=Math.max(10,...Object.values(S));return MUS.map(([k])=>S[k]?Math.round(Math.max(.12,S[k]/mx)*20)/20:0)}
 function musWeek(d){const plans=d.plans||[],sets={};d.workouts.forEach(w=>{const a=(Date.now()-new Date(w.d+"T12:00"))/864e5;if(a>=7||a<-1)return;const pl=w.plan&&plans.find(x=>x.id===w.plan),m=(pl&&pl.mus&&Object.keys(pl.mus).length?pl.mus:null)||exMus(w.name)||{};const n=+w.sets||1;Object.entries(m).forEach(([k,v])=>sets[k]=(sets[k]||0)+n*(v===2?1:.5))});return sets}
 
 let tPlan=null;   /* the workout being designed */
@@ -2392,25 +2395,41 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
   let mixer=null,lastT=0;
   /* fitness body: a real human mesh (MakeHuman, CC0) blended between soft, average and muscular */
   const fitData={};
-  function fitPut(g,b){const dv=new DataView(b),n=dv.getUint32(0,true),ni=dv.getUint32(4,true);let o=8;const A=new Int16Array(b,o,n*3);o+=n*6;const M=new Int16Array(b,o,n*3);o+=n*6;const F=new Int16Array(b,o,n*3);o+=n*6;const Th=new Int16Array(b,o,n*3);o+=n*6;fitData[g]={n,a:A,m:M,f:F,th:Th,idx:new Uint16Array(b,o,ni)};
-    if(fitData.m&&fitData.f&&!fitData.n){const P=fitData.m,Q=fitData.f,mix=k=>{const r=new Float32Array(P.n*3);for(let i=0;i<r.length;i++)r[i]=(P[k][i]+Q[k][i])/2;return r};fitData.n={n:P.n,a:mix("a"),m:mix("m"),f:mix("f"),th:mix("th"),idx:P.idx}}}
+  /* which muscle each vertex belongs to, from its rest position: 0 chest … 13 calves, -1 none */
+  function fitMus(Aa,n){const out=new Float32Array(n).fill(-1);let H=0,mxA=0;for(let i=0;i<n;i++){H=Math.max(H,Aa[i*3+1])}
+    const zs=new Float64Array(101),zn=new Float64Array(101);for(let i=0;i<n;i++){const x=Aa[i*3],h=Aa[i*3+1]/H,b=Math.min(100,Math.max(0,h*100|0));if(Math.abs(x)<1500){zs[b]+=Aa[i*3+2];zn[b]++}}
+    const zr=[...zs].map((v,b)=>zn[b]?v/zn[b]:0),zc=zr.map((_,b)=>{let a=0,c=0;for(let k=b-3;k<=b+3;k++){const q=zr[Math.min(100,Math.max(0,k))];a+=q;c++}return a/c});
+    const isArm=i=>{const h=Aa[i*3+1]/H;return h>.52&&h<.8&&Math.abs(Aa[i*3])>1750};for(let i=0;i<n;i++)if(isArm(i))mxA=Math.max(mxA,Math.abs(Aa[i*3]));const span=Math.max(1,mxA-2000);
+    const as=new Float64Array(26),an=new Float64Array(26),sOf=i=>(Math.abs(Aa[i*3])-2000)/span;for(let i=0;i<n;i++)if(isArm(i)){const b=Math.min(25,Math.max(0,sOf(i)*20|0));as[b]+=Aa[i*3+2];an[b]++}
+    for(let i=0;i<n;i++){const x=Math.abs(Aa[i*3]),h=Aa[i*3+1]/H,z=Aa[i*3+2],b=Math.min(100,Math.max(0,h*100|0)),f=z>zc[b];let m=-1;
+      if(isArm(i)){const sv=sOf(i),ab=Math.min(25,Math.max(0,sv*20|0)),af=z>(an[ab]?as[ab]/an[ab]:0);m=sv<.1?1:sv<.47?(af?2:3):sv<.8?4:-1}
+      else if(h>.86)m=-1;else if(h>=.74&&h<.83&&x>1350&&x<=2300)m=1;else if(!f&&h>=.78&&h<.87&&x<1350)m=7;else if(!f&&h>=.7&&h<.78&&x<650)m=7;else if(h>=.8)m=-1;
+      else if(f&&h>=.655&&x<1750)m=0;else if(!f&&h>=.585&&x<1750)m=8;else if(!f&&h>=.53&&x<1750)m=9;else if(f&&h>=.52&&h<.655)m=x<720?5:6;
+      else if(!f&&h>=.42&&h<.53)m=10;else if(f&&h>=.31&&h<.5)m=11;else if(!f&&h>=.31&&h<.42)m=12;else if(h>=.075&&h<.28)m=13;
+      out[i]=m}return out}
+  function fitPut(g,b){const dv=new DataView(b),n=dv.getUint32(0,true),ni=dv.getUint32(4,true);let o=8;const A=new Int16Array(b,o,n*3);o+=n*6;const M=new Int16Array(b,o,n*3);o+=n*6;const F=new Int16Array(b,o,n*3);o+=n*6;const Th=new Int16Array(b,o,n*3);o+=n*6;fitData[g]={n,a:A,m:M,f:F,th:Th,idx:new Uint16Array(b,o,ni),mus:fitMus(A,n)};
+    if(fitData.m&&fitData.f&&!fitData.n){const P=fitData.m,Q=fitData.f,mix=k=>{const r=new Float32Array(P.n*3);for(let i=0;i<r.length;i++)r[i]=(P[k][i]+Q[k][i])/2;return r};fitData.n={n:P.n,a:mix("a"),m:mix("m"),f:mix("f"),th:mix("th"),idx:P.idx,mus:P.mus}}}
   function fitFig(av){const D=fitData[av.fitMesh],m=Math.max(0,Math.min(1,+av.fit||0)),n=D.n,pos=new Float32Array(n*3),k=1/8000,w=av.fitW;let fa,mu,th=0;
     if(w==null){fa=m<.5?(1-2*m)*.8:0;mu=m>.5?2*m-1:0}else{mu=m;fa=Math.max(0,w)*(1-.45*m);th=Math.max(0,-w)}   // BMI sets the weight, training sets the muscle
     for(let i=0;i<n*3;i++)pos[i]=(D.a[i]+D.m[i]*mu+D.f[i]*fa+D.th[i]*th)*k;
-    const geo=new T.BufferGeometry();geo.setAttribute("position",new T.BufferAttribute(pos,3));geo.setIndex(new T.BufferAttribute(D.idx,1));geo.computeVertexNormals();
+    const geo=new T.BufferGeometry();geo.setAttribute("position",new T.BufferAttribute(pos,3));geo.setAttribute("mid",new T.BufferAttribute(D.mus,1));geo.setIndex(new T.BufferAttribute(D.idx,1));geo.computeVertexNormals();
     const g=new T.Group(),occ=new T.Mesh(geo,new T.MeshBasicMaterial({colorWrite:false}));occ.renderOrder=1;g.add(occ);
-    const hm=fitMat();const body=new T.Mesh(geo,hm);body.renderOrder=2;g.add(body);g.scale.setScalar(1.04);
+    const hm=fitMat(av.mheat);const body=new T.Mesh(geo,hm);body.renderOrder=2;g.add(body);g.scale.setScalar(1.04);
     return {g,torso:null,arms:[],head:new T.Group(),breathe:g}}
-  const fitMat=()=>new T.ShaderMaterial({uniforms:{t:U.t,flick:U.flick},transparent:true,depthWrite:false,blending:T.AdditiveBlending,side:T.FrontSide,
-    vertexShader:`varying vec3 vN;varying vec3 vV;varying vec3 vW;void main(){vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;vN=normalize(mat3(modelMatrix)*normal);vV=normalize(cameraPosition-w.xyz);gl_Position=projectionMatrix*viewMatrix*w;}`,
-    fragmentShader:`uniform float t,flick;varying vec3 vN;varying vec3 vV;varying vec3 vW;
+  const fitMat=heat=>{const mh=new Array(14).fill(0);(heat||[]).forEach((v,i)=>{if(i<14)mh[i]=+v||0});return new T.ShaderMaterial({uniforms:{t:U.t,flick:U.flick,mh:{value:mh}},transparent:true,depthWrite:false,blending:T.AdditiveBlending,side:T.FrontSide,
+    vertexShader:`attribute float mid;uniform float mh[14];varying vec3 vN;varying vec3 vV;varying vec3 vW;varying float vH;void main(){vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;vN=normalize(mat3(modelMatrix)*normal);vV=normalize(cameraPosition-w.xyz);
+      float h=0.;int id=int(floor(mid+.5));for(int k=0;k<14;k++){if(k==id)h=mh[k];}vH=h;gl_Position=projectionMatrix*viewMatrix*w;}`,
+    fragmentShader:`uniform float t,flick;varying vec3 vN;varying vec3 vV;varying vec3 vW;varying float vH;
     void main(){vec3 n=normalize(vN),v=normalize(vV);float nv=abs(dot(n,v));float f=pow(1.-nv,1.7);
       float key=max(0.,dot(n,normalize(vec3(.5,.55,.65))));float form=.16+.5*pow(key,1.6);
       float scan=.82+.18*step(.5,fract(vW.y*70.-t*1.2));float sweep=smoothstep(.06,0.,abs(fract(vW.y*.42-t*.16)-.5))*.5;
       float grid=smoothstep(.93,1.,max(abs(sin(vW.y*46.)),0.))*.1;
       vec3 deep=vec3(.03,.32,.75),mid=vec3(.12,.66,1.),hot=vec3(.8,.97,1.);
       vec3 c=mix(deep,mid,form)*form*1.5+hot*f*1.05+mid*grid+hot*sweep*(.25+f);
-      float a=clamp((form*.85+f*1.1+grid+sweep*.6)*scan,0.,1.);gl_FragColor=vec4(c*scan*flick,a*flick);}`});
+      float a=clamp((form*.85+f*1.1+grid+sweep*.6)*scan,0.,1.);
+      float on=smoothstep(.0,.06,vH);vec3 hc=mix(vec3(1.,.66,.2),vec3(1.,.22,.32),clamp(vH,0.,1.));
+      c=mix(c,hc*(.55+form*1.25+f*.7+sweep*.4),on*.9);a=mix(a,clamp(a+.35,0.,1.),on);
+      gl_FragColor=vec4(c*scan*flick,a*flick);}`})};
   function set(av,stage,md){const k=JSON.stringify(av)+stage+(md?md.key:"");if(k===figKey)return;figKey=k;if(md)md.av=av;
     root.clear();parts=av.fitMesh&&fitData[av.fitMesh]?fitFig(av):md?fromModel(md,stage):build(av,stage);if(!md||av.fitMesh)mixer=null;fig=parts.g;root.add(fig);base=makeBase(stage);scene.add(base);
     scene.children.filter(o=>o.userData.isBase&&o!==base).forEach(o=>scene.remove(o));base.userData.isBase=true;
@@ -2455,7 +2474,7 @@ function holoView(){const fit=figFit(),a=avatarOf(),st=fit?"real":holoStage(),rs
   const bgw=a.bg&&allWalls().find(w=>w.id===a.bg),bgu=bgw?(bgw.live?thumbOf(bgw):bestSrc(bgw,false)):"";
   const fig=H3?`<div class="holo holo3d${bgw?" hasbg":""}" ${bgw?`style="background-image:linear-gradient(rgba(4,8,20,.15),rgba(4,8,20,.5)),url('${bgu}')"`:""} data-h3 role="img" aria-label="${fit?"Your body":HSTAGE[st][0]+" figure"}. Drag to spin.">${a.flag&&/^[a-z]{2}$/i.test(a.flag)?`<span class="avflagbadge st-${st}" aria-label="Flag">${String.fromCodePoint(...[...a.flag.toUpperCase()].map(c=>127397+c.charCodeAt(0)))}</span>`:""}</div>`:(h3Ensure(),hologram(a));
   const lock=`<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`;
-  if(fit){holoPreview=null;const L=fitLevel(D());return fig+`<div class="hfit"><div class="hfit-steps">${FITST.map((x,k)=>`<span class="${k===L.i?"on":k<L.i?"past":""}">${x[0]}</span>`).join("")}</div><div class="hfit-bar"><i style="width:${Math.max(3,L.m*100)}%"></i></div></div><p class="hcap">${(bt=>bt?`<b style="color:rgba(var(--tL),1)">${bt}</b> · `:"")(bodyType(bmiInfo(D()).bmi,L.m))}${L.cap}</p>`}
+  if(fit){holoPreview=null;const L=fitLevel(D());return fig+`<div class="hfit"><div class="hfit-steps">${FITST.map((x,k)=>`<span class="${k===L.i?"on":k<L.i?"past":""}">${x[0]}</span>`).join("")}</div><div class="hfit-bar"><i style="width:${Math.max(3,L.m*100)}%"></i></div></div><p class="hcap">${(bt=>bt?`<b style="color:rgba(var(--tL),1)">${bt}</b> · `:"")(bodyType(bmiInfo(D()).bmi,L.m))}${L.cap}</p>${tab==="train"?(h=>`<p class="hmus">${h.some(v=>v)?`<span><i style="background:${heatCol(.05)}"></i>Worked</span><span><i style="background:${heatCol(1)}"></i>Worked a lot</span><span class="hm-n">this week</span>`:`Muscles you train light up here`}</p>`)(musHeat(D())):""}`}
   holoPreview=null;const mN=missList(D()).length,scN=commitScore(),cap=(rs==="real"?"Alive unlocked. Pick any look.":rs==="holo"?"Reach 65% to unlock Alive and clothing colors.":"Reach 40% to unlock Ghost.")+(scN==null?"":`<br><button class="hwhy" data-missopen>${scN}% now${mN?` · ${mN} missed`:""} · see why</button>`);
   return fig+`<div class="hstage" role="group" aria-label="Figure stages">${["shadow","holo","real"].filter(k=>SRANK[k]<=SRANK[rs]).map(k=>`<button data-hstage="${k}" aria-pressed="${st===k}" title="Use this look">${HSTAGE[k][0]}</button>`).join("")}</div><p class="hcap">${cap}</p>`}
 /* ---------- your own 3D model: stored in Supabase Storage, cached on the device ---------- */
@@ -2513,7 +2532,7 @@ function fitLevel(d){const days=new Set(d.workouts.filter(w=>{const a=(Date.now(
   let i=0;FITST.forEach((x,k)=>{if(m>=x[1])i=k});const nx=FITST[i+1];let cap="Top shape. Keep training to hold it.";
   if(nx){const need=Math.max(1,Math.ceil((b==null?nx[1]:(nx[1]-b*.2)/.8)*8-days));cap=`${days} training day${days===1?"":"s"} in the last 2 weeks. ${need} more to reach ${nx[0]}.`}
   return {m,name:FITST[i][0],cap,days,i}}
-const fitAv=()=>{const a=avatarOf();a.hat=a.top=a.shoes="none";a.wings="";a.cmode="solid";a.fit=fitLevel(D()).m;const bm=bmiInfo(D());a.fitW=bm.bmi==null?null:Math.round(bmiW(bm.bmi)*40)/40;return a};
+const fitAv=()=>{const a=avatarOf();a.hat=a.top=a.shoes="none";a.wings="";a.cmode="solid";a.fit=fitLevel(D()).m;if(tab==="train")a.mheat=musHeat(D());const bm=bmiInfo(D());a.fitW=bm.bmi==null?null:Math.round(bmiW(bm.bmi)*40)/40;return a};
 const figAv=()=>{const a=avatarOf();if(realStage()!=="real")a.cmode="figure";return a};
 const fitLoad={};
 function fitEnsure(g){if(!H3||H3.fitHas(g)||fitLoad[g])return;fitLoad[g]=fetch("lib/body2-"+g+".txt").then(r=>{if(!r.ok)throw 0;return r.text()}).then(t=>{const q=atob(t.trim()),u=new Uint8Array(q.length);for(let i=0;i<q.length;i++)u[i]=q.charCodeAt(i);H3.fitPut(g,u.buffer);if(figFit())holoMount()}).catch(()=>{setTimeout(()=>{fitLoad[g]=null;if(figFit())holoMount()},6000)})}
@@ -3563,7 +3582,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="108";
+const APPV="109";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
