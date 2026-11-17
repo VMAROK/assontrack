@@ -2209,7 +2209,7 @@ function fitLevel(d){const days=new Set(d.workouts.filter(w=>{const a=(Date.now(
 const fitAv=()=>{const a=avatarOf();a.hat=a.top=a.shoes="none";a.wings="";a.cmode="solid";a.fit=fitLevel(D()).m;return a};
 const figAv=()=>{const a=avatarOf();if(realStage()!=="real")a.cmode="figure";return a};
 const fitLoad={};
-function fitEnsure(g){if(!H3||H3.fitHas(g)||fitLoad[g])return;fitLoad[g]=fetch("lib/body-"+g+".bin").then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(b=>{H3.fitPut(g,b);if(figFit())render()}).catch(()=>{fitLoad[g]="fail"})}
+function fitEnsure(g){if(!H3||H3.fitHas(g)||fitLoad[g])return;fitLoad[g]=fetch("lib/body-"+g+".txt").then(r=>{if(!r.ok)throw 0;return r.text()}).then(t=>{const q=atob(t.trim()),u=new Uint8Array(q.length);for(let i=0;i<q.length;i++)u[i]=q.charCodeAt(i);H3.fitPut(g,u.buffer);if(figFit())render()}).catch(()=>{fitLoad[g]="fail"})}
 function holoMount(){const el=document.querySelector("[data-h3]");if(!el||!H3){if(H3)H3.stop();return}
   const fit=figFit(),a=fit?fitAv():figAv();let hs=fit?"real":holoStage();
   if(fit){const g=a.body==="woman"?"f":"m";fitEnsure(g);if(H3.fitHas(g)){a.fitMesh=g;a.useModel=false;hs="holo"}}
