@@ -1190,6 +1190,25 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .wadd-i{font-size:24px}
 .lines-sw{display:inline-flex}
 
+/* training */
+.trtop>.stack>.trlogp{flex:1 1 0;height:0;min-height:170px;display:flex;flex-direction:column}.trlogp .trlog{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;align-content:start}
+@media (max-width:760px){.trtop>.stack>.trlogp{flex:none;height:auto}.trlogp .trlog{max-height:360px}}
+.tr-goal{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px}.tr-goal>b{font-size:26px;font-weight:650}.tr-goal>b em{font-style:normal;font-size:14px;font-weight:400;color:var(--muted)}.tr-goal small{font-size:13px;color:var(--muted);text-align:right}
+.trwk .tr-goal select{display:inline-block;width:auto;height:auto;font:inherit;font-size:14px;color:#e6eeff;background:rgba(var(--tX),.6);border:1px solid rgba(var(--tL),.5);border-radius:6px;padding:1px 4px}
+.trwk .tg-bar{margin-bottom:12px}
+.tr-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}.tr-day{display:grid;justify-items:center;gap:4px}.tr-day i{font-style:normal;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:12.5px;color:var(--muted);border:1px solid rgba(var(--lr),.28)}
+.tr-day.on i{background:#3ddc84;border-color:#3ddc84;color:#04140b;box-shadow:0 0 10px rgba(61,220,132,.55)}.tr-day.td i{border:2px solid rgba(var(--tL),1);color:#e6eeff}.tr-day.td.on i{border-color:#bff5d6}.tr-day.fut i{opacity:.5}.tr-day small{font-size:10.5px;color:var(--muted)}
+.tr-cap{margin:12px 0 0;font-size:13px;color:var(--muted);line-height:1.4}.tr-cap b{color:#e6eeff;font-weight:600}
+.trnew{align-items:flex-start}.trnew .dot{margin-top:10px}.tr-f{flex:1;min-width:0;display:grid;gap:7px}
+.trlogp .trnew input{font:inherit;color:inherit;background:none;border:0;border-bottom:1px solid rgba(var(--tL),.45);border-radius:0;padding:3px 2px;min-width:0;outline:0;box-shadow:none}.trlogp .trnew input:focus{border-bottom-color:rgba(var(--tL),1);box-shadow:0 1px 0 rgba(var(--tL),.9)}
+#woForm #woName{display:block;width:100%;height:auto;font-weight:500}.tr-nums{display:flex;align-items:baseline;gap:7px;font-family:var(--mono);font-size:13px;color:var(--muted)}.trlogp .tr-nums input{display:inline-block;height:auto;width:42px;text-align:center;font-family:var(--mono)}.trlogp .tr-nums #woKg{width:58px}
+.tr-hint{font-size:12px;color:var(--muted);line-height:1.35}.tr-hint b{color:#e6eeff;font-weight:600}.tr-up{font:inherit;font-size:12px;font-weight:600;color:#3ddc84;background:rgba(61,220,132,.12);border:1px solid rgba(61,220,132,.45);border-radius:99px;padding:1px 8px;cursor:pointer}
+.trlogp .wok{width:28px;height:28px;padding:0;display:grid;place-items:center;flex:none;margin-top:4px;color:rgba(var(--tL),1);background:rgba(var(--tL),.1);border:1px solid rgba(var(--tL),.42);border-radius:8px}
+.tr-rep{width:28px;height:28px;padding:0;display:grid;place-items:center;color:var(--muted)}.tr-rep:hover{color:rgba(var(--tL),1)}
+.tr-pb{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.04em;color:#04140b;background:#3ddc84;border-radius:99px;padding:1px 6px;margin-left:4px;vertical-align:2px}
+@media (max-width:760px){.trpro .wtr-sum{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
 /* ===== standalone app ===== */
 #auth{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:max(24px,env(safe-area-inset-top)) 20px max(24px,env(safe-area-inset-bottom));background:radial-gradient(120% 80% at 50% 0%,rgba(30,80,170,.35),rgba(3,6,18,.96) 60%),#03060f;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .auth-card{width:min(100%,380px);display:grid;gap:12px;padding:26px 22px 18px;border-radius:20px;border:1px solid rgba(76,170,255,.28);background:linear-gradient(180deg,rgba(22,52,120,.55),rgba(6,12,32,.9));box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 40px rgba(30,110,255,.12)}
@@ -1945,24 +1964,67 @@ function vBody(){
      <div class="rows wlog"><form class="r wnew" id="wForm" style="--c:var(--violet)"><span class="dot"></span><div class="m"><label class="wd" title="Change the date"><span id="wDateTxt">${fmtDate(today())}</span><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg><input id="wDate" type="date" value="${today()}" max="${today()}" required aria-label="Date"></label></div><div class="v"><input id="wVal" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" aria-label="Weight in ${g.unit}"> ${g.unit}</div><button class="x wok" aria-label="Save weight" title="Save"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></form>${W.length?[...W].reverse().slice(0,30).map(p=>`<div class="r${wFlash===p.id&&Date.now()-wSavedAt<2500?" wflash":""}" style="--c:var(--violet)"><span class="dot"></span><div class="m"><div>${fmtDate(p.d)}${p.at&&W.filter(x=>x.d===p.d).length>1?`<small style="display:inline;margin-left:8px;color:var(--muted)">${new Date(p.at).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}</small>`:""}</div></div><div class="v">${p.v} ${g.unit}</div>${del("weights",p.id)}</div>`).join(""):`<div class="empty">No weigh-ins yet</div>`}</div></div>
    </div></div>${weightTrend(d)}`;
 }
+/* ---------- training: a weekly goal, a quick log that remembers your last numbers, and progress over time ---------- */
+let trEdit=false,trFlash=null,trFlashAt=0;
+const trKey=n=>String(n||"").trim().toLowerCase();
+const trGoal=d=>Math.min(7,Math.max(1,+(d.goals.trainDays)||3));
+function trStats(d){const WO=byDate(d.workouts),wk0=wkOf(today()),days=ds0=>{const e=wkEnd(ds0);return new Set(WO.filter(w=>w.d>=ds0&&w.d<=e).map(w=>w.d))};
+  const vol=ws=>{const e=wkEnd(ws);return WO.filter(w=>w.d>=ws&&w.d<=e).reduce((a,w)=>a+(+w.sets||0)*(+w.reps||0)*(+w.kg||0),0)};
+  const prevWk=n=>{const x=new Date(wk0+"T12:00");x.setDate(x.getDate()-7*n);return ymd(x)};
+  const G=trGoal(d),thisDays=days(wk0);let streak=thisDays.size>=G?1:0;for(let n=1;n<104;n++){if(days(prevWk(n)).size>=G)streak++;else break}
+  const best={};WO.forEach(w=>{const k=trKey(w.name),kg=+w.kg||0;if(!k||w.hk||!kg)return;if(!best[k]||kg>best[k].kg)best[k]={kg,d:w.d,name:w.name,sets:w.sets,reps:w.reps,id:w.id}});const pb=new Set(Object.values(best).map(b=>b.id));   /* the badge sits on your current best for each exercise */
+  const weeks=[...Array(8)].map((_,i)=>{const ws=prevWk(7-i);return {ws,v:vol(ws),n:days(ws).size}});
+  return {WO,G,wk0,thisDays,streak,vol:vol(wk0),lastVol:vol(prevWk(1)),best,pb,weeks}}
+function trLast(d,name){const k=trKey(name);if(!k)return null;const W=byDate(d.workouts).filter(w=>!w.hk&&trKey(w.name)===k);return W.length?W[W.length-1]:null}
+function trNext(d,w){if(!w||!+w.kg)return "";const step=d.goals.unit==="kg"?2.5:5;return (Math.round((+w.kg+step)*10)/10)}
+function trWeekPanel(d,T){const F=fitLevel(d),n=T.thisDays.size,G=T.G,pc=Math.min(100,n/G*100);
+  const dots=DAYS.map((dn,i)=>{const x=new Date(T.wk0+"T12:00");x.setDate(x.getDate()+i);const ds=ymd(x),on=T.thisDays.has(ds),td=ds===today(),fut=ds>today();return `<div class="tr-day${on?" on":""}${td?" td":""}${fut?" fut":""}" title="${fmtDate(ds)}${on?": trained":""}"><i>${on?`<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`:x.getDate()}</i><small>${dn.slice(0,1)}</small></div>`}).join("");
+  return `<div class="panel trwk"><div class="ph"><span>This week</span>${demoOn()?"<i></i>":trEdit?`<span class="tg-acts"><button class="dview" data-trcancel style="margin:0">Cancel</button><button class="dview" data-trsave style="margin:0;color:rgba(var(--tL),1);opacity:1">Save</button></span>`:`<button class="dview" data-tredit style="margin:0">Edit goal</button>`}</div>
+    <div class="tr-goal"><b>${n}<em> of ${trEdit?`<select id="trG" aria-label="Training days per week">${[1,2,3,4,5,6,7].map(k=>`<option ${k===G?"selected":""}>${k}</option>`).join("")}</select>`:G} days</em></b><small style="${n>=G?"color:#3ddc84":""}">${n>=G?"Goal reached this week":G-n===1?"1 more day to go":(G-n)+" more days to go"}</small></div>
+    <div class="tg-bar"><i style="width:${pc.toFixed(1)}%;background:${n>=G?"#3ddc84":"rgba(var(--tL),1)"};box-shadow:0 0 8px ${n>=G?"#3ddc84":"rgba(var(--tL),.8)"}"></i></div>
+    <div class="tr-days">${dots}</div>
+    <p class="tr-cap"><b>${F.name}</b> · ${F.cap}</p></div>`}
+function trLogPanel(d,T){const u=d.goals.unit,names=[...new Set([...byDate(d.workouts).reverse().filter(w=>!w.hk).map(w=>w.name),"Squat","Bench press","Deadlift","Overhead press","Barbell row","Pull-up","Push-up","Lunge","Hip thrust","Romanian deadlift","Leg press","Lat pulldown","Bicep curl","Tricep pushdown","Plank"])];
+  const rows=T.WO.slice().reverse().slice(0,40).map(w=>{const pbw=T.pb.has(w.id),fl=trFlash===w.id&&Date.now()-trFlashAt<2500;return `<div class="r${fl?" wflash":""}" style="--c:var(--lime)"><span class="dot"></span><div class="m"><div>${esc(w.name)}${pbw?` <span class="tr-pb">Best</span>`:""}</div><small>${w.d===today()?"Today":fmtDate(w.d)} · ${w.hk?(w.mins?w.mins+" min":"workout")+" · Apple Health":w.sets+" × "+w.reps}</small></div><div class="v">${w.hk?"":(+w.kg?w.kg+" "+u:"body")}</div>${w.hk||demoOn()?"":`<button class="x tr-rep" data-wrep="${w.id}" aria-label="Log ${esc(w.name)} again today" title="Again today"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0115.5-6.2L21 8M21 3v5h-5M21 12a9 9 0 01-15.5 6.2L3 16M3 21v-5h5"/></svg></button>`}${del("workouts",w.id)}</div>`}).join("");
+  return `<div class="panel trlogp"><div class="ph"><span>Workout log</span><i>${T.WO.filter(w=>w.d===today()).length} today</i></div>
+    <form class="r trnew" id="woForm" style="--c:var(--lime)" autocomplete="off"><span class="dot"></span>
+      <div class="tr-f"><input id="woName" list="exList" required aria-label="Exercise" autocomplete="off" enterkeyhint="next"><datalist id="exList">${names.slice(0,60).map(n=>`<option>${esc(n)}</option>`).join("")}</datalist>
+      <div class="tr-nums"><input id="woSets" inputmode="numeric" value="3" aria-label="Sets"><span>×</span><input id="woReps" inputmode="numeric" value="10" aria-label="Reps"><span>@</span><input id="woKg" inputmode="decimal" aria-label="Load in ${u}"><span>${u}</span></div>
+      <small class="tr-hint" id="trHint">Exercise, then sets × reps @ load. Leave load empty for bodyweight.</small></div>
+      <button class="x wok" aria-label="Log exercise" title="Log"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></form>
+    <div class="rows trlog">${rows||`<div class="empty">Your workouts show up here</div>`}</div></div>`}
+function trProgress(d,T){const u=d.goals.unit,W=T.weeks,mx=Math.max(1,...W.map(x=>x.v)),G=T.G;
+  const X0=46,X1=588,Y0=14,Y1=150,bw=(X1-X0)/8,py=v=>Y1-v/mx*(Y1-Y0);
+  const bars=W.map((x,i)=>{const cx=X0+bw*i+bw*.2,w=bw*.6,h=x.v?Math.max(3,Y1-py(x.v)):2,hit=x.n>=G,cur=x.ws===T.wk0,c=hit?"#3ddc84":"#4cc9ff";
+    return `<rect x="${cx.toFixed(1)}" y="${(Y1-h).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${x.v?c:"rgba(160,190,255,.18)"}" opacity="${cur?1:.8}"><title>Week of ${fmtDate(x.ws)}: ${n0(x.v)} ${u} lifted, ${x.n} training day${x.n===1?"":"s"}</title></rect><text x="${(cx+w/2).toFixed(1)}" y="${(Y1-h-6).toFixed(1)}" text-anchor="middle" font-size="10" font-family="Inter,sans-serif" fill="${hit?"#3ddc84":"#8fa3c8"}">${x.n?x.n+"d":""}</text><text x="${(cx+w/2).toFixed(1)}" y="166" text-anchor="middle" font-size="10" font-family="Inter,sans-serif" fill="${cur?"#e6eeff":"#8fa3c8"}" ${cur?'font-weight="700"':""}>${cur?"This wk":fmtDate(x.ws).replace(/^\w+\s/,m=>m)}</text>`}).join("");
+  const grid=[0,.5,1].map(k=>{const v=mx*k,y=py(v);return `<line x1="${X0}" x2="${X1}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="rgba(160,190,255,.12)" stroke-width="1"/><text x="${X0-8}" y="${(y+3.5).toFixed(1)}" text-anchor="end" font-size="10.5" fill="#8fa3c8" font-family="Inter,sans-serif">${v>=1e4?n0(v/1e3)+"k":n0(v)}</text>`}).join("");
+  const B=Object.values(T.best).sort((a,b)=>b.d<a.d?-1:1).slice(0,8);
+  const hitN=W.filter(x=>x.n>=G).length,bestWk=Math.max(...W.map(x=>x.n));
+  const cell=(l,v,sub,c)=>`<div><small>${l}</small><b${c?` style="color:${c}"`:""}>${v}</b><em>${sub}</em></div>`;
+  return `<div class="panel wtr trpro" style="margin-top:18px"><div class="ph"><span>Progress</span><i>Last 8 weeks</i></div>
+    <div class="wtr-sum">${cell("Goal weeks",hitN+" of 8",`${G} day${G===1?"":"s"} a week`,hitN?"#3ddc84":"")}${cell("Best week",bestWk+" days","most training days")}${cell("This week",n0(T.vol)+" "+u,"lifted (sets × reps × load)")}${cell("Personal bests",Object.keys(T.best).length,"exercises tracked")}</div>
+    ${W.some(x=>x.v||x.n)?`<svg class="wtr-svg" viewBox="0 0 600 176" role="img" aria-label="Weight lifted per week, last 8 weeks">${grid}${bars}</svg><p class="note" style="margin:6px 0 0">Bars are the total weight you lifted each week. Green means you hit your ${G}-day goal that week.</p>`:`<div class="empty">Your graph starts with your first workout</div>`}
+    ${B.length?`<div class="ph" style="margin-top:16px"><span>Personal bests</span><i>heaviest load</i></div><div class="rows tr-best">${B.map(b=>`<div class="r" style="--c:#3ddc84"><span class="dot"></span><div class="m"><div>${esc(b.name)}</div><small>${fmtDate(b.d)} · ${b.sets} × ${b.reps}</small></div><div class="v">${b.kg} ${u}<small>next: ${trNext(d,b)} ${u}</small></div></div>`).join("")}</div>`:""}</div>`}
 function vTrain(){
-  const d=D(),u=d.goals.unit,WO=byDate(d.workouts).reverse();
-  const days=[13,12,11,10,9,8,7,6,5,4,3,2,1,0].map(o=>{const ds=dayStr(o);return {ds,n:d.workouts.filter(w=>w.d===ds).length}});
-  const vol=d.workouts.filter(w=>(Date.now()-new Date(w.d+"T12:00"))/864e5<7).reduce((s,w)=>s+(w.sets||0)*(w.reps||0)*(w.kg||0),0);
-  return banner()+`<div class="passtop figtop">${figurePanel()}
-   <div class="stack">
-    <div class="panel" style="--c:var(--lime)"><div class="ph"><span>Log an exercise</span><i></i></div>
-     <form class="f" id="woForm"><label>Exercise<input id="woName" list="exList" required placeholder="Hip thrust" autocomplete="off"></label>
-     <datalist id="exList"><option>Hip thrust</option><option>Romanian deadlift</option><option>Bulgarian split squat</option><option>Squat</option><option>Glute bridge</option><option>Cable kickback</option><option>Step-up</option><option>Abductor machine</option></datalist>
-     <div class="f3"><label>Sets<input id="woSets" type="number" inputmode="numeric" min="1" value="3"></label><label>Reps<input id="woReps" type="number" inputmode="numeric" min="1" value="10"></label><label>Load (${u})<input id="woKg" type="number" step="0.5" inputmode="decimal" placeholder="0"></label></div>
-     <button class="btn">Log exercise</button></form></div>
-    <div class="panel" style="--c:var(--lime)"><div class="ph"><span>Workout days</span><i>Last 14 days</i></div>
-     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px">${days.map(x=>`<div title="${fmtDate(x.ds)}: ${x.n}" style="aspect-ratio:1;border-radius:3px;border:1px solid ${x.n?"var(--lime)":"rgba(var(--lr),.3)"};background:${x.n?`rgba(46,230,197,${Math.min(.15+x.n*.18,.85)})`:"transparent"};${x.n?"box-shadow:0 0 10px rgba(46,230,197,.35)":""};display:grid;place-items:center;font-family:var(--mono);font-size:11px;color:${x.n?"#02030b":"var(--dim)"};max-width:100%">${new Date(x.ds+"T12:00").getDate()}</div>`).join("")}</div>
-     <p class="note">Volume this week: ${n0(vol)} ${u} (sets × reps × load)</p></div>
-   </div></div>
-   <div class="panel" style="margin-top:18px;--c:var(--lime)"><div class="ph"><span>Training log</span><i>${d.workouts.length} total</i></div>
-    <div class="rows">${WO.length?WO.slice(0,25).map(w=>`<div class="r" style="--c:var(--lime)"><span class="dot"></span><div class="m"><div>${esc(w.name)}</div><small>${fmtDate(w.d)}${w.d===today()?" · Today":""}</small></div><div class="v">${w.hk?(w.mins?w.mins+" min":"Workout"):w.sets+"×"+w.reps}<small>${w.hk?"Apple Health":w.kg?w.kg+" "+u:"bodyweight"}</small></div>${del("workouts",w.id)}</div>`).join(""):`<div class="empty">No exercises logged</div>`}</div></div>`;
+  const d=D(),u=d.goals.unit,T=trStats(d),F=fitLevel(d),dv=T.lastVol?Math.round((T.vol-T.lastVol)/T.lastVol*100):null,lastW=T.WO.length?T.WO[T.WO.length-1]:null;
+  return banner()+`<div class="grid tiles">
+    <div class="panel tile" style="--c:var(--lime)">${ic("dumb")}<small>This week</small><b>${T.thisDays.size}/${T.G}</b><em>training days</em></div>
+    <div class="panel tile" style="--c:var(--amber)">${ic("fire")}<small>Streak</small><b>${T.streak}</b><em>${T.streak===1?"week":"weeks"} on goal</em></div>
+    <div class="panel tile" style="--c:var(--cyan)">${ic("bolt")}<small>Lifted this week</small><b>${T.vol>=1e4?(T.vol/1e3).toFixed(1)+"k":n0(T.vol)}</b><em>${T.lastVol?u+" · last week "+(T.lastVol>=1e4?(T.lastVol/1e3).toFixed(1)+"k":n0(T.lastVol)):u}</em></div>
+    <div class="panel tile" style="--c:var(--violet)">${ic("star")}<small>Fitness</small><b>${F.name}</b><em>${lastW?"last workout "+(lastW.d===today()?"today":fmtDate(lastW.d)):"no workouts yet"}</em></div>
+  </div>
+  <div class="passtop figtop bodytop trtop" style="margin-top:18px">${figurePanel()}
+   <div class="stack">${trWeekPanel(d,T)}${trLogPanel(d,T)}</div></div>${trProgress(d,T)}`;
 }
+/* typing an exercise you've done before fills in last time's numbers and suggests the next step up */
+document.addEventListener("input",e=>{if(e.target.id!=="woName")return;const w=trLast(D(),e.target.value),h=$("#trHint"),u=D().goals.unit;if(!h)return;
+  if(w){$("#woSets").value=w.sets||3;$("#woReps").value=w.reps||10;$("#woKg").value=w.kg||"";const nx=trNext(D(),w);h.innerHTML=`Last time ${fmtDate(w.d)}: <b>${w.sets} × ${w.reps}${+w.kg?" @ "+w.kg+" "+u:""}</b>${nx?` · try <button type="button" class="tr-up" data-trup="${nx}">${nx} ${u}</button>`:" · try one more rep"}`}
+  else h.textContent="Exercise, then sets × reps @ load. Leave load empty for bodyweight."});
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-trup],[data-wrep],[data-tredit],[data-trsave],[data-trcancel]");if(!t)return;
+  if(t.dataset.trup){$("#woKg").value=t.dataset.trup;return}
+  if(t.dataset.tredit!==undefined){trEdit=true;render();return}if(t.dataset.trcancel!==undefined){trEdit=false;render();return}
+  if(t.dataset.trsave!==undefined){const v=+($("#trG")||{}).value;if(v>=1&&v<=7){data.goals.trainDays=v;toast("Goal: "+v+" day"+(v===1?"":"s")+" a week")}trEdit=false;render();save();return}
+  if(t.dataset.wrep){const w=data.workouts.find(x=>x.id===t.dataset.wrep);if(!w)return;const n={id:uid(),d:today(),name:w.name,sets:w.sets,reps:w.reps,kg:w.kg};data.workouts.push(n);trFlash=n.id;trFlashAt=Date.now();toast(w.name+" logged again");render();save()}});
 /* ---------- hologram: blue body with a black fedora, black trench coat and black boots ---------- */
 const mirP=path=>path.replace(/([MLCQ])([^MLCQZ]*)/g,(m,c,args)=>c+args.trim().split(/[\s,]+/).map((v,i)=>i%2===0?String(200-parseFloat(v)):v).join(" ")+" ");
 const AV_ITEMS={hat:[["none","None"],["fedora","Fedora"]],top:[["none","None"],["trench","Trench coat"]],shoes:[["none","Barefoot"],["boots","Boots"]]};
@@ -3394,7 +3456,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="106";
+const APPV="107";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
@@ -3427,7 +3489,7 @@ document.addEventListener("submit",e=>{
   if(f==="mealForm"){data.meals.push({id:uid(),d:today(),name:$("#mName").value.trim(),type:$("#mType").value,kcal:num("#mKcal")||0,protein:num("#mPro")||0});toast("Meal logged")}
   else if(f==="wForm"){const d=$("#wDate").value||today(),v=Math.round(parseFloat(String($("#wVal").value).replace(",","."))*10)/10;if(!(v>0)||v>1500){const i=$("#wVal");if(Date.now()-wSavedAt>5000)toast(String(i.value).trim()?"That doesn't look like a weight":"Type your weight on the right first");if(i&&typeof touchUI==="function"&&!touchUI())i.focus();return}const nid=uid();data.weights.push({id:nid,d,v,at:Date.now()});wSavedAt=Date.now();wFlash=nid;toast(v+" "+data.goals.unit+" saved for "+fmtDate(d))}
   else if(f==="msForm"){const r={id:uid(),d:$("#msDate").value,waist:num("#msWaist"),hips:num("#msHips"),glutes:num("#msGlutes")};if(r.waist==null&&r.hips==null&&r.glutes==null){toast("Enter at least one measurement");return}data.meas=data.meas.filter(x=>x.d!==r.d);data.meas.push(r);toast("Measurements saved")}
-  else if(f==="woForm"){data.workouts.push({id:uid(),d:today(),name:$("#woName").value.trim(),sets:num("#woSets")||1,reps:num("#woReps")||1,kg:num("#woKg")});toast("Exercise logged")}
+  else if(f==="woForm"){const nm=$("#woName").value.trim();if(!nm){toast("Type the exercise first");$("#woName").focus();return}const kg=num("#woKg"),prev=data.workouts.filter(w=>!w.hk&&trKey(w.name)===trKey(nm)).reduce((a,w)=>Math.max(a,+w.kg||0),0);const n={id:uid(),d:today(),name:nm,sets:num("#woSets")||1,reps:num("#woReps")||1,kg};data.workouts.push(n);trFlash=n.id;trFlashAt=Date.now();toast(prev&&kg>prev?"New personal best: "+kg+" "+data.goals.unit:"Exercise logged")}
   else if(f==="evForm"){data.events=data.events||[];const dd=$("#evD").value||calSel;data.events.push({id:uid(),d:dd,time:$("#evTm").value||"",title:$("#evT").value.trim()});calSel=dd;toast("Event added")}
   else if(f==="tkAddForm"){const p=data.passions.find(x=>x.id===selP);const t=p&&(p.tasks||[]).find(x=>x.id===e.target.dataset.tid);if(!t)return;const mins=(num("#taH")||0)*60+(num("#taM")||0);const dd=$("#taD").value||today();if(mins<=0){toast("Enter some time first");return}if(dd>today()){toast("Use the schedule or a start date to plan ahead");return}
     const st0=+new Date(dd+"T12:00");(t.runs=t.runs||[]).push({s:st0,e:st0+mins*6e4,manual:true});data.sessions.push({id:uid(),pid:p.id,d:dd,mins,note:"Task: "+t.title+" (added manually)",taskId:t.id});addTimeFor=null;toast(fmtH(mins)+" added")}
