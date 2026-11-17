@@ -1113,6 +1113,7 @@ aside{background:rgba(var(--tD),calc(.82*var(--go)))!important;backdrop-filter:b
 .wtr-sum{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}.wtr-sum>div{display:grid;gap:1px;justify-items:center;align-content:center;height:66px;border:1px solid rgba(var(--lr),.16);border-radius:10px;background:rgba(var(--tX),calc(.5*var(--go)));min-width:0;text-align:center}.wtr-sum small{font-size:11px;color:var(--muted)}.wtr-sum b{font-size:15.5px;white-space:nowrap}.wtr-sum em{font-style:normal;font-size:10.5px;color:var(--muted);white-space:nowrap}
 .wtr-svg{display:block;width:100%;height:auto;overflow:visible}.wtr-leg{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:6px}.wtr-leg span{display:inline-flex;align-items:center;gap:6px}.wtr-leg i{width:14px;height:3px;border-radius:2px;display:inline-block}.wtr-leg i.dash{background:repeating-linear-gradient(90deg,#4cc9ff 0 4px,transparent 4px 7px)}
 @media (max-width:620px){.wtr-sum{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.wflash{animation:wflash 1.6s ease-out}@keyframes wflash{0%{background:rgba(61,220,132,.28)}100%{background:transparent}}
 .dtrack{position:relative;clip-path:inset(-30px 0)}.dtrack-in{position:absolute;inset:0;will-change:transform}.dpane{position:absolute!important;top:0;width:100%;margin:0!important;animation:none!important}
 .dfull{touch-action:pan-y;user-select:none;-webkit-user-select:none}.dfull input{user-select:text;-webkit-user-select:text}
 .dfull.fromR.slide{animation:dslR .38s cubic-bezier(.2,.85,.25,1) both}.dfull.fromL.slide{animation:dslL .38s cubic-bezier(.2,.85,.25,1) both}@keyframes dslR{from{opacity:0;transform:translateX(46px)}to{opacity:1;transform:none}}@keyframes dslL{from{opacity:0;transform:translateX(-46px)}to{opacity:1;transform:none}}
@@ -1269,7 +1270,7 @@ async function pull(){
     else if(!isEmpty(data))save();
     try{localStorage.setItem("aot-owner",sbUser.id)}catch(e){}
   }catch(e){storeNote=navigator.onLine?"Couldn't reach your account. Changes are kept on this device and will sync later.":"You're offline. Changes are kept on this device and will sync when you're back online.";syncDirty=true}
-  pulling=false;render();
+  pulling=false;softRender();
 }
 async function onSession(session){
   const u=session&&session.user||null;if((u&&u.id)===(sbUser&&sbUser.id))return;
@@ -1850,7 +1851,7 @@ function vBody(){
    <div class="stack">
     ${bmiPanel(d)}
     <div class="panel"><div class="ph"><span>Weigh in</span><i>${W.length} total</i></div>
-     <div class="rows"><form class="r wnew" id="wForm" style="--c:var(--violet)"><span class="dot"></span><div class="m"><label class="wd" title="Change the date"><span id="wDateTxt">${fmtDate(today())}</span><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg><input id="wDate" type="date" value="${today()}" max="${today()}" required aria-label="Date"></label></div><div class="v"><input id="wVal" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" aria-label="Weight in ${g.unit}"> ${g.unit}</div><button class="wok" aria-label="Save weight" title="Save"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></form>${W.length?[...W].reverse().slice(0,8).map(p=>`<div class="r" style="--c:var(--violet)"><span class="dot"></span><div class="m"><div>${fmtDate(p.d)}</div></div><div class="v">${p.v} ${g.unit}</div>${del("weights",p.id)}</div>`).join(""):`<div class="empty">No weigh-ins yet</div>`}</div></div>
+     <div class="rows"><form class="r wnew" id="wForm" style="--c:var(--violet)"><span class="dot"></span><div class="m"><label class="wd" title="Change the date"><span id="wDateTxt">${fmtDate(today())}</span><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg><input id="wDate" type="date" value="${today()}" max="${today()}" required aria-label="Date"></label></div><div class="v"><input id="wVal" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" aria-label="Weight in ${g.unit}"> ${g.unit}</div><button class="wok" aria-label="Save weight" title="Save"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></form>${W.length?[...W].reverse().slice(0,8).map(p=>`<div class="r${wFlash===p.d&&Date.now()-wSavedAt<2500?" wflash":""}" style="--c:var(--violet)"><span class="dot"></span><div class="m"><div>${fmtDate(p.d)}</div></div><div class="v">${p.v} ${g.unit}</div>${del("weights",p.id)}</div>`).join(""):`<div class="empty">No weigh-ins yet</div>`}</div></div>
    </div></div>${weightTrend(d)}`;
 }
 function vTrain(){
@@ -2991,6 +2992,9 @@ function vSet(){
 }
 
 const TITLES={dash:["Dashboard","Calendar and today's targets"],fuel:["Nutrition","Meals and macros"],body:["Body","Weight and measurements"],train:["Training","Workouts"],pass:["Passions","Hours and goals"],set:["Settings","Goals and data"]};
+const typing=()=>{const a=document.activeElement;return !!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&a.type!=="range"&&a.type!=="checkbox"&&a.type!=="radio"&&a.type!=="file")};
+let renderWait=false;function softRender(){if(typing()){renderWait=true;return}renderWait=false;render()}
+document.addEventListener("focusout",()=>setTimeout(()=>{if(renderWait&&!typing()){renderWait=false;render()}},600));
 function render(){
   const v=$("#view"),y=v.scrollTop;
   const SCR=".theme-strip,.fd-list,.lk-row,.cat-bar,.wgrid,.avbg,.av-tabs,.wa-grid,.rows",keep=[];SCR.split(",").forEach(q=>v.querySelectorAll(q).forEach((el,i)=>{if(el.scrollLeft||el.scrollTop)keep.push([q,i,el.scrollLeft,el.scrollTop])}));
@@ -3137,10 +3141,12 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
 });
 const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
+let wSavedAt=0,wFlash=null;
+const APPV="81";{const o=vSet;vSet=function(){return o()+`<p class="note" style="text-align:center;margin:16px 0 4px;opacity:.75">AssOnTrack version ${APPV}</p>`}}
 document.addEventListener("submit",e=>{
   e.preventDefault();const f=e.target.id;
   if(f==="mealForm"){data.meals.push({id:uid(),d:today(),name:$("#mName").value.trim(),type:$("#mType").value,kcal:num("#mKcal")||0,protein:num("#mPro")||0});toast("Meal logged")}
-  else if(f==="wForm"){const d=$("#wDate").value||today(),v=Math.round(parseFloat(String($("#wVal").value).replace(",","."))*10)/10;if(!(v>0)||v>1500){toast("Type your weight");return}data.weights=data.weights.filter(w=>w.d!==d);data.weights.push({id:uid(),d,v});toast("Weight saved")}
+  else if(f==="wForm"){const d=$("#wDate").value||today(),v=Math.round(parseFloat(String($("#wVal").value).replace(",","."))*10)/10;if(!(v>0)||v>1500){const i=$("#wVal");if(Date.now()-wSavedAt>5000)toast(String(i.value).trim()?"That doesn't look like a weight":"Type your weight on the right first");if(i&&typeof touchUI==="function"&&!touchUI())i.focus();return}data.weights=data.weights.filter(w=>w.d!==d);data.weights.push({id:uid(),d,v});wSavedAt=Date.now();wFlash=d;toast(v+" "+data.goals.unit+" saved for "+fmtDate(d))}
   else if(f==="msForm"){const r={id:uid(),d:$("#msDate").value,waist:num("#msWaist"),hips:num("#msHips"),glutes:num("#msGlutes")};if(r.waist==null&&r.hips==null&&r.glutes==null){toast("Enter at least one measurement");return}data.meas=data.meas.filter(x=>x.d!==r.d);data.meas.push(r);toast("Measurements saved")}
   else if(f==="woForm"){data.workouts.push({id:uid(),d:today(),name:$("#woName").value.trim(),sets:num("#woSets")||1,reps:num("#woReps")||1,kg:num("#woKg")});toast("Exercise logged")}
   else if(f==="evForm"){data.events=data.events||[];const dd=$("#evD").value||calSel;data.events.push({id:uid(),d:dd,time:$("#evTm").value||"",title:$("#evT").value.trim()});calSel=dd;toast("Event added")}
@@ -3182,7 +3188,7 @@ function tick(){const d=new Date();$("#clk").textContent=d.toLocaleTimeString(un
   $("#sd").textContent=d.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}
 tick();setInterval(tick,15000);
 setInterval(()=>{document.querySelectorAll("[data-timer]").forEach(el=>{const[pid,tid]=el.dataset.timer.split(":");const p=data.passions.find(x=>x.id===pid);const t=p&&(p.tasks||[]).find(x=>x.id===tid);if(t)el.textContent=fmtClock(taskMs(t))})},1000);
-setInterval(()=>{const a=document.activeElement;if(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;if(tab==="dash"||(tab==="pass"&&selP))render()},60000);
+setInterval(()=>{if(typing())return;if(tab==="dash"||(tab==="pass"&&selP))render()},60000);
 
 
 /* always show the full desktop site: scale it down to fit narrow screens */
@@ -3193,7 +3199,7 @@ addEventListener("resize",fit);fit();
 
 render();
 
-if("serviceWorker" in navigator&&location.protocol==="https:"){addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>{r.update();document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")r.update()})}).catch(()=>{}));let reloaded=false;const hadCtl=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(hadCtl&&!reloaded){reloaded=true;location.reload()}})}
+if("serviceWorker" in navigator&&location.protocol==="https:"){addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>{r.update();document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")r.update()})}).catch(()=>{}));let reloaded=false;const hadCtl=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!hadCtl||reloaded)return;const go=()=>{if(reloaded)return;if(typing()){setTimeout(go,1500);return}reloaded=true;location.reload()};go()})}
 </script>
 
 </body></html>
