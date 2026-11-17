@@ -1826,15 +1826,15 @@ function vBody(){
     <div class="panel chart" style="--c:var(--violet)"><div class="ph"><span>Weight by time</span><i>${g.unit}</i></div>${lineChart(W.map(p=>({d:p.d,v:p.v})),"#8fd8ff")}</div>
     <div class="panel"><div class="ph"><span>Log weight</span><i></i></div>
      <form class="f" id="wForm"><div class="f2"><label>Date<input id="wDate" type="date" value="${today()}" max="${today()}" required></label>
-     <label>Weight (${g.unit})<input id="wVal" type="number" step="0.1" inputmode="decimal" required placeholder="${lw??150}"></label></div><button class="btn">Save weight</button></form></div>
+     <label>Weight (${g.unit})<input id="wVal" type="number" step="0.1" inputmode="decimal" required></label></div><button class="btn">Save weight</button></form></div>
    </div></div>
   <div class="grid cols2" style="margin-top:18px">
    <div class="stack">
     <div class="panel"><div class="ph"><span>Log measurements</span><i>${g.len}</i></div>
      <form class="f" id="msForm"><label>Date<input id="msDate" type="date" value="${today()}" max="${today()}" required></label>
-     <div class="f3"><label>Waist<input id="msWaist" type="number" step="0.1" inputmode="decimal" placeholder="${lm?.waist??28}"></label>
-     <label>Hips<input id="msHips" type="number" step="0.1" inputmode="decimal" placeholder="${lm?.hips??38}"></label>
-     <label>Glutes<input id="msGlutes" type="number" step="0.1" inputmode="decimal" placeholder="${lm?.glutes??40}"></label></div>
+     <div class="f3"><label>Waist<input id="msWaist" type="number" step="0.1" inputmode="decimal"></label>
+     <label>Hips<input id="msHips" type="number" step="0.1" inputmode="decimal"></label>
+     <label>Glutes<input id="msGlutes" type="number" step="0.1" inputmode="decimal"></label></div>
      <button class="btn mag">Save measurements</button></form></div>
     <div class="panel"><div class="ph"><span>Weigh-ins</span><i>${W.length} total</i></div><div class="rows">${W.length?[...W].reverse().slice(0,8).map(p=>`<div class="r" style="--c:var(--violet)"><span class="dot"></span><div class="m"><div>${fmtDate(p.d)}</div></div><div class="v">${p.v} ${g.unit}</div>${del("weights",p.id)}</div>`).join(""):`<div class="empty">No weigh-ins yet</div>`}</div></div>
    </div>
@@ -2219,7 +2219,7 @@ let bmiEdit=false,bmiDraft={};
 document.addEventListener("input",e=>{const id=e.target.id;if(id==="bmFt"||id==="bmIn"||id==="bmCm"||id==="bmW")bmiDraft[id]=e.target.value},true);
 function bmiPanel(d){const g=d.goals,b=bmiInfo(d),imp=g.len!=="cm",h=b.h,ti=h?Math.round(h/2.54*2)/2:0,ft=h?Math.floor(ti/12):"",inch=h?+(ti-ft*12).toFixed(1):"";
   if(b.bmi==null||bmiEdit)return `<div class="panel bmi"><div class="ph"><span>Your BMI</span><i>Sets your body type</i></div><p class="note" style="margin:0 0 10px">Add your height and weight. It works out your BMI, gives you a body type and shapes your figure to match.</p>
-    <div class="bmi-form${imp?" ft3":""}">${imp?`<label>Feet<input id="bmFt" inputmode="numeric" autocomplete="off" value="${esc(bmiDraft.bmFt??ft)}" placeholder="5"></label><label>Inches<input id="bmIn" inputmode="decimal" autocomplete="off" value="${esc(bmiDraft.bmIn??inch)}" placeholder="8"></label>`:`<label>Height (cm)<input id="bmCm" inputmode="decimal" autocomplete="off" value="${esc(bmiDraft.bmCm??(h?Math.round(h):""))}" placeholder="172"></label>`}<label>Weight (${g.unit})<input id="bmW" inputmode="decimal" autocomplete="off" value="${esc(bmiDraft.bmW??b.lw??"")}" placeholder="${g.unit==="kg"?70:155}"></label></div>
+    <div class="bmi-form${imp?" ft3":""}">${imp?`<label>Feet<input id="bmFt" inputmode="numeric" autocomplete="off" value="${esc(bmiDraft.bmFt??ft)}"></label><label>Inches<input id="bmIn" inputmode="decimal" autocomplete="off" value="${esc(bmiDraft.bmIn??inch)}"></label>`:`<label>Height (cm)<input id="bmCm" inputmode="decimal" autocomplete="off" value="${esc(bmiDraft.bmCm??(h?Math.round(h):""))}"></label>`}<label>Weight (${g.unit})<input id="bmW" inputmode="decimal" autocomplete="off" value="${esc(bmiDraft.bmW??b.lw??"")}"></label></div>
     <div class="bmi-btns"><button class="btn" data-bmisave>Save</button>${bmiEdit&&b.bmi!=null?`<button class="btn ghost" data-bmicancel>Cancel</button>`:""}</div></div>`;
   const mu=fitLevel(d).m,ty=bodyType(b.bmi,mu),x=Math.max(2,Math.min(98,(b.bmi-15)/25*100));
   return `<div class="panel bmi"><div class="ph"><span>Your BMI</span><button class="dview" data-bmiedit style="margin:0">Edit</button></div>
