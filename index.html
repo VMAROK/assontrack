@@ -1057,6 +1057,7 @@ aside{background:rgba(var(--tD),calc(.82*var(--go)))!important;backdrop-filter:b
 .pd-inline .pd-title h2{font-size:19px}.pd-inline .pstats{margin-bottom:12px}
 .pdetail .pd-hero{padding-top:14px}
 @media (max-width:760px){.pd-inline .pstats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.snd-row{margin-top:10px}
 .dashtop{margin-bottom:18px}
 .dtiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;padding:0!important;overflow:hidden}.dtile{border-left:1px solid rgba(var(--lr),.18);padding:16px 8px 10px;display:grid;justify-items:center;gap:6px;min-width:0}.dtile:first-child{border-left:0}.dview{font:inherit;font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--muted);opacity:.75;background:none;border:0;padding:4px 10px;margin-top:2px;cursor:pointer;border-radius:6px}.dview:hover{opacity:1;color:rgba(var(--tL),1);background:rgba(var(--tL),.08)}
 .dt-ring{width:62px;height:62px}.dtile b{font-size:14px}.dtile small{font-size:11.5px;font-weight:600;text-align:center;line-height:1.25}
@@ -1438,7 +1439,7 @@ function budgetManage(d){const o=budgetInfo(d),B=d.budget||{};
   return `<div class="panel bud"><div class="ph"><span>Manage budget</span><button class="x" data-budopen aria-label="Close">×</button></div><form id="budForm" class="bud-row"><label>Monthly budget<input id="budIn" inputmode="decimal" placeholder="1500" value="${B.monthly||""}" autocomplete="off"></label><button class="btn">Set</button></form>
     <form id="expForm" class="bud-row"><label>Amount<input id="expAmt" inputmode="decimal" placeholder="12.50" autocomplete="off" required></label><label>What for<input id="expNote" placeholder="Groceries" maxlength="40" autocomplete="off"></label><button class="btn">Add expense</button></form>
     ${o.ex.length?`<div class="bud-list">${o.ex.slice().sort((a,b)=>(b.at||0)-(a.at||0)).slice(0,12).map(x=>`<div class="bud-it"><span>${esc(x.note||"Expense")}<small>${fmtDate(x.d)}</small></span><b>${money(+x.amt||0)}</b><button class="x" data-expdel="${x.id}" aria-label="Remove expense">×</button></div>`).join("")}</div>`:`<p class="note" style="margin:0">No expenses this month yet.</p>`}</div>`}
-function dashAnim(key){const now=performance.now();if(key!==dashShown){dashShown=key;dashAt=now}const el=now-dashAt;return el<450?` slide" style="animation-delay:-${Math.round(el)}ms`:""}
+function dashAnim(key){const now=performance.now();if(key!==dashShown){if(dashShown)sfx("whoosh");dashShown=key;dashAt=now}const el=now-dashAt;return el<450?` slide" style="animation-delay:-${Math.round(el)}ms`:""}
 function progressPanel(d){const wk=weekKey(today()),I={pass:passInfo(d),fit:bodyInfo(d),diet:dietInfo(d),budget:budgetInfo(d)};
   if(dashOpen&&DCARDS[dashOpen]){const full=scoreCard(I[dashOpen]);
     return `<div class="dfull${dashDir>0?" fromR":dashDir<0?" fromL":""}${dashAnim("f:"+dashOpen)}" data-dswipe><button class="dback" data-dopen="" aria-label="Back to all progress"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Back</button><span class="ddots" aria-hidden="true">${Object.keys(DCARDS).map(k=>`<i class="${k===dashOpen?"on":""}"></i>`).join("")}</span>${dashOpen==="budget"?`<button class="dview dmanage" data-budopen>${budOpen?"Done":"Manage"}</button>`:""}${full}</div>${dashOpen==="budget"&&budOpen?budgetManage(d):""}`}
@@ -2254,7 +2255,7 @@ function passStats(d,p){
 const PTI={schedule:`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>`,tasks:`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/></svg>`,projects:`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H10l2 2.5h6.5A2.5 2.5 0 0 1 21 10v7.5a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/></svg>`};
 let delOpen=false;
 let headShown="",headAt=0;
-function headAttrs(key){const now=performance.now();if(key!==headShown){headShown=key;headAt=now}const el=now-headAt;return el<450?` class="pd-inline slide" style="animation-delay:-${Math.round(el)}ms"`:` class="pd-inline"`}
+function headAttrs(key){const now=performance.now();if(key!==headShown){headShown=key;headAt=now;sfx("whoosh")}const el=now-headAt;return el<450?` class="pd-inline slide" style="animation-delay:-${Math.round(el)}ms"`:` class="pd-inline"`}
 function catHead(d,id){const L=d.passions.filter(p=>id==="none"?!p.cat||!cats().some(c=>c.id===p.cat):p.cat===id);const A=L.map(p=>passStats(d,p)),sum=k=>A.reduce((a,x)=>a+(+x[k]||0),0),sc=commitScore(L),missed=sum("missed");
   const col=sc==null?"var(--muted)":sc>=85?"#3ddc84":sc>=65?"#7ddc6a":sc>=40?"var(--amber)":"#ff5d6c",word=sc==null?"Nothing logged yet":sc>=85?"Locked in":sc>=65?"On track":sc>=40?"Slipping":"Off track";
   return `<div${headAttrs("c:"+id)}><div class="pd-head"><div class="pd-title"><h2>${esc(id==="none"?"No category":catName(id))}</h2><span class="ch-score" style="color:${col}">${sc==null?"":sc+"% · "}${word}</span></div><div class="pd-modes"><span class="ch-count">${L.length} passion${L.length===1?"":"s"}</span></div></div>
@@ -2451,6 +2452,51 @@ document.addEventListener("focusout",()=>{setTimeout(()=>{if(!isField(document.a
 function liveOff(){const c=$("#bglive");if(c)c.classList.remove("on");const k=liveRAF;setTimeout(()=>{if(liveRAF===k)cancelAnimationFrame(k)},450)}
 let wallTok=0,bgFront=0;
 const mainBlur=()=>Math.max(0,Math.min(3,+((data.profile||{}).wallBlur)||0));
+/* ---------- ambient sound: a deep, slow, spacious drone made in the browser (no audio file) ---------- */
+const soundOn=()=>(data.profile||{}).sound!==false,soundVol=()=>{const v=(data.profile||{}).soundVol;return (v==null?35:Math.max(0,Math.min(100,+v)))/100};
+function buildAmbient(ctx,out){const now=ctx.currentTime,mk=(type,f)=>{const o=ctx.createOscillator();o.type=type;o.frequency.value=f;o.start(now);return o},G=v=>{const g=ctx.createGain();g.gain.value=v;return g};
+  const lfo=(rate,depth,param,phase)=>{const o=mk("sine",rate),g=G(depth);o.connect(g);g.connect(param);return o};
+  // long, dark reverb tail
+  const len=Math.floor(ctx.sampleRate*7),ir=ctx.createBuffer(2,len,ctx.sampleRate);for(let c=0;c<2;c++){const d=ir.getChannelData(c);let lp=0;for(let i=0;i<len;i++){const t=i/len;lp+=(Math.random()*2-1-lp)*.18;d[i]=lp*Math.pow(1-t,2.6)*(i<300?i/300:1)}}
+  const conv=ctx.createConvolver();conv.buffer=ir;const wet=G(.9),dry=G(.35),bus=G(1),tone=ctx.createBiquadFilter();tone.type="lowpass";tone.frequency.value=1500;tone.Q.value=.3;
+  bus.connect(dry);bus.connect(conv);conv.connect(wet);dry.connect(tone);wet.connect(tone);tone.connect(out);
+  // deep drone: stacked fifths with slow beating and breathing
+  [[54,.34,.07],[81,.2,.05],[108.2,.13,.09],[162.4,.05,.04],[216.5,.025,.03]].forEach(([f,g,r],i)=>{const v=G(g*.7);[f-.11,f+.13].forEach(ff=>mk(i<2?"sine":"triangle",ff).connect(v));lfo(r,g*.3,v.gain);
+    const pan=ctx.createStereoPanner?ctx.createStereoPanner():null;if(pan){pan.pan.value=(i%2?-1:1)*.25*i/4;lfo(.03+i*.011,.3,pan.pan);v.connect(pan);pan.connect(bus)}else v.connect(bus)});
+  // air: slow-moving filtered noise
+  const nb=ctx.createBuffer(1,ctx.sampleRate*4,ctx.sampleRate),nd=nb.getChannelData(0);let b0=0,b1=0;for(let i=0;i<nd.length;i++){const w=Math.random()*2-1;b0=.985*b0+w*.06;b1=.92*b1+w*.1;nd[i]=(b0+b1*.3)}
+  const ns=ctx.createBufferSource();ns.buffer=nb;ns.loop=true;const bp=ctx.createBiquadFilter();bp.type="bandpass";bp.frequency.value=420;bp.Q.value=.7;const ng=G(.16);ns.connect(bp);bp.connect(ng);ng.connect(bus);lfo(.043,230,bp.frequency);lfo(.027,.07,ng.gain);ns.start(now);
+  // far-off shimmer
+  [[432,.012,.019],[648,.007,.013]].forEach(([f,g,r])=>{const v=G(0);mk("sine",f).connect(v);lfo(r,g,v.gain);v.connect(conv)})}
+let AC=null,acOut=null,fxOut=null,ambBuilt=false,soundArmed=false,fxNoise=null;
+const sfxOn=()=>(data.profile||{}).sfx!==false;
+function acGet(){if(AC)return AC;try{const K=window.AudioContext||window.webkitAudioContext;if(!K)return null;AC=new K();acOut=AC.createGain();acOut.gain.value=0;acOut.connect(AC.destination);fxOut=AC.createGain();fxOut.gain.value=.5;fxOut.connect(AC.destination)}catch(e){AC=null}return AC}
+function soundApply(){const vis=document.visibilityState==="visible",on=soundOn()&&soundArmed&&vis;
+  if(soundArmed&&(soundOn()||sfxOn()))acGet();if(!AC)return;
+  if(on&&!ambBuilt){try{buildAmbient(AC,acOut);ambBuilt=true}catch(e){}}
+  const t=AC.currentTime;acOut.gain.cancelScheduledValues(t);acOut.gain.setValueAtTime(acOut.gain.value,t);acOut.gain.linearRampToValueAtTime(on?soundVol()*.9:0,t+(on?3.5:.8));
+  const need=vis&&soundArmed&&(soundOn()||sfxOn());if(need)AC.resume&&AC.resume();else setTimeout(()=>{if(AC&&!(document.visibilityState==="visible"&&(soundOn()||sfxOn())))AC.suspend&&AC.suspend()},900)}
+/* ---------- interface sounds: a console blip for buttons, a whoosh for sliding panels, a wobbly sine for sliders ---------- */
+function sfx(kind){if(!soundArmed||!sfxOn()||document.visibilityState!=="visible")return;const c=acGet();if(!c||c.state!=="running"){c&&c.resume&&c.resume();if(!c||c.state==="closed")return}
+  const t=c.currentTime,g=c.createGain();g.connect(fxOut);
+  if(kind==="blip"||kind==="back"){const up=kind==="blip",o=c.createOscillator(),o2=c.createOscillator();o.type="sine";o2.type="triangle";
+    o.frequency.setValueAtTime(up?1180:1500,t);o.frequency.exponentialRampToValueAtTime(up?1760:880,t+.07);o2.frequency.setValueAtTime(up?2360:1760,t+.035);o2.frequency.exponentialRampToValueAtTime(up?2640:1180,t+.1);
+    const g2=c.createGain();g2.gain.value=.35;o2.connect(g2);g2.connect(g);o.connect(g);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.16,t+.008);g.gain.exponentialRampToValueAtTime(.001,t+.13);o.start(t);o2.start(t+.03);o.stop(t+.15);o2.stop(t+.15)}
+  else if(kind==="whoosh"){if(!fxNoise){fxNoise=c.createBuffer(1,c.sampleRate*.6,c.sampleRate);const d=fxNoise.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
+    const n=c.createBufferSource();n.buffer=fxNoise;const f=c.createBiquadFilter();f.type="bandpass";f.Q.value=1.1;f.frequency.setValueAtTime(260,t);f.frequency.exponentialRampToValueAtTime(2600,t+.26);f.frequency.exponentialRampToValueAtTime(700,t+.45);
+    n.connect(f);f.connect(g);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.2,t+.14);g.gain.exponentialRampToValueAtTime(.001,t+.46);n.start(t);n.stop(t+.5)}}
+let sliderVoice=null;
+function sliderSound(el){if(!soundArmed||!sfxOn())return;const c=acGet();if(!c)return;c.resume&&c.resume();const t=c.currentTime,mn=+el.min||0,mx=+el.max||100,u=mx>mn?(+el.value-mn)/(mx-mn):0,f=180*Math.pow(5.2,u);
+  if(!sliderVoice){const o=c.createOscillator(),g=c.createGain(),l=c.createOscillator(),lg=c.createGain();o.type="sine";l.frequency.value=6.5;lg.gain.value=14;l.connect(lg);lg.connect(o.frequency);o.frequency.value=f;g.gain.value=0;o.connect(g);g.connect(fxOut);o.start(t);l.start(t);sliderVoice={o,g,l,timer:0}}
+  const v=sliderVoice;v.o.frequency.setTargetAtTime(f,t,.03);v.g.gain.cancelScheduledValues(t);v.g.gain.setTargetAtTime(.13,t,.02);clearTimeout(v.timer);
+  v.timer=setTimeout(()=>{const t2=c.currentTime;v.g.gain.setTargetAtTime(0,t2,.06);v.o.frequency.setTargetAtTime(f*.82,t2,.09);setTimeout(()=>{if(sliderVoice===v){try{v.o.stop();v.l.stop()}catch(_){}sliderVoice=null}},400)},170)}
+document.addEventListener("input",e=>{if(e.target.matches&&e.target.matches("input[type=range]"))sliderSound(e.target)},true);
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("button,[role=button],[role=tab],[role=radio],a[href],.plrow,label.tcard,label.btn,summary");if(!b||b.disabled)return;
+  sfx(b.matches(".x,.dback,[data-avcancel],[data-catcancelx],[data-closep],[data-addday].mv")||/^(cancel|back|close|done)$/i.test((b.textContent||"").trim())?"back":"blip")},true);
+["pointerdown","keydown","touchend"].forEach(ev=>document.addEventListener(ev,()=>{if(!soundArmed){soundArmed=true;soundApply()}},{capture:true,passive:true}));
+document.addEventListener("visibilitychange",soundApply);
+document.addEventListener("input",e=>{if(e.target.id!=="sndVol")return;const v=+e.target.value;data.profile=Object.assign({},data.profile,{soundVol:v});const o=$("#sndVolVal");if(o)o.textContent=v+"%";if(AC&&acOut){const t=AC.currentTime;acOut.gain.cancelScheduledValues(t);acOut.gain.setTargetAtTime(soundOn()?v/100*.9:0,t,.08)}});
+document.addEventListener("change",e=>{if(e.target.id==="sndVol")save()});
 const wallBlurOf=()=>{const c=ctxCat();return c&&c.wallBlur!=null?Math.max(0,Math.min(3,+c.wallBlur||0)):mainBlur()};
 function applyWallBlur(){const k=wallBlurOf(),r=document.documentElement.style;r.setProperty("--wblur",[0,6,14,28][k]+"px");r.setProperty("--wbs",[1,1.03,1.06,1.12][k])}
 function applyWall(){const w=passWall()||wallOf(),spin=animOn()&&KALEI.has(w.id),key=w.id+(spin?"*":"");if(wallShown===key)return;wallShown=key;
@@ -2471,6 +2517,9 @@ function preloadWalls(){if(preloaded)return;preloaded=true;const d=D(),ids=new S
   let i=0;const next=()=>{if(i<list.length)loadImg(list[i++]).catch(()=>{}).then(()=>setTimeout(next,150))};setTimeout(next,1500)}
 function wallPanel(){const cur=wallOf().id;return `<div class="panel wallp"><div class="ph"><span>Wallpaper</span><i>${esc(wallOf().name)}</i></div>
   <div class="wgrid" role="radiogroup" aria-label="Wallpaper">${wallGroups().map(([n,ws])=>`<div class="wgroup">${esc(n)}</div>`+ws.map(w=>`<div class="wcell"><button class="wcard" role="radio" aria-checked="${w.id===cur}" data-wall="${w.id}"><span class="wimg" style="background-image:url('${thumbOf(w)}')"></span><span class="wname">${esc(w.name)}</span></button>${w.custom?`<button class="wdel" data-walldel="${w.id}" aria-label="Remove ${esc(w.name)}" title="Remove">×</button>`:""}</div>`).join("")).join("")}<label class="wcard wadd" title="Use your own photo"><span class="wimg wadd-i"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span class="wname">Add your own</span><input type="file" accept="image/*" data-wallup="main"></label></div>
+  <div class="anim-row"><div><b>Ambient sound</b><small>A deep, slow, spacious tone that plays while the app is open. It starts after your first tap. On an iPhone or iPad it follows the silent switch.</small></div><div class="seg2" role="group" aria-label="Ambient sound"><button data-sound="1" aria-pressed="${soundOn()}">On</button><button data-sound="0" aria-pressed="${!soundOn()}">Off</button></div></div>
+  ${soundOn()?`<div class="glass-row snd-row"><span>Quiet</span><input type="range" id="sndVol" min="0" max="100" value="${Math.round(soundVol()*100)}" aria-label="Ambient sound volume"><span>Loud</span><b id="sndVolVal">${Math.round(soundVol()*100)}%</b><span></span></div>`:""}
+  <div class="anim-row"><div><b>Sound effects</b><small>A console blip on buttons, a whoosh when panels slide, and a wobbly tone on sliders.</small></div><div class="seg2" role="group" aria-label="Sound effects"><button data-sfx="1" aria-pressed="${sfxOn()}">On</button><button data-sfx="0" aria-pressed="${!sfxOn()}">Off</button></div></div>
   <div class="anim-row"><div><b>Blur the background</b><small>Softens the whole wallpaper behind everything, on every screen.</small></div><div class="seg2" role="group" aria-label="Blur the background">${[[0,"Off"],[1,"Light"],[2,"Medium"],[3,"Heavy"]].map(([k,l])=>`<button data-wallblur="${k}" aria-pressed="${mainBlur()===k}">${l}</button>`).join("")}</div></div>
   <div class="anim-row"><div><b>Animate kaleidoscopes</b><small>They slowly turn and breathe. Animated ones can take a moment longer to load and use a little more battery.</small></div><div class="seg2" role="group" aria-label="Animate kaleidoscopes"><button data-animwall="1" aria-pressed="${animOn()}">On</button><button data-animwall="0" aria-pressed="${!animOn()}">Off</button></div></div></div>`}
 async function shrinkImage(file,max,q){const url=URL.createObjectURL(file);try{const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=url});
@@ -2542,7 +2591,7 @@ addEventListener("resize",()=>placeBranch());
 
 /* ---------- events ---------- */
 let confirmClear=false;
-function go(t){tab=t;confirmClear=false;render();$("#view").scrollTop=0}
+function go(t){if(t!==tab)sfx("whoosh");tab=t;confirmClear=false;render();$("#view").scrollTop=0}
 document.addEventListener("change",e=>{const t=e.target;if(!t.dataset||!t.dataset.tkproj)return;const p=data.passions.find(x=>x.id===selP);const k=p&&(p.tasks||[]).find(x=>x.id===t.dataset.tkproj);if(!k)return;k.proj=t.value||null;render();save();toast(t.value?"Moved to "+t.options[t.selectedIndex].text:"Removed from project")});
 document.addEventListener("focusout",e=>{if(e.target.id==="slH"||e.target.id==="seH"){const m=parseHM(e.target.value);if(m!=null)e.target.value=String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&renaming&&e.target.id==="rnIn"){renaming=null;render()}});
@@ -2590,6 +2639,8 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
   else if(b.dataset.clook!==undefined){const c=cats().find(x=>x.id===passCat);if(c){const L=Object.assign({},c.look);if(b.dataset.clook)L.color=b.dataset.clook;else delete L.color;if(Object.keys(L).length)c.look=L;else delete c.look;render();save()}}
   else if(b.dataset.creset){const c=cats().find(x=>x.id===passCat);if(c&&c.look){delete c.look[b.dataset.creset];if(!Object.keys(c.look).length)delete c.look;render();save()}}
   else if(b.dataset.catapply){const id=b.dataset.catapply;if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="Tap again to clear their own themes";b.classList.add("armed");return}if(catDraft)catDraft.dirtyP=true;data.passions.forEach(p=>{if(p.cat===id){delete p.wall;delete p.look}});render();save();toast("Every passion in "+catName(id)+" now uses its theme")}
+  else if(b.dataset.sfx!==undefined){data.profile=Object.assign({},data.profile,{sfx:b.dataset.sfx==="1"});soundArmed=true;soundApply();render();save()}
+  else if(b.dataset.sound!==undefined){data.profile=Object.assign({},data.profile,{sound:b.dataset.sound==="1"});soundArmed=true;soundApply();render();save()}
   else if(b.dataset.wallblur!==undefined){data.profile=Object.assign({},data.profile,{wallBlur:+b.dataset.wallblur});render();save()}
   else if(b.dataset.animwall!==undefined){data.profile=Object.assign({},data.profile,{animWall:b.dataset.animwall==="1"});render();save()}
   else if(b.dataset.lines!==undefined){data.profile=Object.assign({},data.profile,{look:Object.assign(lookOf(),{lines:b.dataset.lines==="1"})});render();save()}
