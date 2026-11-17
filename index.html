@@ -1130,6 +1130,8 @@ aside{background:rgba(var(--tD),calc(.82*var(--go)))!important;backdrop-filter:b
 .ms-r .btn{flex:none;padding:7px 11px;font-size:12.5px;white-space:nowrap}.ms-r .btn.ghost{background:none;border-color:rgba(var(--lr),.3);color:var(--muted)}.ms-none{color:#3ddc84!important}.ms-open{cursor:pointer;border-radius:8px}.ms-open:hover{background:rgba(255,93,108,.08)}.ms-open small{text-decoration:underline;text-underline-offset:2px}
 .hwhy{font:inherit;font-size:12px;color:rgba(var(--tL),1);background:none;border:0;padding:4px 6px;margin-top:2px;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 @media (max-width:480px){.ms-r{flex-wrap:wrap}.ms-m{flex-basis:100%}.ms-r .btn{flex:1}}
+input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+.kbhelp{position:fixed;left:10px;right:10px;top:max(10px,env(safe-area-inset-top));z-index:990;padding:12px 14px;border-radius:14px;background:rgba(8,14,34,.97);border:1px solid rgba(255,182,72,.55);box-shadow:0 14px 40px rgba(0,0,0,.6);display:grid;gap:10px}.kbhelp p{margin:0;font-size:14px;line-height:1.4;color:#cfdcf5}.kbhelp p b{color:#ffb648}.kbhelp>div{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.kbhelp .btn{padding:9px 14px;font-size:14px;text-decoration:none}.kbhelp .btn.ghost{background:none;border-color:rgba(160,190,255,.3);color:#9fb4d8}.kbhelp .x{margin-left:auto}
 .dtrack{position:relative;clip-path:inset(-30px 0)}.dtrack-in{position:absolute;inset:0;will-change:transform}.dpane{position:absolute!important;top:0;width:100%;margin:0!important;animation:none!important}
 .dfull{touch-action:pan-y;user-select:none;-webkit-user-select:none}.dfull input{user-select:text;-webkit-user-select:text}
 .dfull.fromR.slide{animation:dslR .38s cubic-bezier(.2,.85,.25,1) both}.dfull.fromL.slide{animation:dslL .38s cubic-bezier(.2,.85,.25,1) both}@keyframes dslR{from{opacity:0;transform:translateX(46px)}to{opacity:1;transform:none}}@keyframes dslL{from{opacity:0;transform:translateX(-46px)}to{opacity:1;transform:none}}
@@ -3265,7 +3267,17 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
 const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
-const APPV="88";
+const APPV="89";
+/* iPhone sometimes refuses to bring up the keyboard (worst in home-screen apps). Notice when a tapped field gets no keyboard and offer a way out. */
+(function(){const vv=window.visualViewport,coarse=(()=>{try{return matchMedia("(pointer:coarse)").matches}catch(e){return false}})();if(!vv||!coarse)return;let base=vv.height,t=0,off=false;try{off=localStorage.getItem("aot-kbhelp")==="off"}catch(e){}
+  addEventListener("orientationchange",()=>setTimeout(()=>{base=vv.height},600));
+  const hide=()=>{const b=document.getElementById("kbHelp");b&&b.remove()};
+  const show=()=>{if(off||document.getElementById("kbHelp"))return;const standalone=(navigator.standalone===true)||(()=>{try{return matchMedia("(display-mode:standalone)").matches}catch(e){return false}})(),b=document.createElement("div");b.id="kbHelp";b.className="kbhelp";
+    b.innerHTML=`<p><b>Keyboard not coming up?</b> That's an iPhone glitch${standalone?" with home-screen apps":""}, not anything you did. Try Reload first. If that doesn't do it, swipe the app closed and open it again.</p><div><button class="btn" data-kb="reload">Reload</button>${standalone?`<a class="btn ghost" href="${location.href.split("#")[0]}" target="_blank" rel="noopener">Open in Safari</a>`:""}<button class="btn ghost" data-kb="off">Don't show this</button><button class="x" data-kb="x" aria-label="Close">×</button></div>`;document.body.appendChild(b)};
+  document.addEventListener("focusin",e=>{const el=e.target;if(!el||!/^(INPUT|TEXTAREA)$/.test(el.tagName)||/^(range|checkbox|radio|file|date|time|color|button|submit)$/.test(el.type)||el.readOnly||el.disabled)return;clearTimeout(t);const h0=Math.max(base,vv.height);
+    t=setTimeout(()=>{if(document.activeElement===el&&vv.height>h0-80)show()},1400)});
+  document.addEventListener("focusout",()=>clearTimeout(t));vv.addEventListener("resize",()=>{if(vv.height<base-80)hide()});
+  document.addEventListener("click",e=>{const k=e.target.closest&&e.target.closest("[data-kb]");if(!k)return;const a=k.dataset.kb;if(a==="reload"){location.reload();return}if(a==="off"){off=true;try{localStorage.setItem("aot-kbhelp","off")}catch(_){}}hide()},true)})();
 /* the weigh-in log never grows past the figure: rows that don't fit are simply not shown (the graph has them all) */
 function wlogFit(){const box=$(".wlog");if(!box)return;const p=box.closest(".panel"),rows=[...box.children].filter(r=>r.classList.contains("r")&&!r.classList.contains("wnew"));rows.forEach(r=>{r.style.display="";r.style.borderBottomColor="";r.style.paddingTop=r.style.paddingBottom=""});box.style.gridTemplateRows="";box.style.alignContent="";const nw=box.querySelector(".wnew");if(nw)nw.style.paddingTop=nw.style.paddingBottom="";
   if(getComputedStyle(p).flexGrow==="0"){rows.forEach((r,i)=>{if(i>=5)r.style.display="none"});return}
