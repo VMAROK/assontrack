@@ -3145,11 +3145,14 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
 const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
-const APPV="84";
+const APPV="85";
 /* the weigh-in log never grows past the figure: rows that don't fit are simply not shown (the graph has them all) */
-function wlogFit(){const box=$(".wlog");if(!box)return;const p=box.closest(".panel"),rows=[...box.children].filter(r=>r.classList.contains("r")&&!r.classList.contains("wnew"));rows.forEach(r=>r.style.display="");
+function wlogFit(){const box=$(".wlog");if(!box)return;const p=box.closest(".panel"),rows=[...box.children].filter(r=>r.classList.contains("r")&&!r.classList.contains("wnew"));rows.forEach(r=>{r.style.display="";r.style.borderBottomColor="";r.style.paddingTop=r.style.paddingBottom=""});box.style.gridTemplateRows="";box.style.alignContent="";const nw=box.querySelector(".wnew");if(nw)nw.style.paddingTop=nw.style.paddingBottom="";
   if(getComputedStyle(p).flexGrow==="0"){rows.forEach((r,i)=>{if(i>=5)r.style.display="none"});return}
-  const lim=p.getBoundingClientRect().bottom-parseFloat(getComputedStyle(p).paddingBottom)+1;rows.forEach(r=>{if(r.getBoundingClientRect().bottom>lim)r.style.display="none"});const last=rows.filter(r=>r.style.display!=="none").pop();rows.forEach(r=>r.style.borderBottomColor="");if(last)last.style.borderBottomColor="transparent"}
+  const H=box.clientHeight,h0=nw?nw.offsetHeight:47,n=Math.max(2,Math.floor((H+1)/(h0*.84)));   // rows may tighten a little so the panel is filled edge to edge
+  rows.forEach((r,i)=>{if(i>=n-1)r.style.display="none"});const vis=rows.filter(r=>r.style.display!=="none");
+  if(vis.length>=n-1){box.style.gridTemplateRows=`repeat(${n},minmax(0,1fr))`;box.style.alignContent="stretch";[nw,...vis].forEach(r=>{if(r)r.style.paddingTop=r.style.paddingBottom="0"})}
+  const last=vis[vis.length-1];if(last)last.style.borderBottomColor="transparent"}
 {const o=render;render=function(){const r=o.apply(this,arguments);wlogFit();return r}}
 addEventListener("resize",()=>wlogFit());{const o=vSet;vSet=function(){return o()+`<p class="note" style="text-align:center;margin:16px 0 4px;opacity:.75">AssOnTrack version ${APPV}</p>`}}
 document.addEventListener("submit",e=>{
