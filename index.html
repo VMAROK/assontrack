@@ -1114,6 +1114,8 @@ aside{background:rgba(var(--tD),calc(.82*var(--go)))!important;backdrop-filter:b
 .wtr-svg{display:block;width:100%;height:auto;overflow:visible}.wtr-leg{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:6px}.wtr-leg span{display:inline-flex;align-items:center;gap:6px}.wtr-leg i{width:14px;height:3px;border-radius:2px;display:inline-block}.wtr-leg i.dash{background:repeating-linear-gradient(90deg,#4cc9ff 0 4px,transparent 4px 7px)}
 @media (max-width:620px){.wtr-sum{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .wflash{animation:wflash 1.6s ease-out}@keyframes wflash{0%{background:rgba(61,220,132,.28)}100%{background:transparent}}
+.bodytop{align-items:stretch}.bodytop>.stack{display:flex;flex-direction:column;min-height:0}.bodytop>.stack>.panel{flex:none}.bodytop>.stack>.wlogp{flex:1 1 0;height:0;min-height:128px;overflow:hidden;display:flex;flex-direction:column}.wlogp .wlog{flex:1;min-height:0;overflow:hidden;align-content:start}
+@media (max-width:760px){.bodytop>.stack>.wlogp{flex:none;height:auto;min-height:0}}
 .dtrack{position:relative;clip-path:inset(-30px 0)}.dtrack-in{position:absolute;inset:0;will-change:transform}.dpane{position:absolute!important;top:0;width:100%;margin:0!important;animation:none!important}
 .dfull{touch-action:pan-y;user-select:none;-webkit-user-select:none}.dfull input{user-select:text;-webkit-user-select:text}
 .dfull.fromR.slide{animation:dslR .38s cubic-bezier(.2,.85,.25,1) both}.dfull.fromL.slide{animation:dslL .38s cubic-bezier(.2,.85,.25,1) both}@keyframes dslR{from{opacity:0;transform:translateX(46px)}to{opacity:1;transform:none}}@keyframes dslL{from{opacity:0;transform:translateX(-46px)}to{opacity:1;transform:none}}
@@ -1848,10 +1850,10 @@ function vBody(){
     <div class="panel tile" style="--c:var(--magenta)">${ic("bolt")}<small>BMI</small><b>${bm.bmi==null?"--":bm.bmi.toFixed(1)}</b><em>${bm.bmi==null?"add height and weight":bm.cat}</em></div>
     <div class="panel tile" style="--c:var(--amber)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg><small>Change</small><b>${ch==null?"--":(ch>0?"+":"")+ch.toFixed(1)}</b><em>${ch==null?"needs two weigh-ins":g.unit+" since "+fmtDate(W[0].d)}</em></div>
   </div>
-  <div class="passtop figtop" style="margin-top:18px">${figurePanel()}
+  <div class="passtop figtop bodytop" style="margin-top:18px">${figurePanel()}
    <div class="stack">
     ${bmiPanel(d)}
-    <div class="panel"><div class="ph"><span>Weigh-in log</span><i>${W.length} total</i></div>
+    <div class="panel wlogp"><div class="ph"><span>Weigh-in log</span><i>${W.length} total</i></div>
      <div class="rows wlog"><form class="r wnew" id="wForm" style="--c:var(--violet)"><span class="dot"></span><div class="m"><label class="wd" title="Change the date"><span id="wDateTxt">${fmtDate(today())}</span><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg><input id="wDate" type="date" value="${today()}" max="${today()}" required aria-label="Date"></label></div><div class="v"><input id="wVal" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" aria-label="Weight in ${g.unit}"> ${g.unit}</div><button class="x wok" aria-label="Save weight" title="Save"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></form>${W.length?[...W].reverse().slice(0,30).map(p=>`<div class="r${wFlash===p.id&&Date.now()-wSavedAt<2500?" wflash":""}" style="--c:var(--violet)"><span class="dot"></span><div class="m"><div>${fmtDate(p.d)}${p.at&&W.filter(x=>x.d===p.d).length>1?`<small style="display:inline;margin-left:8px;color:var(--muted)">${new Date(p.at).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}</small>`:""}</div></div><div class="v">${p.v} ${g.unit}</div>${del("weights",p.id)}</div>`).join(""):`<div class="empty">No weigh-ins yet</div>`}</div></div>
    </div></div>${weightTrend(d)}`;
 }
@@ -3143,7 +3145,13 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
 const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
-const APPV="83";{const o=vSet;vSet=function(){return o()+`<p class="note" style="text-align:center;margin:16px 0 4px;opacity:.75">AssOnTrack version ${APPV}</p>`}}
+const APPV="84";
+/* the weigh-in log never grows past the figure: rows that don't fit are simply not shown (the graph has them all) */
+function wlogFit(){const box=$(".wlog");if(!box)return;const p=box.closest(".panel"),rows=[...box.children].filter(r=>r.classList.contains("r")&&!r.classList.contains("wnew"));rows.forEach(r=>r.style.display="");
+  if(getComputedStyle(p).flexGrow==="0"){rows.forEach((r,i)=>{if(i>=5)r.style.display="none"});return}
+  const lim=p.getBoundingClientRect().bottom-parseFloat(getComputedStyle(p).paddingBottom)+1;rows.forEach(r=>{if(r.getBoundingClientRect().bottom>lim)r.style.display="none"});const last=rows.filter(r=>r.style.display!=="none").pop();rows.forEach(r=>r.style.borderBottomColor="");if(last)last.style.borderBottomColor="transparent"}
+{const o=render;render=function(){const r=o.apply(this,arguments);wlogFit();return r}}
+addEventListener("resize",()=>wlogFit());{const o=vSet;vSet=function(){return o()+`<p class="note" style="text-align:center;margin:16px 0 4px;opacity:.75">AssOnTrack version ${APPV}</p>`}}
 document.addEventListener("submit",e=>{
   e.preventDefault();const f=e.target.id;
   if(f==="mealForm"){data.meals.push({id:uid(),d:today(),name:$("#mName").value.trim(),type:$("#mType").value,kcal:num("#mKcal")||0,protein:num("#mPro")||0});toast("Meal logged")}
