@@ -1068,6 +1068,7 @@ aside{background:rgba(var(--tD),calc(.82*var(--go)))!important;backdrop-filter:b
 .dfull .dback{top:8px;left:10px;padding:3px 9px 3px 6px;font-size:12px}.dfull .ddots{top:15px}.dfull .dmanage{top:5px}
 @media (max-width:760px){.dstack{--dph:228px}.dfull .dcomp{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto;align-content:center;gap:10px}.dc-stats>div{height:58px}.dc-stats b{font-size:14px}}.dback{position:absolute;left:12px;top:10px;z-index:2;display:inline-flex;align-items:center;gap:4px;font:inherit;font-size:12.5px;font-weight:700;color:rgba(var(--tL),1);background:rgba(var(--tL),.1);border:1px solid rgba(var(--tL),.4);border-radius:8px;padding:5px 10px 5px 7px;cursor:pointer}
 .dtiles.slide,.dfull.slide{animation:headslide .4s cubic-bezier(.2,.85,.25,1) both}
+.dtrack{position:relative;clip-path:inset(-30px 0)}.dtrack-in{position:absolute;inset:0;will-change:transform}.dpane{position:absolute!important;top:0;width:100%;margin:0!important;animation:none!important}
 .dfull{touch-action:pan-y;user-select:none;-webkit-user-select:none}.dfull input{user-select:text;-webkit-user-select:text}
 .dfull.fromR.slide{animation:dslR .38s cubic-bezier(.2,.85,.25,1) both}.dfull.fromL.slide{animation:dslL .38s cubic-bezier(.2,.85,.25,1) both}@keyframes dslR{from{opacity:0;transform:translateX(46px)}to{opacity:1;transform:none}}@keyframes dslL{from{opacity:0;transform:translateX(-46px)}to{opacity:1;transform:none}}
 .ddots{position:absolute;left:50%;top:19px;transform:translateX(-50%);display:flex;gap:6px;z-index:2}.ddots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.22)}.ddots i.on{background:rgba(var(--tL),1);box-shadow:0 0 6px rgba(var(--tL),.8)}
@@ -1434,10 +1435,24 @@ function budgetInfo(d){const B=d.budget||{},m=today().slice(0,7),ex=(d.expenses|
     stats:[[money(spent),"Spent"],[lim?money(Math.max(0,lim-spent)):"–","Left"],[ex.length,"Expenses"],[lim?money(Math.max(0,(lim-spent)/Math.max(1,dim-day+1))):"–","Per day left"]],ex}}
 const DCARDS={pass:"Passions",fit:"Fitness",diet:"Diet",budget:"Budget"};
 let dashOpen=null,dashShown="",dashAt=0,dashDir=0,dSw=null;
-function dashStep(n){const K=Object.keys(DCARDS),i=K.indexOf(dashOpen);if(i<0)return;dashDir=n;dashOpen=K[(i+n+K.length)%K.length];render()}
+let dT=null;
+function dashPaneHTML(key){const o=dashOpen,b=budOpen,s=dashShown,a=dashAt;dashOpen=key;budOpen=false;dashDir=0;dashShown=key?"f:"+key:"tiles";dashAt=-1e9;let h="";try{h=progressPanel(D())}finally{dashOpen=o;budOpen=b;dashShown=s;dashAt=a}return h}
+function dashTrack(){if(dT)return null;const cur=document.querySelector(".dstack>.dfull,.dstack>.dtiles");if(!cur)return null;const W=cur.offsetWidth,H=cur.offsetHeight,sc=(cur.getBoundingClientRect().width/W)||1;
+  const w=document.createElement("div");w.className="dtrack";w.style.height=H+"px";const inr=document.createElement("div");inr.className="dtrack-in";cur.replaceWith(w);w.appendChild(inr);cur.classList.remove("slide","fromL","fromR");cur.style.animation="none";inr.appendChild(cur);
+  return dT={w,inr,W,sc,step:W+18,x:0}}
+function dashPane(T,key,side){const t=document.createElement("div");t.innerHTML=dashPaneHTML(key);const el=t.firstElementChild;el.classList.add("dpane");el.style.left=side*T.step+"px";T.inr.appendChild(el)}
+function dashEnd(T,side,key){T.inr.style.transition="transform .36s cubic-bezier(.22,.8,.24,1)";T.inr.style.transform=`translate3d(${-side*T.step}px,0,0)`;
+  if(side){sfx("whoosh");dashOpen=key;budOpen=false;dashDir=0;dashShown=key?"f:"+key:"tiles";dashAt=-1e9}
+  let done=false;const fin=()=>{if(done)return;done=true;if(dT===T)dT=null;render()};T.inr.addEventListener("transitionend",fin,{once:true});setTimeout(fin,470)}
+function dashGo(key,side){const T=dashTrack();if(!T){if(dT)return;dashDir=0;dashOpen=key;render();return}dashPane(T,key,side);T.inr.getBoundingClientRect();dashEnd(T,side,key)}
+function dashStep(n){const K=Object.keys(DCARDS),i=K.indexOf(dashOpen);if(i<0)return;dashGo(K[(i+n+K.length)%K.length],n)}
 document.addEventListener("pointerdown",e=>{const z=e.target.closest&&e.target.closest("[data-dswipe]");if(!z||e.target.closest("input,select,textarea,button,a,label"))return;dSw={x:e.clientX,y:e.clientY,id:e.pointerId,t:performance.now()}});
-const dSwEnd=e=>{if(!dSw||e.pointerId!==dSw.id)return;const dx=e.clientX-dSw.x,dy=e.clientY-dSw.y;dSw=null;if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.4)dashStep(dx<0?1:-1)};
-document.addEventListener("pointerup",dSwEnd);document.addEventListener("pointercancel",e=>{if(dSw&&e.pointerId===dSw.id)dSw=null});
+document.addEventListener("pointermove",e=>{if(!dSw||e.pointerId!==dSw.id)return;const dx=e.clientX-dSw.x,dy=e.clientY-dSw.y;
+  if(!dSw.T){if(Math.abs(dx)<8||Math.abs(dx)<Math.abs(dy)*1.2)return;const T=dashTrack();if(!T){dSw=null;return}const K=Object.keys(DCARDS),i=K.indexOf(dashOpen);dSw.K=[K[(i+K.length-1)%K.length],K[(i+1)%K.length]];dashPane(T,dSw.K[0],-1);dashPane(T,dSw.K[1],1);dSw.T=T;dSw.x+=dx>0?8:-8}
+  const T=dSw.T;T.x=(e.clientX-dSw.x)/T.sc;T.inr.style.transform=`translate3d(${T.x}px,0,0)`;dSw.lx=dSw.px;dSw.lt=dSw.pt;dSw.px=e.clientX;dSw.pt=e.timeStamp});
+const dSwEnd=(e,cancel)=>{if(!dSw||e.pointerId!==dSw.id)return;const s=dSw;dSw=null;const T=s.T;if(!T)return;if(!T.w.isConnected){dT=null;return}
+  const v=s.lt!=null&&s.pt>s.lt?(s.px-s.lx)/(s.pt-s.lt):0,go=!cancel&&Math.abs(T.x)>6&&(Math.abs(T.x)>T.W*.22||(Math.abs(v)>.22&&v*T.x>0)),side=go?(T.x<0?1:-1):0;dashEnd(T,side,side?s.K[side>0?1:0]:dashOpen)};
+document.addEventListener("pointerup",e=>dSwEnd(e));document.addEventListener("pointercancel",e=>dSwEnd(e,true));
 function miniRing(pct,col){const r=22,C=2*Math.PI*r,f=pct==null?0:Math.max(0,Math.min(1,pct));return `<svg class="dt-ring" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="${r}" fill="none" stroke="rgba(76,170,255,.15)" stroke-width="5"/>${f>0?`<circle cx="28" cy="28" r="${r}" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${(f*C).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 28 28)" style="filter:drop-shadow(0 0 4px ${col})"/>`:""}<text x="28" y="33" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700" font-size="${pct==null?15:13.5}" fill="#e6eeff">${pct==null?"–":Math.round(pct*100)+"%"}</text></svg>`}
 let budOpen=false;
 function budgetManage(d){const o=budgetInfo(d),B=d.budget||{};
@@ -1459,7 +1474,7 @@ function weekAhead(d){const mon=monday(0);const days=DAYS.map((dn,i)=>{const dt=
 function dashTop(d){return `<div class="passtop dashtop">${figurePanel()}<div class="stack dstack">${progressPanel(d)}${weekAhead(d)}</div></div>`}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-dopen],[data-expdel]");if(!b)return;
   if(b.dataset.expdel){data.expenses=(data.expenses||[]).filter(x=>x.id!==b.dataset.expdel);render();save();return}
-  dashDir=0;dashOpen=b.dataset.dopen||null;render()});
+  const k=b.dataset.dopen||null;if(k===dashOpen)return;dashGo(k,k?1:-1)});
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-budopen]");if(!b)return;budOpen=!budOpen;render()});
 document.addEventListener("submit",e=>{const f=e.target.id;if(f!=="budForm"&&f!=="expForm")return;e.preventDefault();const numv=v=>{const n=parseFloat(String(v).replace(/[^0-9.]/g,""));return isFinite(n)?n:NaN};
   if(f==="budForm"){const v=numv($("#budIn").value);data.budget=Object.assign({},data.budget,{monthly:v>0?v:0});toast(v>0?"Budget set":"Budget cleared")}
