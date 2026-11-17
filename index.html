@@ -1091,6 +1091,8 @@ aside{background:rgba(var(--tD),calc(.82*var(--go)))!important;backdrop-filter:b
 .scan-line{position:absolute;left:8%;right:8%;top:50%;height:2px;background:rgba(var(--tL),1);box-shadow:0 0 12px rgba(var(--tL),.9);animation:scanln 1.6s ease-in-out infinite alternate;pointer-events:none;z-index:2}@keyframes scanln{from{transform:translateY(-46px)}to{transform:translateY(46px)}}
 .scan-box .note{margin:0}.scan-man{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.scan-man input{min-width:0;width:100%;box-sizing:border-box}
 @media (prefers-reduced-motion:reduce){.scan-line,.fd-spin{animation:none}}
+.hfit{display:grid;gap:7px;margin:10px 4px 0}.hfit-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;text-align:center;font-size:11px;font-weight:600;color:var(--muted);opacity:.6}.hfit-steps span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hfit-steps .past{opacity:.9}.hfit-steps .on{color:rgba(var(--tL),1);opacity:1;text-shadow:0 0 8px rgba(var(--tL),.6)}.hfit-steps:has(.on){opacity:1}.hfit-steps span:not(.on):not(.past){opacity:.55}
+.hfit-bar{height:5px;border-radius:99px;background:rgba(var(--lr),.18);overflow:hidden}.hfit-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,rgba(var(--tL),.55),rgba(var(--tL),1));box-shadow:0 0 8px rgba(var(--tL),.7);transition:width .5s}
 .dtrack{position:relative;clip-path:inset(-30px 0)}.dtrack-in{position:absolute;inset:0;will-change:transform}.dpane{position:absolute!important;top:0;width:100%;margin:0!important;animation:none!important}
 .dfull{touch-action:pan-y;user-select:none;-webkit-user-select:none}.dfull input{user-select:text;-webkit-user-select:text}
 .dfull.fromR.slide{animation:dslR .38s cubic-bezier(.2,.85,.25,1) both}.dfull.fromL.slide{animation:dslL .38s cubic-bezier(.2,.85,.25,1) both}@keyframes dslR{from{opacity:0;transform:translateX(46px)}to{opacity:1;transform:none}}@keyframes dslL{from{opacity:0;transform:translateX(-46px)}to{opacity:1;transform:none}}
@@ -1565,18 +1567,18 @@ function meter(label,v,goal,u,c){const p=goal?Math.min(v/goal,1):0;
 function vFuel(){
   const d=D(),g=d.goals,t=today(),tm=d.meals.filter(m=>m.d===t);
   const kcal=tm.reduce((s,m)=>s+(+m.kcal||0),0),pro=tm.reduce((s,m)=>s+(+m.protein||0),0);
-  return banner()+`<div class="grid cols2">
+  return banner()+`<div class="passtop figtop">${figurePanel()}
    <div class="stack">
     <div class="panel" style="--c:var(--magenta)"><div class="ph"><span>Today's totals</span><i>Today</i></div>
       <div class="stack" style="gap:16px">${meter("Calories",kcal,g.kcal,"kcal","var(--cyan)")}${meter("Protein",pro,g.protein,"g","var(--magenta)")}</div>
       <p class="note">${kcal<=g.kcal?n0(g.kcal-kcal)+" kcal remaining":n0(kcal-g.kcal)+" kcal over target"} · ${Math.max(g.protein-pro,0)}g protein to go${tm.some(m=>m.carbs!=null)?` · Carbs ${n0(tm.reduce((a,m)=>a+(+m.carbs||0),0))}g · Fat ${n0(tm.reduce((a,m)=>a+(+m.fat||0),0))}g`:""}</p></div>
     ${foodPanel()}
-   </div>
-   <div class="stack">
+   </div></div>
+   <div class="grid cols2" style="margin-top:18px">
     <div class="panel chart" style="--c:var(--magenta)"><div class="ph"><span>Calories by day</span><i>Last 7 days</i></div>${kcalBars(d)}</div>
     <div class="panel"><div class="ph"><span>Today's meals</span><i>${tm.length} logged</i></div>
      <div class="rows">${tm.length?tm.map(m=>`<div class="r" style="--c:var(--magenta)"><span class="dot"></span><div class="m"><div>${esc(m.name)}</div><small>${esc(m.type)}</small></div><div class="v">${n0(m.kcal)} kcal<small style="color:var(--violet)">${m.protein||0}g protein</small></div>${del("meals",m.id)}</div>`).join(""):`<div class="empty">No meals logged today</div>`}</div></div>
-   </div></div>`;
+   </div>`;
 }
 
 /* ---------- nutrition: my foods, recipes, food database, barcode ---------- */
@@ -1805,22 +1807,25 @@ function vBody(){
     <div class="panel tile" style="--c:var(--magenta)">${ic("bolt")}<small>Glutes</small><b>${lm?.glutes??"--"}</b><em>${g.len}${M.length>1&&M[0].glutes!=null&&lm.glutes!=null?" · "+(lm.glutes-M[0].glutes>0?"+":"")+(lm.glutes-M[0].glutes).toFixed(1):""}</em></div>
     <div class="panel tile" style="--c:var(--amber)">${ic("dumb")}<small>Waist · hips</small><b style="font-size:22px">${lm?.waist??"--"} · ${lm?.hips??"--"}</b><em>${g.len}</em></div>
   </div>
-  <div class="grid cols2" style="margin-top:18px">
+  <div class="passtop figtop" style="margin-top:18px">${figurePanel()}
    <div class="stack">
     <div class="panel chart" style="--c:var(--violet)"><div class="ph"><span>Weight by time</span><i>${g.unit}</i></div>${lineChart(W.map(p=>({d:p.d,v:p.v})),"#8fd8ff")}</div>
     <div class="panel"><div class="ph"><span>Log weight</span><i></i></div>
      <form class="f" id="wForm"><div class="f2"><label>Date<input id="wDate" type="date" value="${today()}" max="${today()}" required></label>
      <label>Weight (${g.unit})<input id="wVal" type="number" step="0.1" inputmode="decimal" required placeholder="${lw??150}"></label></div><button class="btn">Save weight</button></form></div>
-    <div class="panel"><div class="ph"><span>Weigh-ins</span><i>${W.length} total</i></div><div class="rows">${W.length?[...W].reverse().slice(0,8).map(p=>`<div class="r" style="--c:var(--violet)"><span class="dot"></span><div class="m"><div>${fmtDate(p.d)}</div></div><div class="v">${p.v} ${g.unit}</div>${del("weights",p.id)}</div>`).join(""):`<div class="empty">No weigh-ins yet</div>`}</div></div>
-   </div>
+   </div></div>
+  <div class="grid cols2" style="margin-top:18px">
    <div class="stack">
-    <div class="panel chart" style="--c:var(--magenta)"><div class="ph"><span>Glutes by time</span><i>${g.len} · widest point</i></div>${lineChart(M.filter(p=>p.glutes!=null).map(p=>({d:p.d,v:p.glutes})),"#2f7bff")}</div>
     <div class="panel"><div class="ph"><span>Log measurements</span><i>${g.len}</i></div>
      <form class="f" id="msForm"><label>Date<input id="msDate" type="date" value="${today()}" max="${today()}" required></label>
      <div class="f3"><label>Waist<input id="msWaist" type="number" step="0.1" inputmode="decimal" placeholder="${lm?.waist??28}"></label>
      <label>Hips<input id="msHips" type="number" step="0.1" inputmode="decimal" placeholder="${lm?.hips??38}"></label>
      <label>Glutes<input id="msGlutes" type="number" step="0.1" inputmode="decimal" placeholder="${lm?.glutes??40}"></label></div>
      <button class="btn mag">Save measurements</button></form></div>
+    <div class="panel"><div class="ph"><span>Weigh-ins</span><i>${W.length} total</i></div><div class="rows">${W.length?[...W].reverse().slice(0,8).map(p=>`<div class="r" style="--c:var(--violet)"><span class="dot"></span><div class="m"><div>${fmtDate(p.d)}</div></div><div class="v">${p.v} ${g.unit}</div>${del("weights",p.id)}</div>`).join(""):`<div class="empty">No weigh-ins yet</div>`}</div></div>
+   </div>
+   <div class="stack">
+    <div class="panel chart" style="--c:var(--magenta)"><div class="ph"><span>Glutes by time</span><i>${g.len} · widest point</i></div>${lineChart(M.filter(p=>p.glutes!=null).map(p=>({d:p.d,v:p.glutes})),"#2f7bff")}</div>
     <div class="panel"><div class="ph"><span>Measurement log</span><i>${M.length} total</i></div><div class="rows">${M.length?[...M].reverse().slice(0,8).map(p=>`<div class="r" style="--c:var(--magenta)"><span class="dot"></span><div class="m"><div>${fmtDate(p.d)}</div><small>Waist ${p.waist??"–"} · Hips ${p.hips??"–"}</small></div><div class="v">${p.glutes??"–"}<small>glutes</small></div>${del("meas",p.id)}</div>`).join(""):`<div class="empty">No measurements yet</div>`}</div></div>
    </div></div>`;
 }
@@ -1828,7 +1833,7 @@ function vTrain(){
   const d=D(),u=d.goals.unit,WO=byDate(d.workouts).reverse();
   const days=[13,12,11,10,9,8,7,6,5,4,3,2,1,0].map(o=>{const ds=dayStr(o);return {ds,n:d.workouts.filter(w=>w.d===ds).length}});
   const vol=d.workouts.filter(w=>(Date.now()-new Date(w.d+"T12:00"))/864e5<7).reduce((s,w)=>s+(w.sets||0)*(w.reps||0)*(w.kg||0),0);
-  return banner()+`<div class="grid cols2">
+  return banner()+`<div class="passtop figtop">${figurePanel()}
    <div class="stack">
     <div class="panel" style="--c:var(--lime)"><div class="ph"><span>Log an exercise</span><i></i></div>
      <form class="f" id="woForm"><label>Exercise<input id="woName" list="exList" required placeholder="Hip thrust" autocomplete="off"></label>
@@ -1838,10 +1843,9 @@ function vTrain(){
     <div class="panel" style="--c:var(--lime)"><div class="ph"><span>Workout days</span><i>Last 14 days</i></div>
      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px">${days.map(x=>`<div title="${fmtDate(x.ds)}: ${x.n}" style="aspect-ratio:1;border-radius:3px;border:1px solid ${x.n?"var(--lime)":"rgba(var(--lr),.3)"};background:${x.n?`rgba(46,230,197,${Math.min(.15+x.n*.18,.85)})`:"transparent"};${x.n?"box-shadow:0 0 10px rgba(46,230,197,.35)":""};display:grid;place-items:center;font-family:var(--mono);font-size:11px;color:${x.n?"#02030b":"var(--dim)"};max-width:100%">${new Date(x.ds+"T12:00").getDate()}</div>`).join("")}</div>
      <p class="note">Volume this week: ${n0(vol)} ${u} (sets × reps × load)</p></div>
-   </div>
-   <div class="panel" style="--c:var(--lime)"><div class="ph"><span>Training log</span><i>${d.workouts.length} total</i></div>
-    <div class="rows">${WO.length?WO.slice(0,25).map(w=>`<div class="r" style="--c:var(--lime)"><span class="dot"></span><div class="m"><div>${esc(w.name)}</div><small>${fmtDate(w.d)}${w.d===today()?" · Today":""}</small></div><div class="v">${w.sets}×${w.reps}<small>${w.kg?w.kg+" "+u:"bodyweight"}</small></div>${del("workouts",w.id)}</div>`).join(""):`<div class="empty">No exercises logged</div>`}</div></div>
-  </div>`;
+   </div></div>
+   <div class="panel" style="margin-top:18px;--c:var(--lime)"><div class="ph"><span>Training log</span><i>${d.workouts.length} total</i></div>
+    <div class="rows">${WO.length?WO.slice(0,25).map(w=>`<div class="r" style="--c:var(--lime)"><span class="dot"></span><div class="m"><div>${esc(w.name)}</div><small>${fmtDate(w.d)}${w.d===today()?" · Today":""}</small></div><div class="v">${w.sets}×${w.reps}<small>${w.kg?w.kg+" "+u:"bodyweight"}</small></div>${del("workouts",w.id)}</div>`).join(""):`<div class="empty">No exercises logged</div>`}</div></div>`;
 }
 /* ---------- hologram: blue body with a black fedora, black trench coat and black boots ---------- */
 const mirP=path=>path.replace(/([MLCQ])([^MLCQZ]*)/g,(m,c,args)=>c+args.trim().split(/[\s,]+/).map((v,i)=>i%2===0?String(200-parseFloat(v)):v).join(" ")+" ");
@@ -1934,18 +1938,29 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
     const SKIN=av.skin?new T.Color(av.skin).getHex():0xd8a07a,HAIR=av.hairColor?new T.Color(av.hairColor).getHex():woman?0x3a2418:0x22160f,PANTS=0x2a3550,TEE=0x3c4f6e;
     const trench=av.top==="trench",fed=av.hat==="fedora",boots=av.shoes==="boots";
     const skin=B(SKIN),pants=B(PANTS,true),tee=B(TEE),hair=B(HAIR,true);
-    const sw=man?1.32:woman?1.05:1.16,hipW=woman?1.28:man?1.08:1.15,lx=woman?.095:.105;
+    const F=av.fit!=null,m=F?Math.max(0,Math.min(1,+av.fit)):0;
+    const sw=(man?1.32:woman?1.05:1.16)*(1+m*(woman?.1:.2)),hipW=(woman?1.28:man?1.08:1.15)*(1+m*(woman?.1:0)),lx=woman?.095:.105;
+    const shorts=F?toon(0x1b2030):pants,legm=F?skin:pants,upm=F?skin:tee,chm=F?skin:tee;
     /* ---- body layer ---- */
-    [-1,1].forEach(s=>{const leg=cap(.085,.62,pants);leg.position.set(s*lx,.56,0);g.add(leg);
+    [-1,1].forEach(s=>{const leg=cap(.085*(1+m*.26),.62,legm);leg.position.set(s*lx,.56,0);g.add(leg);
+      if(F){const th=cap(.094*(1+m*.28),.13,shorts);th.position.set(s*lx,.81,0);g.add(th);
+        if(m>.2){const q=sph(.082*(.78+m*.5),skin);q.scale.set(1,1.9,1);q.position.set(s*lx,.64,.03);g.add(q);const cf=sph(.07*(.78+m*.5),skin);cf.scale.set(1,1.7,1);cf.position.set(s*lx,.36,-.035);g.add(cf)}
+        if(woman){const gl=sph(.105+.05*m,shorts);gl.scale.set(1,1,.92);gl.position.set(s*.085,.95,-.085);g.add(gl)}}
       const foot=sph(.075,skin);foot.scale.set(1,.5,1.6);foot.position.set(s*lx,.04,.05);g.add(foot)});
-    const hips=sph(.17,pants);hips.scale.set(hipW,.72,.85);hips.position.y=.98;g.add(hips);
+    const hips=sph(.17,shorts);hips.scale.set(hipW,.72,.85);hips.position.y=.98;g.add(hips);
     const torso=new T.Group();torso.position.y=1.3;g.add(torso);
-    const chest=cap(.17,.34,tee);chest.scale.set(sw,1,.78);torso.add(chest);
-    if(woman){const w=sph(.15,tee);w.scale.set(1.15,.9,.8);w.position.y=-.16;torso.add(w)}
-    const neck=new T.Mesh(new T.CylinderGeometry(.055,.06,.14,14),skin);neck.position.y=1.62;g.add(neck);
+    const chest=cap(.17,.34,chm);chest.scale.set(sw,1,.78);torso.add(chest);
+    if(F){if(woman){const b=cap(.176,.06,toon(0x2f7bff));b.scale.set(sw,1,.8);b.position.y=.115;torso.add(b)}
+      else{if(m>.12)[-1,1].forEach(s=>{const pc=sph(.072+.04*m,skin);pc.scale.set(1.2,.8,.55);pc.position.set(s*.074*sw,.1,.1);torso.add(pc)});
+        if(m>.45)for(let i=0;i<3;i++)[-1,1].forEach(s=>{const ab=sph(.03+.01*m,skin,12,8);ab.scale.set(1.05,.8,.5);ab.position.set(s*.04,-.04-i*.072,.128);torso.add(ab)});
+        if(m>.6)[-1,1].forEach(s=>{const tp=sph(.075*m,skin);tp.scale.set(1.7,.7,1);tp.position.set(s*.09,.3,-.01);torso.add(tp)})}
+      if(m>.3)[-1,1].forEach(s=>{const lt=sph(.03+.07*m,skin);lt.scale.set(.7,1.7,.8);lt.position.set(s*.145*sw,.02,-.02);torso.add(lt)})}
+    if(woman){const w=sph(.15,chm);w.scale.set(1.15,.9,.8);w.position.y=-.16;torso.add(w)}
+    const neck=new T.Mesh(new T.CylinderGeometry(.055*(1+m*.2),.06*(1+m*.4),.14,14),skin);neck.position.y=1.62;g.add(neck);
     const arms=[];[-1,1].forEach(s=>{const a=new T.Group();a.position.set(s*(.205*sw),1.53,0);a.rotation.z=s*.1;g.add(a);
-      const up=cap(.06,.22,tee);up.position.y=-.16;a.add(up);
-      const fo=cap(.053,.22,skin);fo.position.y=-.44;a.add(fo);
+      const up=cap(.06*(1+m*(woman?.28:.6)),.22,upm);up.position.y=-.16;a.add(up);
+      const fo=cap(.053*(1+m*(woman?.18:.35)),.22,skin);fo.position.y=-.44;a.add(fo);
+      if(F){const dl=sph(.068+m*(woman?.02:.045),skin);dl.position.y=-.02;a.add(dl);if(m>.25){const bi=sph(.05+.036*m*(woman?.5:1),skin);bi.scale.set(1,1.5,1);bi.position.set(0,-.15,.028);a.add(bi)}}
       const hand=sph(.06,skin);hand.scale.set(.9,1.15,.8);hand.position.y=-.62;a.add(hand);arms.push(a)});
     const head=new T.Group();head.position.y=1.84;g.add(head);
     const skull=sph(.2,skin,32,24);skull.scale.set(.93,1.1,.97);head.add(skull);
@@ -2119,7 +2134,7 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
   return {canvas,cam,set,start,stop,mount(el){host=el;if(canvas.parentNode!==el)el.appendChild(canvas);size();start()},renderNow(){size();last=0;frame(performance.now());cancelAnimationFrame(raf);raf=0}}}
 
 let H3=null,h3Load=null,h3Fail=false,holoPreview=null,holoPrevTimer=0;
-function h3Ensure(){if(h3Load||h3Fail)return;h3Load=import("./lib/three-r160.module.js").then(T=>{H3=h3Init(T);if(!H3)h3Fail=true;if(tab==="pass"||tab==="dash")render()}).catch(()=>{h3Fail=true})}
+function h3Ensure(){if(h3Load||h3Fail)return;h3Load=import("./lib/three-r160.module.js").then(T=>{H3=h3Init(T);if(!H3)h3Fail=true;if(tab!=="set")render()}).catch(()=>{h3Fail=true})}
 function commitScore(only){const d=D(),P=only||d.passions,W={Priority:3,Moderate:2,Bonus:1};let sw=0,ss=0;
   P.forEach(p=>{const sc0=schedStats(d,p),tk=taskStats(p),dn=sc0.done+tk.done,ms=sc0.missed+tk.missed,gm=(p.goal||0)*60,tot=d.sessions.filter(s=>s.pid===p.id&&!s.planned).reduce((a,s)=>a+(+s.mins||0),0);
     const pct=dn+ms>0?dn/(dn+ms):(gm?tot/gm:null);if(pct==null)return;const w=W[p.lvl]||2;sw+=w;ss+=w*Math.min(pct,1)});return sw?Math.round(ss/sw*100):null}
@@ -2128,10 +2143,11 @@ const realStage=()=>{const s=commitScore();return s==null?"holo":s>=65?"real":s>
 const pickedStage=()=>{const top=realStage(),c=avatarOf().stage;return c&&SRANK[c]<=SRANK[top]?c:top};
 const holoStage=()=>holoPreview||pickedStage();
 const HSTAGE={shadow:["Disturbed",40],holo:["Ghost",40],real:["Alive",65]};
-function holoView(){const a=avatarOf(),st=holoStage(),rs=realStage();
+function holoView(){const fit=figFit(),a=avatarOf(),st=fit?"real":holoStage(),rs=realStage();
   const bgw=a.bg&&allWalls().find(w=>w.id===a.bg),bgu=bgw?(bgw.live?thumbOf(bgw):bestSrc(bgw,false)):"";
-  const fig=H3?`<div class="holo holo3d${bgw?" hasbg":""}" ${bgw?`style="background-image:linear-gradient(rgba(4,8,20,.15),rgba(4,8,20,.5)),url('${bgu}')"`:""} data-h3 role="img" aria-label="${HSTAGE[st][0]} figure. Drag to spin.">${a.flag&&/^[a-z]{2}$/i.test(a.flag)?`<span class="avflagbadge st-${st}" aria-label="Flag">${String.fromCodePoint(...[...a.flag.toUpperCase()].map(c=>127397+c.charCodeAt(0)))}</span>`:""}</div>`:(h3Ensure(),hologram(a));
+  const fig=H3?`<div class="holo holo3d${bgw?" hasbg":""}" ${bgw?`style="background-image:linear-gradient(rgba(4,8,20,.15),rgba(4,8,20,.5)),url('${bgu}')"`:""} data-h3 role="img" aria-label="${fit?"Your body":HSTAGE[st][0]+" figure"}. Drag to spin.">${a.flag&&/^[a-z]{2}$/i.test(a.flag)?`<span class="avflagbadge st-${st}" aria-label="Flag">${String.fromCodePoint(...[...a.flag.toUpperCase()].map(c=>127397+c.charCodeAt(0)))}</span>`:""}</div>`:(h3Ensure(),hologram(a));
   const lock=`<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`;
+  if(fit){holoPreview=null;const L=fitLevel(D());return fig+`<div class="hfit"><div class="hfit-steps">${FITST.map((x,k)=>`<span class="${k===L.i?"on":k<L.i?"past":""}">${x[0]}</span>`).join("")}</div><div class="hfit-bar"><i style="width:${Math.max(3,L.m*100)}%"></i></div></div><p class="hcap">${L.cap}</p>`}
   holoPreview=null;const cap=rs==="real"?"Alive unlocked. Pick any look.":rs==="holo"?"Reach 65% to unlock Alive and clothing colors.":"Reach 40% to unlock Ghost.";
   return fig+`<div class="hstage" role="group" aria-label="Figure stages">${["shadow","holo","real"].filter(k=>SRANK[k]<=SRANK[rs]).map(k=>`<button data-hstage="${k}" aria-pressed="${st===k}" title="Use this look">${HSTAGE[k][0]}</button>`).join("")}</div><p class="hcap">${cap}</p>`}
 /* ---------- your own 3D model: stored in Supabase Storage, cached on the device ---------- */
@@ -2155,12 +2171,19 @@ let mdl={key:null,obj:null,busy:false,fail:false},mdlBusy=false;
 async function loadModel(m){const k=mKey(m);mdl={key:k,obj:null,busy:true,fail:false};
   try{const buf=await modelBuffer(m);if(!buf)throw new Error("nofile");const r=await parseModel(buf,m.ext);if(mdl.key!==k)return;mdl={key:k,obj:r.obj,clips:r.clips,busy:false}}
   catch(e){if(mdl.key===k){mdl={key:k,obj:null,busy:false,fail:true};toast(m.path==="local"&&!(await IDB.get(k))?"Your 3D model is on the device you added it from":"Couldn't load your 3D model")}}
-  if(tab==="pass")render()}
+  if(tab!=="set")render()}
+const figFit=()=>tab==="body"||tab==="train";
+const FITST=[["Start",0],["Lean",.25],["Toned",.5],["Built",.75]];
+function fitLevel(d){const days=new Set(d.workouts.filter(w=>{const a=(Date.now()-new Date(w.d+"T12:00"))/864e5;return a<14&&a>-1}).map(w=>w.d)).size,tr=Math.min(1,days/8),b=bodyInfo(d).pct,m=Math.round((b==null?tr:tr*.8+b*.2)*100)/100;
+  let i=0;FITST.forEach((x,k)=>{if(m>=x[1])i=k});const nx=FITST[i+1];let cap="Top shape. Keep training to hold it.";
+  if(nx){const need=Math.max(1,Math.ceil((b==null?nx[1]:(nx[1]-b*.2)/.8)*8-days));cap=`${days} training day${days===1?"":"s"} in the last 2 weeks. ${need} more to reach ${nx[0]}.`}
+  return {m,name:FITST[i][0],cap,days,i}}
+const fitAv=()=>{const a=avatarOf();a.hat=a.top=a.shoes="none";a.wings="";a.cmode="solid";a.fit=fitLevel(D()).m;return a};
 const figAv=()=>{const a=avatarOf();if(realStage()!=="real")a.cmode="figure";return a};
 function holoMount(){const el=document.querySelector("[data-h3]");if(!el||!H3){if(H3)H3.stop();return}
-  const a=figAv(),m=a.useModel&&a.model;
-  if(m){const k=mKey(m);if(mdl.key!==k)loadModel(m);if(mdl.key===k&&mdl.obj){mdl.mtl=m.mtl||null;H3.set(a,holoStage(),mdl);el.classList.remove("loading")}else{H3.set(a,holoStage());el.classList.toggle("loading",!mdl.fail)}}
-  else{H3.set(a,holoStage());el.classList.remove("loading")}
+  const fit=figFit(),a=fit?fitAv():figAv(),hs=fit?"real":holoStage(),m=a.useModel&&a.model;
+  if(m){const k=mKey(m);if(mdl.key!==k)loadModel(m);if(mdl.key===k&&mdl.obj){mdl.mtl=m.mtl||null;H3.set(a,hs,mdl);el.classList.remove("loading")}else{H3.set(a,hs);el.classList.toggle("loading",!mdl.fail)}}
+  else{H3.set(a,hs);el.classList.remove("loading")}
   H3.mount(el);if(heavyPaused)H3.stop()}
 function parseMtl(t){const out={};let cur=null;t.split(/\r?\n/).forEach(l=>{const a=l.trim().split(/\s+/);if(a[0]==="newmtl")cur=a.slice(1).join(" ");else if(a[0]==="Kd"&&cur)out[cur]=a.slice(1,4).map(Number)});return out}
 async function addModel(f,mtlFile){const ext=(f.name.split(".").pop()||"").toLowerCase();
@@ -2628,7 +2651,7 @@ function commitPanel(d,P,wk){
     <p>${score==null?"Add a schedule, a task or a weekly goal to a passion to start scoring.":"Average across your passions. Priority counts 3×, Moderate 2×, Bonus 1×."}</p>${lvl?`<div class="cs-lvs">${lvl}</div>`:""}</div></div>
     <div class="cs-stats"><div><b style="color:#3ddc84">${done}</b><small>On time</small></div><div><b class="${missed?"miss":""}">${missed}</b><small>Missed</small></div><div><b>${fmtH(wkM)}</b><small>This week</small></div><div><b>${stk}<span>d</span></b><small>Streak</small></div></div></div>`;
 }
-function figurePanel(){return `<div class="panel holopanel"><div class="ph"><span>Your figure</span><button class="addp gear avgear${avEdit?" on":""}" data-avedit aria-expanded="${avEdit}" aria-label="Customize" title="Customize"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button></div>${holoView()}<div class="avfoot">${avEdit?avEditor()+`<div class="av-actions"><button class="btn ghost" data-avcancel>Cancel</button><button class="btn" data-avsave>Save</button></div>`:""}</div></div>`}
+function figurePanel(){return `<div class="panel holopanel"><div class="ph"><span>${figFit()?"Your body":"Your figure"}</span><button class="addp gear avgear${avEdit?" on":""}" data-avedit aria-expanded="${avEdit}" aria-label="Customize" title="Customize"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button></div>${holoView()}<div class="avfoot">${avEdit?avEditor()+`<div class="av-actions"><button class="btn ghost" data-avcancel>Cancel</button><button class="btn" data-avsave>Save</button></div>`:""}</div></div>`}
 function vPass(){
   const d=D(),S=scoreAll(d),st=streak(d),wk=weekKey(today()),P=d.passions;
   const pn=id=>(P.find(p=>p.id===id)||{name:"Removed"}).name;
