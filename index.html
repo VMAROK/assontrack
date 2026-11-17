@@ -2436,8 +2436,32 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
         vec3 o=col*(.48+.1*n.y+.5*df+.16*df2)+vec3(sp+rim);
         if(hh>0.){float pu=.5+.5*sin(t*2.4);o+=col*(.10+.14*hh)*pu;}   /* trained this week: a soft glow, colours stay gentle */
         gl_FragColor=vec4(o,1.);}`});
+  /* Écorché anatomy model (CC BY-SA 4.0): every muscle a separate smooth mesh, coloured by muscle group */
+  let eco=null;const ecoMats={};
+  const ecoMat=(key,hex,hex2)=>{if(ecoMats[key])return ecoMats[key];const v=h=>new T.Vector3(parseInt(h.slice(1,3),16)/255,parseInt(h.slice(3,5),16)/255,parseInt(h.slice(5,7),16)/255);
+    return ecoMats[key]=new T.ShaderMaterial({uniforms:{t:U.t,col:{value:v(hex)},col2:{value:v(hex2||hex)},hh:{value:0},hh2:{value:0}},side:T.DoubleSide,
+    vertexShader:`attribute float cmix;varying float vM;varying vec3 vN;varying vec3 vV;void main(){vec4 w=modelMatrix*vec4(position,1.);vN=normalize(mat3(modelMatrix)*normal);vV=normalize(cameraPosition-w.xyz);vM=cmix;gl_Position=projectionMatrix*viewMatrix*w;}`,
+    fragmentShader:`uniform float t,hh,hh2;uniform vec3 col,col2;varying float vM;varying vec3 vN;varying vec3 vV;
+      void main(){vec3 n=normalize(vN),v=normalize(vV);if(dot(n,v)<0.)n=-n;vec3 L1=normalize(vec3(-.45,.6,.75)),L2=normalize(vec3(.6,.25,.5));vec3 c=mix(col,col2,step(.5,vM));float h=mix(hh,hh2,step(.5,vM));
+        float df=max(0.,dot(n,L1)),df2=max(0.,dot(n,L2)),sp=pow(max(0.,dot(reflect(-L1,n),v)),30.)*.3,rim=pow(1.-max(0.,dot(n,v)),3.)*.15;
+        vec3 o=c*(.5+.08*n.y+.48*df+.15*df2)+vec3(sp+rim);
+        if(h>0.){float pu=.5+.5*sin(t*2.4);o+=c*(.10+.14*h)*pu;}
+        gl_FragColor=vec4(o,1.);}`})};
+  function ecoPut(root,map){const wrap=new T.Group();root.updateMatrixWorld(true);const box=new T.Box3().setFromObject(root),sz=box.getSize(new T.Vector3()),ct=box.getCenter(new T.Vector3()),k=2.02/sz.y;
+    root.position.set(-ct.x,-box.min.y,-ct.z);wrap.scale.setScalar(k);wrap.add(root);root.updateMatrixWorld(true);
+    // how wide the six-pack is, so the sheet of the obliques that covers it can show the abs colour
+    let xw=0;root.traverse(o=>{if(o.isMesh&&map[(o.name||"").replace(/_/g," ").replace(/ \d+$/,"")]===7){const b=new T.Box3().setFromObject(o);xw=Math.max(xw,Math.abs(b.min.x+ct.x),Math.abs(b.max.x+ct.x))}});
+    const list=[];root.traverse(o=>{if(!o.isMesh)return;const nm=(o.name||"").replace(/_/g," ").replace(/ \d+$/,"");const c=map[nm]??map[(o.parent&&o.parent.name||"").replace(/_/g," ")]??-3;
+      if(c===-2){o.visible=false;return}o.frustumCulled=false;
+      if(c===8&&/oblique/i.test(nm)){const P=o.geometry.attributes.position,n=P.count,cm=new Float32Array(n),vv=new T.Vector3();for(let i=0;i<n;i++){vv.fromBufferAttribute(P,i).applyMatrix4(o.matrixWorld);cm[i]=Math.abs(vv.x+ct.x)<xw*.98?1:0}o.geometry.setAttribute("cmix",new T.BufferAttribute(cm,1));o.material=ecoMat("obl",ACOL[8],ACOL[7]);o.userData.g=[8,7]}
+      else{if(!o.geometry.attributes.cmix)o.geometry.setAttribute("cmix",new T.BufferAttribute(new Float32Array(o.geometry.attributes.position.count),1));o.material=c>=0?ecoMat("g"+c,ACOL[c]):c===-1?ecoMat("bone","#f2eee6"):ecoMat("flesh","#e7cdc2");o.userData.g=c>=0?[c,c]:null}
+      list.push(o)});
+    eco={wrap,list};figKey=""}
+  window.H3ecoPut=ecoPut;
+  function ecoFig(av){const heat=av.mheat||[];Object.entries(ecoMats).forEach(([k,m])=>{if(k==="obl"){m.uniforms.hh.value=heat[8]||0;m.uniforms.hh2.value=heat[7]||0}else if(k[0]==="g"){const i=+k.slice(1);m.uniforms.hh.value=m.uniforms.hh2.value=heat[i]||0}});
+    if(eco.wrap.parent)eco.wrap.parent.remove(eco.wrap);return {g:eco.wrap,torso:null,arms:[],head:new T.Group(),breathe:null}}
   function anatFig(av){const g=new T.Group(),S=.001227,heat=av.mheat||[];
-    anat.forEach(pt=>{const nv=pt.P.length/3,pos=new Float32Array(nv*3);for(let i=0;i<nv;i++){pos[i*3]=pt.P[i*3]*S;pos[i*3+1]=(pt.P[i*3+2]+12.7)*S;pos[i*3+2]=-(pt.P[i*3+1]+95)*S}
+    anat.forEach(pt=>{const nv=pt.P.length/3,pos=new Float32Array(nv*3);for(let i=0;i<nv;i++){pos[i*3]=pt.P[i*3]/8000;pos[i*3+1]=pt.P[i*3+1]/8000;pos[i*3+2]=pt.P[i*3+2]/8000}
       const geo=new T.BufferGeometry();geo.setAttribute("position",new T.BufferAttribute(pos,3));geo.setIndex(new T.BufferAttribute(pt.I,1));geo.computeVertexNormals();
       const mt=pt.gi<0?anatMat("#f1f2f5",0):anatMat(ACOL[pt.gi],heat[pt.gi]||0);if(pt.gi<0){mt.polygonOffset=true;mt.polygonOffsetFactor=3;mt.polygonOffsetUnits=6}   // the body sits behind the muscles
       const m=new T.Mesh(geo,mt);m.renderOrder=pt.gi<0?1:2;g.add(m)});
@@ -2463,7 +2487,7 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
       else if(q[1]<10)dd-=S*.12*(1-q[1]/10);
       if(dd){P[i*3]+=N[i*3]*dd;P[i*3+1]+=N[i*3+1]*dd;P[i*3+2]+=N[i*3+2]*dd}}
     g.attributes.position.needsUpdate=true;g.computeVertexNormals();g.setAttribute("mC",new T.BufferAttribute(c,3));return g}
-  function fitFig(av){if(av.mheat&&anat)return anatFig(av);const D=fitData[av.fitMesh],m=Math.max(0,Math.min(1,+av.fit||0)),n=D.n,pos=new Float32Array(n*3),k=1/8000,w=av.fitW;let fa,mu,th=0;
+  function fitFig(av){if(av.mheat&&eco)return ecoFig(av);if(av.mheat&&anat)return anatFig(av);const D=fitData[av.fitMesh],m=Math.max(0,Math.min(1,+av.fit||0)),n=D.n,pos=new Float32Array(n*3),k=1/8000,w=av.fitW;let fa,mu,th=0;
     if(w==null){fa=m<.5?(1-2*m)*.8:0;mu=m>.5?2*m-1:0}else{mu=m;fa=Math.max(0,w)*(1-.45*m);th=Math.max(0,-w)}   // BMI sets the weight, training sets the muscle
     for(let i=0;i<n*3;i++)pos[i]=(D.a[i]+D.m[i]*mu+D.f[i]*fa+D.th[i]*th)*k;
     const sculpted=!!(av.mheat&&musMap&&musMap.n===n);
@@ -2608,7 +2632,7 @@ function holoView(){const fit=figFit(),a=avatarOf(),st=fit?"real":holoStage(),rs
   const bgw=a.bg&&allWalls().find(w=>w.id===a.bg),bgu=bgw?(bgw.live?thumbOf(bgw):bestSrc(bgw,false)):"";
   const fig=H3?`<div class="holo holo3d${bgw?" hasbg":""}" ${bgw?`style="background-image:linear-gradient(rgba(4,8,20,.15),rgba(4,8,20,.5)),url('${bgu}')"`:""} data-h3 role="img" aria-label="${fit?"Your body":HSTAGE[st][0]+" figure"}. Drag to spin.">${a.flag&&/^[a-z]{2}$/i.test(a.flag)?`<span class="avflagbadge st-${st}" aria-label="Flag">${String.fromCodePoint(...[...a.flag.toUpperCase()].map(c=>127397+c.charCodeAt(0)))}</span>`:""}</div>`:(h3Ensure(),hologram(a));
   const lock=`<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`;
-  if(fit){holoPreview=null;const L=fitLevel(D());return fig+`<div class="hfit"><div class="hfit-steps">${FITST.map((x,k)=>`<span class="${k===L.i?"on":k<L.i?"past":""}">${x[0]}</span>`).join("")}</div><div class="hfit-bar"><i style="width:${Math.max(3,L.m*100)}%"></i></div></div><p class="hcap">${(bt=>bt?`<b style="color:rgba(var(--tL),1)">${bt}</b> · `:"")(bodyType(bmiInfo(D()).bmi,L.m))}${L.cap}</p>${tab==="train"?(h=>`<div class="hmus">${MUS.map(([k,nm],i)=>`<span class="${h[i]?"on":""}"><i style="background:${MUSC[i]}"></i>${nm.replace(" (lats)","")}</span>`).join("")}</div><p class="hmus-n">${h.some(v=>v)?"Glowing = trained this week.":"Every muscle group has its own colour. The ones you train this week glow."}</p><p class="hmus-c">3D anatomy: <a href="https://lifesciencedb.jp/bp3d/" target="_blank" rel="noopener">BodyParts3D</a> © DBCLS, <a href="https://creativecommons.org/licenses/by-sa/2.1/jp/deed.en" target="_blank" rel="noopener">CC BY-SA 2.1 JP</a></p>`)(musHeat(D())):""}`}
+  if(fit){holoPreview=null;const L=fitLevel(D());return fig+`<div class="hfit"><div class="hfit-steps">${FITST.map((x,k)=>`<span class="${k===L.i?"on":k<L.i?"past":""}">${x[0]}</span>`).join("")}</div><div class="hfit-bar"><i style="width:${Math.max(3,L.m*100)}%"></i></div></div><p class="hcap">${(bt=>bt?`<b style="color:rgba(var(--tL),1)">${bt}</b> · `:"")(bodyType(bmiInfo(D()).bmi,L.m))}${L.cap}</p>${tab==="train"?(h=>`<div class="hmus">${MUS.map(([k,nm],i)=>`<span class="${h[i]?"on":""}"><i style="background:${MUSC[i]}"></i>${nm.replace(" (lats)","")}</span>`).join("")}</div><p class="hmus-n">${h.some(v=>v)?"Glowing = trained this week.":"Every muscle group has its own colour. The ones you train this week glow."}</p><p class="hmus-c">3D anatomy: <a href="https://github.com/charleeh/ecorche" target="_blank" rel="noopener">Écorché</a>, CC BY-SA 4.0, based on BodyParts3D © DBCLS and Z-Anatomy by Gauthier Kervyn</p>`)(musHeat(D())):""}`}
   holoPreview=null;const mN=missList(D()).length,scN=commitScore(),cap=(rs==="real"?"Alive unlocked. Pick any look.":rs==="holo"?"Reach 65% to unlock Alive and clothing colors.":"Reach 40% to unlock Ghost.")+(scN==null?"":`<br><button class="hwhy" data-missopen>${scN}% now${mN?` · ${mN} missed`:""} · see why</button>`);
   return fig+`<div class="hstage" role="group" aria-label="Figure stages">${["shadow","holo","real"].filter(k=>SRANK[k]<=SRANK[rs]).map(k=>`<button data-hstage="${k}" aria-pressed="${st===k}" title="Use this look">${HSTAGE[k][0]}</button>`).join("")}</div><p class="hcap">${cap}</p>`}
 /* ---------- your own 3D model: stored in Supabase Storage, cached on the device ---------- */
@@ -2669,7 +2693,10 @@ function fitLevel(d){const days=new Set(d.workouts.filter(w=>{const a=(Date.now(
 const fitAv=()=>{const a=avatarOf();a.hat=a.top=a.shoes="none";a.wings="";a.cmode="solid";a.fit=fitLevel(D()).m;if(tab==="train")a.mheat=musHeat(D());const bm=bmiInfo(D());a.fitW=bm.bmi==null?null:Math.round(bmiW(bm.bmi)*40)/40;return a};
 const figAv=()=>{const a=avatarOf();if(realStage()!=="real")a.cmode="figure";return a};
 const fitLoad={};
-let musLoad=null;function musEnsure(){if(musLoad||!window.H3anatPut)return;musLoad=fetch("lib/anat-3.txt").then(r=>{if(!r.ok)throw 0;return r.text()}).then(t=>{const q=atob(t.trim()),u=new Uint8Array(q.length);for(let i=0;i<q.length;i++)u[i]=q.charCodeAt(i);return new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer()}).then(b=>{window.H3anatPut(b);if(figFit())holoMount()}).catch(()=>{setTimeout(()=>{musLoad=null},6000)})}
+let musLoad=null;function musEnsure(){if(musLoad||!window.H3ecoPut)return;
+  musLoad=Promise.all([import("./lib/jsm/loaders/GLTFLoader.js"),import("./lib/jsm/libs/meshopt_decoder.module.js"),fetch("lib/ecorche-map-1.json").then(r=>{if(!r.ok)throw 0;return r.json()})])
+    .then(([{GLTFLoader},{MeshoptDecoder},map])=>new Promise((ok,no)=>{const l=new GLTFLoader();l.setMeshoptDecoder(MeshoptDecoder);l.load("lib/ecorche-1.glb",g=>ok([g.scene,map]),undefined,no)}))
+    .then(([root,map])=>{window.H3ecoPut(root,map);if(figFit())holoMount()}).catch(e=>{console.warn("anatomy model",e);setTimeout(()=>{musLoad=null},8000)})}
 function fitEnsure(g){if(tab==="train")musEnsure();if(!H3||H3.fitHas(g)||fitLoad[g])return;fitLoad[g]=fetch("lib/body2-"+g+".txt").then(r=>{if(!r.ok)throw 0;return r.text()}).then(t=>{const q=atob(t.trim()),u=new Uint8Array(q.length);for(let i=0;i<q.length;i++)u[i]=q.charCodeAt(i);H3.fitPut(g,u.buffer);if(figFit())holoMount()}).catch(()=>{setTimeout(()=>{fitLoad[g]=null;if(figFit())holoMount()},6000)})}
 function holoMount(){const el=document.querySelector("[data-h3]");if(!el||!H3){if(H3)H3.stop();return}
   const fit=figFit(),a=fit?fitAv():figAv();let hs=fit?"real":holoStage();
@@ -3717,7 +3744,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="118";
+const APPV="119";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
