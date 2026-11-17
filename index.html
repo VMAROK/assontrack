@@ -2938,7 +2938,8 @@ const thumbOf=w=>w.thumb||`wp/t/${w.id}.jpg`;
 const wallOf=()=>allWalls().find(w=>w.id===((data.profile||{}).wallpaper))||WALLS[0];
 const ctxPass=()=>tab==="pass"&&selP&&D().passions.find(x=>x.id===selP)||null;
 const ctxCat=()=>{if(tab!=="pass")return null;const p=ctxPass(),cid=p?p.cat:(passCat!=="all"&&passCat!=="none"?passCat:null);return cid&&(D().categories||[]).find(c=>c.id===cid)||null};
-const passWall=()=>{const p=ctxPass(),c=ctxCat(),id=(p&&p.wall)||(c&&c.wall);return id&&allWalls().find(w=>w.id===id)||null};
+const mainOnly=()=>!!(data.profile||{}).mainOnly;   // use the main theme everywhere; category and passion themes are kept but ignored
+const passWall=()=>{if(mainOnly())return null;const p=ctxPass(),c=ctxCat(),id=(p&&p.wall)||(c&&c.wall);return id&&allWalls().find(w=>w.id===id)||null};
 let themeOpen=false;
 let wallShown=null;
 const KALEI=new Set(["hyperspace","portal","royalgold","gilded","inferno","deepdub","pearl","chrome"]);
@@ -3032,7 +3033,7 @@ document.addEventListener("visibilitychange",soundApply);["blur","focus","pagesh
 addEventListener("load",()=>setTimeout(()=>{soundArmed=true;try{soundApply()}catch(e){}},700));
 document.addEventListener("input",e=>{if(e.target.id!=="sndVol")return;const v=+e.target.value;data.profile=Object.assign({},data.profile,{soundVol:v});const o=$("#sndVolVal");if(o)o.textContent=v+"%";if(AC&&acOut){const t=AC.currentTime;acOut.gain.cancelScheduledValues(t);acOut.gain.setTargetAtTime(soundOn()?v/100*.9:0,t,.08)}});
 document.addEventListener("change",e=>{if(e.target.id==="sndVol")save()});
-const wallBlurOf=()=>{const c=ctxCat();return c&&c.wallBlur!=null?Math.max(0,Math.min(3,+c.wallBlur||0)):mainBlur()};
+const wallBlurOf=()=>{if(mainOnly())return mainBlur();const c=ctxCat();return c&&c.wallBlur!=null?Math.max(0,Math.min(3,+c.wallBlur||0)):mainBlur()};
 function applyWallBlur(){const k=wallBlurOf(),r=document.documentElement.style;r.setProperty("--wblur",[0,6,14,28][k]+"px");r.setProperty("--wbs",[1,1.03,1.06,1.12][k])}
 function applyWall(){const w=passWall()||wallOf(),spin=animOn()&&KALEI.has(w.id),key=w.id+(spin?"*":"");if(wallShown===key)return;wallShown=key;
   const L=[$("#bgimg"),$("#bgimg2")];if(!L[0]||!L[1])return;const tok=++wallTok,sh=document.querySelector(".bgshade"),src=bestSrc(w,spin);
@@ -3056,6 +3057,7 @@ function wallPanel(){const cur=wallOf().id;return `<div class="panel wallp"><div
   ${soundSet()?`<div class="glass-row snd-row"><span>Quiet</span><input type="range" id="sndVol" min="0" max="100" value="${Math.round(soundVol()*100)}" aria-label="Ambient sound volume"><span>Loud</span><b id="sndVolVal">${Math.round(soundVol()*100)}%</b><span></span></div>`:""}
   <div class="anim-row"><div><b>Sound effects</b><small>A console blip on buttons, a whoosh when panels slide, and a wobbly tone on sliders.</small></div><div class="seg2" role="group" aria-label="Sound effects"><button data-sfx="1" aria-pressed="${(data.profile||{}).sfx!==false}">On</button><button data-sfx="0" aria-pressed="${(data.profile||{}).sfx===false}">Off</button></div></div>
   <div class="anim-row mixrow"><div><b>With your own music</b><small>${({mix:"Both play: the app's sound mixes in under your music or podcast without pausing it.",app:"App first: the app's sound takes over and pauses other audio, for full immersion.",music:"My music first: the app stays silent so nothing touches what you're playing."})[audioMix()]}${navigator.audioSession?"":" Your browser always plays both together, so Both play and App first sound the same here."}</small></div><div class="seg2" role="group" aria-label="With your own music">${[["mix","Both play"],["app","App first"],["music","My music first"]].map(([k,l])=>`<button data-audiomix="${k}" aria-pressed="${audioMix()===k}">${l}</button>`).join("")}</div></div>
+  <div class="anim-row"><div><b>Main theme everywhere</b><small>${mainOnly()?"On: every screen uses your main wallpaper and colors. Your category and passion themes are kept, and come back when you turn this off.":"Off: a category or passion with its own theme shows it when you open it. Turn this on to switch them all off at once without losing them."}</small></div><div class="seg2" role="group" aria-label="Main theme everywhere"><button data-mainonly="1" aria-pressed="${mainOnly()}">On</button><button data-mainonly="0" aria-pressed="${!mainOnly()}">Off</button></div></div>
   <div class="anim-row"><div><b>Blur the background</b><small>Softens the whole wallpaper behind everything, on every screen.</small></div><div class="seg2" role="group" aria-label="Blur the background">${[[0,"Off"],[1,"Light"],[2,"Medium"],[3,"Heavy"]].map(([k,l])=>`<button data-wallblur="${k}" aria-pressed="${mainBlur()===k}">${l}</button>`).join("")}</div></div>
   <div class="anim-row"><div><b>Animate kaleidoscopes</b><small>They slowly turn and breathe. Animated ones can take a moment longer to load and use a little more battery.</small></div><div class="seg2" role="group" aria-label="Animate kaleidoscopes"><button data-animwall="1" aria-pressed="${animOn()}">On</button><button data-animwall="0" aria-pressed="${!animOn()}">Off</button></div></div></div>`}
 async function shrinkImage(file,max,q){const url=URL.createObjectURL(file);try{const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=url});
@@ -3078,7 +3080,7 @@ function sampleColor(src){if(wallColor.has(src))return Promise.resolve(wallColor
   for(let j=0;j<d.length;j+=4){const r=d[j]/255,g=d[j+1]/255,b=d[j+2]/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,dl=mx-mn;if(!dl)continue;const s=dl/(1-Math.abs(2*l-1));let h=mx===r?((g-b)/dl)%6:mx===g?(b-r)/dl+2:(r-g)/dl+4;h=h*60;if(h<0)h+=360;const w=s*s*(l>.1&&l<.88?1:.15);vx+=Math.cos(h*Math.PI/180)*w;vy+=Math.sin(h*Math.PI/180)*w;sw+=w;ss+=s*w}
   let h=Math.atan2(vy,vx)*180/Math.PI;if(h<0)h+=360;const res=sw?{h,s:Math.max(.08,Math.min(.75,(ss/sw)*Math.min(1,Math.hypot(vx,vy)/sw*1.4)))}:{h:220,s:.08};wallColor.set(src,res);ok(res)}catch(_){ok({h:223,s:.69})}};i.onerror=()=>ok({h:223,s:.69});i.src=src})}
 let toneNow=.5;function setTint(h,s,l=.27){const r=document.documentElement.style,q=toneNow,sf=.4+1.2*q,lf=1.45-.9*q;r.setProperty("--tA",hsl2rgb(h,Math.min(s*sf,.95),l*lf));r.setProperty("--tD",hsl2rgb(h,Math.min(1,s*.75*sf),.075*lf));r.setProperty("--tX",hsl2rgb(h,Math.min(1,s*.8*sf),.045*lf));const tl=hsl2rgb(h,Math.max(.35,Math.min(1,s*1.4)),.66);r.setProperty("--tL",tl);const lines=lookOf().lines!==false;r.setProperty("--lr",lines?tl:"76,170,255");r.setProperty("--lrd",lines?hsl2rgb(h,Math.min(.7,s),.27):"27,42,99");r.setProperty("--tB",hsl2rgb(h,Math.min(.65,s),.59))}
-const passLook=()=>{const p=ctxPass(),c=ctxCat(),o=Object.assign({},c&&c.look||{},p&&p.look||{});return Object.keys(o).length?o:null};
+const passLook=()=>{if(mainOnly())return null;const p=ctxPass(),c=ctxCat(),o=Object.assign({},c&&c.look||{},p&&p.look||{});return Object.keys(o).length?o:null};
 const effLook=()=>{const g=lookOf(),pl=passLook()||{};return {color:pl.color||g.color,glass:pl.glass??g.glass,trans:pl.trans??g.trans,tone:pl.tone??g.tone??50}};
 function applyLook(tmp){tmp=typeof tmp==="number"?{glass:tmp}:(tmp||{});const L=effLook(),g=(tmp.glass??L.glass)/100,t=(tmp.trans??L.trans)/100,r=document.documentElement.style;toneNow=(tmp.tone??L.tone)/100;r.setProperty("--go",(1-t*.88).toFixed(3));r.setProperty("--gb",(4+g*24).toFixed(1)+"px");
   if(L.color==="auto"){const w=passWall()||wallOf();sampleColor(w.src).then(c=>{if(effLook().color==="auto"&&(passWall()||wallOf()).src===w.src)setTint(c.h,c.s)})}else{const P=LOOKS.find(x=>x.id===L.color)||LOOKS[0];setTint(P.h,P.s,P.l)}}
@@ -3267,6 +3269,7 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
   else if(b.dataset.sfx!==undefined){data.profile=Object.assign({},data.profile,{sfx:b.dataset.sfx==="1"});soundArmed=true;soundApply();render();save()}
   else if(b.dataset.sound!==undefined){data.profile=Object.assign({},data.profile,{sound:b.dataset.sound==="1"});soundArmed=true;soundApply();render();save()}
   else if(b.dataset.wallblur!==undefined){data.profile=Object.assign({},data.profile,{wallBlur:+b.dataset.wallblur});render();save()}
+  else if(b.dataset.mainonly!==undefined){data.profile=Object.assign({},data.profile,{mainOnly:b.dataset.mainonly==="1"});wallShown=null;render();save();toast(mainOnly()?"Main theme is on everywhere":"Category and passion themes are back")}
   else if(b.dataset.animwall!==undefined){data.profile=Object.assign({},data.profile,{animWall:b.dataset.animwall==="1"});render();save()}
   else if(b.dataset.lines!==undefined){data.profile=Object.assign({},data.profile,{look:Object.assign(lookOf(),{lines:b.dataset.lines==="1"})});render();save()}
   else if(b.dataset.catmgr!==undefined){if(catGuard(()=>{const n=document.querySelector("[data-catmgr]");n&&catMgr&&n.click()}))return;catRevert();catMgr=!catMgr;catEditing=null;catDelArm=null;catThemeOpen=false;render();if(catMgr&&!cats().length){const i=$("#catAddIn");i&&i.focus()}}
@@ -3282,7 +3285,7 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
   else if(b.dataset.pglassreset!==undefined){const p=data.passions.find(x=>x.id===selP);if(p&&p.look){delete p.look.glass;if(!Object.keys(p.look).length)delete p.look;render();save()}}
   else if(b.dataset.look){data.profile=Object.assign({},data.profile,{look:Object.assign(lookOf(),{color:b.dataset.look})});render();save();toast(b.dataset.look==="auto"?"Boxes match your wallpaper":(LOOKS.find(x=>x.id===b.dataset.look)||{}).name+" boxes")}
   else if(b.dataset.walldel){if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="Remove?";b.classList.add("armed");return}const id=b.dataset.walldel;data.customWalls=(data.customWalls||[]).filter(c=>c.id!==id);if((data.profile||{}).wallpaper===id)data.profile.wallpaper="alpine";data.passions.forEach(p=>{if(p.wall===id)delete p.wall});render();save();toast("Wallpaper removed")}
-  else if(b.dataset.theme!==undefined){themeOpen=!themeOpen;render()}
+  else if(b.dataset.theme!==undefined){themeOpen=!themeOpen;render();if(themeOpen&&mainOnly())toast("Main theme everywhere is on in Settings, so this theme is hidden for now")}
   else if(b.dataset.pwall!==undefined){const p=data.passions.find(x=>x.id===selP);if(p){if(b.dataset.pwall)p.wall=b.dataset.pwall;else delete p.wall;themeOpen=false;render();save();toast(p.wall?p.name+" · "+allWalls().find(w=>w.id===p.wall).name+" theme":p.name+" uses the main wallpaper")}}
   else if(b.dataset.wall){data.profile=Object.assign({},data.profile,{wallpaper:b.dataset.wall});render();save();toast(wallOf().name+" wallpaper")}
   else if(b.dataset.addsub){addingSub=addingSub===b.dataset.addsub?null:b.dataset.addsub;render();if(addingSub){const i=$("#sbT");i&&i.focus()}}
@@ -3351,7 +3354,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="92";
+const APPV="93";
 /* iPhone sometimes refuses to bring up the keyboard (worst in home-screen apps). Notice when a tapped field gets no keyboard and offer a way out. */
 (function(){const vv=window.visualViewport,coarse=(()=>{try{return matchMedia("(pointer:coarse)").matches}catch(e){return false}})();if(!vv||!coarse)return;let base=vv.height,t=0,off=false;try{off=localStorage.getItem("aot-kbhelp")==="off"}catch(e){}
   addEventListener("orientationchange",()=>setTimeout(()=>{base=vv.height},600));
