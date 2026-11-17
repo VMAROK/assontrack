@@ -3037,7 +3037,7 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 ["pointerdown","pointerup","touchend","click","keydown"].forEach(ev=>document.addEventListener(ev,()=>{const first=!soundArmed;soundArmed=true;if(first||!AC||AC.state!=="running"||(soundOn()&&!ambBuilt))soundApply()},{capture:true,passive:true}));
 document.addEventListener("visibilitychange",soundApply);["blur","focus","pageshow","pagehide"].forEach(ev=>addEventListener(ev,()=>soundApply()));
 // try to start on its own as soon as the app opens; browsers that allow it will play straight away, the rest start on the first touch
-addEventListener("load",()=>setTimeout(()=>{soundArmed=true;try{soundApply()}catch(e){}},700));
+addEventListener("load",()=>setTimeout(()=>{if(soundArmed||!(soundOn()||sfxOn()))return;const c=acGet();if(!c)return;const ok=()=>{if(c.state==="running"&&!soundArmed){soundArmed=true;soundApply()}};try{const pr=c.resume&&c.resume();pr&&pr.then(ok,()=>{})}catch(e){}setTimeout(ok,700)},700));
 document.addEventListener("input",e=>{if(e.target.id!=="sndVol")return;const v=+e.target.value;data.profile=Object.assign({},data.profile,{soundVol:v});const o=$("#sndVolVal");if(o)o.textContent=v+"%";if(AC&&acOut){const t=AC.currentTime;acOut.gain.cancelScheduledValues(t);acOut.gain.setTargetAtTime(soundOn()?v/100*.9:0,t,.08)}});
 document.addEventListener("change",e=>{if(e.target.id==="sndVol")save()});
 const wallBlurOf=()=>{if(mainOnly())return mainBlur();const c=ctxCat();return c&&c.wallBlur!=null?Math.max(0,Math.min(3,+c.wallBlur||0)):mainBlur()};
@@ -3361,7 +3361,15 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="95";
+const APPV="96";
+/* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
+(function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
+  async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
+      let tried=0;try{tried=+sessionStorage.getItem("aot-upd")||0}catch(e){}if(tried>=v)return;                       // already reloaded for this one: don't loop if the server is still catching up
+      const go=async()=>{const el=document.activeElement;if(typeof typing==="function"&&typing()&&el&&String(el.value||"").trim()){setTimeout(go,2000);return}   // never yank the page away mid-typing
+        try{sessionStorage.setItem("aot-upd",String(v))}catch(e){}
+        try{await Promise.race([(async()=>{const reg=await navigator.serviceWorker.getRegistration();reg&&await reg.update()})(),new Promise(r=>setTimeout(r,1800))])}catch(e){}location.reload()};go()}catch(e){}finally{busy=false}}
+  addEventListener("load",()=>setTimeout(check,1500));document.addEventListener("visibilitychange",()=>setTimeout(check,400));addEventListener("pageshow",()=>setTimeout(check,400));addEventListener("focus",()=>setTimeout(check,400));setInterval(check,180000)})();
 /* iPhone sometimes refuses to bring up the keyboard (worst in home-screen apps). Notice when a tapped field gets no keyboard and offer a way out. */
 (function(){const vv=window.visualViewport,coarse=(()=>{try{return matchMedia("(pointer:coarse)").matches}catch(e){return false}})();if(!vv||!coarse)return;let base=vv.height,t=0,off=false;try{off=localStorage.getItem("aot-kbhelp")==="off"}catch(e){}
   addEventListener("orientationchange",()=>setTimeout(()=>{base=vv.height},600));
