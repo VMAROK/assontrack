@@ -2858,7 +2858,7 @@ function schedView(d,p){
   const mon=monday(wkOff),slots=(p.slots||[]).slice().sort((a,b)=>a.day-b.day||((a.start||"99")<(b.start||"99")?-1:1));
   const end=new Date(mon);end.setDate(end.getDate()+6);
   let planned=0,doneM=0,doneN=0,missN=0;
-  const narrow=lay!=="rows"&&innerWidth<760;
+  const narrow=false;   /* the add form always opens inside the day you tapped */
   const cols=DAYS.map((dn,i)=>{const dt=new Date(mon);dt.setDate(dt.getDate()+i);const ds=ymd(dt),fut=ds>today();
     const ss=slots.filter(sl=>!isWk(sl)&&sl.day===i&&(sl.once?sl.once===ds:!(sl.until&&ds>sl.until))).map(sl=>{const st=slotState(d,p,sl,ds),t=slotTimes(sl,ds);
       if(st!=="none"){planned+=slotMins(sl)}
@@ -3387,7 +3387,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="103";
+const APPV="104";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
