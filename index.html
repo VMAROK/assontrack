@@ -158,6 +158,7 @@ label{font-size:13px;font-weight:500}
 .navbtn{border-radius:10px}
 #bgimg,#bgimg2{position:fixed;inset:0;z-index:0;pointer-events:none;background:#05060c no-repeat 50% 50%/cover;opacity:0;transition:opacity .35s ease,filter .45s ease}
 #bgimg.on,#bgimg2.on{opacity:1}
+#bgimg,#bgimg2,#bglive{filter:blur(var(--wblur,0px));transform:scale(var(--wbs,1))}
 #bglive{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0;transition:opacity .45s ease;background:#000}#bglive.on{opacity:1}
 .bgshade{position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(90deg,rgba(4,8,20,.45),rgba(4,8,20,.05) 45%,rgba(4,8,20,.05) 60%,rgba(4,8,20,.3))}
 aside{background:rgba(5,10,26,.82)!important;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
@@ -2338,6 +2339,8 @@ document.addEventListener("focusin",e=>{if(isField(e.target))pauseHeavy(true)});
 document.addEventListener("focusout",()=>{setTimeout(()=>{if(!isField(document.activeElement)&&!document.body.classList.contains("authing"))pauseHeavy(false)},150)});
 function liveOff(){const c=$("#bglive");if(c)c.classList.remove("on");const k=liveRAF;setTimeout(()=>{if(liveRAF===k)cancelAnimationFrame(k)},450)}
 let wallTok=0,bgFront=0;
+const wallBlurOf=()=>Math.max(0,Math.min(3,+((data.profile||{}).wallBlur)||0));
+function applyWallBlur(){const k=wallBlurOf(),r=document.documentElement.style;r.setProperty("--wblur",[0,6,14,28][k]+"px");r.setProperty("--wbs",[1,1.03,1.06,1.12][k])}
 function applyWall(){const w=passWall()||wallOf(),spin=animOn()&&KALEI.has(w.id),key=w.id+(spin?"*":"");if(wallShown===key)return;wallShown=key;
   const L=[$("#bgimg"),$("#bgimg2")];if(!L[0]||!L[1])return;const tok=++wallTok,sh=document.querySelector(".bgshade"),src=bestSrc(w,spin);
   if(w.live&&liveOn(w.live)){spinner(false);L[0].classList.remove("on");L[1].classList.remove("on");if(sh)sh.style.setProperty("--wshade",w.shade);return}
@@ -2356,6 +2359,7 @@ function preloadWalls(){if(preloaded)return;preloaded=true;const d=D(),ids=new S
   let i=0;const next=()=>{if(i<list.length)loadImg(list[i++]).catch(()=>{}).then(()=>setTimeout(next,150))};setTimeout(next,1500)}
 function wallPanel(){const cur=wallOf().id;return `<div class="panel wallp"><div class="ph"><span>Wallpaper</span><i>${esc(wallOf().name)}</i></div>
   <div class="wgrid" role="radiogroup" aria-label="Wallpaper">${wallGroups().map(([n,ws])=>`<div class="wgroup">${esc(n)}</div>`+ws.map(w=>`<div class="wcell"><button class="wcard" role="radio" aria-checked="${w.id===cur}" data-wall="${w.id}"><span class="wimg" style="background-image:url('${thumbOf(w)}')"></span><span class="wname">${esc(w.name)}</span></button>${w.custom?`<button class="wdel" data-walldel="${w.id}" aria-label="Remove ${esc(w.name)}" title="Remove">×</button>`:""}</div>`).join("")).join("")}<label class="wcard wadd" title="Use your own photo"><span class="wimg wadd-i"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span class="wname">Add your own</span><input type="file" accept="image/*" data-wallup="main"></label></div>
+  <div class="anim-row"><div><b>Blur the background</b><small>Softens the whole wallpaper behind everything, on every screen.</small></div><div class="seg2" role="group" aria-label="Blur the background">${[[0,"Off"],[1,"Light"],[2,"Medium"],[3,"Heavy"]].map(([k,l])=>`<button data-wallblur="${k}" aria-pressed="${wallBlurOf()===k}">${l}</button>`).join("")}</div></div>
   <div class="anim-row"><div><b>Animate kaleidoscopes</b><small>They slowly turn and breathe. Animated ones can take a moment longer to load and use a little more battery.</small></div><div class="seg2" role="group" aria-label="Animate kaleidoscopes"><button data-animwall="1" aria-pressed="${animOn()}">On</button><button data-animwall="0" aria-pressed="${!animOn()}">Off</button></div></div></div>`}
 async function shrinkImage(file,max,q){const url=URL.createObjectURL(file);try{const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=url});
   const out=(m,qq,square)=>{let w=img.naturalWidth,h=img.naturalHeight,sx=0,sy=0,sw=w,sh=h;if(square){const s=Math.min(w,h);sx=(w-s)/2;sy=(h-s)/2;sw=sh=s}const k=Math.min(1,m/Math.max(sw,sh)),c=document.createElement("canvas");c.width=Math.round(sw*k);c.height=Math.round(sh*k);c.getContext("2d").drawImage(img,sx,sy,sw,sh,0,0,c.width,c.height);return c.toDataURL("image/jpeg",qq)};
@@ -2419,7 +2423,7 @@ function render(){
   v.scrollTop=y;
   $("#ttl").innerHTML=`${TITLES[tab][0]}<small>${TITLES[tab][1]}</small>`;
   document.querySelectorAll(".navbtn").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab));
-  placeBranch();applyWall();applyLook();preloadWalls();holoMount();
+  placeBranch();applyWall();applyWallBlur();applyLook();preloadWalls();holoMount();
 }
 function placeBranch(){const br=document.querySelector(".tkf-branch"),ch=document.querySelector(".tk-top-band .tkfilter .fchip.open");if(!br||!ch)return;const c=ch.getBoundingClientRect(),b=br.getBoundingClientRect();br.style.setProperty("--cx",Math.round(c.left+c.width/2-b.left)+"px");br.style.setProperty("--up",Math.round(b.top-c.bottom)+"px")}
 addEventListener("resize",()=>placeBranch());
@@ -2467,6 +2471,7 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
   else if(b.dataset.clook!==undefined){const c=cats().find(x=>x.id===passCat);if(c){const L=Object.assign({},c.look);if(b.dataset.clook)L.color=b.dataset.clook;else delete L.color;if(Object.keys(L).length)c.look=L;else delete c.look;render();save()}}
   else if(b.dataset.creset){const c=cats().find(x=>x.id===passCat);if(c&&c.look){delete c.look[b.dataset.creset];if(!Object.keys(c.look).length)delete c.look;render();save()}}
   else if(b.dataset.catapply){const id=b.dataset.catapply;if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="Tap again to clear their own themes";b.classList.add("armed");return}if(catDraft)catDraft.dirtyP=true;data.passions.forEach(p=>{if(p.cat===id){delete p.wall;delete p.look}});render();save();toast("Every passion in "+catName(id)+" now uses its theme")}
+  else if(b.dataset.wallblur!==undefined){data.profile=Object.assign({},data.profile,{wallBlur:+b.dataset.wallblur});render();save()}
   else if(b.dataset.animwall!==undefined){data.profile=Object.assign({},data.profile,{animWall:b.dataset.animwall==="1"});render();save()}
   else if(b.dataset.lines!==undefined){data.profile=Object.assign({},data.profile,{look:Object.assign(lookOf(),{lines:b.dataset.lines==="1"})});render();save()}
   else if(b.dataset.catmgr!==undefined){catRevert();catMgr=!catMgr;catEditing=null;catDelArm=null;catThemeOpen=false;render();if(catMgr&&!cats().length){const i=$("#catAddIn");i&&i.focus()}}
