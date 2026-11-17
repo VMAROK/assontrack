@@ -1812,35 +1812,21 @@ async function scanHit(raw){const S=scan;if(!S||S.busy)return;const code=String(
 document.addEventListener("click",e=>{const T=e.target;if(!scan||!T.closest)return;if(T.closest("[data-scanx]")||T===scan.o){scanClose();return}if(T.closest("[data-scango]")){const v=($("#scanCode")||{}).value||"";scanHit(v)}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&scan)scanClose()});
 function vBody(){
-  const d=D(),g=d.goals,W=byDate(d.weights),M=byDate(d.meas),lw=W.length?W[W.length-1].v:null,lm=M.length?M[M.length-1]:null;
-  const toGoal=lw!=null&&g.weight?lw-g.weight:null;
+  const d=D(),g=d.goals,W=byDate(d.weights),lw=W.length?W[W.length-1].v:null,bm=bmiInfo(d);
+  const toGoal=lw!=null&&g.weight?lw-g.weight:null,ch=W.length>1?lw-W[0].v:null;
   return banner()+`<div class="grid tiles">
     <div class="panel tile" style="--c:var(--violet)">${ic("scale")}<small>Current weight</small><b>${lw??"--"}</b><em>${g.unit}</em></div>
     <div class="panel tile" style="--c:var(--cyan)">${ic("star")}<small>To goal</small><b>${toGoal==null?"--":Math.abs(toGoal).toFixed(1)}</b><em>${toGoal==null?"set a goal":toGoal>0?g.unit+" to lose":toGoal<0?g.unit+" to gain":"reached"}</em></div>
-    <div class="panel tile" style="--c:var(--magenta)">${ic("bolt")}<small>Glutes</small><b>${lm?.glutes??"--"}</b><em>${g.len}${M.length>1&&M[0].glutes!=null&&lm.glutes!=null?" · "+(lm.glutes-M[0].glutes>0?"+":"")+(lm.glutes-M[0].glutes).toFixed(1):""}</em></div>
-    <div class="panel tile" style="--c:var(--amber)">${ic("dumb")}<small>Waist · hips</small><b style="font-size:22px">${lm?.waist??"--"} · ${lm?.hips??"--"}</b><em>${g.len}</em></div>
+    <div class="panel tile" style="--c:var(--magenta)">${ic("bolt")}<small>BMI</small><b>${bm.bmi==null?"--":bm.bmi.toFixed(1)}</b><em>${bm.bmi==null?"add height and weight":bm.cat}</em></div>
+    <div class="panel tile" style="--c:var(--amber)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg><small>Change</small><b>${ch==null?"--":(ch>0?"+":"")+ch.toFixed(1)}</b><em>${ch==null?"needs two weigh-ins":g.unit+" since "+fmtDate(W[0].d)}</em></div>
   </div>
   <div class="passtop figtop" style="margin-top:18px">${figurePanel()}
    <div class="stack">
     ${bmiPanel(d)}
-    <div class="panel chart" style="--c:var(--violet)"><div class="ph"><span>Weight by time</span><i>${g.unit}</i></div>${lineChart(W.map(p=>({d:p.d,v:p.v})),"#8fd8ff")}</div>
-    <div class="panel"><div class="ph"><span>Log weight</span><i></i></div>
+    <div class="panel"><div class="ph"><span>Weigh in</span><i>${W.length} total</i></div>
      <form class="f" id="wForm"><div class="f2"><label>Date<input id="wDate" type="date" value="${today()}" max="${today()}" required></label>
-     <label>Weight (${g.unit})<input id="wVal" type="number" step="0.1" inputmode="decimal" required></label></div><button class="btn">Save weight</button></form></div>
-   </div></div>
-  <div class="grid cols2" style="margin-top:18px">
-   <div class="stack">
-    <div class="panel"><div class="ph"><span>Log measurements</span><i>${g.len}</i></div>
-     <form class="f" id="msForm"><label>Date<input id="msDate" type="date" value="${today()}" max="${today()}" required></label>
-     <div class="f3"><label>Waist<input id="msWaist" type="number" step="0.1" inputmode="decimal"></label>
-     <label>Hips<input id="msHips" type="number" step="0.1" inputmode="decimal"></label>
-     <label>Glutes<input id="msGlutes" type="number" step="0.1" inputmode="decimal"></label></div>
-     <button class="btn mag">Save measurements</button></form></div>
-    <div class="panel"><div class="ph"><span>Weigh-ins</span><i>${W.length} total</i></div><div class="rows">${W.length?[...W].reverse().slice(0,8).map(p=>`<div class="r" style="--c:var(--violet)"><span class="dot"></span><div class="m"><div>${fmtDate(p.d)}</div></div><div class="v">${p.v} ${g.unit}</div>${del("weights",p.id)}</div>`).join(""):`<div class="empty">No weigh-ins yet</div>`}</div></div>
-   </div>
-   <div class="stack">
-    <div class="panel chart" style="--c:var(--magenta)"><div class="ph"><span>Glutes by time</span><i>${g.len} · widest point</i></div>${lineChart(M.filter(p=>p.glutes!=null).map(p=>({d:p.d,v:p.glutes})),"#2f7bff")}</div>
-    <div class="panel"><div class="ph"><span>Measurement log</span><i>${M.length} total</i></div><div class="rows">${M.length?[...M].reverse().slice(0,8).map(p=>`<div class="r" style="--c:var(--magenta)"><span class="dot"></span><div class="m"><div>${fmtDate(p.d)}</div><small>Waist ${p.waist??"–"} · Hips ${p.hips??"–"}</small></div><div class="v">${p.glutes??"–"}<small>glutes</small></div>${del("meas",p.id)}</div>`).join(""):`<div class="empty">No measurements yet</div>`}</div></div>
+     <label>Weight (${g.unit})<input id="wVal" type="number" step="0.1" inputmode="decimal" required></label></div><button class="btn">Save weight</button></form>
+     <div class="rows" style="margin-top:12px">${W.length?[...W].reverse().slice(0,8).map(p=>`<div class="r" style="--c:var(--violet)"><span class="dot"></span><div class="m"><div>${fmtDate(p.d)}</div></div><div class="v">${p.v} ${g.unit}</div>${del("weights",p.id)}</div>`).join(""):`<div class="empty">No weigh-ins yet</div>`}</div></div>
    </div></div>`;
 }
 function vTrain(){
