@@ -1237,6 +1237,11 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .hmus-n{margin:4px 0 0;text-align:center;font-size:11px;color:var(--muted)}
 .hmus-c{margin:4px 0 0;text-align:center;font-size:9.5px;color:var(--dim)}.hmus-c a{color:inherit}
 
+.mus-card{margin:8px 0 4px;padding:10px 12px;border-radius:12px;background:rgba(var(--tX),.55);border:1px solid color-mix(in srgb,var(--mc) 55%,transparent);box-shadow:0 0 16px color-mix(in srgb,var(--mc) 25%,transparent)}
+.mc-top{display:flex;align-items:center;gap:8px}.mc-top i{width:10px;height:10px;border-radius:50%;background:var(--mc);box-shadow:0 0 8px var(--mc)}.mc-top b{flex:1;font-size:15px}.mc-top .x{font-size:18px}
+.mc-stats{display:flex;justify-content:space-between;gap:8px;margin:6px 0 8px;font-size:12px;color:var(--muted)}.mc-stats b{color:#e6eeff;font-size:14px}
+.mc-ex{display:flex;flex-wrap:wrap;gap:6px}.mc-ex button{font:inherit;font-size:12px;padding:4px 9px;border-radius:99px;cursor:pointer;color:#e6eeff;background:color-mix(in srgb,var(--mc) 18%,transparent);border:1px solid color-mix(in srgb,var(--mc) 50%,transparent)}
+
 /* ===== standalone app ===== */
 #auth{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:max(24px,env(safe-area-inset-top)) 20px max(24px,env(safe-area-inset-bottom));background:radial-gradient(120% 80% at 50% 0%,rgba(30,80,170,.35),rgba(3,6,18,.96) 60%),#03060f;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .auth-card{width:min(100%,380px);display:grid;gap:12px;padding:26px 22px 18px;border-radius:20px;border:1px solid rgba(76,170,255,.28);background:linear-gradient(180deg,rgba(22,52,120,.55),rgba(6,12,32,.9));box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 40px rgba(30,110,255,.12)}
@@ -2085,6 +2090,19 @@ function exMus(name){const n=String(name||"").toLowerCase();for(const [re,m] of 
 function sugMus(ex){const m={};(ex||[]).forEach(e=>{const g=exMus(e.name);if(g)Object.entries(g).forEach(([k,v])=>m[k]=Math.max(m[k]||0,v))});return m}
 /* sets worked per muscle over the last 7 days, from what you logged */
 const MUSC=["#f7c59f","#f5b38f","#f5b38f","#f5b38f","#f6dd94","#f6dd94","#b9de9b","#f7c59f","#9fd3c1","#f2a7a0","#f7c59f","#f7c59f","#e9eaee","#8fc7d6","#8fc7d6","#a7b4e6","#a7b4e6","#bba7e6","#d3a6da"];
+let musSel=null;
+const MUSEX={chest:["Bench press","Incline dumbbell press","Push-up","Cable fly"],frontdelts:["Overhead press","Front raise","Incline press"],sidedelts:["Lateral raise","Upright row","Cable lateral raise"],reardelts:["Face pull","Reverse fly","Rear delt row"],
+ biceps:["Barbell curl","Hammer curl","Chin-up"],triceps:["Tricep pushdown","Skull crusher","Dips"],forearms:["Farmer carry","Wrist curl","Reverse curl"],abs:["Crunch","Hanging leg raise","Ab wheel","Plank"],obliques:["Side plank","Russian twist","Cable woodchop"],
+ traps:["Shrug","Upright row","Face pull"],upperback:["Barbell row","Seated cable row","Face pull"],lats:["Pull-up","Lat pulldown","Barbell row"],lowerback:["Back extension","Deadlift","Good morning"],glutes:["Hip thrust","Squat","Romanian deadlift"],
+ abductors:["Hip abduction","Side-lying leg raise","Banded walk"],adductors:["Hip adduction","Copenhagen plank","Sumo squat"],quads:["Squat","Leg press","Leg extension","Lunge"],hamstrings:["Romanian deadlift","Leg curl","Nordic curl"],calves:["Standing calf raise","Seated calf raise"]};
+function musLast(d,k){const pl=d.plans||[];const W=byDate(d.workouts).reverse();for(const w of W){const p=w.plan&&pl.find(x=>x.id===w.plan),m=musNorm((p&&p.mus&&Object.keys(p.mus).length?p.mus:null)||exMus(w.name)||{});if(m[k])return w.d}return null}
+function musPick(g){musSel=g;if(H3&&H3.setSel)H3.setSel(g);const box=document.getElementById("musCard");if(box)box.outerHTML=musCard();else{const h=document.querySelector(".holopanel .hfit");h&&h.insertAdjacentHTML("beforebegin",musCard())}}
+function musCard(){if(musSel==null||!MUS[musSel])return `<div id="musCard" hidden></div>`;const d=D(),[k,nm]=MUS[musSel],S=musWeek(d),sets=Math.round(S[k]||0),last=musLast(d,k);
+  return `<div id="musCard" class="mus-card" style="--mc:${MUSC[musSel]}"><div class="mc-top"><i></i><b>${nm}</b><button class="x" data-muscx aria-label="Close">×</button></div>
+    <div class="mc-stats"><span><b>${sets}</b> set${sets===1?"":"s"} this week</span><span>${last?"Last trained "+(last===today()?"today":fmtDate(last)):"Not trained yet"}</span></div>
+    <div class="mc-ex">${(MUSEX[k]||[]).map(x=>`<button data-musex="${esc(x)}">${esc(x)}</button>`).join("")}</div></div>`}
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-muscx],[data-musex]");if(!t)return;if(t.dataset.muscx!==undefined){musPick(null);return}
+  const i=$("#woName");if(i){i.value=t.dataset.musex;i.dispatchEvent(new Event("input",{bubbles:true}));i.scrollIntoView({behavior:"smooth",block:"center"});i.focus({preventScroll:true})}});
 function musHeat(d){const S=musWeek(d),mx=Math.max(10,...Object.values(S));return MUS.map(([k])=>S[k]?Math.round(Math.max(.12,S[k]/mx)*20)/20:0)}
 function musWeek(d){const plans=d.plans||[],sets={};d.workouts.forEach(w=>{const a=(Date.now()-new Date(w.d+"T12:00"))/864e5;if(a>=7||a<-1)return;const pl=w.plan&&plans.find(x=>x.id===w.plan),m=musNorm((pl&&pl.mus&&Object.keys(pl.mus).length?pl.mus:null)||exMus(w.name)||{});const n=+w.sets||1;Object.entries(m).forEach(([k,v])=>sets[k]=(sets[k]||0)+n*(v===2?1:.5))});return sets}
 
@@ -2437,17 +2455,20 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
         if(hh>0.){float pu=.5+.5*sin(t*2.4);o+=col*(.10+.14*hh)*pu;}   /* trained this week: a soft glow, colours stay gentle */
         gl_FragColor=vec4(o,1.);}`});
   /* Écorché anatomy model (CC BY-SA 4.0): every muscle a separate smooth mesh, coloured by muscle group */
-  let eco=null;const ecoMats={};
+  let eco=null;const ecoMats={},SEL={value:-1};
   const ecoMat=(key,hex,hex2)=>{if(ecoMats[key])return ecoMats[key];const v=h=>new T.Vector3(parseInt(h.slice(1,3),16)/255,parseInt(h.slice(3,5),16)/255,parseInt(h.slice(5,7),16)/255);
-    return ecoMats[key]=new T.ShaderMaterial({uniforms:{t:U.t,col:{value:v(hex)},col2:{value:v(hex2||hex)},hh:{value:0},hh2:{value:0}},side:T.DoubleSide,
+    const gi=key==="obl"?[8,7]:key[0]==="g"?[+key.slice(1),+key.slice(1)]:[-9,-9];
+    return ecoMats[key]=new T.ShaderMaterial({uniforms:{t:U.t,col:{value:v(hex)},col2:{value:v(hex2||hex)},hh:{value:0},hh2:{value:0},sel:SEL,gid:{value:new T.Vector2(gi[0],gi[1])}},side:T.DoubleSide,
     vertexShader:`attribute float cmix;varying float vM;varying vec3 vN;varying vec3 vV;void main(){vec4 w=modelMatrix*vec4(position,1.);vN=normalize(mat3(modelMatrix)*normal);vV=normalize(cameraPosition-w.xyz);vM=cmix;gl_Position=projectionMatrix*viewMatrix*w;}`,
-    fragmentShader:`uniform float t,hh,hh2;uniform vec3 col,col2;varying float vM;varying vec3 vN;varying vec3 vV;
+    fragmentShader:`uniform float t,hh,hh2,sel;uniform vec2 gid;uniform vec3 col,col2;varying float vM;varying vec3 vN;varying vec3 vV;
       void main(){vec3 n=normalize(vN),v=normalize(vV);if(dot(n,v)<0.)n=-n;vec3 L1=normalize(vec3(-.45,.6,.75)),L2=normalize(vec3(.6,.25,.5));vec3 c=mix(col,col2,step(.5,vM));float h=mix(hh,hh2,step(.5,vM));
         float nv=max(0.,dot(n,v)),df=max(0.,dot(n,L1)),df2=max(0.,dot(n,L2)),sp=pow(max(0.,dot(reflect(-L1,n),v)),36.)*.38;
         /* grooves: muscle edges turn away from the eye, so darken them; sharp bends in the surface darken too */
         float groove=mix(.38,1.,smoothstep(.04,.55,nv));float crease=1.-clamp(length(fwidth(n))*.9,0.,.22);
         vec3 o=c*(.34+.06*n.y+.66*df+.16*df2)*groove*crease+vec3(sp*groove);
         if(h>0.){float pu=.5+.5*sin(t*2.4);o+=c*(.10+.14*h)*pu*groove;}
+        if(sel>-.5){float g=mix(gid.x,gid.y,step(.5,vM));if(abs(g-sel)<.5){float pu=.5+.5*sin(t*4.);vec3 sat=clamp(mix(vec3(dot(c,vec3(.333))),c,1.6),0.,1.);o=sat*(.36+.56*df)*groove+vec3(sp*.6)+sat*(.08+.10*pu);}
+          else{float l=dot(o,vec3(.3,.59,.11));o=mix(vec3(l),o,.35)*.62;}}   /* tapped group stands out, the rest fades back */
         gl_FragColor=vec4(o,1.);}`})};
   function ecoPut(root,map){const wrap=new T.Group();root.updateMatrixWorld(true);const box=new T.Box3().setFromObject(root),sz=box.getSize(new T.Vector3()),ct=box.getCenter(new T.Vector3()),k=2.02/sz.y;
     root.position.set(-ct.x,-box.min.y,-ct.z);wrap.scale.setScalar(k);wrap.add(root);root.updateMatrixWorld(true);
@@ -2460,6 +2481,11 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
       list.push(o)});
     eco={wrap,list};figKey=""}
   window.H3ecoPut=ecoPut;
+  const ray=new T.Raycaster(),ndc=new T.Vector2();
+  function pick(x,y){if(!eco||!eco.wrap.parent||!host)return null;const r=canvas.getBoundingClientRect();ndc.set((x-r.left)/r.width*2-1,-(y-r.top)/r.height*2+1);ray.setFromCamera(ndc,cam);
+    const hit=ray.intersectObjects(eco.list.filter(o=>o.visible),false)[0];if(!hit)return -1;const o=hit.object,g=o.userData.g;if(!g)return -1;
+    if(g[0]!==g[1]&&hit.face){const cm=o.geometry.attributes.cmix;if(cm&&(cm.getX(hit.face.a)+cm.getX(hit.face.b)+cm.getX(hit.face.c))>1.5)return g[1]}return g[0]}
+  function setSel(i){SEL.value=i==null?-1:i}
   function ecoFig(av){const heat=av.mheat||[];Object.entries(ecoMats).forEach(([k,m])=>{if(k==="obl"){m.uniforms.hh.value=heat[8]||0;m.uniforms.hh2.value=heat[7]||0}else if(k[0]==="g"){const i=+k.slice(1);m.uniforms.hh.value=m.uniforms.hh2.value=heat[i]||0}});
     if(eco.wrap.parent)eco.wrap.parent.remove(eco.wrap);return {g:eco.wrap,torso:null,arms:[],head:new T.Group(),breathe:null}}
   function anatFig(av){const g=new T.Group(),S=.001227,heat=av.mheat||[];
@@ -2618,7 +2644,7 @@ float musAt(vec3 c,out float ed,out float dep,out vec3 mc){float id=-1.;ed=99.;d
     ren.render(scene,cam)}
   function start(){if(!raf){last=0;raf=requestAnimationFrame(frame)}}
   function stop(){cancelAnimationFrame(raf);raf=0}
-  return {canvas,cam,set,start,stop,fitPut,fitHas:g=>!!fitData[g],mount(el){host=el;if(canvas.parentNode!==el)el.appendChild(canvas);size();start()},renderNow(){size();last=0;frame(performance.now());cancelAnimationFrame(raf);raf=0}}}
+  return {canvas,cam,set,start,stop,fitPut,pick,setSel,fitHas:g=>!!fitData[g],mount(el){host=el;if(canvas.parentNode!==el)el.appendChild(canvas);size();start()},renderNow(){size();last=0;frame(performance.now());cancelAnimationFrame(raf);raf=0}}}
 
 let H3=null,h3Load=null,h3Fail=false,holoPreview=null,holoPrevTimer=0;
 function h3Ensure(){if(h3Load||h3Fail)return;h3Load=import("./lib/three-r160.module.js").then(T=>{H3=h3Init(T);if(!H3)h3Fail=true;if(tab!=="set")render()}).catch(()=>{h3Fail=true})}
@@ -2634,7 +2660,7 @@ function holoView(){const fit=figFit(),a=avatarOf(),st=fit?"real":holoStage(),rs
   const bgw=a.bg&&allWalls().find(w=>w.id===a.bg),bgu=bgw?(bgw.live?thumbOf(bgw):bestSrc(bgw,false)):"";
   const fig=H3?`<div class="holo holo3d${bgw?" hasbg":""}" ${bgw?`style="background-image:linear-gradient(rgba(4,8,20,.15),rgba(4,8,20,.5)),url('${bgu}')"`:""} data-h3 role="img" aria-label="${fit?"Your body":HSTAGE[st][0]+" figure"}. Drag to spin.">${a.flag&&/^[a-z]{2}$/i.test(a.flag)?`<span class="avflagbadge st-${st}" aria-label="Flag">${String.fromCodePoint(...[...a.flag.toUpperCase()].map(c=>127397+c.charCodeAt(0)))}</span>`:""}</div>`:(h3Ensure(),hologram(a));
   const lock=`<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`;
-  if(fit){holoPreview=null;const L=fitLevel(D());return fig+`<div class="hfit"><div class="hfit-steps">${FITST.map((x,k)=>`<span class="${k===L.i?"on":k<L.i?"past":""}">${x[0]}</span>`).join("")}</div><div class="hfit-bar"><i style="width:${Math.max(3,L.m*100)}%"></i></div></div><p class="hcap">${(bt=>bt?`<b style="color:rgba(var(--tL),1)">${bt}</b> · `:"")(bodyType(bmiInfo(D()).bmi,L.m))}${L.cap}</p>${tab==="train"?(h=>`<div class="hmus">${MUS.map(([k,nm],i)=>`<span class="${h[i]?"on":""}"><i style="background:${MUSC[i]}"></i>${nm.replace(" (lats)","")}</span>`).join("")}</div><p class="hmus-n">${h.some(v=>v)?"Glowing = trained this week.":"Every muscle group has its own colour. The ones you train this week glow."}</p><p class="hmus-c">3D anatomy: <a href="https://github.com/charleeh/ecorche" target="_blank" rel="noopener">Écorché</a>, CC BY-SA 4.0, based on BodyParts3D © DBCLS and Z-Anatomy by Gauthier Kervyn</p>`)(musHeat(D())):""}`}
+  if(fit){holoPreview=null;const L=fitLevel(D());return fig+`<div class="hfit"><div class="hfit-steps">${FITST.map((x,k)=>`<span class="${k===L.i?"on":k<L.i?"past":""}">${x[0]}</span>`).join("")}</div><div class="hfit-bar"><i style="width:${Math.max(3,L.m*100)}%"></i></div></div><p class="hcap">${(bt=>bt?`<b style="color:rgba(var(--tL),1)">${bt}</b> · `:"")(bodyType(bmiInfo(D()).bmi,L.m))}${L.cap}</p>${tab==="train"?musCard():""}${tab==="train"?(h=>`<div class="hmus">${MUS.map(([k,nm],i)=>`<span class="${h[i]?"on":""}"><i style="background:${MUSC[i]}"></i>${nm.replace(" (lats)","")}</span>`).join("")}</div><p class="hmus-n">${h.some(v=>v)?"Glowing = trained this week.":"Every muscle group has its own colour. The ones you train this week glow."}</p><p class="hmus-c">3D anatomy: <a href="https://github.com/charleeh/ecorche" target="_blank" rel="noopener">Écorché</a>, CC BY-SA 4.0, based on BodyParts3D © DBCLS and Z-Anatomy by Gauthier Kervyn</p>`)(musHeat(D())):""}`}
   holoPreview=null;const mN=missList(D()).length,scN=commitScore(),cap=(rs==="real"?"Alive unlocked. Pick any look.":rs==="holo"?"Reach 65% to unlock Alive and clothing colors.":"Reach 40% to unlock Ghost.")+(scN==null?"":`<br><button class="hwhy" data-missopen>${scN}% now${mN?` · ${mN} missed`:""} · see why</button>`);
   return fig+`<div class="hstage" role="group" aria-label="Figure stages">${["shadow","holo","real"].filter(k=>SRANK[k]<=SRANK[rs]).map(k=>`<button data-hstage="${k}" aria-pressed="${st===k}" title="Use this look">${HSTAGE[k][0]}</button>`).join("")}</div><p class="hcap">${cap}</p>`}
 /* ---------- your own 3D model: stored in Supabase Storage, cached on the device ---------- */
@@ -2811,7 +2837,9 @@ function holoTick(now){holoRAF=0;let more=true;
 const holoGo=()=>{if(!holoRAF)holoRAF=requestAnimationFrame(holoTick)};
 document.addEventListener("pointerdown",e=>{const h=e.target.closest&&e.target.closest(".holo");if(!h)return;holoDrag={x0:e.clientX,x:e.clientX,t0:performance.now(),moved:false,id:e.pointerId};holoV=0;h.classList.add("grab");try{h.setPointerCapture(e.pointerId)}catch(_){}holoGo()});
 document.addEventListener("pointermove",e=>{if(!holoDrag||e.pointerId!==holoDrag.id)return;const dx=e.clientX-holoDrag.x;holoDrag.x=e.clientX;if(Math.abs(e.clientX-holoDrag.x0)>4)holoDrag.moved=true;if(holoDrag.moved){holoRot+=dx*.9;holoV=dx*.9;holoApply()}});
-const holoUp=e=>{if(!holoDrag||e.pointerId!==holoDrag.id)return;if(!holoDrag.moved)holoV=4.5;holoDrag=null;const h=document.querySelector(".holo");h&&h.classList.remove("grab");holoGo()};
+const holoUp=e=>{if(!holoDrag||e.pointerId!==holoDrag.id)return;
+  if(!holoDrag.moved&&tab==="train"&&H3&&H3.pick&&performance.now()-holoDrag.t0<450){const g=H3.pick(e.clientX,e.clientY);if(g!=null){musPick(g>=0&&g!==musSel?g:null);holoDrag=null;const h=document.querySelector(".holo");h&&h.classList.remove("grab");return}}
+  if(!holoDrag.moved)holoV=4.5;holoDrag=null;const h=document.querySelector(".holo");h&&h.classList.remove("grab");holoGo()};
 document.addEventListener("pointerup",holoUp);document.addEventListener("pointercancel",holoUp);
 document.addEventListener("contextmenu",e=>{if(e.target.closest&&e.target.closest(".holo"))e.preventDefault()});
 document.addEventListener("touchmove",e=>{if(holoDrag||(e.target.closest&&e.target.closest(".holo")))e.preventDefault()},{passive:false});
@@ -3746,7 +3774,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="120";
+const APPV="121";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
