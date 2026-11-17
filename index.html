@@ -2215,10 +2215,11 @@ function bmiInfo(d){const g=d.goals,h=+g.height||0,W=byDate(d.weights),lw=W.leng
 const bmiW=b=>b<22?Math.max(-1,-(22-b)/5):Math.min(1,(b-22)/11);
 const bodyType=(b,mu)=>b==null?null:b<18.5?(mu>=.5?"Lean and toned":"Slim"):b<25?(mu>=.75?"Athletic":mu>=.5?"Toned":"Average"):b<30?(mu>=.5?"Strong build":"Soft"):(mu>=.75?"Powerful":"Heavy");
 const hTxt=(h,imp)=>{if(!imp)return Math.round(h)+" cm";let t=Math.round(h/2.54),f=Math.floor(t/12);return f+"′"+(t-f*12)+"″"};
-let bmiEdit=false;
+let bmiEdit=false,bmiDraft={};
+document.addEventListener("input",e=>{const id=e.target.id;if(id==="bmFt"||id==="bmIn"||id==="bmCm"||id==="bmW")bmiDraft[id]=e.target.value},true);
 function bmiPanel(d){const g=d.goals,b=bmiInfo(d),imp=g.len!=="cm",h=b.h,ti=h?Math.round(h/2.54*2)/2:0,ft=h?Math.floor(ti/12):"",inch=h?+(ti-ft*12).toFixed(1):"";
   if(b.bmi==null||bmiEdit)return `<div class="panel bmi"><div class="ph"><span>Your BMI</span><i>Sets your body type</i></div><p class="note" style="margin:0 0 10px">Add your height and weight. It works out your BMI, gives you a body type and shapes your figure to match.</p>
-    <div class="bmi-form${imp?" ft3":""}">${imp?`<label>Feet<input id="bmFt" inputmode="numeric" autocomplete="off" value="${ft}" placeholder="5"></label><label>Inches<input id="bmIn" inputmode="decimal" autocomplete="off" value="${inch}" placeholder="8"></label>`:`<label>Height (cm)<input id="bmCm" inputmode="decimal" autocomplete="off" value="${h?Math.round(h):""}" placeholder="172"></label>`}<label>Weight (${g.unit})<input id="bmW" inputmode="decimal" autocomplete="off" value="${b.lw??""}" placeholder="${g.unit==="kg"?70:155}"></label></div>
+    <div class="bmi-form${imp?" ft3":""}">${imp?`<label>Feet<input id="bmFt" inputmode="numeric" autocomplete="off" value="${esc(bmiDraft.bmFt??ft)}" placeholder="5"></label><label>Inches<input id="bmIn" inputmode="decimal" autocomplete="off" value="${esc(bmiDraft.bmIn??inch)}" placeholder="8"></label>`:`<label>Height (cm)<input id="bmCm" inputmode="decimal" autocomplete="off" value="${esc(bmiDraft.bmCm??(h?Math.round(h):""))}" placeholder="172"></label>`}<label>Weight (${g.unit})<input id="bmW" inputmode="decimal" autocomplete="off" value="${esc(bmiDraft.bmW??b.lw??"")}" placeholder="${g.unit==="kg"?70:155}"></label></div>
     <div class="bmi-btns"><button class="btn" data-bmisave>Save</button>${bmiEdit&&b.bmi!=null?`<button class="btn ghost" data-bmicancel>Cancel</button>`:""}</div></div>`;
   const mu=fitLevel(d).m,ty=bodyType(b.bmi,mu),x=Math.max(2,Math.min(98,(b.bmi-15)/25*100));
   return `<div class="panel bmi"><div class="ph"><span>Your BMI</span><button class="dview" data-bmiedit style="margin:0">Edit</button></div>
@@ -2226,11 +2227,12 @@ function bmiPanel(d){const g=d.goals,b=bmiInfo(d),imp=g.len!=="cm",h=b.h,ti=h?Ma
     <div class="bmi-bar"><i style="left:${x.toFixed(1)}%"></i></div><div class="bmi-scale"><span style="left:14%">18.5</span><span style="left:40%">25</span><span style="left:60%">30</span></div>
     <p class="note" style="margin:6px 0 0">BMI is a rough guide and can't tell muscle from fat, so your training shapes the figure too.</p></div>`}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-bmisave],[data-bmiedit],[data-bmicancel]");if(!b)return;
-  if(b.dataset.bmiedit!==undefined){bmiEdit=true;render();return}if(b.dataset.bmicancel!==undefined){bmiEdit=false;render();return}
-  const nv=id=>{const el=$(id);if(!el)return null;const n=parseFloat(String(el.value).replace(",","."));return isFinite(n)?n:null},g=data.goals;let h;
-  if(g.len!=="cm"){const f=nv("#bmFt"),i=nv("#bmIn")||0;if(f==null){toast("Enter your height");return}h=(f*12+i)*2.54}else{h=nv("#bmCm");if(h==null){toast("Enter your height");return}}
-  if(h<90||h>250){toast("That height doesn't look right");return}const w=nv("#bmW"),kg=w==null?0:g.unit==="kg"?w:w*.45359237;if(w==null||kg<20||kg>400){toast("Enter your weight");return}
-  g.height=Math.round(h*10)/10;const W=byDate(data.weights),lw=W.length?+W[W.length-1].v:null;if(lw!==w){data.weights=data.weights.filter(x=>x.d!==today());data.weights.push({id:uid(),d:today(),v:w})}
+  if(b.dataset.bmiedit!==undefined){bmiEdit=true;bmiDraft={};render();return}if(b.dataset.bmicancel!==undefined){bmiEdit=false;bmiDraft={};render();return}
+  const raw=id=>{const el=$("#"+id),v=el&&el.value!==""?el.value:bmiDraft[id];return v==null?"":String(v)},nums=t=>(t.replace(/,/g,".").match(/\d+(\.\d+)?/g)||[]).map(Number),g=data.goals,W=byDate(data.weights),lw=W.length?+W[W.length-1].v:null;let h;
+  if(g.len!=="cm"){const f=nums(raw("bmFt")),i=nums(raw("bmIn"));if(!f.length){toast("Enter your height in feet");return}h=f[0]>=36?f[0]*2.54:(f[0]*12+(f.length>1?f[1]:i[0]||0))*2.54}   // 5 and 8, or 5'8 typed in one box, or 68 inches
+  else{const c=nums(raw("bmCm"));if(!c.length){toast("Enter your height");return}h=c[0]<3?c[0]*100:c[0]}
+  if(h<90||h>250){toast("That height doesn't look right");return}const wn=nums(raw("bmW")),w=wn.length?wn[0]:lw,kg=w==null?0:g.unit==="kg"?w:w*.45359237;if(w==null){toast("Enter your weight");return}if(kg<20||kg>400){toast("That weight doesn't look right for "+g.unit);return}
+  bmiDraft={};g.height=Math.round(h*10)/10;if(lw!==w){data.weights=data.weights.filter(x=>x.d!==today());data.weights.push({id:uid(),d:today(),v:w})}
   bmiEdit=false;render();save();toast("BMI saved")},true);
 const figFit=()=>tab==="body"||tab==="train";
 const FITST=[["Start",0],["Lean",.25],["Toned",.5],["Built",.75]];
@@ -2241,7 +2243,7 @@ function fitLevel(d){const days=new Set(d.workouts.filter(w=>{const a=(Date.now(
 const fitAv=()=>{const a=avatarOf();a.hat=a.top=a.shoes="none";a.wings="";a.cmode="solid";a.fit=fitLevel(D()).m;const bm=bmiInfo(D());a.fitW=bm.bmi==null?null:Math.round(bmiW(bm.bmi)*40)/40;return a};
 const figAv=()=>{const a=avatarOf();if(realStage()!=="real")a.cmode="figure";return a};
 const fitLoad={};
-function fitEnsure(g){if(!H3||H3.fitHas(g)||fitLoad[g])return;fitLoad[g]=fetch("lib/body2-"+g+".txt").then(r=>{if(!r.ok)throw 0;return r.text()}).then(t=>{const q=atob(t.trim()),u=new Uint8Array(q.length);for(let i=0;i<q.length;i++)u[i]=q.charCodeAt(i);H3.fitPut(g,u.buffer);if(figFit())render()}).catch(()=>{setTimeout(()=>{fitLoad[g]=null;if(figFit())holoMount()},6000)})}
+function fitEnsure(g){if(!H3||H3.fitHas(g)||fitLoad[g])return;fitLoad[g]=fetch("lib/body2-"+g+".txt").then(r=>{if(!r.ok)throw 0;return r.text()}).then(t=>{const q=atob(t.trim()),u=new Uint8Array(q.length);for(let i=0;i<q.length;i++)u[i]=q.charCodeAt(i);H3.fitPut(g,u.buffer);if(figFit())holoMount()}).catch(()=>{setTimeout(()=>{fitLoad[g]=null;if(figFit())holoMount()},6000)})}
 function holoMount(){const el=document.querySelector("[data-h3]");if(!el||!H3){if(H3)H3.stop();return}
   const fit=figFit(),a=fit?fitAv():figAv();let hs=fit?"real":holoStage();
   if(fit){const g=a.body==="woman"?"f":a.body==="man"?"m":"n";if(g==="n"){fitEnsure("m");fitEnsure("f")}else fitEnsure(g);a.useModel=false;if(H3.fitHas(g)){a.fitMesh=g;hs="holo"}}
