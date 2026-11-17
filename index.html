@@ -1906,7 +1906,7 @@ function pie(pct){
    <circle cx="24" cy="24" r="${r+2}" fill="none" stroke="rgba(255,255,255,.22)" stroke-width=".6"/><circle cx="24" cy="24" r="${r-2}" fill="none" stroke="rgba(0,0,0,.45)" stroke-width=".6"/>
    <circle cx="24" cy="24" r="${r-.9}" fill="none" stroke="#fff" stroke-width=".8" stroke-linecap="round" stroke-dasharray="${hl}" transform="rotate(-150 24 24)" opacity=".6"/></svg>`;
 }
-function emptyPie(){return `<svg class="pie pie-e" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="18" fill="none" stroke="rgba(6,8,44,.82)" stroke-width="4"/></svg>`}
+function emptyPie(){return `<svg class="pie pie-e" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="18" fill="none" style="stroke:rgba(var(--tD),.9)" stroke-width="4"/><circle cx="24" cy="24" r="18" fill="none" style="stroke:rgba(var(--tA),.28)" stroke-width="4"/></svg>`}
 let addingP=false;
 const LVR={Priority:0,Moderate:1,Bonus:2};
 const sortPass=P=>P.map((p,i)=>[p,i]).sort((a,b)=>((LVR[a[0].lvl]??3)-(LVR[b[0].lvl]??3))||((a[0].order??a[1])-(b[0].order??b[1]))).map(x=>x[0]);
