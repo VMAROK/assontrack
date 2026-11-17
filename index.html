@@ -1508,7 +1508,7 @@ const mirP=path=>path.replace(/([MLCQ])([^MLCQZ]*)/g,(m,c,args)=>c+args.trim().s
 const AV_ITEMS={hat:[["none","None"],["fedora","Fedora"]],top:[["none","None"],["trench","Trench coat"]],shoes:[["none","Barefoot"],["boots","Boots"]]};
 const AV_DEF={hat:"fedora",top:"trench",shoes:"boots"};
 function avatarOf(){const pr=data.profile||{},av=pr.avatar||{},a={body:av.body||pr.figure||"woman"};
-  for(const k in AV_ITEMS)a[k]=AV_ITEMS[k].some(o=>o[0]===av[k])?av[k]:AV_DEF[k];a.colors=Object.assign({},av.colors||{});a.cmode=["solid","glass","figure"].includes(av.cmode)?av.cmode:av.blend?"figure":av.glass?"glass":"solid";if(av.stage)a.stage=av.stage;if(av.skin)a.skin=av.skin;if(av.hair)a.hair=av.hair;if(av.hairColor)a.hairColor=av.hairColor;if(av.flag)a.flag=av.flag;if(av.bg)a.bg=av.bg;a.fx=Object.assign({kind:"auto",color:"#4cc9ff",amount:2},av.fx||{});if(av.model)a.model=av.model;a.useModel=!!(av.useModel&&av.model);return a}
+  for(const k in AV_ITEMS)a[k]=AV_ITEMS[k].some(o=>o[0]===av[k])?av[k]:AV_DEF[k];a.colors=Object.assign({},av.colors||{});a.cmode=["solid","glass","figure"].includes(av.cmode)?av.cmode:av.blend?"figure":av.glass?"glass":"solid";if(av.stage)a.stage=av.stage;if(av.skin)a.skin=av.skin;if(av.wings==="white"||av.wings==="dark")a.wings=av.wings;if(av.hair)a.hair=av.hair;if(av.hairColor)a.hairColor=av.hairColor;if(av.flag)a.flag=av.flag;if(av.bg)a.bg=av.bg;a.fx=Object.assign({kind:"auto",color:"#4cc9ff",amount:2},av.fx||{});if(av.model)a.model=av.model;a.useModel=!!(av.useModel&&av.model);return a}
 let avEdit=false,avCat="body",avEditMsg=null,mdlDelArm=false;
 const AV_COLORS=[["#16171c","Black"],["#3a3d45","Charcoal"],["#e6e4df","White"],["#b0814f","Camel"],["#5a3a26","Brown"],["#6e1a2a","Burgundy"],["#c0282f","Red"],["#d86a9a","Pink"],["#1f2f5a","Navy"],["#2b56c6","Royal blue"],["#1f4a33","Forest"],["#5b5f2e","Olive"],["#4b2a6e","Purple"],["#c8a040","Gold"]];
 const AV_DEFCOL={hat:"#16171c",top:"#16171c",shoes:"#16171c"};
@@ -1517,8 +1517,8 @@ function modelPane(a){const m=a.model;
     <div class="seg2" role="group" aria-label="Figure"><button data-usemodel="0" aria-pressed="${!a.useModel}">Built-in figure</button><button data-usemodel="1" aria-pressed="${a.useModel}">My model</button></div>
     <div class="mdl-btns"><label class="mv mdl-up">Replace<input type="file" accept=".glb,.gltf,.fbx,.obj,.mtl" multiple data-modelup></label><button class="mv ${mdlDelArm?"armed":""}" data-modeldel>${mdlDelArm?"Tap again to remove":"Remove"}</button></div>`
    :`<label class="btn mdl-up mdl-add">Import a 3D model<input type="file" accept=".glb,.gltf,.fbx,.obj,.mtl" multiple data-modelup></label>`}
-   <p class="avnote">GLB works best. FBX and OBJ work too, up to 50 MB. For an OBJ, pick its .mtl file at the same time to bring in the clothing colors. Your model gets the Disturbed, Ghost and Alive looks and spins like the built-in figure. It shows as it is, without the hat, coat or boots. Switch to the built-in figure to use the outfit.</p></div>`}
-const AV_SKINS=[["#f6d7c3", "Porcelain"], ["#eec1a2", "Fair"], ["#d8a07a", "Tan"], ["#c08a5e", "Honey"], ["#a56e45", "Bronze"], ["#80502f", "Brown"], ["#5c3a22", "Deep brown"], ["#3d2616", "Espresso"]],FX_COLORS=[["#4cc9ff", "Cyan"], ["#ffffff", "White"], ["#ffd36b", "Gold"], ["#ff8a3d", "Ember"], ["#ff4d6d", "Rose"], ["#b07bff", "Violet"], ["#58f0a8", "Mint"], ["#7dff5a", "Lime"]],FX_KINDS=[["auto","Auto"],["none","None"],["sparks","Sparks"],["snow","Snow"],["fireflies","Fireflies"],["stars","Stars"],["smoke","Smoke"]];
+   <p class="avnote">GLB works best. FBX and OBJ work too, up to 50 MB. For an OBJ, pick its .mtl file at the same time to bring in the clothing colors. Your model gets the Disturbed, Ghost and Alive looks and spins like the built-in figure. It shows as it is, without the hat, coat or boots. It can wear wings. Switch to the built-in figure to use the outfit.</p></div>`}
+const AV_SKINS=[["#f6d7c3", "Porcelain"], ["#eec1a2", "Fair"], ["#d8a07a", "Tan"], ["#c08a5e", "Honey"], ["#a56e45", "Bronze"], ["#80502f", "Brown"], ["#5c3a22", "Deep brown"], ["#3d2616", "Espresso"]],FX_COLORS=[["#4cc9ff", "Cyan"], ["#ffffff", "White"], ["#ffd36b", "Gold"], ["#ff8a3d", "Ember"], ["#ff4d6d", "Rose"], ["#b07bff", "Violet"], ["#58f0a8", "Mint"], ["#7dff5a", "Lime"]],FX_KINDS=[["auto","Auto"],["none","None"],["sparks","Sparks"],["snow","Snow"],["fireflies","Fireflies"],["stars","Stars"],["smoke","Smoke"],["fire","Fire"]];
 const HAIR_STYLES=[["short","Short"],["swoop","Swoop"],["long","Long"],["bob","Bob"],["ponytail","Ponytail"],["bun","Bun"],["afro","Afro"],["mohawk","Mohawk"],["buzz","Buzz cut"],["bald","Bald"]],
   HAIR_COLORS=[["#16110d","Black"],["#22160f","Dark brown"],["#3a2418","Brown"],["#6b3f22","Chestnut"],["#8c3b1c","Auburn"],["#c2591f","Ginger"],["#d9b25f","Blonde"],["#efe2bd","Platinum"],["#8d9199","Grey"],["#f2f2f2","White"],["#2b56c6","Blue"],["#d86a9a","Pink"],["#6a3fb0","Purple"],["#2e9c5a","Green"],["#c0282f","Red"]];
 const FLAG_CODES="AF AL DZ AD AO AG AR AM AU AT AZ BS BH BD BB BY BE BZ BJ BT BO BA BW BR BN BG BF BI KH CM CA CV CF TD CL CN CO KM CG CD CR CI HR CU CY CZ DK DJ DM DO EC EG SV GQ ER EE SZ ET FJ FI FR GA GM GE DE GH GR GD GT GN GW GY HT HN HK HU IS IN ID IR IQ IE IL IT JM JP JO KZ KE KI KP KR XK KW KG LA LV LB LS LR LY LI LT LU MO MG MW MY MV ML MT MH MR MU MX FM MD MC MN ME MA MZ MM NA NR NP NL NZ NI NE NG MK NO OM PK PW PS PA PG PY PE PH PL PT PR QA RO RU RW KN LC VC WS SM ST SA SN RS SC SL SG SK SI SB SO ZA SS ES LK SD SR SE CH SY TW TJ TZ TH TL TG TO TT TN TR TM TV UG UA AE GB US UY UZ VU VA VE VN YE ZM ZW".split(" ");let flagList=null;
@@ -1537,11 +1537,11 @@ function scenePane(a){const f=a.fx;return `<div class="lk-label" style="margin:0
     <div class="theme-strip avbg" role="radiogroup" aria-label="Backdrop"><button class="tcard" role="radio" aria-checked="${!a.bg}" data-avbg=""><span class="timg tnone"></span><span class="tname">None</span></button>${stripWalls(w=>`<button class="tcard" role="radio" aria-checked="${a.bg===w.id}" data-avbg="${w.id}"><span class="timg" style="background-image:url('${thumbOf(w)}')"></span><span class="tname">${esc(w.name)}</span></button>`)}</div>
     <div class="avglass"><span>Flag</span><select data-avflag aria-label="Country flag" class="avflag">${flagOpts(a.flag||"")}</select></div>
     <div class="lk-label" style="margin:2px 0 -2px">Background particles</div><div class="avopts">${FX_KINDS.map(([k,l])=>`<button class="fchip" data-fxkind="${k}" aria-pressed="${f.kind===k}">${l}</button>`).join("")}</div>
-    ${f.kind==="auto"?`<p class="avnote">Auto: dark smoke when Disturbed, blue sparks as a Ghost, golden fireflies when Alive.</p>`:f.kind==="none"?"":`<div class="avcols" role="radiogroup" aria-label="Particle color">${FX_COLORS.map(([h,n])=>`<button class="avsw" role="radio" style="--sw:${h}" data-fxcol="${h}" aria-checked="${f.color===h}" aria-label="${n}" title="${n}"></button>`).join("")}</div>
+    ${f.kind==="auto"?`<p class="avnote">Auto: dark smoke when Disturbed, blue sparks as a Ghost, golden fireflies when Alive.</p>`:f.kind==="none"?"":`${f.kind==="fire"?"":`<div class="avcols" role="radiogroup" aria-label="Particle color">${FX_COLORS.map(([h,n])=>`<button class="avsw" role="radio" style="--sw:${h}" data-fxcol="${h}" aria-checked="${f.color===h}" aria-label="${n}" title="${n}"></button>`).join("")}</div>`}
     <div class="avglass"><span>Amount</span><span class="seg2" role="group" aria-label="Amount">${[[1,"Few"],[2,"Some"],[3,"Lots"]].map(([k,l])=>`<button data-fxamt="${k}" aria-pressed="${f.amount===k}">${l}</button>`).join("")}</span></div>`}`}
-function avEditor(){const a=avatarOf(),um=a.useModel&&a.model,cats=um?[["scene","Scene"],["model","3D model"]]:[["body","Body"],["hair","Hair"],["hat","Hat"],["top","Top"],["shoes","Shoes"],["scene","Scene"],["model","3D model"]];
+function avEditor(){const a=avatarOf(),um=a.useModel&&a.model,cats=um?[["wings","Wings"],["scene","Scene"],["model","3D model"]]:[["body","Body"],["hair","Hair"],["hat","Hat"],["top","Top"],["shoes","Shoes"],["wings","Wings"],["scene","Scene"],["model","3D model"]];
   if(!cats.some(c=>c[0]===avCat))avCat=cats[0][0];const tabsH=`<div class="avcats">${cats.map(([k,l])=>`<button class="avcat" data-avcat="${k}" aria-pressed="${avCat===k}">${l}</button>`).join("")}</div>`;
-  if(avCat==="model")return `<div class="aved">${tabsH}${modelPane(a)}</div>`;if(avCat==="body")return `<div class="aved">${tabsH}${bodyPane(a)}</div>`;if(avCat==="hair")return `<div class="aved">${tabsH}${hairPane(a)}</div>`;if(avCat==="scene")return `<div class="aved">${tabsH}${scenePane(a)}</div>`;
+  if(avCat==="model")return `<div class="aved">${tabsH}${modelPane(a)}</div>`;if(avCat==="body")return `<div class="aved">${tabsH}${bodyPane(a)}</div>`;if(avCat==="wings")return `<div class="aved">${tabsH}<div class="lk-label" style="margin:0 0 -2px">Angel wings</div><div class="avopts">${[["","None"],["white","White"],["dark","Dark"]].map(([k,l])=>`<button class="fchip" data-avwings="${k}" aria-pressed="${(a.wings||"")===k}">${l}</button>`).join("")}</div>${realStage()!=="real"&&a.wings?`<p class="avnote">Until you reach Alive at 65%, the wings take on the look of the figure. Then they show in white or dark.</p>`:""}</div>`;if(avCat==="hair")return `<div class="aved">${tabsH}${hairPane(a)}</div>`;if(avCat==="scene")return `<div class="aved">${tabsH}${scenePane(a)}</div>`;
   return `<div class="aved"><div class="avcats">${cats.map(([k,l])=>`<button class="avcat" data-avcat="${k}" aria-pressed="${avCat===k}">${l}</button>`).join("")}</div>
     <div class="avopts">${AV_ITEMS[avCat].map(([v,l])=>`<button class="fchip" data-avset="${avCat}:${v}" aria-pressed="${a[avCat]===v}">${l}</button>`).join("")}</div>
     ${realStage()!=="real"?`<p class="avnote">Clothing colors and looks unlock at 65%, when your figure is Alive.</p>`:a[avCat]!=="none"?`<div class="avcols" role="radiogroup" aria-label="Color">${AV_COLORS.map(([h,n])=>`<button class="avsw" role="radio" style="--sw:${h}" data-avcol="${avCat}:${h}" aria-checked="${(a.colors[avCat]||AV_DEFCOL[avCat]).toLowerCase()===h}" aria-label="${n}" title="${n}"></button>`).join("")}</div>`:""}
@@ -1654,7 +1654,17 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
       const band=new T.Mesh(new T.CylinderGeometry(.19,.193,.04,28),C(tone(col.hat,.45).lerp(new T.Color(0x5a1b25),.5)));band.position.y=.16;head.add(band)}
     if(boots){const bm=C(col.shoes);[-1,1].forEach(s=>{const foot=new T.Mesh(new T.BoxGeometry(.18,.16,.31,2,2,2),bm);foot.position.set(s*lx,.085,.04);g.add(foot);
       const toe=sph(.09,bm);toe.scale.set(1,.85,1);toe.position.set(s*lx,.09,.17);g.add(toe);const cuff=new T.Mesh(new T.CylinderGeometry(.105,.105,.07,16),bm);cuff.position.set(s*lx,.19,0);g.add(cuff)})}}
+    if(av.wings){const wg=makeWings(av.wings,stage);wg.position.set(0,1.5,trench?-.19:-.15);g.add(wg)}
     return {g,torso,arms,head}}
+  function makeWings(kind,stage){const real=stage==="real",mat=real?toon(kind==="dark"?0x17171d:0xf3f4f8):stage==="holo"?holoMat(false):shadowMat(),mat2=real?toon(kind==="dark"?0x2a2a34:0xdfe3ee):mat;
+    const W=new T.Group();W.userData.isWings=true;
+    [-1,1].forEach(sd=>{const w=new T.Group();w.position.set(sd*.07,0,0);w.rotation.y=sd*-.45;w.userData.wing=sd;
+      const N=11;for(let i=0;i<N;i++){const u=i/(N-1),ang=(58-u*135)*Math.PI/180,len=(.98-.62*Math.pow(u,.85))*(i===0?.86:1);
+        const f=sph(1,i%2?mat2:mat,12,8);f.scale.set(len/2,.085,.012);f.rotation.z=sd>0?ang:Math.PI-ang;f.position.set(sd*Math.cos(ang)*len/2,Math.sin(ang)*len/2,-.004*i);w.add(f)}
+      for(let i=0;i<7;i++){const u=i/6,ang=(50-u*110)*Math.PI/180,len=.42-.2*u;const f=sph(1,mat,10,8);f.scale.set(len/2,.09,.018);f.rotation.z=sd>0?ang:Math.PI-ang;f.position.set(sd*Math.cos(ang)*len/2,Math.sin(ang)*len/2,.012);w.add(f)}
+      const a0=58*Math.PI/180,rd=cap(.03,.62,mat);rd.rotation.z=sd*(a0-Math.PI/2);rd.position.set(sd*Math.cos(a0)*.33,Math.sin(a0)*.33,.02);w.add(rd);
+      W.add(w)});return W}
+  let wingsNow=[];
   const flagTex={};
   function makeFlag(code,stage){const em=String.fromCodePoint(...[...code.toUpperCase()].map(c=>127397+c.charCodeAt(0)));
     if(!flagTex[code]){const c=document.createElement("canvas");c.width=256;c.height=176;const x=c.getContext("2d");x.textAlign="center";x.textBaseline="middle";x.font='150px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';x.fillText(em,128,96);
@@ -1674,11 +1684,12 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
     if(stage!=="real"){const beam=new T.Mesh(new T.CylinderGeometry(.28,.5,2.3,32,1,true),new T.ShaderMaterial({uniforms:{c:{value:new T.Color(col)}},transparent:true,depthWrite:false,blending:T.AdditiveBlending,side:T.DoubleSide,
       vertexShader:`varying float y;void main(){y=uv.y;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:`uniform vec3 c;varying float y;void main(){gl_FragColor=vec4(c,(1.-y)*.16);}`}));beam.position.y=1.15;grp.add(beam)}
     return grp}
-  function makeFx(kind,color,amt){const N=({smoke:[70,140,220],sparks:[60,130,240],snow:[70,150,280],fireflies:[18,36,64],stars:[60,130,240]})[kind][amt-1],pos=new Float32Array(N*3),seed=new Float32Array(N);
+  function makeFx(kind,color,amt){const N=({smoke:[70,140,220],sparks:[60,130,240],snow:[70,150,280],fireflies:[18,36,64],stars:[60,130,240],fire:[90,170,280]})[kind][amt-1],pos=new Float32Array(N*3),seed=new Float32Array(N);
     const wide=kind==="stars"||kind==="snow"||kind==="fireflies";for(let i=0;i<N;i++){seed[i]=Math.random();pos[i*3]=(Math.random()-.5)*(wide?2.4:.9);pos[i*3+1]=Math.random()*2.4;pos[i*3+2]=(Math.random()-.5)*(wide?1.4:.5)-(kind==="stars"?.6:0)}
     const geo=new T.BufferGeometry();geo.setAttribute("position",new T.BufferAttribute(pos,3));
-    const size=({smoke:.32,sparks:.11,snow:.1,fireflies:.19,stars:.09})[kind],op=({smoke:.5,sparks:.95,snow:.85,fireflies:.95,stars:.9})[kind];
-    const pts=new T.Points(geo,new T.PointsMaterial({map:spr,color:new T.Color(color),size,transparent:true,opacity:op,depthWrite:false,blending:T.AdditiveBlending}));pts.userData.seed=seed;pts.userData.kind=kind;pts.userData.op=op;return pts}
+    const size=({smoke:.32,sparks:.11,snow:.1,fireflies:.19,stars:.09,fire:.3})[kind],op=({smoke:.5,sparks:.95,snow:.85,fireflies:.95,stars:.9,fire:.55})[kind];
+    if(kind==="fire"){const col=new Float32Array(N*3);for(let i=0;i<N;i++){const a=Math.random()*6.283,r=.15+Math.random()*.42;pos[i*3]=Math.cos(a)*r;pos[i*3+2]=Math.sin(a)*r*.6;pos[i*3+1]=Math.random()*1.3}geo.setAttribute("color",new T.BufferAttribute(col,3))}
+    const pts=new T.Points(geo,new T.PointsMaterial({map:spr,color:kind==="fire"?0xffffff:new T.Color(color),vertexColors:kind==="fire",size,transparent:true,opacity:op,depthWrite:false,blending:T.AdditiveBlending}));pts.userData.seed=seed;pts.userData.kind=kind;pts.userData.op=op;return pts}
   const root=new T.Group();scene.add(root);
   const NAMECOL=[[/skin|body|face|head|flesh|hand|arm|leg|neck/i,0xd8a07a],[/hair|brow|lash/i,0x2b1d14],[/denim|jean/i,0x2a3550],[/leather/i,0x4a3020],[/navy/i,0x1f2f5a],[/brown|tan|khaki|wood/i,0x6b4a2f],[/black|dark/i,0x1c1d22],[/white|ivory|cream/i,0xe6e4df],[/red|crimson|maroon/i,0xb8282f],[/blue/i,0x2b56c6],[/green|olive/i,0x3a6b40],[/gr[ae]y|silver|metal/i,0x8a9099],[/yellow|gold/i,0xc8a040],[/orange/i,0xd9772b],[/pink/i,0xd86a9a],[/purple|violet/i,0x5b2a7e]];
   const avgMap=mp=>{try{const im=mp&&mp.image;if(!im||!(im.width||im.videoWidth))return null;const c=document.createElement("canvas");c.width=c.height=8;const x=c.getContext("2d");x.drawImage(im,0,0,8,8);const d=x.getImageData(0,0,8,8).data;let r=0,g=0,b=0,n=0;for(let i=0;i<d.length;i+=4){if(d[i+3]<40)continue;r+=d[i];g+=d[i+1];b+=d[i+2];n++}return n?new T.Color(r/n/255,g/n/255,b/n/255).convertSRGBToLinear():null}catch(_){return null}};
@@ -1733,7 +1744,8 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
     const g=new T.Group();g.add(o);mixer=md.mixer||null;
     (md.worn||[]).forEach(c=>c.parent&&c.parent.remove(c));md.worn=[];
     if(!md.ms){o.updateMatrixWorld(true);md.ms=measure(o)}
-    g.updateMatrixWorld(true);md.local=md.local||{};[].forEach(([c,b],i)=>{const key=(c.userData.slot||i)+"";
+    g.updateMatrixWorld(true);md.local=md.local||{};const wearing=[];if(md.av&&md.av.wings){const wg=makeWings(md.av.wings,stage),ms=md.ms;wg.position.set(ms.chest[0],ms.top-.52,ms.chest[1]-ms.chd-.04);wg.userData.slot="wings";let bn=null;o.traverse(x=>{if(!bn&&x.isBone&&/spine2|upperchest|chest|spine1|spine/i.test(x.name))bn=x});wearing.push([wg,bn])}
+    wearing.forEach(([c,b],i)=>{const key=(c.userData.slot||i)+"";
       if(b&&md.local[key]){b.add(c);md.local[key].decompose(c.position,c.quaternion,c.scale)}else{g.add(c);c.updateMatrixWorld(true);if(b){b.attach(c);md.local[key]=c.matrix.clone()}}md.worn.push(c)});
     return {g,torso:null,arms:[],head:null}}
   let mixer=null,lastT=0;
@@ -1742,11 +1754,13 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
     scene.children.filter(o=>o.userData.isBase&&o!==base).forEach(o=>scene.remove(o));base.userData.isBase=true;
     if(flag){scene.remove(flag);flag=null}
     if(smoke){scene.remove(smoke);smoke=null}{const fx=av.fx||{kind:"auto"};let kind=fx.kind,col=fx.color||"#4cc9ff";if(kind==="auto"){kind=stage==="shadow"?"smoke":stage==="holo"?"sparks":"fireflies";col=stage==="shadow"?"#5a1640":stage==="holo"?"#4cc9ff":"#ffd36b"}if(kind&&kind!=="none"){smoke=makeFx(kind,col,Math.max(1,Math.min(3,fx.amount||2)));scene.add(smoke)}}
+    wingsNow=[];root.traverse(x=>{if(x.userData.wing)wingsNow.push(x)});
     cur=stage}
   let cur="holo",raf=0,last=0,host=null,t0=performance.now();
   function size(){if(!host)return;const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;if(canvas.width!==Math.round(w*ren.getPixelRatio())||canvas.height!==Math.round(h*ren.getPixelRatio())){ren.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}}
   function frame(now){raf=requestAnimationFrame(frame);if(!host||!host.isConnected){stop();return}if(now-last<24)return;last=now;size();
     const t=(now-t0)/1000;U.t.value=t;U.flick.value=cur==="holo"?(Math.random()<.03?.55:1):1;
+    wingsNow.forEach(w=>{w.rotation.y=w.userData.wing*(-.45-Math.sin(t*1.3)*.1)});
     if(flag){const c=flag.userData.cloth,pa=c.geometry.attributes.position,r=flag.userData.rest;for(let i=0;i<pa.count;i++){const x0=r[i*3];pa.setZ(i,Math.sin(x0*11-t*3.2)*.035*(x0/.46));pa.setY(i,r[i*3+1]+Math.sin(x0*7-t*2.4)*.01*(x0/.46))}pa.needsUpdate=true}
     if(fig){fig.rotation.y=(typeof holoRot==="number"?holoRot:0)*Math.PI/180;fig.position.y=cur==="holo"?Math.sin(t*1.3)*.035:cur==="shadow"?Math.sin(t*.8)*.02:0;
       if(mixer){mixer.update(Math.min(.1,t-lastT))}lastT=t;
@@ -1756,7 +1770,9 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
       if(k==="smoke"||k==="sparks"){const v=k==="sparks"?2.4:1;for(let i=0;i<n;i++){let y=p.getY(i)+(.004+s[i]*.006)*v;if(y>2.4)y=0;p.setY(i,y);p.setX(i,p.getX(i)+Math.sin(t*(k==="sparks"?3:1)+s[i]*20)*.0015)}p.needsUpdate=true;if(k==="smoke")smoke.rotation.y=fig?fig.rotation.y:0}
       else if(k==="snow"){for(let i=0;i<n;i++){let y=p.getY(i)-(.004+s[i]*.005);if(y<0)y=2.4;p.setY(i,y);p.setX(i,p.getX(i)+Math.sin(t*.8+s[i]*20)*.0012)}p.needsUpdate=true}
       else if(k==="fireflies"){for(let i=0;i<n;i++){p.setX(i,p.getX(i)+Math.sin(t*.7+s[i]*40)*.0025);p.setY(i,Math.max(.05,Math.min(2.35,p.getY(i)+Math.cos(t*.9+s[i]*31)*.002)))}p.needsUpdate=true;smoke.material.opacity=smoke.userData.op*(.65+.35*Math.sin(t*2.2))}
-      else if(k==="stars"){smoke.material.opacity=smoke.userData.op*(.75+.25*Math.sin(t*1.7))}}
+      else if(k==="stars"){smoke.material.opacity=smoke.userData.op*(.75+.25*Math.sin(t*1.7))}
+      else if(k==="fire"){const c=smoke.geometry.attributes.color;for(let i=0;i<n;i++){const top=.7+s[i]*.9;let y=p.getY(i)+.012+s[i]*.014;if(y>top){y=0;const a=Math.random()*6.283,r=.15+Math.random()*.42;p.setX(i,Math.cos(a)*r);p.setZ(i,Math.sin(a)*r*.6)}
+          const h=y/top;p.setY(i,y);p.setX(i,p.getX(i)*.992+Math.sin(t*5+s[i]*30)*.003);const f=1-h;c.setXYZ(i,1*f,(.78-.62*h)*f,(.25-.25*Math.min(1,h*2))*f)}p.needsUpdate=true;c.needsUpdate=true}}
     ren.render(scene,cam)}
   function start(){if(!raf){last=0;raf=requestAnimationFrame(frame)}}
   function stop(){cancelAnimationFrame(raf);raf=0}
@@ -1884,16 +1900,13 @@ function hologram(a){
 
 function pie(pct){
   const r=18,C=2*Math.PI*r,p=Math.max(0,Math.min(pct,1)),D=`${(p*C).toFixed(2)} ${C.toFixed(2)}`,hl=`${(C*.16).toFixed(2)} ${C.toFixed(2)}`;
-  return `<svg class="pie pie-m" viewBox="0 0 48 48" aria-hidden="true"><circle class="pg-r" cx="24" cy="24" r="${r}" fill="none" stroke="url(#gRedMetal)" stroke-width="7"/>
-   ${p>0?`<circle class="pg-g" cx="24" cy="24" r="${r}" fill="none" stroke="url(#gMetal)" stroke-width="7" stroke-linecap="${p<1?"round":"butt"}" stroke-dasharray="${D}" transform="rotate(-90 24 24)"/>
-   <circle cx="24" cy="24" r="${r}" fill="none" stroke="url(#gSheen)" stroke-width="7" stroke-dasharray="${D}" transform="rotate(-90 24 24)" opacity=".55"/>`:""}
-   <circle cx="24" cy="24" r="${r+3.4}" fill="none" stroke="rgba(255,255,255,.22)" stroke-width=".6"/><circle cx="24" cy="24" r="${r-3.4}" fill="none" stroke="rgba(0,0,0,.45)" stroke-width=".6"/>
-   <circle cx="24" cy="24" r="${r-1.6}" fill="none" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-dasharray="${hl}" transform="rotate(-150 24 24)" opacity=".6"/></svg>`;
+  return `<svg class="pie pie-m" viewBox="0 0 48 48" aria-hidden="true"><circle class="pg-r" cx="24" cy="24" r="${r}" fill="none" stroke="url(#gRedMetal)" stroke-width="4"/>
+   ${p>0?`<circle class="pg-g" cx="24" cy="24" r="${r}" fill="none" stroke="url(#gMetal)" stroke-width="4" stroke-linecap="${p<1?"round":"butt"}" stroke-dasharray="${D}" transform="rotate(-90 24 24)"/>
+   <circle cx="24" cy="24" r="${r}" fill="none" stroke="url(#gSheen)" stroke-width="4" stroke-dasharray="${D}" transform="rotate(-90 24 24)" opacity=".55"/>`:""}
+   <circle cx="24" cy="24" r="${r+2}" fill="none" stroke="rgba(255,255,255,.22)" stroke-width=".6"/><circle cx="24" cy="24" r="${r-2}" fill="none" stroke="rgba(0,0,0,.45)" stroke-width=".6"/>
+   <circle cx="24" cy="24" r="${r-.9}" fill="none" stroke="#fff" stroke-width=".8" stroke-linecap="round" stroke-dasharray="${hl}" transform="rotate(-150 24 24)" opacity=".6"/></svg>`;
 }
-function emptyPie(){const r=18,C=2*Math.PI*r;
-  return `<svg class="pie" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="${r}" fill="none" stroke="url(#gSteel)" stroke-width="7"/><circle cx="24" cy="24" r="${r}" fill="none" stroke="url(#gSheen)" stroke-width="7" opacity=".35"/>
-   <circle cx="24" cy="24" r="${r+3.4}" fill="none" stroke="rgba(255,255,255,.12)" stroke-width=".6"/><circle cx="24" cy="24" r="${r-3.4}" fill="none" stroke="rgba(0,0,0,.55)" stroke-width=".6"/>
-   <circle cx="24" cy="24" r="${r-1.6}" fill="none" stroke="#fff" stroke-width="1.1" stroke-linecap="round" stroke-dasharray="${(C*.14).toFixed(2)} ${C.toFixed(2)}" transform="rotate(-150 24 24)" opacity=".22"/></svg>`}
+function emptyPie(){return `<svg class="pie pie-e" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="18" fill="none" stroke="rgba(6,8,44,.82)" stroke-width="4"/></svg>`}
 let addingP=false;
 const LVR={Priority:0,Moderate:1,Bonus:2};
 const sortPass=P=>P.map((p,i)=>[p,i]).sort((a,b)=>((LVR[a[0].lvl]??3)-(LVR[b[0].lvl]??3))||((a[0].order??a[1])-(b[0].order??b[1]))).map(x=>x[0]);
@@ -2545,6 +2558,7 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
   else if(b.dataset.avcancel!==undefined){avRevert();avEdit=false;render()}
   else if(b.dataset.avcat){avCat=b.dataset.avcat;render()}
   else if(b.dataset.avhair||b.dataset.avhaircol||b.dataset.avbg!==undefined){const a=avatarOf();if(b.dataset.avhair)a.hair=b.dataset.avhair;if(b.dataset.avhaircol)a.hairColor=b.dataset.avhaircol;if(b.dataset.avbg!==undefined){if(b.dataset.avbg)a.bg=b.dataset.avbg;else delete a.bg}data.profile=Object.assign({},data.profile,{avatar:a});render();save()}
+  else if(b.dataset.avwings!==undefined){const a=avatarOf();if(b.dataset.avwings)a.wings=b.dataset.avwings;else delete a.wings;data.profile=Object.assign({},data.profile,{avatar:a});render();save()}
   else if(b.dataset.avskin){const a=avatarOf();a.skin=b.dataset.avskin;data.profile=Object.assign({},data.profile,{avatar:a});render();save()}
   else if(b.dataset.fxkind||b.dataset.fxcol||b.dataset.fxamt){const a=avatarOf();if(b.dataset.fxkind)a.fx.kind=b.dataset.fxkind;if(b.dataset.fxcol)a.fx.color=b.dataset.fxcol;if(b.dataset.fxamt)a.fx.amount=+b.dataset.fxamt;data.profile=Object.assign({},data.profile,{avatar:a});render();save()}
   else if(b.dataset.avcol){const[k,v]=b.dataset.avcol.split(":");const a=avatarOf();a.colors[k]=v;data.profile=Object.assign({},data.profile,{avatar:a});render();save()}
