@@ -1101,6 +1101,11 @@ aside{background:rgba(var(--tD),calc(.82*var(--go)))!important;backdrop-filter:b
 .tsp .wimg{position:relative}.ts-dot{position:absolute;left:7px;bottom:7px;width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.85);box-shadow:0 1px 6px rgba(0,0,0,.6)}.ts-n{position:absolute;right:7px;bottom:7px;font-style:normal;font-size:10.5px;font-weight:700;color:#fff;background:rgba(4,8,20,.72);border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:1px 6px}
 .wdel.arm{width:auto;padding:0 8px;font-size:11px;font-weight:700;color:#ff8a94;border-color:rgba(255,93,108,.6)}
 @media (max-width:520px){.ts-save{grid-template-columns:minmax(0,1fr)}}
+.bmi-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}.bmi-form.ft3{grid-template-columns:repeat(3,minmax(0,1fr))}.bmi-form label{display:grid;gap:4px;font-size:11.5px;color:var(--muted);min-width:0}.bmi-form input{width:100%;box-sizing:border-box;min-width:0}.bmi-btns{display:flex;gap:8px;margin-top:10px}.bmi-btns .btn{flex:1}.bmi-btns .btn.ghost{background:none;border-color:rgba(var(--lr),.3);color:var(--muted)}
+.bmi-top{display:flex;align-items:center;gap:16px}.bmi-num{flex:none;display:grid;justify-items:center;min-width:76px}.bmi-num b{font-size:34px;font-weight:650;line-height:1;text-shadow:0 0 14px currentColor}.bmi-num small{font-size:11px;color:var(--muted);letter-spacing:.1em;margin-top:4px}
+.bmi-txt{display:grid;gap:2px;min-width:0}.bmi-txt>b{font-size:17px}.bmi-txt span{font-size:13.5px;color:var(--muted)}.bmi-txt em{font-style:normal;font-weight:600;color:#e6eeff}.bmi-txt small{font-size:11.5px;color:var(--muted)}
+.bmi-bar{position:relative;height:6px;border-radius:99px;margin:14px 0 4px;background:linear-gradient(90deg,#4cc9ff 0 14%,#3ddc84 14% 40%,#ffb648 40% 60%,#ff7a5c 60% 100%);opacity:.9}.bmi-bar i{position:absolute;top:50%;width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid #0a1226;box-shadow:0 0 8px rgba(255,255,255,.8);transform:translate(-50%,-50%)}
+.bmi-scale{position:relative;height:14px;font-size:10.5px;color:var(--muted)}.bmi-scale span{position:absolute;transform:translateX(-50%)}
 .dtrack{position:relative;clip-path:inset(-30px 0)}.dtrack-in{position:absolute;inset:0;will-change:transform}.dpane{position:absolute!important;top:0;width:100%;margin:0!important;animation:none!important}
 .dfull{touch-action:pan-y;user-select:none;-webkit-user-select:none}.dfull input{user-select:text;-webkit-user-select:text}
 .dfull.fromR.slide{animation:dslR .38s cubic-bezier(.2,.85,.25,1) both}.dfull.fromL.slide{animation:dslL .38s cubic-bezier(.2,.85,.25,1) both}@keyframes dslR{from{opacity:0;transform:translateX(46px)}to{opacity:1;transform:none}}@keyframes dslL{from{opacity:0;transform:translateX(-46px)}to{opacity:1;transform:none}}
@@ -1817,6 +1822,7 @@ function vBody(){
   </div>
   <div class="passtop figtop" style="margin-top:18px">${figurePanel()}
    <div class="stack">
+    ${bmiPanel(d)}
     <div class="panel chart" style="--c:var(--violet)"><div class="ph"><span>Weight by time</span><i>${g.unit}</i></div>${lineChart(W.map(p=>({d:p.d,v:p.v})),"#8fd8ff")}</div>
     <div class="panel"><div class="ph"><span>Log weight</span><i></i></div>
      <form class="f" id="wForm"><div class="f2"><label>Date<input id="wDate" type="date" value="${today()}" max="${today()}" required></label>
@@ -1882,7 +1888,8 @@ function hairPane(a){const hs=a.hair||(a.body==="woman"?"long":a.body==="man"?"s
     ${realStage()!=="real"?`<p class="avnote">Hair color shows once your figure is Alive, at 65%. The hair type shows in every stage.</p>`:""}`}
 let avSnap=null;
 function avRevert(){if(avSnap==null)return;const now=JSON.stringify({a:(data.profile||{}).avatar||null,f:(data.profile||{}).figure||null});const was=avSnap;avSnap=null;if(now===was)return;const o=JSON.parse(was);const pr=Object.assign({},data.profile);if(o.a)pr.avatar=o.a;else delete pr.avatar;if(o.f)pr.figure=o.f;else delete pr.figure;data.profile=pr;save()}
-function bodyPane(a){return `<div class="avglass"><span>Body</span><span class="sexsw" role="group" aria-label="Body">${[["woman","♀","Woman"],["man","♂","Man"],["neither",`<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="12" r="5"/><path d="M14.5 8.5 L19 4 M15 4 h4 v4"/><path d="M11 17 v5 M8.5 19.5 h5"/></svg>`,"Neither"]].map(([k,sym,l])=>`<button data-sex="${k}" aria-pressed="${a.body===k}" aria-label="${l}" title="${l}">${sym}</button>`).join("")}</span></div>
+const sexRow=a=>`<div class="avglass"><span>Sex</span><span class="sexsw" role="group" aria-label="Body">${[["woman","♀","Woman"],["man","♂","Man"],["neither",`<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="12" r="5"/><path d="M14.5 8.5 L19 4 M15 4 h4 v4"/><path d="M11 17 v5 M8.5 19.5 h5"/></svg>`,"Neither"]].map(([k,sym,l])=>`<button data-sex="${k}" aria-pressed="${a.body===k}" aria-label="${l}" title="${l}">${sym}</button>`).join("")}</span></div>`;
+function bodyPane(a){return `${sexRow(a)}
     <div class="lk-label" style="margin:2px 0 -2px">Skin tone</div><div class="avcols" role="radiogroup" aria-label="Skin tone">${AV_SKINS.map(([h,n])=>`<button class="avsw" role="radio" style="--sw:${h}" data-avskin="${h}" aria-checked="${(a.skin||"#d8a07a")===h}" aria-label="${n}" title="${n}"></button>`).join("")}</div>
     ${realStage()!=="real"?`<p class="avnote">Skin tone shows once your figure is Alive, at 65%.</p>`:""}`}
 function scenePane(a){const f=a.fx;return `<div class="lk-label" style="margin:0 0 -2px">Backdrop</div>
@@ -1891,7 +1898,7 @@ function scenePane(a){const f=a.fx;return `<div class="lk-label" style="margin:0
     <div class="lk-label" style="margin:2px 0 -2px">Background particles</div><div class="avopts">${FX_KINDS.map(([k,l])=>`<button class="fchip" data-fxkind="${k}" aria-pressed="${f.kind===k}">${l}</button>`).join("")}</div>
     ${f.kind==="auto"?`<p class="avnote">Auto: dark smoke when Disturbed, blue sparks as a Ghost, golden fireflies when Alive.</p>`:f.kind==="none"?"":`${f.kind==="fire"?"":`<div class="avcols" role="radiogroup" aria-label="Particle color">${FX_COLORS.map(([h,n])=>`<button class="avsw" role="radio" style="--sw:${h}" data-fxcol="${h}" aria-checked="${f.color===h}" aria-label="${n}" title="${n}"></button>`).join("")}</div>`}
     <div class="avglass"><span>Amount</span><span class="seg2" role="group" aria-label="Amount">${[[1,"Few"],[2,"Some"],[3,"Lots"]].map(([k,l])=>`<button data-fxamt="${k}" aria-pressed="${f.amount===k}">${l}</button>`).join("")}</span></div>`}`}
-function avEditor(){const a=avatarOf(),um=a.useModel&&a.model,cats=um?[["wings","Wings"],["scene","Scene"],["model","3D model"]]:[["body","Body"],["hair","Hair"],["hat","Hat"],["top","Top"],["shoes","Shoes"],["wings","Wings"],["scene","Scene"],["model","3D model"]];
+function avEditor(){if(figFit())return `<div class="aved">${sexRow(avatarOf())}<p class="avnote">This figure is your body. Its shape comes from your BMI and your training, so the only thing to pick here is the sex.</p></div>`;const a=avatarOf(),um=a.useModel&&a.model,cats=um?[["wings","Wings"],["scene","Scene"],["model","3D model"]]:[["body","Body"],["hair","Hair"],["hat","Hat"],["top","Top"],["shoes","Shoes"],["wings","Wings"],["scene","Scene"],["model","3D model"]];
   if(!cats.some(c=>c[0]===avCat))avCat=cats[0][0];const tabsH=`<div class="avcats">${cats.map(([k,l])=>`<button class="avcat" data-avcat="${k}" aria-pressed="${avCat===k}">${l}</button>`).join("")}</div>`;
   if(avCat==="model")return `<div class="aved">${tabsH}${modelPane(a)}</div>`;if(avCat==="body")return `<div class="aved">${tabsH}${bodyPane(a)}</div>`;if(avCat==="wings")return `<div class="aved">${tabsH}<div class="lk-label" style="margin:0 0 -2px">Angel wings</div><div class="avopts">${[["","None"],["white","White"],["dark","Dark"]].map(([k,l])=>`<button class="fchip" data-avwings="${k}" aria-pressed="${(a.wings||"")===k}">${l}</button>`).join("")}</div>${realStage()!=="real"&&a.wings?`<p class="avnote">Until you reach Alive at 65%, the wings take on the look of the figure. Then they show in white or dark.</p>`:""}</div>`;if(avCat==="hair")return `<div class="aved">${tabsH}${hairPane(a)}</div>`;if(avCat==="scene")return `<div class="aved">${tabsH}${scenePane(a)}</div>`;
   return `<div class="aved"><div class="avcats">${cats.map(([k,l])=>`<button class="avcat" data-avcat="${k}" aria-pressed="${avCat===k}">${l}</button>`).join("")}</div>
@@ -2114,9 +2121,11 @@ vec4 w=modelMatrix*vec4(transformed,1.);w.xyz+=normalize(mat3(modelMatrix)*objec
   let mixer=null,lastT=0;
   /* fitness body: a real human mesh (MakeHuman, CC0) blended between soft, average and muscular */
   const fitData={};
-  function fitPut(g,b){const dv=new DataView(b),n=dv.getUint32(0,true),ni=dv.getUint32(4,true);let o=8;const A=new Int16Array(b,o,n*3);o+=n*6;const M=new Int16Array(b,o,n*3);o+=n*6;const F=new Int16Array(b,o,n*3);o+=n*6;fitData[g]={n,a:A,m:M,f:F,idx:new Uint16Array(b,o,ni)}}
-  function fitFig(av){const D=fitData[av.fitMesh],m=Math.max(0,Math.min(1,+av.fit||0)),n=D.n,pos=new Float32Array(n*3),k=1/8000,fa=m<.5?(1-2*m)*.8:0,mu=m>.5?2*m-1:0;
-    for(let i=0;i<n*3;i++)pos[i]=(D.a[i]+D.m[i]*mu+D.f[i]*fa)*k;
+  function fitPut(g,b){const dv=new DataView(b),n=dv.getUint32(0,true),ni=dv.getUint32(4,true);let o=8;const A=new Int16Array(b,o,n*3);o+=n*6;const M=new Int16Array(b,o,n*3);o+=n*6;const F=new Int16Array(b,o,n*3);o+=n*6;const Th=new Int16Array(b,o,n*3);o+=n*6;fitData[g]={n,a:A,m:M,f:F,th:Th,idx:new Uint16Array(b,o,ni)};
+    if(fitData.m&&fitData.f&&!fitData.n){const P=fitData.m,Q=fitData.f,mix=k=>{const r=new Float32Array(P.n*3);for(let i=0;i<r.length;i++)r[i]=(P[k][i]+Q[k][i])/2;return r};fitData.n={n:P.n,a:mix("a"),m:mix("m"),f:mix("f"),th:mix("th"),idx:P.idx}}}
+  function fitFig(av){const D=fitData[av.fitMesh],m=Math.max(0,Math.min(1,+av.fit||0)),n=D.n,pos=new Float32Array(n*3),k=1/8000,w=av.fitW;let fa,mu,th=0;
+    if(w==null){fa=m<.5?(1-2*m)*.8:0;mu=m>.5?2*m-1:0}else{mu=m;fa=Math.max(0,w)*(1-.45*m);th=Math.max(0,-w)}   // BMI sets the weight, training sets the muscle
+    for(let i=0;i<n*3;i++)pos[i]=(D.a[i]+D.m[i]*mu+D.f[i]*fa+D.th[i]*th)*k;
     const geo=new T.BufferGeometry();geo.setAttribute("position",new T.BufferAttribute(pos,3));geo.setIndex(new T.BufferAttribute(D.idx,1));geo.computeVertexNormals();
     const g=new T.Group(),occ=new T.Mesh(geo,new T.MeshBasicMaterial({colorWrite:false}));occ.renderOrder=1;g.add(occ);
     const hm=fitMat();const body=new T.Mesh(geo,hm);body.renderOrder=2;g.add(body);g.scale.setScalar(1.04);
@@ -2175,7 +2184,7 @@ function holoView(){const fit=figFit(),a=avatarOf(),st=fit?"real":holoStage(),rs
   const bgw=a.bg&&allWalls().find(w=>w.id===a.bg),bgu=bgw?(bgw.live?thumbOf(bgw):bestSrc(bgw,false)):"";
   const fig=H3?`<div class="holo holo3d${bgw?" hasbg":""}" ${bgw?`style="background-image:linear-gradient(rgba(4,8,20,.15),rgba(4,8,20,.5)),url('${bgu}')"`:""} data-h3 role="img" aria-label="${fit?"Your body":HSTAGE[st][0]+" figure"}. Drag to spin.">${a.flag&&/^[a-z]{2}$/i.test(a.flag)?`<span class="avflagbadge st-${st}" aria-label="Flag">${String.fromCodePoint(...[...a.flag.toUpperCase()].map(c=>127397+c.charCodeAt(0)))}</span>`:""}</div>`:(h3Ensure(),hologram(a));
   const lock=`<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`;
-  if(fit){holoPreview=null;const L=fitLevel(D());return fig+`<div class="hfit"><div class="hfit-steps">${FITST.map((x,k)=>`<span class="${k===L.i?"on":k<L.i?"past":""}">${x[0]}</span>`).join("")}</div><div class="hfit-bar"><i style="width:${Math.max(3,L.m*100)}%"></i></div></div><p class="hcap">${L.cap}</p>`}
+  if(fit){holoPreview=null;const L=fitLevel(D());return fig+`<div class="hfit"><div class="hfit-steps">${FITST.map((x,k)=>`<span class="${k===L.i?"on":k<L.i?"past":""}">${x[0]}</span>`).join("")}</div><div class="hfit-bar"><i style="width:${Math.max(3,L.m*100)}%"></i></div></div><p class="hcap">${(bt=>bt?`<b style="color:rgba(var(--tL),1)">${bt}</b> · `:"")(bodyType(bmiInfo(D()).bmi,L.m))}${L.cap}</p>`}
   holoPreview=null;const cap=rs==="real"?"Alive unlocked. Pick any look.":rs==="holo"?"Reach 65% to unlock Alive and clothing colors.":"Reach 40% to unlock Ghost.";
   return fig+`<div class="hstage" role="group" aria-label="Figure stages">${["shadow","holo","real"].filter(k=>SRANK[k]<=SRANK[rs]).map(k=>`<button data-hstage="${k}" aria-pressed="${st===k}" title="Use this look">${HSTAGE[k][0]}</button>`).join("")}</div><p class="hcap">${cap}</p>`}
 /* ---------- your own 3D model: stored in Supabase Storage, cached on the device ---------- */
@@ -2200,19 +2209,42 @@ async function loadModel(m){const k=mKey(m);mdl={key:k,obj:null,busy:true,fail:f
   try{const buf=await modelBuffer(m);if(!buf)throw new Error("nofile");const r=await parseModel(buf,m.ext);if(mdl.key!==k)return;mdl={key:k,obj:r.obj,clips:r.clips,busy:false}}
   catch(e){if(mdl.key===k){mdl={key:k,obj:null,busy:false,fail:true};toast(m.path==="local"&&!(await IDB.get(k))?"Your 3D model is on the device you added it from":"Couldn't load your 3D model")}}
   if(tab!=="set")render()}
+function bmiInfo(d){const g=d.goals,h=+g.height||0,W=byDate(d.weights),lw=W.length?+W[W.length-1].v:null;if(!h||!lw)return {h,lw,bmi:null};
+  const kg=g.unit==="kg"?lw:lw*.45359237,bmi=kg/Math.pow(h/100,2),c=bmi<18.5?["Underweight","#4cc9ff"]:bmi<25?["Healthy weight","#3ddc84"]:bmi<30?["Overweight","#ffb648"]:["Obese range","#ff7a5c"],k=g.unit==="kg"?1:2.20462;
+  return {h,lw,bmi,cat:c[0],col:c[1],lo:18.5*h*h/1e4*k,hi:24.9*h*h/1e4*k}}
+const bmiW=b=>b<22?Math.max(-1,-(22-b)/5):Math.min(1,(b-22)/11);
+const bodyType=(b,mu)=>b==null?null:b<18.5?(mu>=.5?"Lean and toned":"Slim"):b<25?(mu>=.75?"Athletic":mu>=.5?"Toned":"Average"):b<30?(mu>=.5?"Strong build":"Soft"):(mu>=.75?"Powerful":"Heavy");
+const hTxt=(h,imp)=>{if(!imp)return Math.round(h)+" cm";let t=Math.round(h/2.54),f=Math.floor(t/12);return f+"′"+(t-f*12)+"″"};
+let bmiEdit=false;
+function bmiPanel(d){const g=d.goals,b=bmiInfo(d),imp=g.len!=="cm",h=b.h,ti=h?Math.round(h/2.54*2)/2:0,ft=h?Math.floor(ti/12):"",inch=h?+(ti-ft*12).toFixed(1):"";
+  if(b.bmi==null||bmiEdit)return `<div class="panel bmi"><div class="ph"><span>Your BMI</span><i>Sets your body type</i></div><p class="note" style="margin:0 0 10px">Add your height and weight. It works out your BMI, gives you a body type and shapes your figure to match.</p>
+    <div class="bmi-form${imp?" ft3":""}">${imp?`<label>Feet<input id="bmFt" inputmode="numeric" autocomplete="off" value="${ft}" placeholder="5"></label><label>Inches<input id="bmIn" inputmode="decimal" autocomplete="off" value="${inch}" placeholder="8"></label>`:`<label>Height (cm)<input id="bmCm" inputmode="decimal" autocomplete="off" value="${h?Math.round(h):""}" placeholder="172"></label>`}<label>Weight (${g.unit})<input id="bmW" inputmode="decimal" autocomplete="off" value="${b.lw??""}" placeholder="${g.unit==="kg"?70:155}"></label></div>
+    <div class="bmi-btns"><button class="btn" data-bmisave>Save</button>${bmiEdit&&b.bmi!=null?`<button class="btn ghost" data-bmicancel>Cancel</button>`:""}</div></div>`;
+  const mu=fitLevel(d).m,ty=bodyType(b.bmi,mu),x=Math.max(2,Math.min(98,(b.bmi-15)/25*100));
+  return `<div class="panel bmi"><div class="ph"><span>Your BMI</span><button class="dview" data-bmiedit style="margin:0">Edit</button></div>
+    <div class="bmi-top"><div class="bmi-num"><b style="color:${b.col}">${b.bmi.toFixed(1)}</b><small>BMI</small></div><div class="bmi-txt"><b style="color:${b.col}">${b.cat}</b><span>Body type: <em>${ty}</em></span><small>${hTxt(b.h,imp)} · ${b.lw} ${g.unit} · healthy range ${Math.round(b.lo)}–${Math.round(b.hi)} ${g.unit}</small></div></div>
+    <div class="bmi-bar"><i style="left:${x.toFixed(1)}%"></i></div><div class="bmi-scale"><span style="left:14%">18.5</span><span style="left:40%">25</span><span style="left:60%">30</span></div>
+    <p class="note" style="margin:6px 0 0">BMI is a rough guide and can't tell muscle from fat, so your training shapes the figure too.</p></div>`}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-bmisave],[data-bmiedit],[data-bmicancel]");if(!b)return;
+  if(b.dataset.bmiedit!==undefined){bmiEdit=true;render();return}if(b.dataset.bmicancel!==undefined){bmiEdit=false;render();return}
+  const nv=id=>{const el=$(id);if(!el)return null;const n=parseFloat(String(el.value).replace(",","."));return isFinite(n)?n:null},g=data.goals;let h;
+  if(g.len!=="cm"){const f=nv("#bmFt"),i=nv("#bmIn")||0;if(f==null){toast("Enter your height");return}h=(f*12+i)*2.54}else{h=nv("#bmCm");if(h==null){toast("Enter your height");return}}
+  if(h<90||h>250){toast("That height doesn't look right");return}const w=nv("#bmW"),kg=w==null?0:g.unit==="kg"?w:w*.45359237;if(w==null||kg<20||kg>400){toast("Enter your weight");return}
+  g.height=Math.round(h*10)/10;const W=byDate(data.weights),lw=W.length?+W[W.length-1].v:null;if(lw!==w){data.weights=data.weights.filter(x=>x.d!==today());data.weights.push({id:uid(),d:today(),v:w})}
+  bmiEdit=false;render();save();toast("BMI saved")},true);
 const figFit=()=>tab==="body"||tab==="train";
 const FITST=[["Start",0],["Lean",.25],["Toned",.5],["Built",.75]];
 function fitLevel(d){const days=new Set(d.workouts.filter(w=>{const a=(Date.now()-new Date(w.d+"T12:00"))/864e5;return a<14&&a>-1}).map(w=>w.d)).size,tr=Math.min(1,days/8),b=bodyInfo(d).pct,m=Math.round((b==null?tr:tr*.8+b*.2)*100)/100;
   let i=0;FITST.forEach((x,k)=>{if(m>=x[1])i=k});const nx=FITST[i+1];let cap="Top shape. Keep training to hold it.";
   if(nx){const need=Math.max(1,Math.ceil((b==null?nx[1]:(nx[1]-b*.2)/.8)*8-days));cap=`${days} training day${days===1?"":"s"} in the last 2 weeks. ${need} more to reach ${nx[0]}.`}
   return {m,name:FITST[i][0],cap,days,i}}
-const fitAv=()=>{const a=avatarOf();a.hat=a.top=a.shoes="none";a.wings="";a.cmode="solid";a.fit=fitLevel(D()).m;return a};
+const fitAv=()=>{const a=avatarOf();a.hat=a.top=a.shoes="none";a.wings="";a.cmode="solid";a.fit=fitLevel(D()).m;const bm=bmiInfo(D());a.fitW=bm.bmi==null?null:Math.round(bmiW(bm.bmi)*40)/40;return a};
 const figAv=()=>{const a=avatarOf();if(realStage()!=="real")a.cmode="figure";return a};
 const fitLoad={};
 function fitEnsure(g){if(!H3||H3.fitHas(g)||fitLoad[g])return;fitLoad[g]=fetch("lib/body-"+g+".txt").then(r=>{if(!r.ok)throw 0;return r.text()}).then(t=>{const q=atob(t.trim()),u=new Uint8Array(q.length);for(let i=0;i<q.length;i++)u[i]=q.charCodeAt(i);H3.fitPut(g,u.buffer);if(figFit())render()}).catch(()=>{fitLoad[g]="fail"})}
 function holoMount(){const el=document.querySelector("[data-h3]");if(!el||!H3){if(H3)H3.stop();return}
   const fit=figFit(),a=fit?fitAv():figAv();let hs=fit?"real":holoStage();
-  if(fit){const g=a.body==="woman"?"f":"m";fitEnsure(g);if(H3.fitHas(g)){a.fitMesh=g;a.useModel=false;hs="holo"}}
+  if(fit){const g=a.body==="woman"?"f":a.body==="man"?"m":"n";if(g==="n"){fitEnsure("m");fitEnsure("f")}else fitEnsure(g);if(H3.fitHas(g)){a.fitMesh=g;a.useModel=false;hs="holo"}}
   const m=a.useModel&&a.model;
   if(m){const k=mKey(m);if(mdl.key!==k)loadModel(m);if(mdl.key===k&&mdl.obj){mdl.mtl=m.mtl||null;H3.set(a,hs,mdl);el.classList.remove("loading")}else{H3.set(a,hs);el.classList.toggle("loading",!mdl.fail)}}
   else{H3.set(a,hs);el.classList.remove("loading")}
