@@ -2832,8 +2832,8 @@ function dayForm(i,ds,wide,wk){const fr=wk?wkOf(today()):ds>=today()?ds:(()=>{co
     <label class="mo st" ${wk?"hidden":""}><span id="slFl">Starts</span><input id="slF" type="date" value="${fr}" min="${wk?fr:today()}"></label>
     <label class="du mo">Ends<select id="slU"><option value="">Never</option><option value="date">On a date</option></select></label>
     <label class="du dud mo" hidden>End date<input id="slUd" type="date" min="${today()}"></label>
-    <button type="button" class="sf-more" data-slmore>${slMore?"Fewer options":"More options"}</button><p class="sf-err" id="slErr" role="alert" hidden></p><div class="df-btns"><button class="btn">Add</button><button type="button" class="mv" data-addday="${wk?"wk":i}">Cancel</button></div></form>`}
-let slMore=false;document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-slmore]");if(!b)return;slMore=!slMore;b.textContent=slMore?"Fewer options":"More options";slotFormSync(b.closest("form"))});
+    <p class="sf-err" id="slErr" role="alert" hidden></p><div class="df-btns"><button class="btn">Add</button><button type="button" class="mv" data-addday="${wk?"wk":i}">Cancel</button></div></form>`}
+let slMore=true;   /* every input is always shown */document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-slmore]");if(!b)return;slMore=!slMore;b.textContent=slMore?"Fewer options":"More options";slotFormSync(b.closest("form"))});
 const slErr=(m,sel)=>{toast(m);const e=$("#slErr");if(e){e.textContent=m;e.hidden=false}const i=sel&&$(sel);i&&i.focus()};
 /* after adding, open what was just added so it is plainly there */
 function slotShow(id,ds){selSlot={id,ds};editSlot=null;setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"nearest"})},80)}
@@ -3387,7 +3387,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="104";
+const APPV="105";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
