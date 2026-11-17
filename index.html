@@ -1385,7 +1385,7 @@ function scoreAll(d){
   return {total,mins,level:Math.floor(total/PTS_PER_LEVEL)+1,into:total%PTS_PER_LEVEL,wkMins,wkPts:Math.round(wkMins/60*PTS_PER_HOUR)};
 }
 function streak(d){const days=new Set(d.sessions.map(s=>s.d));let n=0,x=new Date();if(!days.has(today()))x.setDate(x.getDate()-1);while(days.has(ymd(x))){n++;x.setDate(x.getDate()-1)}return n}
-const byDate=a=>[...a].sort((p,q)=>p.d<q.d?-1:p.d>q.d?1:0);
+const byDate=a=>[...a].sort((p,q)=>p.d<q.d?-1:p.d>q.d?1:(p.at||0)-(q.at||0));
 const PAL=["var(--cyan)","var(--magenta)","var(--violet)","var(--amber)","var(--lime)"];
 
 /* ---------- charts ---------- */
@@ -1820,20 +1820,21 @@ async function scanHit(raw){const S=scan;if(!S||S.busy)return;const code=String(
 document.addEventListener("click",e=>{const T=e.target;if(!scan||!T.closest)return;if(T.closest("[data-scanx]")||T===scan.o){scanClose();return}if(T.closest("[data-scango]")){const v=($("#scanCode")||{}).value||"";scanHit(v)}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&scan)scanClose()});
 function weightTrend(d){const g=d.goals,W=byDate(d.weights),u=g.unit,DN="#3ddc84",UP="#ffb648",FL="#8fa3c8";
-  if(W.length<2)return `<div class="panel wtr" style="margin-top:18px"><div class="ph"><span>Weight trend</span><i>${u}</i></div><div class="empty">Log two weigh-ins and your ups and downs show here</div></div>`;
-  const t=x=>new Date(x+"T12:00").getTime(),t0=t(W[0].d),t1=t(W[W.length-1].d),span=Math.max(1,t1-t0),vs=W.map(w=>+w.v),gl=+g.weight||null;
+  if(!W.length)return `<div class="panel wtr" style="margin-top:18px"><div class="ph"><span>Weight trend</span><i>${u}</i></div><div class="empty">Your graph starts with your first weigh-in</div></div>`;
+  const dayN={};W.forEach(w=>dayN[w.d]=(dayN[w.d]||0)+1);const dayI={},tm=W.map(w=>{const b=new Date(w.d+"T00:00").getTime(),n=dayN[w.d],i=dayI[w.d]=(dayI[w.d]||0)+1;return b+864e5*i/(n+1)});   // several on one day are spread across that day, in order
+  const t=w=>tm[W.indexOf(w)],t0=tm[0],t1=tm[tm.length-1],span=Math.max(1,t1-t0),one=W.length<2,vs=W.map(w=>+w.v),gl=+g.weight||null;
   let lo=Math.min(...vs,gl??Infinity),hi=Math.max(...vs,gl??-Infinity);if(hi-lo<2){lo-=1;hi+=1}const pad=(hi-lo)*.14;lo-=pad;hi+=pad;
-  const X0=46,X1=588,Y0=14,Y1=168,px=w=>X0+(t(w.d)-t0)/span*(X1-X0),py=v=>Y1-(v-lo)/(hi-lo)*(Y1-Y0),P=W.map(w=>[px(w),py(+w.v)]);
+  const X0=46,X1=588,Y0=14,Y1=168,px=w=>one?(X0+X1)/2:X0+(t(w)-t0)/span*(X1-X0),py=v=>Y1-(v-lo)/(hi-lo)*(Y1-Y0),P=W.map(w=>[px(w),py(+w.v)]);
   const seg=P.slice(1).map((q,i)=>{const dv=vs[i+1]-vs[i],c=dv<0?DN:dv>0?UP:FL;return `<line x1="${P[i][0].toFixed(1)}" y1="${P[i][1].toFixed(1)}" x2="${q[0].toFixed(1)}" y2="${q[1].toFixed(1)}" stroke="${c}" stroke-width="2.4" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`}).join("");
   const area=`M${P[0][0].toFixed(1)},${Y1} `+P.map(q=>`L${q[0].toFixed(1)},${q[1].toFixed(1)}`).join(" ")+` L${P[P.length-1][0].toFixed(1)},${Y1} Z`;
   const dots=P.map((q,i)=>{const dv=i?vs[i]-vs[i-1]:0,c=dv<0?DN:dv>0?UP:"#cfe0ff";return `<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="${i===P.length-1?4.2:2.8}" fill="${c}" stroke="#0a1226" stroke-width="1.2"><title>${fmtDate(W[i].d)}: ${vs[i]} ${u}${i?` (${dv>0?"+":""}${dv.toFixed(1)})`:""}</title></circle>`}).join("");
   const grid=[0,.5,1].map(k=>{const v=lo+pad+(hi-lo-2*pad)*k,y=py(v);return `<line x1="${X0}" x2="${X1}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="rgba(160,190,255,.12)" stroke-width="1" vector-effect="non-scaling-stroke"/><text x="${X0-8}" y="${(y+3.5).toFixed(1)}" text-anchor="end" font-size="10.5" fill="#8fa3c8" font-family="Inter,sans-serif">${Math.round(v*10)/10}</text>`}).join("");
   const goal=gl?`<line x1="${X0}" x2="${X1}" y1="${py(gl).toFixed(1)}" y2="${py(gl).toFixed(1)}" stroke="#4cc9ff" stroke-width="1.2" stroke-dasharray="5 5" vector-effect="non-scaling-stroke"/><text x="${X1}" y="${(py(gl)-5).toFixed(1)}" text-anchor="end" font-size="10.5" fill="#4cc9ff" font-family="Inter,sans-serif">Goal ${gl}</text>`:"";
-  const tot=vs[vs.length-1]-vs[0],last=vs[vs.length-1]-vs[vs.length-2],wk=tot/(span/6048e5),sg=v=>(v>0?"+":v<0?"−":"")+Math.abs(v).toFixed(1),col=v=>v<0?DN:v>0?UP:FL,ar=v=>v<0?"↓":v>0?"↑":"→";
+  const tot=vs[vs.length-1]-vs[0],last=one?0:vs[vs.length-1]-vs[vs.length-2],wk=tot/(span/6048e5),sg=v=>(v>0?"+":v<0?"−":"")+Math.abs(v).toFixed(1),col=v=>v<0?DN:v>0?UP:FL,ar=v=>v<0?"↓":v>0?"↑":"→";
   let dn=0,up=0;for(let i=1;i<vs.length;i++){if(vs[i]<vs[i-1])dn++;else if(vs[i]>vs[i-1])up++}
   const chip=(l,v,sub)=>`<div><small>${l}</small><b style="color:${col(v)}">${ar(v)} ${sg(v)} ${u}</b><em>${sub}</em></div>`;
   return `<div class="panel wtr" style="margin-top:18px"><div class="ph"><span>Weight trend</span><i>${W.length} weigh-ins</i></div>
-    <div class="wtr-sum">${chip("Overall",tot,"since "+fmtDate(W[0].d))}${chip("Last weigh-in",last,fmtDate(W[W.length-1].d))}${span>=6048e5?chip("Pace",wk,"per week"):`<div><small>Pace</small><b style="color:${FL}">--</b><em>needs a week of data</em></div>`}<div><small>Moves</small><b><span style="color:${DN}">↓ ${dn}</span> <span style="color:${UP}">↑ ${up}</span></b><em>down · up</em></div></div>
+    <div class="wtr-sum">${one?`<div><small>Overall</small><b style="color:${FL}">--</b><em>one weigh-in so far</em></div><div><small>Last weigh-in</small><b>${vs[0]} ${u}</b><em>${fmtDate(W[0].d)}</em></div>`:chip("Overall",tot,"since "+fmtDate(W[0].d))+chip("Last weigh-in",last,fmtDate(W[W.length-1].d))}${span>=6048e5?chip("Pace",wk,"per week"):`<div><small>Pace</small><b style="color:${FL}">--</b><em>needs a week of data</em></div>`}<div><small>Moves</small><b><span style="color:${DN}">↓ ${dn}</span> <span style="color:${UP}">↑ ${up}</span></b><em>down · up</em></div></div>
     <svg class="wtr-svg" viewBox="0 0 600 190" role="img" aria-label="Weight over time. Overall ${tot<0?"down":tot>0?"up":"no change"} ${Math.abs(tot).toFixed(1)} ${u} since ${fmtDate(W[0].d)}."><defs><linearGradient id="wtrg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(120,180,255,.2)"/><stop offset="1" stop-color="rgba(120,180,255,0)"/></linearGradient></defs>
       ${grid}<path d="${area}" fill="url(#wtrg)"/>${goal}${seg}${dots}
       <text x="${X0}" y="186" font-size="10.5" fill="#8fa3c8" font-family="Inter,sans-serif">${fmtDate(W[0].d)}</text><text x="${X1}" y="186" text-anchor="end" font-size="10.5" fill="#8fa3c8" font-family="Inter,sans-serif">${fmtDate(W[W.length-1].d)}</text></svg>
@@ -1850,8 +1851,8 @@ function vBody(){
   <div class="passtop figtop" style="margin-top:18px">${figurePanel()}
    <div class="stack">
     ${bmiPanel(d)}
-    <div class="panel"><div class="ph"><span>Weigh in</span><i>${W.length} total</i></div>
-     <div class="rows"><form class="r wnew" id="wForm" style="--c:var(--violet)"><span class="dot"></span><div class="m"><label class="wd" title="Change the date"><span id="wDateTxt">${fmtDate(today())}</span><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg><input id="wDate" type="date" value="${today()}" max="${today()}" required aria-label="Date"></label></div><div class="v"><input id="wVal" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" aria-label="Weight in ${g.unit}"> ${g.unit}</div><button class="wok" aria-label="Save weight" title="Save"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></form>${W.length?[...W].reverse().slice(0,8).map(p=>`<div class="r${wFlash===p.d&&Date.now()-wSavedAt<2500?" wflash":""}" style="--c:var(--violet)"><span class="dot"></span><div class="m"><div>${fmtDate(p.d)}</div></div><div class="v">${p.v} ${g.unit}</div>${del("weights",p.id)}</div>`).join(""):`<div class="empty">No weigh-ins yet</div>`}</div></div>
+    <div class="panel"><div class="ph"><span>Weigh-in log</span><i>${W.length} total</i></div>
+     <div class="rows"><form class="r wnew" id="wForm" style="--c:var(--violet)"><span class="dot"></span><div class="m"><label class="wd" title="Change the date"><span id="wDateTxt">${fmtDate(today())}</span><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg><input id="wDate" type="date" value="${today()}" max="${today()}" required aria-label="Date"></label></div><div class="v"><input id="wVal" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" aria-label="Weight in ${g.unit}"> ${g.unit}</div><button class="wok" aria-label="Save weight" title="Save"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></form>${W.length?[...W].reverse().slice(0,30).map(p=>`<div class="r${wFlash===p.id&&Date.now()-wSavedAt<2500?" wflash":""}" style="--c:var(--violet)"><span class="dot"></span><div class="m"><div>${fmtDate(p.d)}${p.at&&W.filter(x=>x.d===p.d).length>1?`<small style="display:inline;margin-left:8px;color:var(--muted)">${new Date(p.at).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}</small>`:""}</div></div><div class="v">${p.v} ${g.unit}</div>${del("weights",p.id)}</div>`).join(""):`<div class="empty">No weigh-ins yet</div>`}</div></div>
    </div></div>${weightTrend(d)}`;
 }
 function vTrain(){
@@ -2245,7 +2246,7 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   if(g.len!=="cm"){const f=nums(raw("bmFt")),i=nums(raw("bmIn"));if(!f.length){toast("Enter your height in feet");return}h=f[0]>=36?f[0]*2.54:(f[0]*12+(f.length>1?f[1]:i[0]||0))*2.54}   // 5 and 8, or 5'8 typed in one box, or 68 inches
   else{const c=nums(raw("bmCm"));if(!c.length){toast("Enter your height");return}h=c[0]<3?c[0]*100:c[0]}
   if(h<90||h>250){toast("That height doesn't look right");return}const wn=nums(raw("bmW")),w=wn.length?wn[0]:lw,kg=w==null?0:g.unit==="kg"?w:w*.45359237;if(w==null){toast("Enter your weight");return}if(kg<20||kg>400){toast("That weight doesn't look right for "+g.unit);return}
-  bmiDraft={};g.height=Math.round(h*10)/10;if(lw!==w){data.weights=data.weights.filter(x=>x.d!==today());data.weights.push({id:uid(),d:today(),v:w})}
+  bmiDraft={};g.height=Math.round(h*10)/10;if(lw!==w){data.weights.push({id:uid(),d:today(),v:w,at:Date.now()})}
   bmiEdit=false;render();save();toast("BMI saved")},true);
 const figFit=()=>tab==="body"||tab==="train";
 const FITST=[["Start",0],["Lean",.25],["Toned",.5],["Built",.75]];
@@ -3142,11 +3143,11 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
 const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
-const APPV="81";{const o=vSet;vSet=function(){return o()+`<p class="note" style="text-align:center;margin:16px 0 4px;opacity:.75">AssOnTrack version ${APPV}</p>`}}
+const APPV="82";{const o=vSet;vSet=function(){return o()+`<p class="note" style="text-align:center;margin:16px 0 4px;opacity:.75">AssOnTrack version ${APPV}</p>`}}
 document.addEventListener("submit",e=>{
   e.preventDefault();const f=e.target.id;
   if(f==="mealForm"){data.meals.push({id:uid(),d:today(),name:$("#mName").value.trim(),type:$("#mType").value,kcal:num("#mKcal")||0,protein:num("#mPro")||0});toast("Meal logged")}
-  else if(f==="wForm"){const d=$("#wDate").value||today(),v=Math.round(parseFloat(String($("#wVal").value).replace(",","."))*10)/10;if(!(v>0)||v>1500){const i=$("#wVal");if(Date.now()-wSavedAt>5000)toast(String(i.value).trim()?"That doesn't look like a weight":"Type your weight on the right first");if(i&&typeof touchUI==="function"&&!touchUI())i.focus();return}data.weights=data.weights.filter(w=>w.d!==d);data.weights.push({id:uid(),d,v});wSavedAt=Date.now();wFlash=d;toast(v+" "+data.goals.unit+" saved for "+fmtDate(d))}
+  else if(f==="wForm"){const d=$("#wDate").value||today(),v=Math.round(parseFloat(String($("#wVal").value).replace(",","."))*10)/10;if(!(v>0)||v>1500){const i=$("#wVal");if(Date.now()-wSavedAt>5000)toast(String(i.value).trim()?"That doesn't look like a weight":"Type your weight on the right first");if(i&&typeof touchUI==="function"&&!touchUI())i.focus();return}const nid=uid();data.weights.push({id:nid,d,v,at:Date.now()});wSavedAt=Date.now();wFlash=nid;toast(v+" "+data.goals.unit+" saved for "+fmtDate(d))}
   else if(f==="msForm"){const r={id:uid(),d:$("#msDate").value,waist:num("#msWaist"),hips:num("#msHips"),glutes:num("#msGlutes")};if(r.waist==null&&r.hips==null&&r.glutes==null){toast("Enter at least one measurement");return}data.meas=data.meas.filter(x=>x.d!==r.d);data.meas.push(r);toast("Measurements saved")}
   else if(f==="woForm"){data.workouts.push({id:uid(),d:today(),name:$("#woName").value.trim(),sets:num("#woSets")||1,reps:num("#woReps")||1,kg:num("#woKg")});toast("Exercise logged")}
   else if(f==="evForm"){data.events=data.events||[];const dd=$("#evD").value||calSel;data.events.push({id:uid(),d:dd,time:$("#evTm").value||"",title:$("#evT").value.trim()});calSel=dd;toast("Event added")}
