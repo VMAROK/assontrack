@@ -2839,7 +2839,7 @@ function slotFormSync(f){if(!f||f.id!=="slotForm")return;const q=x=>f.querySelec
   const hl=q("#slHl");if(hl)hl.textContent=fq==="daily"?"Hours per day (h:mm)":fq==="once"?"Hours (h:mm)":perWeek?"Hours per week (h:mm)":"Hours each "+day+" (h:mm)";
   const once=fq==="once";f.querySelectorAll(".du").forEach(l=>l.hidden=once||(l.classList.contains("dud")&&q("#slU").value!=="date"));const fl=q("#slFl");if(fl)fl.textContent=once?"Date":"Starts";
   const sf=q("#slF");if(sf&&!f.dataset.frT)sf.value=fq==="daily"?today():f.dataset.fr||sf.value;   /* every day starts today unless you pick another date */
-  const wkOpt=q('#slFq option[value="weekly"]');if(wkOpt)wkOpt.textContent=dur?"Every week":"Every "+day}
+  const wkOpt=q('#slFq option[value="weekly"]');if(wkOpt)wkOpt.textContent="Every week"}
 document.addEventListener("change",e=>{const f=e.target.closest&&e.target.closest("#slotForm");if(f&&e.target.id==="slF")f.dataset.frT="1";if(f&&/^(slFq|slK|slDy|slU)$/.test(e.target.id)){slotFormSync(f);if(e.target.id==="slK"&&e.target.value==="dur"&&typeof touchUI==="function"&&!touchUI()){const i=f.querySelector("#slH");i&&i.focus()}}});
 /* how often first, then how much: "Every day · 8h", "Every week · 8h", "Every Tue · 8h" */
 const slAmt=sl=>sl.dur?fmtH(sl.dur):slRange(sl.start,sl.end);
@@ -3382,7 +3382,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="99";
+const APPV="100";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
