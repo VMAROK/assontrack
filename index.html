@@ -1160,6 +1160,7 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 @media (prefers-reduced-motion:reduce){.sd{animation:none}}
 .sd-dl{margin:14px 0 0;padding:12px 0 0;border-top:1px solid rgba(var(--lr),.16);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 18px}.sd-dl>div{min-width:0}.sd-dl dt{font-size:11px;color:var(--muted);letter-spacing:.04em;margin-bottom:2px}.sd-dl dd{margin:0;font-size:14px;font-weight:600;color:#e6eeff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sd-dl .miss{color:#ff8a94}
 @media (max-width:620px){.sd-dl{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.sl-pg{display:block;height:4px;border-radius:99px;background:rgba(var(--lr),.22);overflow:hidden;margin-top:4px}.sl-pg i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ffb648,#3ddc84)}.sl-pt{display:block;font-size:10.5px;color:var(--muted);margin-top:2px;font-weight:400}
 .dtrack{position:relative;clip-path:inset(-30px 0)}.dtrack-in{position:absolute;inset:0;will-change:transform}.dpane{position:absolute!important;top:0;width:100%;margin:0!important;animation:none!important}
 .dfull{touch-action:pan-y;user-select:none;-webkit-user-select:none}.dfull input{user-select:text;-webkit-user-select:text}
 .dfull.fromR.slide{animation:dslR .38s cubic-bezier(.2,.85,.25,1) both}.dfull.fromL.slide{animation:dslL .38s cubic-bezier(.2,.85,.25,1) both}@keyframes dslR{from{opacity:0;transform:translateX(46px)}to{opacity:1;transform:none}}@keyframes dslL{from{opacity:0;transform:translateX(-46px)}to{opacity:1;transform:none}}
@@ -2558,6 +2559,8 @@ const isWk=sl=>!!sl&&sl.per==="week";
 const wkOf=ds=>{const x=new Date(ds+"T12:00");x.setDate(x.getDate()-dow(ds));return ymd(x)};
 const wkEnd=wk=>{const x=new Date(wk+"T12:00");x.setDate(x.getDate()+6);return ymd(x)};
 const wkLogged=(d,p,sl,wk)=>{const e=wkEnd(wk);return d.sessions.reduce((a,x)=>a+(x.pid===p.id&&x.slotId===sl.id&&!x.planned&&x.d>=wk&&x.d<=e?(+x.mins||0):0),0)};
+const dayLogged=(d,p,sl,ds)=>d.sessions.reduce((a,x)=>a+(x.pid===p.id&&x.slotId===sl.id&&!x.planned&&x.d===ds?(+x.mins||0):0),0);
+const slotLogged=(d,p,sl,key)=>isWk(sl)?wkLogged(d,p,sl,key):dayLogged(d,p,sl,key);
 function slotTimes(sl,ds){if(isWk(sl)){const b=+new Date(wkOf(ds)+"T00:00"),end=b+7*864e5;return {start:b,end,open:b,close:end+GRACE*6e4}}const base=+new Date(ds+"T00:00");if(sl.dur){const end=base+864e5;return {start:base,end,open:base,close:end+GRACE*6e4}}const st=toMin(sl.start),en=toMin(sl.end)>st?toMin(sl.end):st+60;
   return {start:base+st*6e4,end:base+en*6e4,open:base+(st-OPEN_BEFORE)*6e4,close:base+(en+GRACE)*6e4}}
 function slotState(d,p,sl,ds){
@@ -2566,7 +2569,7 @@ function slotState(d,p,sl,ds){
     if(wkLogged(d,p,sl,wk)>=sl.dur)return nw<=tw.close?"done":"donelocked";if(tw.end<cr)return "none";if(nw<tw.open)return "upcoming";if(nw<=tw.close)return "open";return wk===wkOf(ymd(new Date(cr)))?"none":"missed"}   // the week you set it up in never counts against you
   if((sl.skip||[]).includes(ds))return "none";
   if(sl.once?ds!==sl.once:((sl.from&&ds<sl.from)||(sl.until&&ds>sl.until)))return "none";
-  if(d.sessions.some(s=>s.pid===p.id&&s.slotId===sl.id&&s.d===ds))return now<=t.close?"done":"donelocked";
+  if(sl.dur?dayLogged(d,p,sl,ds)>=sl.dur:d.sessions.some(s=>s.pid===p.id&&s.slotId===sl.id&&s.d===ds))return now<=t.close?"done":"donelocked";
   if(t.end<created)return "none";
   if(now<t.open)return "upcoming";
   if(now<=t.close)return "open";
@@ -2581,7 +2584,8 @@ function schedStats(d,p){
     for(const x=new Date(from);ymd(x)<=t0;x.setDate(x.getDate()+1)){const ds=ymd(x);if(dow(ds)!==sl.day)continue;const st=slotState(d,p,sl,ds);
       if(st==="done"||st==="donelocked"){out.occ.push({ds,sl,st:"done"})}else if(st==="missed"){out.missed++;out.occ.push({ds,sl,st:"missed"})}}});
   // every scheduled session you checked off counts, from the very first one: also ones from before a slot had a start date, and ones whose slot was later changed or removed
-  const seen={};d.sessions.forEach(x=>{if(x.pid===p.id&&x.slotId&&!x.planned&&!wkIds.has(x.slotId))seen[x.slotId+"|"+x.d]=1});out.done=Object.keys(seen).length+wkDone;
+  const seen={},byId={};(p.slots||[]).forEach(x=>byId[x.id]=x);d.sessions.forEach(x=>{if(x.pid===p.id&&x.slotId&&!x.planned&&!wkIds.has(x.slotId)){const k=x.slotId+"|"+x.d;seen[k]=(seen[k]||0)+(+x.mins||0)}});
+  out.done=Object.keys(seen).filter(k=>{const g=byId[k.split("|")[0]];return !(g&&g.dur)||seen[k]>=g.dur}).length+wkDone;   // a part-filled hours goal isn't done yet
   return out;
 }
 const clock=ms=>new Date(ms).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"});
@@ -2610,7 +2614,7 @@ function missHTML(){const d=D(),L=missList(d),sc=commitScore(),demo=demoOn();let
     ${L.length?`<div class="ms-list">${L.map(row).join("")}</div>${demo||L.length<2?"":`<div class="ask-btns"><button class="btn" data-missall="done">I did all of these</button><button class="btn ghost" data-missall="skip">None of these count</button></div>`}`:`<p class="ms-none">Nothing is counted as missed. ${sc==null?"Check off a scheduled session or finish a task and your score starts.":"You're clean."}</p>`}</div>`}
 function missOpen(){if(missBox)return;const o=document.createElement("div");o.className="askbox";document.body.appendChild(o);missBox=o;o.innerHTML=missHTML();sfx("whoosh")}
 function missClose(){if(missBox){missBox.remove();missBox=null}}
-function missFix(m,how){if(m.k==="s"){const p=data.passions.find(x=>x.id===m.p.id),sl=p&&(p.slots||[]).find(x=>x.id===m.sl.id);if(!sl)return;if(how==="done"&&isWk(sl)){const left=sl.dur-wkLogged(data,p,sl,m.ds);if(left>0)data.sessions.push({id:uid(),pid:p.id,d:wkEnd(m.ds),time:"",mins:left,slotId:sl.id,late:1})}else if(how==="done"){if(!data.sessions.some(x=>x.pid===p.id&&x.slotId===sl.id&&x.d===m.ds))data.sessions.push({id:uid(),pid:p.id,d:m.ds,time:sl.start||"",mins:slotMins(sl),slotId:sl.id,late:1})}else{sl.skip=[...(sl.skip||[]),m.ds]}}
+function missFix(m,how){if(m.k==="s"){const p=data.passions.find(x=>x.id===m.p.id),sl=p&&(p.slots||[]).find(x=>x.id===m.sl.id);if(!sl)return;if(how==="done"&&sl.dur){const left=sl.dur-slotLogged(data,p,sl,m.ds);if(left>0)data.sessions.push({id:uid(),pid:p.id,d:isWk(sl)?wkEnd(m.ds):m.ds,time:"",mins:left,slotId:sl.id,late:1})}else if(how==="done"){if(!data.sessions.some(x=>x.pid===p.id&&x.slotId===sl.id&&x.d===m.ds))data.sessions.push({id:uid(),pid:p.id,d:m.ds,time:sl.start||"",mins:slotMins(sl),slotId:sl.id,late:1})}else{sl.skip=[...(sl.skip||[]),m.ds]}}
   else{const p=data.passions.find(x=>x.id===m.p.id),t=p&&(p.tasks||[]).find(x=>x.id===m.t.id);if(!t)return;if(how==="done")t.countDone=1;else t.excused=1}}
 document.addEventListener("click",e=>{const T=e.target;if(!T.closest)return;if(T.closest("[data-missopen]")){e.preventDefault();e.stopPropagation();missOpen();return}if(!missBox)return;
   if(T===missBox||T.closest("[data-missx]")){missClose();return}const b=T.closest("[data-missdone],[data-missskip],[data-missall]");if(!b)return;const L=missList(D());
@@ -2776,23 +2780,25 @@ function sdFields(sl,grp,hist){const startD=sl.once||sl.from||(sl.created?ymd(ne
 function sdShell(col,pill,p,when,body,sl,grp){const head=`${slFreq(sl,true)} · ${sl.dur?hrsWord(sl.dur):fmtTime(sl.start)+" – "+fmtTime(sl.end)}`;return `<div class="sd" id="slotDetail" style="--sc:${col}">
     <div class="sd-top"><span class="sd-pill"><i></i>${pill}</span><span class="sd-tools"><button class="sd-ic" data-editslot="${sl.id}" title="${grp?"Edit this day only":"Edit"}" aria-label="${grp?"Edit this day only":"Edit"}">${SDI.edit}</button>${grp?`<button class="sd-ic danger" data-delgrp="${sl.grp}" title="Remove from every day" aria-label="Remove from every day">${SDI.bin}</button>`:`<button class="sd-ic danger" data-delslot="${sl.id}" title="Remove" aria-label="Remove">${SDI.bin}</button>`}<button class="sd-ic" data-selslotx title="Close" aria-label="Close">×</button></span></div>
     <h3>${esc(p.name)}</h3><p class="sd-freq">${head}</p><p class="sd-when">${when}</p>${body}</div>`}
-function wkDetail(d,p,sl){const wk=wkOf(selSlot.ds),st=slotState(d,p,sl,wk),lg=wkLogged(d,p,sl,wk),left=Math.max(0,sl.dur-lg),occ=schedStats(d,p).occ.filter(o=>o.sl.id===sl.id),dn=occ.filter(o=>o.st==="done").length,ms=occ.filter(o=>o.st==="missed").length;
-  const [pill,col]={done:["Done this week","#3ddc84"],donelocked:["Done","#3ddc84"],open:["In progress","#ffb648"],upcoming:["Not started","#8fa3c8"],missed:["Missed","#ff5d6c"],none:["Not counted","#8fa3c8"]}[st];
-  const cur=today()>=wk&&today()<=wkEnd(wk),daysLeft=7-dow(today()),has=d.sessions.some(x=>x.pid===p.id&&x.slotId===sl.id&&x.d>=wk&&x.d<=wkEnd(wk)),startD=sl.from||(sl.created?ymd(new Date(sl.created)):null),pc=Math.min(100,lg/sl.dur*100);
-  const side=st==="missed"?hrsWord(left)+" short":left?hrsWord(left)+" left"+(cur?" · "+(daysLeft===1?"last day":daysLeft+" days to go"):""):"Goal reached";
+function goalDetail(d,p,sl){const W=isWk(sl),key=W?wkOf(selSlot.ds):selSlot.ds,st=slotState(d,p,sl,key),t=slotTimes(sl,key),lg=slotLogged(d,p,sl,key),left=Math.max(0,sl.dur-lg),grp=!W&&!!sl.grp&&p.slots.filter(q=>q.grp===sl.grp).length>1;
+  const fam=grp?new Set(p.slots.filter(q=>q.grp===sl.grp).map(q=>q.id)):new Set([sl.id]),ms=schedStats(d,p).occ.filter(o=>fam.has(o.sl.id)&&o.st==="missed").length;let dn;if(W)dn=schedStats(d,p).occ.filter(o=>o.sl.id===sl.id&&o.st==="done").length;else{const sum={};d.sessions.forEach(x=>{if(x.pid===p.id&&fam.has(x.slotId)&&!x.planned)sum[x.d]=(sum[x.d]||0)+(+x.mins||0)});dn=Object.values(sum).filter(v=>v>=sl.dur).length}   // an every-day goal keeps one history across all seven days
+  const cur=W?(today()>=key&&today()<=wkEnd(key)):key===today(),has=lg>0;
+  const [pill,col]={done:[W?"Done this week":"Done","#3ddc84"],donelocked:["Done","#3ddc84"],open:[has?"In progress":"Open now","#ffb648"],upcoming:[W?"Not started":cur?"Later today":"Upcoming","#8fa3c8"],missed:["Missed","#ff5d6c"],none:["Not counted","#8fa3c8"]}[st];
+  const daysLeft=7-dow(today()),side=st==="missed"?hrsWord(left)+" short":left?hrsWord(left)+" left"+(st==="open"?" · "+(W?(daysLeft===1?"last day":daysLeft+" days to go"):"closes "+clock(t.close)):""):"Goal reached",pc=Math.min(100,lg/sl.dur*100);
   const body=`<div class="sd-prog"><div class="sd-num"><b>${fmtH(lg)}</b><span>of ${fmtH(sl.dur)}</span><em>${side}</em></div><div class="wkq-bar big"><i style="width:${pc.toFixed(1)}%"></i></div></div>
-    ${st==="open"||st==="done"?`<div class="sd-add"><span class="sd-lab">Add time</span><div class="sd-chips">${[15,30,60,120].map(m=>`<button class="sd-chip" data-wkq="${m}" data-wkid="${sl.id}">+${fmtH(m)}</button>`).join("")}<span class="sd-custom"><input id="wkAdd" inputmode="numeric" maxlength="5" autocomplete="off" aria-label="Other amount, hours and minutes like 1:30" title="Other amount, like 1:30"><button class="sd-chip solid" data-wkadd="${sl.id}">Add</button></span></div><div class="sd-links">${left?`<button data-wkrest="${sl.id}">Log the rest (+${fmtH(left)})</button>`:""}${has?`<button data-wkundo="${sl.id}">Undo last</button>`:""}</div></div>`:""}
+    ${st==="open"?`<div class="sd-add"><span class="sd-lab">Add time</span><div class="sd-chips">${[15,30,60,120].map(m=>`<button class="sd-chip" data-wkq="${m}" data-wkid="${sl.id}">+${fmtH(m)}</button>`).join("")}<span class="sd-custom"><input id="wkAdd" inputmode="numeric" maxlength="5" autocomplete="off" aria-label="Other amount, hours and minutes like 1:30" title="Other amount, like 1:30"><button class="sd-chip solid" data-wkadd="${sl.id}">Add</button></span></div><div class="sd-links">${left?`<button data-wkrest="${sl.id}">Log the rest (+${fmtH(left)})</button>`:""}${has?`<button data-wkundo="${sl.id}">Undo last</button>`:""}</div></div>`:st==="done"&&has?`<div class="sd-links" style="margin-top:12px"><button data-wkundo="${sl.id}">Undo last</button></div>`:""}
     ${st==="missed"?`<div class="sd-act"><button class="btn" data-sdfix="done">I did it</button><button class="btn ghost" data-sdfix="skip">Doesn't count</button></div>`:""}
-    <div class="sd-links" style="margin-top:12px"><button data-sdconv="day">Switch to per day</button></div>
-    ${sdFields(sl,false,`${dn} week${dn===1?"":"s"} done${ms?` · <b class="miss">${ms} missed</b>`:""}`)}`;
-  return sdShell(col,pill,p,`${cur?"This week · ":"Week of "}${fmtDate(wk)} – ${fmtDate(wkEnd(wk))}`,body,sl,false)}
-document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-wkadd],[data-wkrest],[data-wkundo],[data-wkq]");if(!b)return;const p=data.passions.find(x=>x.id===selP),id=b.dataset.wkadd||b.dataset.wkrest||b.dataset.wkundo||b.dataset.wkid,sl=p&&(p.slots||[]).find(x=>x.id===id);if(!sl||!selSlot)return;const wk=wkOf(selSlot.ds),inWk=today()>=wk&&today()<=wkEnd(wk),dd=inWk?today():wkEnd(wk);
-  if(b.dataset.wkundo){const L=data.sessions.filter(x=>x.pid===p.id&&x.slotId===sl.id&&x.d>=wk&&x.d<=wkEnd(wk));const last=L[L.length-1];if(!last)return;data.sessions=data.sessions.filter(x=>x!==last);toast(fmtH(last.mins)+" removed")}
-  else{let mins;if(b.dataset.wkq)mins=+b.dataset.wkq;else if(b.dataset.wkrest)mins=Math.max(0,sl.dur-wkLogged(data,p,sl,wk));else{const v=String(($("#wkAdd")||{}).value||"").trim();mins=parseHM(v);if(mins==null&&/^\d{1,3}$/.test(v))mins=+v*60;if(mins==null&&/^\d{1,2}\.\d$/.test(v))mins=Math.round(+v*60)}
-    if(!mins){toast("Type the time like 1:30, or 2 for two hours");return}if(mins>1440){toast("That's more than a day in one go");return}data.sessions.push({id:uid(),pid:p.id,d:dd,time:"",mins,slotId:sl.id});const lg=wkLogged(data,p,sl,wk);toast(lg>=sl.dur?"Week done. "+fmtH(lg)+" logged":fmtH(mins)+" added · "+fmtH(sl.dur-lg)+" to go")}
+    <div class="sd-links" style="margin-top:12px"><button data-sdconv="${W?"day":"week"}">Switch to per ${W?"day":"week"}</button></div>
+    ${sdFields(sl,grp,`${dn} ${W?"week"+(dn===1?"":"s")+" ":""}done${ms?` · <b class="miss">${ms} missed</b>`:""}`)}`;
+  return sdShell(col,pill,p,W?`${cur?"This week · ":"Week of "}${fmtDate(key)} – ${fmtDate(wkEnd(key))}`:`${cur?"Today · ":""}${DAYS[dow(key)]}, ${fmtDate(key)}`,body,sl,grp)}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-wkadd],[data-wkrest],[data-wkundo],[data-wkq]");if(!b)return;const p=data.passions.find(x=>x.id===selP),id=b.dataset.wkadd||b.dataset.wkrest||b.dataset.wkundo||b.dataset.wkid,sl=p&&(p.slots||[]).find(x=>x.id===id);if(!sl||!selSlot)return;
+  const W=isWk(sl),key=W?wkOf(selSlot.ds):selSlot.ds,dd=W?(today()>=key&&today()<=wkEnd(key)?today():wkEnd(key)):key,inP=x=>x.pid===p.id&&x.slotId===sl.id&&(W?x.d>=key&&x.d<=wkEnd(key):x.d===key);
+  if(b.dataset.wkundo){const L=data.sessions.filter(inP),last=L[L.length-1];if(!last)return;data.sessions=data.sessions.filter(x=>x!==last);toast(fmtH(last.mins)+" removed")}
+  else{let mins;if(b.dataset.wkq)mins=+b.dataset.wkq;else if(b.dataset.wkrest)mins=Math.max(0,sl.dur-slotLogged(data,p,sl,key));else{const v=String(($("#wkAdd")||{}).value||"").trim();mins=parseHM(v);if(mins==null&&/^\d{1,3}$/.test(v))mins=+v*60;if(mins==null&&/^\d{1,2}\.\d$/.test(v))mins=Math.round(+v*60)}
+    if(!mins){toast("Type the time like 1:30, or 2 for two hours");return}if(mins>1440){toast("That's more than a day in one go");return}data.sessions.push({id:uid(),pid:p.id,d:dd,time:"",mins,slotId:sl.id});const lg=slotLogged(data,p,sl,key);toast(lg>=sl.dur?(W?"Week done. ":"Done for the day. ")+fmtH(lg)+" logged":fmtH(mins)+" added · "+fmtH(sl.dur-lg)+" to go")}
   render();save()},true);
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="wkAdd"){e.preventDefault();const b=$("[data-wkadd]");b&&b.click()}});
-function slotDetail(d,p){if(!selSlot||editSlot)return "";const sl=(p.slots||[]).find(x=>x.id===selSlot.id);if(!sl)return "";if(isWk(sl))return wkDetail(d,p,sl);
+function slotDetail(d,p){if(!selSlot||editSlot)return "";const sl=(p.slots||[]).find(x=>x.id===selSlot.id);if(!sl)return "";if(sl.dur)return goalDetail(d,p,sl);
   const ds=selSlot.ds,st=slotState(d,p,sl,ds),t=slotTimes(sl,ds),grp=!!sl.grp&&p.slots.filter(q=>q.grp===sl.grp).length>1,isToday=ds===today();
   const done=d.sessions.filter(x=>x.pid===p.id&&x.slotId===sl.id&&!x.planned).length,missed=schedStats(d,p).occ.filter(o=>o.st==="missed"&&o.sl.id===sl.id).length;
   const [pill,col]={done:["Done","#3ddc84"],donelocked:["Done","#3ddc84"],open:["Open now","#ffb648"],upcoming:[isToday?"Later today":"Upcoming","#8fa3c8"],missed:["Missed","#ff5d6c"],none:["Not scheduled","#8fa3c8"]}[st];
@@ -2837,11 +2843,11 @@ function schedView(d,p){
   const cols=DAYS.map((dn,i)=>{const dt=new Date(mon);dt.setDate(dt.getDate()+i);const ds=ymd(dt),fut=ds>today();
     const ss=slots.filter(sl=>!isWk(sl)&&sl.day===i&&(sl.once?sl.once===ds:!(sl.until&&ds>sl.until))).map(sl=>{const st=slotState(d,p,sl,ds),t=slotTimes(sl,ds);
       if(st!=="none"){planned+=slotMins(sl)}
-      if(st==="done"||st==="donelocked"){doneM+=slotMins(sl);doneN++}
+      if(st==="done"||st==="donelocked"){doneM+=slotMins(sl);doneN++}else if(sl.dur&&st!=="none")doneM+=Math.min(dayLogged(d,p,sl,ds),sl.dur);
       if(st==="missed")missN++;
       const can=st==="open"||st==="done";
       const msg={done:`✓ Done · undo until ${clock(t.close)}`,donelocked:"✓ Done",open:`Log now · until ${clock(t.close)}`,upcoming:ds===today()?`Opens ${clock(t.open)}`:sl.once?"One time":"Coming up",missed:"✗ Missed",none:sl.from&&ds<sl.from?`Starts ${fmtDate(sl.from)}`:"Not scheduled yet"}[st];
-      return `<div class="slot st-${st}" title="${esc(msg)}"><button class="slot-main${selSlot&&selSlot.id===sl.id&&selSlot.ds===ds?" sel":""}" data-selslot="${sl.id}:${ds}" aria-expanded="${!!(selSlot&&selSlot.id===sl.id&&selSlot.ds===ds)}" aria-label="${sl.dur?fmtH(sl.dur)+" at any time":fmtTime(sl.start)+" to "+fmtTime(sl.end)}. ${esc(msg)}. Tap for details"><b class="t-full">${slLabel(sl)}</b><b class="t-short">${slLabelS(sl)}</b></button></div>`}).join("");
+      return `<div class="slot st-${st}" title="${esc(msg)}"><button class="slot-main${selSlot&&selSlot.id===sl.id&&selSlot.ds===ds?" sel":""}" data-selslot="${sl.id}:${ds}" aria-expanded="${!!(selSlot&&selSlot.id===sl.id&&selSlot.ds===ds)}" aria-label="${sl.dur?fmtH(sl.dur)+" at any time":fmtTime(sl.start)+" to "+fmtTime(sl.end)}. ${esc(msg)}. Tap for details"><b class="t-full">${slLabel(sl)}</b><b class="t-short">${slLabelS(sl)}</b>${sl.dur&&st!=="none"?(lg=>lg>0?`<span class="sl-pg" title="${fmtH(lg)} of ${fmtH(sl.dur)}"><i style="width:${Math.min(100,lg/sl.dur*100).toFixed(0)}%"></i></span><small class="sl-pt">${fmtH(lg)} of ${fmtH(sl.dur)}</small>`:"")(dayLogged(d,p,sl,ds)):""}</button></div>`}).join("");
     return `<div class="wday${ds===today()?" now":""}${ss?"":" free"}"><div class="wdh">${dn}<small>${dt.getDate()}</small></div>${ss||(addDay===i&&!narrow?"":`<div class="wnone">Nothing scheduled</div>`)}${addDay===i&&!narrow?dayForm(i,ds):`<button class="dayadd${addDay===i?" on":""}" data-addday="${i}" aria-label="Add a time slot on ${dn}" title="Add a time slot on ${dn}">+</button>`}</div>`});
   const wk0=ymd(mon),wkRow=(()=>{const q=slots.filter(isWk).map(sl=>{const st=slotState(d,p,sl,wk0);if(st==="none")return "";const lg=wkLogged(d,p,sl,wk0),on=selSlot&&selSlot.id===sl.id;planned+=sl.dur;doneM+=Math.min(lg,sl.dur);if(st==="done"||st==="donelocked")doneN++;
       return `<button class="wkq st-${st}${on?" sel":""}" data-selslot="${sl.id}:${wk0}" aria-expanded="${!!on}" aria-label="${fmtH(sl.dur)} this week, ${fmtH(lg)} logged. Tap for details"><b>Every week · ${fmtH(sl.dur)}</b><span class="wkq-bar"><i style="width:${Math.min(100,lg/sl.dur*100).toFixed(1)}%"></i></span><small>${lg>=sl.dur?"✓ Done":fmtH(lg)+" logged · "+fmtH(sl.dur-lg)+" to go"}</small></button>`}).join("");return q?`<div class="wkqs">${q}</div>`:""})();
@@ -3361,7 +3367,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="96";
+const APPV="97";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
