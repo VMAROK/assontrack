@@ -2273,7 +2273,7 @@ async function forceUpdate(b){if(b)b.textContent="Updating…";try{sessionStorag
   try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k!=="aot-img").map(k=>caches.delete(k)))}catch(e){}
   try{const rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(r=>r.unregister()))}catch(e){}
   try{await Promise.race([Promise.all(["./","index.html","sw.js","version.txt"].map(u=>fetch(u,{cache:"reload"}))),new Promise(r=>setTimeout(r,4000))])}catch(e){}
-  location.reload()}
+  location.replace(location.pathname+"?u="+Date.now())}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-forceupd]");if(b)forceUpdate(b)});
 /* smooth workout-card transitions when a day filter changes: cards that stay glide to their new spot, new ones rise in, removed ones fade out */
 let cmGhosts=null;
@@ -4073,7 +4073,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="152";
+const APPV="153";if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
@@ -4082,7 +4082,7 @@ const APPV="152";
       if(st.n&&Date.now()-st.t<20000){setTimeout(check,20000);return}                     // give the server a moment between tries
       const go=async()=>{const el=document.activeElement;if(typeof typing==="function"&&typing()&&el&&String(el.value||"").trim()){setTimeout(go,2000);return}   // never yank the page away mid-typing
         try{st.n++;st.t=Date.now();sessionStorage.setItem("aot-upd2",JSON.stringify(st))}catch(e){}
-        try{await Promise.race([(async()=>{const reg=await navigator.serviceWorker.getRegistration();reg&&await reg.update()})(),new Promise(r=>setTimeout(r,1800))])}catch(e){}location.reload()};go()}catch(e){}finally{busy=false}}
+        try{await Promise.race([(async()=>{const reg=await navigator.serviceWorker.getRegistration();reg&&await reg.update()})(),new Promise(r=>setTimeout(r,1800))])}catch(e){}location.replace(location.pathname+"?u="+Date.now())};go()}catch(e){}finally{busy=false}}
   function updBtn(v){if(document.getElementById("updBtn"))return;const b=document.createElement("button");b.id="updBtn";b.textContent="Update to the newest version";b.style.cssText="position:fixed;z-index:9999;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);font:600 14px/1 inherit;padding:12px 18px;border-radius:8px;border:1px solid rgba(76,201,255,.9);background:#0e2a4a;color:#e8f6ff;box-shadow:0 8px 24px rgba(0,0,0,.45);cursor:pointer";
     b.onclick=async()=>{b.textContent="Updating…";try{sessionStorage.removeItem("aot-upd2")}catch(e){}try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k!=="aot-img").map(k=>caches.delete(k)))}catch(e){}try{const reg=await navigator.serviceWorker.getRegistration();reg&&await reg.update()}catch(e){}location.replace(location.pathname+"?v="+v)};document.body.appendChild(b)}
   addEventListener("load",()=>setTimeout(check,1500));document.addEventListener("visibilitychange",()=>setTimeout(check,400));addEventListener("pageshow",()=>setTimeout(check,400));addEventListener("focus",()=>setTimeout(check,400));setInterval(check,180000)})();

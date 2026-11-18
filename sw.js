@@ -1,5 +1,5 @@
 // Offline support: the app opens without a connection; data syncs when back online.
-const VERSION = "aot-v152";
+const VERSION = "aot-v153";
 const LIB = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4";
 const SHELL = ["./", "./index.html", "./config.js", "./ramsau.jpg", "./manifest.webmanifest",
   "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", LIB];
@@ -28,7 +28,9 @@ self.addEventListener("fetch", e => {
   }
   // app files: newest from the network, cached copy when offline
   // always ask the server for the newest copy (skip the browser's 10-minute cache)
-  e.respondWith(fetch(req, { cache: "no-store" }).then(res => {
+  // GitHub Pages' CDN can hold an old copy for 10 minutes: ask for a unique URL so it always goes to the newest one
+  const fresh = url.origin + url.pathname + (url.search ? url.search + "&" : "?") + "_=" + Date.now();
+  e.respondWith(fetch(fresh, { cache: "no-store", credentials: "same-origin" }).then(res => {
     if (res.ok) { const copy = res.clone(); caches.open(VERSION).then(c => c.put(req, copy)); }
     return res;
   }).catch(() => caches.match(req).then(hit => hit || (req.mode === "navigate" ? caches.match("./index.html") : undefined))));
