@@ -1191,15 +1191,6 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .lines-sw{display:inline-flex}
 
 /* training */
-.wk-sqg{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;padding:2px 0 12px}
-.wk-sqg>.wk-sq{aspect-ratio:1/1;min-width:0;padding:10px;gap:6px;cursor:pointer;overflow:hidden;border-top:2px solid var(--cc);background:linear-gradient(180deg,color-mix(in srgb,var(--cc) 12%,transparent),rgba(var(--tX),.45) 60%);transition:transform .15s,border-color .15s}
-.wk-sqg>.wk-sq:hover{border-color:color-mix(in srgb,var(--cc) 70%,transparent)}.wk-sqg>.wk-sq:active{transform:scale(.97)}
-.wk-sqn{font-size:14px;line-height:1.2;color:#eef3ff;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:none}
-.wk-sq .musvg{flex:1 1 0;min-height:0;height:0;width:100%;max-height:none}
-.wk-sqf{display:flex;justify-content:space-between;align-items:center;gap:6px;flex:none;font-size:11px;color:var(--muted)}.wk-sqf small{font-family:var(--mono);font-size:10.5px;white-space:nowrap}
-.wk-sqc{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#cfe0ff}.wk-sqc i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--cc);margin-right:4px;vertical-align:0}
-.wk-sqg>.tp-new{aspect-ratio:1/1;min-height:0;min-width:0}
-.wk-sqg>.wk-sqo{grid-column:1/-1;position:relative;border-top:2px solid var(--cc)}.wk-sqx{position:absolute;right:8px;top:6px;font-size:20px;z-index:2}.wk-sqo .tp-top{padding-right:28px}
 #dbgTog{position:fixed;z-index:1000;top:calc(env(safe-area-inset-top,0px) + 58px);left:50%;transform:translateX(-50%);font:700 13px/1 system-ui;color:#fff;background:#ff2d55;border:2px solid #fff;border-radius:99px;padding:8px 14px;box-shadow:0 3px 10px rgba(0,0,0,.6);cursor:pointer}#dbgTog[aria-pressed=false]{background:rgba(20,30,60,.92);color:#cfe0ff;border-color:rgba(207,224,255,.6)}#dbgTog[hidden]{display:none}
 body.dbg-off .dbg-n{display:none}body.dbg-off .dbg-box{outline:none}
 .dbg-box{outline:2px dashed #ff2d55;outline-offset:-2px}.dbg-n{position:absolute;left:4px;top:4px;z-index:30;pointer-events:none;min-width:22px;height:22px;padding:0 6px;display:grid;place-items:center;box-sizing:border-box;background:#ff2d55;color:#fff;font:800 13px/1 system-ui;border-radius:99px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.6)}
@@ -2310,15 +2301,7 @@ function wkSec(d,c,IN,only,td,PL,all){const fd=c&&catDayF[c]>=0?catDayF[c]:-1;if
   const asg=c&&wkAssign===c;
   return `<section class="wk-sec" style="--cc:${catCol(c)}" aria-label="${esc(c||"No category")} workouts"><div class="sh-h"><i></i><b>${esc(c||(all?"All workouts":"Not in a category"))}</b>${c&&td.includes(c)?`<span class="sh-td">Today</span>`:""}<small>${IN.length} workout${IN.length===1?"":"s"}</small>${c?`<span class="wk-days" title="Tap a day to see its ${esc(c)} workouts">${dayRow(catDayF[c]>=0?[catDayF[c]]:[],"data-wkfd",`data-wkc="${esc(c)}"`,catCol(c))}</span>`:""}${c?`<button class="tp-tile${asg?" done":" add"} wk-asg" data-wkassign="${esc(c)}">${asg?"Done":"＋ Assign workouts"}</button>`:""}</div>
     ${catDayAsk&&catDayAsk.c===c?askHTML("sec"):""}${asg?`<div class="wk-asgbox"><small>Tap a workout to put it in or take it out of ${esc(c)}.</small><div class="tp-tiles">${PL.map(p=>{const on=pCats(p).includes(c);return `<button type="button" class="tp-tile${on?" on":""}" style="--cc:${catCol(c)}" aria-pressed="${on}" data-wkput="${p.id}" data-wkc="${esc(c)}"><span>${esc(p.name)}</span>${ppOf(p.mus).map(x=>`<b class="pp-dot" style="--pp:${PPCOL[x]}" title="${x}"></b>`).join("")}</button>`}).join("")||`<small>No workouts yet. Design one below.</small>`}</div></div>`:""}
-    ${(()=>{const L=only?IN.filter(p=>pSub(p,c)===only):IN;return `${!L.length&&fd>=0?`<p class="wk-empty">No ${esc(c)} workouts on ${["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"][fd]}.</p>`:""}${asg&&!L.length?"":`<div class="wk-sqg">${L.map(p=>sqTile(d,p,!c)).join("")}${wkNewCard(c)}</div>`}`})()}</section>`}
-/* one collection of square workout tiles; tap a tile to open the full card in place */
-let sqOpen="";
-function sqTile(d,pl,showCat){const cs=pCats(pl),cc=catCol(cs[0]||""),mus=musNorm(pl.mus);
-  if(sqOpen===pl.id)return planCard(d,pl,!showCat).replace('<div class="tp-card"',`<div class="tp-card wk-sqo" style="--cc:${cc}"`).replace('<div class="tp-top">',`<button type="button" class="x wk-sqx" data-sqopen="${esc(pl.id)}" aria-label="Close ${esc(pl.name)}">×</button><div class="tp-top">`);
-  const dy=pDays(pl).sort();
-  return `<div class="tp-card wk-sq" data-pid="${esc(pl.id||"")}" data-sqopen="${esc(pl.id)}" role="button" tabindex="0" aria-label="Open ${esc(pl.name)}" style="--cc:${cc}"><b class="wk-sqn">${esc(pl.name)}</b>${musSvg(mus,{lab:false})}<div class="wk-sqf">${showCat&&cs.length?`<span class="wk-sqc">${cs.map(c=>`<i style="--cc:${catCol(c)}"></i>${esc(c)}`).join(" ")}</span>`:"<span></span>"}<small>${pl.ex.length} ex${dy.length?" · "+dy.map(i=>DAYS[i].slice(0,2)).join(" "):""}</small></div></div>`}
-document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-sqopen]");if(!t)return;const id=t.dataset.sqopen;cardMorph(()=>{sqOpen=sqOpen===id?"":id;render()})});
-document.addEventListener("keydown",e=>{const t=e.target.closest&&e.target.closest(".wk-sq[data-sqopen]");if(t&&(e.key==="Enter"||e.key===" ")){e.preventDefault();t.click()}});
+    ${(()=>{const L=only?IN.filter(p=>pSub(p,c)===only):IN;return `${!L.length&&fd>=0?`<p class="wk-empty">No ${esc(c)} workouts on ${["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"][fd]}.</p>`:""}${asg&&!L.length?"":`<div class="sh-row">${L.map(p=>planCard(d,p,!!c)).join("")}${wkNewCard(c)}</div>`}`})()}</section>`}
 const wkNewCard=c=>`<button class="tp-new wk-newc" ${c?`data-pnewcat="${esc(c)}"`:"data-pnew"}><b>＋</b><small>${c?"New workout in "+esc(c):"Design a workout"}</small></button>`;
 function musWeekPanel(d){const S=musWeek(d),mx=Math.max(1,...Object.values(S)),H={};Object.entries(S).forEach(([k,v])=>H[k]=v/Math.max(mx,10));const hit=MUS.filter(([k])=>S[k]),miss=MUS.filter(([k])=>!S[k]);
   return `<div class="tp-week"><div>${musSvg(null,{heat:H})}<div class="tp-leg"><span><i style="background:${heatCol(.05)}"></i>A little</span><span><i style="background:${heatCol(1)}"></i>A lot</span><span><i style="background:rgba(150,180,240,.2)"></i>Not yet</span></div></div>
@@ -4074,7 +4057,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="149";
+const APPV="150";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
