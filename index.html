@@ -1191,6 +1191,17 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .lines-sw{display:inline-flex}
 
 /* training */
+.tck{display:grid;gap:8px;margin:2px 0 10px}.tck-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:0 2px}.tck-h b{font-size:13.5px;color:#e6eeff}.tck-h small{font-size:11.5px;color:var(--muted)}
+.tck-cat{display:grid;gap:6px;padding:8px 10px 10px;border-radius:12px;border:1px solid color-mix(in srgb,var(--cc) 45%,transparent);border-left:3px solid var(--cc);background:linear-gradient(180deg,color-mix(in srgb,var(--cc) 11%,transparent),rgba(var(--tX),.3))}
+.tck-cat.full{box-shadow:0 0 14px color-mix(in srgb,var(--cc) 30%,transparent)}
+.tck-ch{display:flex;align-items:center;gap:7px}.tck-ch i{width:8px;height:8px;border-radius:50%;background:var(--cc);box-shadow:0 0 6px var(--cc)}.tck-ch b{font-size:12.5px;color:var(--cc);letter-spacing:.02em}.tck-ch small{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.tck-pl{display:grid;gap:2px;padding:6px 8px;border-radius:9px;background:rgba(var(--tX),.4);border:1px solid rgba(var(--lr),.16)}
+.tck-ph,.tck-ex{display:flex;align-items:center;gap:9px;width:100%;text-align:left;font:inherit;color:#e6eeff;background:none;border:0;padding:5px 2px;cursor:pointer;border-radius:6px}
+.tck-ph b{font-size:13.5px;font-weight:600;flex:1;min-width:0}.tck-ph small{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.tck-ex{padding-left:12px;font-size:13px}.tck-ex .tck-n{flex:1;min-width:0}.tck-ex em{font-style:normal;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.tck-ex.on .tck-n{color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--cc) 70%,transparent)}
+.tck-b{flex:none;width:18px;height:18px;border-radius:5px;display:grid;place-items:center;border:1.5px solid color-mix(in srgb,var(--cc) 70%,transparent);color:#081022;transition:background .15s,transform .15s}
+.tck-b.on{background:var(--cc);border-color:var(--cc);box-shadow:0 0 8px color-mix(in srgb,var(--cc) 60%,transparent)}.tck-ex:active .tck-b,.tck-ph:active .tck-b{transform:scale(.88)}
 .dy.ld{position:relative;border-style:dashed;border-color:color-mix(in srgb,var(--cc,#7fb0ff) 70%,transparent);background:color-mix(in srgb,var(--cc,#7fb0ff) 9%,#14203f)}
 .dy.ld2{background:color-mix(in srgb,var(--cc,#7fb0ff) 18%,#14203f)}.dy.ld3{background:color-mix(in srgb,var(--cc,#7fb0ff) 28%,#14203f);border-color:var(--cc,#7fb0ff)}
 .dy .ldd{position:absolute;left:0;right:0;bottom:1px;display:block;text-align:center;white-space:nowrap;font-style:normal;font-size:8px;line-height:6px;letter-spacing:0;color:var(--cc,#7fb0ff);pointer-events:none}.dy.on .ldd{color:#081022}
@@ -2113,6 +2124,22 @@ function trWeekPanel(d,T){const F=fitLevel(d),n=T.thisDays.size,G=T.G,pc=Math.mi
     <div class="tg-bar"><i style="width:${pc.toFixed(1)}%;background:${n>=G?"#3ddc84":"rgba(var(--tL),1)"};box-shadow:0 0 8px ${n>=G?"#3ddc84":"rgba(var(--tL),.8)"}"></i></div>
     <div class="tr-days">${dots}</div>
     ${dayLabel(dayIdx(today())).length?`<p class="tr-cap" style="margin-top:8px">Today: <b>${dayLabel(dayIdx(today())).map(esc).join(" + ")}</b></p>`:""}<p class="tr-cap"><b>${F.name}</b> · ${F.cap}</p></div>`}
+/* today's checklist: each planned workout's exercises to tick off, boxed by their category */
+const tckDone=(d,pl,e)=>(d.workouts||[]).find(w=>w.d===today()&&w.plan===pl.id&&trKey(w.name)===trKey(e.name));
+function trCheckHTML(d){const td=dayIdx(today()),PL=(d.plans||[]).filter(p=>p.ex&&p.ex.length&&onDay(p,td));if(!PL.length)return "";
+  const groups=[];PL.forEach(p=>{const c=pCats(p)[0]||"";let g=groups.find(x=>x.c===c);if(!g)groups.push(g={c,ps:[]});g.ps.push(p)});groups.sort((a,b)=>(a.c?0:1)-(b.c?0:1));
+  const ck=on=>`<span class="tck-b${on?" on":""}" aria-hidden="true">${on?`<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`:""}</span>`;
+  const box=g=>{const all=g.ps.reduce((a,p)=>a+p.ex.length,0),done=g.ps.reduce((a,p)=>a+p.ex.filter(e=>tckDone(d,p,e)).length,0);
+    return `<div class="tck-cat${done===all?" full":""}" style="--cc:${catCol(g.c)}"><div class="tck-ch"><i></i><b>${esc(g.c||"Not in a category")}</b><small>${done}/${all}</small></div>
+    ${g.ps.map(p=>{const n=p.ex.filter(e=>tckDone(d,p,e)).length,full=n===p.ex.length;return `<div class="tck-pl"><button type="button" class="tck-ph" data-tckall="${p.id}" aria-pressed="${full}">${ck(full)}<b>${esc(p.name)}</b><small>${n}/${p.ex.length}</small></button>
+      ${p.ex.map((e,i)=>{const on=!!tckDone(d,p,e);return `<button type="button" class="tck-ex${on?" on":""}" data-tck="${p.id}|${i}" aria-pressed="${on}">${ck(on)}<span class="tck-n">${esc(e.name)}</span><em>${e.sets}×${e.reps}</em></button>`}).join("")}</div>`}).join("")}</div>`};
+  return `<div class="tck"><div class="tck-h"><b>Today's checklist</b><small>Tick off what you've done</small></div>${groups.map(box).join("")}</div>`}
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-tck],[data-tckall]");if(!t||demoOn())return;const d=data;
+  const add=(pl,ex)=>{const last=trLast(d,ex.name);d.workouts.push({id:uid(),d:today(),name:ex.name,sets:ex.sets,reps:ex.reps,kg:last?last.kg:null,plan:pl.id})};
+  const rm=(pl,ex)=>{const w=tckDone(d,pl,ex);if(w)d.workouts=d.workouts.filter(x=>x!==w)};
+  if(t.dataset.tck){const[id,i]=t.dataset.tck.split("|"),pl=(d.plans||[]).find(x=>x.id===id),ex=pl&&pl.ex[+i];if(!ex)return;tckDone(d,pl,ex)?rm(pl,ex):add(pl,ex)}
+  else{const pl=(d.plans||[]).find(x=>x.id===t.dataset.tckall);if(!pl)return;const full=pl.ex.every(x=>tckDone(d,pl,x));pl.ex.forEach(x=>{if(full)rm(pl,x);else if(!tckDone(d,pl,x))add(pl,x)});if(!full)toast(pl.name+" done")}
+  if(typeof sfx==="function")try{sfx("tick")}catch(_){}render();save()});
 function trLogPanel(d,T){const u=d.goals.unit,names=[...new Set([...byDate(d.workouts).reverse().filter(w=>!w.hk).map(w=>w.name),"Squat","Bench press","Deadlift","Overhead press","Barbell row","Pull-up","Push-up","Lunge","Hip thrust","Romanian deadlift","Leg press","Lat pulldown","Bicep curl","Tricep pushdown","Plank"])];
   const rows=T.WO.slice().reverse().slice(0,40).map(w=>{const pbw=T.pb.has(w.id),fl=trFlash===w.id&&Date.now()-trFlashAt<2500;return `<div class="r${fl?" wflash":""}" style="--c:var(--lime)"><span class="dot"></span><div class="m"><div>${esc(w.name)}${pbw?` <span class="tr-pb">Best</span>`:""}</div><small>${w.d===today()?"Today":fmtDate(w.d)} · ${w.hk?(w.mins?w.mins+" min":"workout")+" · Apple Health":w.sets+" × "+w.reps}</small></div><div class="v">${w.hk?"":(+w.kg?w.kg+" "+u:"body")}</div>${w.hk||demoOn()?"":`<button class="x tr-rep" data-wrep="${w.id}" aria-label="Log ${esc(w.name)} again today" title="Again today"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0115.5-6.2L21 8M21 3v5h-5M21 12a9 9 0 01-15.5 6.2L3 16M3 21v-5h5"/></svg></button>`}${del("workouts",w.id)}</div>`}).join("");
   return `<div class="panel trlogp"><div class="ph"><span>Workout log</span><i>${T.WO.filter(w=>w.d===today()).length} today</i></div>
@@ -2122,7 +2149,7 @@ function trLogPanel(d,T){const u=d.goals.unit,names=[...new Set([...byDate(d.wor
       <small class="tr-hint" id="trHint">Exercise, then sets × reps @ load. Leave load empty for bodyweight.</small></div>
       <button type="button" class="x wok gy-sc" data-gfind aria-label="Find a gym machine" title="Find a machine"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg></button><button type="button" class="x wok gy-sc" data-gscan aria-label="Scan a gym machine" title="Scan a machine"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2M7 8v8M10.5 8v8M13.5 8v8M17 8v8"/></svg></button>
       <button class="x wok" aria-label="Log exercise" title="Log"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></form>
-    <div class="rows trlog">${rows||`<div class="empty">Your workouts show up here</div>`}</div></div>`}
+    <div class="rows trlog">${trCheckHTML(d)}${rows||`<div class="empty">Your workouts show up here</div>`}</div></div>`}
 function trProgress(d,T){const u=d.goals.unit,W=T.weeks,mx=Math.max(1,...W.map(x=>x.v)),G=T.G;
   const X0=46,X1=588,Y0=14,Y1=150,bw=(X1-X0)/8,py=v=>Y1-v/mx*(Y1-Y0);
   const bars=W.map((x,i)=>{const cx=X0+bw*i+bw*.2,w=bw*.6,h=x.v?Math.max(3,Y1-py(x.v)):2,hit=x.n>=G,cur=x.ws===T.wk0,c=hit?"#3ddc84":"#4cc9ff";
@@ -4087,7 +4114,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="160";if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
+const APPV="161";if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
