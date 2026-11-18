@@ -1194,7 +1194,12 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .wk-cats.compact .tp-card .musvg{display:none}.wk-cats.compact .tp-card{gap:7px}
 .tp-exg{margin-top:4px;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.tp-exg:first-child{margin-top:0}
 .tpp .tp-er{grid-template-columns:22px minmax(0,1fr) 46px auto 46px 44px 28px}
-.tpx{display:grid;gap:8px}.tpx-body{display:grid;gap:8px}
+.tpx{display:grid;gap:8px}.tpx.cols{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));align-items:start;gap:10px}
+.tpp .tpx.cols .tp-er{grid-template-columns:22px 40px auto 40px minmax(0,1fr) 24px;grid-template-areas:"h n n n n d" ". s x r u .";row-gap:5px;padding:6px 4px;border:1px solid rgba(var(--lr),.18);border-radius:9px;background:rgba(var(--tX),.3)}
+.tpx.cols .tp-er>.tpx-h{grid-area:h}.tpx.cols .tp-er>.tp-en{grid-area:n}.tpx.cols .tp-er>[data-tpk=sets]{grid-area:s}.tpx.cols .tp-er>span:not(.tpx-h){grid-area:x;text-align:center}.tpx.cols .tp-er>[data-tpk=reps]{grid-area:r}.tpx.cols .tp-er>.tp-unit{grid-area:u;justify-self:start;min-width:44px}.tpx.cols .tp-er>[data-tpdel]{grid-area:d}
+.tpp .tpx.cols .tp-er input{height:34px}.tpx.cols .tp-unit{height:34px}.tpx.cols .tpx-h{height:34px}
+.tp-lab.tpx-lab{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tpx-view{display:inline-flex;border:1px solid rgba(var(--lr),.3);border-radius:8px;overflow:hidden}.tpx-view button{font:inherit;font-size:12px;font-weight:600;padding:5px 11px;cursor:pointer;color:var(--muted);background:rgba(var(--tX),.4);border:0}.tpx-view button+button{border-left:1px solid rgba(var(--lr),.3)}.tpx-view button[aria-pressed=true]{color:#eef3ff;background:rgba(var(--tL),.28)}.tpx-body{display:grid;gap:8px}
 .tpx-h{display:grid;place-items:center;height:38px;color:var(--muted);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;border-radius:6px}.tpx-h:hover{color:#e6eeff}
 .tpx-r{position:relative;border-radius:8px;transition:box-shadow .15s,background .15s}.tpx-r.drag{z-index:5;background:rgba(var(--tX),.95);box-shadow:0 10px 26px rgba(0,0,0,.55),0 0 0 1px rgba(var(--tL),.6);transition:none}
 .tpx-r.dropb{box-shadow:0 -3px 0 0 rgba(var(--tL),1)}.tpx-r.dropa{box-shadow:0 3px 0 0 rgba(var(--tL),1)}
@@ -1277,8 +1282,7 @@ body.dbg-off .dbg-n{display:none}body.dbg-off .dbg-box{outline:none}
 #tpDiag .musvg{max-height:300px}
 .tp-chips{display:flex;flex-wrap:wrap;gap:6px}.tp-chip{font:inherit;font-size:12.5px;padding:5px 10px;border-radius:99px;cursor:pointer;color:var(--muted);background:rgba(150,180,240,.06);border:1px solid rgba(150,180,240,.28)}.tp-chip.l2{background:rgba(255,93,108,.2);color:#ffd0d4;border-color:#ff5d6c}.tp-chip.l1{background:rgba(255,182,72,.16);color:#ffe2b8;border-color:#ffb648}
 .tp-acts{grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap;position:sticky;bottom:0;z-index:6;margin:0 -14px -14px;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,transparent,rgba(var(--tX),.92) 30%);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:0 0 12px 12px}
-.tp-hacts{margin-left:auto;display:flex;gap:8px}.tp-hacts .btn{padding:7px 14px;font-size:13px}
-.tp-savebtn{background:#3ddc84!important;border-color:#3ddc84!important;color:#04140b!important;font-weight:700;box-shadow:0 0 12px rgba(61,220,132,.45)}.tp-acts .btn{flex:0 1 180px}.btn.danger{color:#ff8a95;border-color:rgba(255,93,108,.5)}
+.tp-hacts{margin-left:auto;display:flex;gap:8px}.tp-hacts .btn{padding:7px 14px;font-size:13px}.tp-acts .btn{flex:0 1 180px}.btn.danger{color:#ff8a95;border-color:rgba(255,93,108,.5)}
 .tp-week{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:center;margin-bottom:6px}.tp-week .musvg{max-height:240px}
 .tp-leg{display:flex;justify-content:center;gap:14px;margin-top:6px;font-size:11.5px;color:var(--muted)}.tp-leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
 .tp-wl{display:grid;gap:2px;align-content:center}.tp-wl>div{display:flex;justify-content:space-between;padding:6px 2px;border-bottom:1px solid rgba(var(--lrd),.7);font-size:13.5px}.tp-wl b{font-family:var(--mono);font-weight:500;font-size:12.5px}
@@ -2311,11 +2315,12 @@ function tpPPHTML(){const t=ppOf(tPlan.mus);return t.length?ppTag(tPlan.mus)+`<s
 function dayRow(sel,attr,extra,cc){const td=dayIdx(today());return `<div class="dy-row" role="group" aria-label="Days">${DAYS.map((dn,i)=>{const on=sel.includes(i);return `<button type="button" class="dy${on?" on":""}${i===td?" td":""}" aria-pressed="${on}" ${attr}="${i}" ${extra||""}${cc?` style="--cc:${cc}"`:""}>${dn}</button>`}).join("")}</div>`}
 function tpDaysHTML(){return dayRow(tPlan.days||[],"data-tpday")}
 function tpCatPaint(){const c=$("#tpCats");if(c&&tPlan)c.innerHTML=tpCatsHTML()}
-let tpFold=new Set();   /* collapsed groups in the editor, by name */
+let tpFold=new Set(),tpxView="rows";try{tpxView=localStorage.getItem("aot-tpx-view")||"rows"}catch(e){}
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-tpxview]");if(!t)return;tpxView=t.dataset.tpxview;try{localStorage.setItem("aot-tpx-view",tpxView)}catch(_){}document.querySelectorAll("[data-tpxview]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.tpxview===tpxView));tpExPaint()});   /* collapsed groups in the editor, by name */
 function tpExHTML(P){const G=exGroups(P.ex),heads=G.length>1||G.some(x=>x[0]);
   const row=(e,i)=>`<div class="tp-er tpx-r" data-tprow="${i}"><span class="tpx-h" data-tpdrag="${i}" aria-label="Drag to reorder" title="Drag to reorder or move to another group"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></span><input class="tp-en" data-tpi="${i}" data-tpk="name" list="exList" value="${esc(e.name)}" aria-label="Exercise ${i+1}" autocomplete="off" placeholder="Exercise"><input class="tp-n" data-tpi="${i}" data-tpk="sets" inputmode="numeric" value="${e.sets}" aria-label="Sets" placeholder="1"><span>×</span><input class="tp-n" data-tpi="${i}" data-tpk="reps" inputmode="numeric" value="${e.reps}" aria-label="${e.unit==="s"?"Seconds":"Reps"}"><button type="button" class="tp-unit${e.unit==="s"?" s":""}" data-tpunit="${i}" aria-label="Switch between reps and seconds" title="Reps or seconds">${e.unit==="s"?"sec":"reps"}</button><button type="button" class="x" data-tpdel="${i}" aria-label="Remove exercise">×</button></div>`;
   if(!heads)return `<div class="tpx" data-tpg="0">${G.map(([,xs])=>xs.map(([e,i])=>row(e,i)).join("")).join("")}</div>`;
-  return `<div class="tpx">${G.map(([g,xs],k)=>{const shut=tpFold.has(g);return `<div class="tpx-g${shut?" shut":""}" data-tpg="${k}">
+  return `<div class="tpx${tpxView==="cols"?" cols":""}">${G.map(([g,xs],k)=>{const shut=tpFold.has(g);return `<div class="tpx-g${shut?" shut":""}" data-tpg="${k}">
     <div class="tpx-gh" data-tpgtog="${k}"><svg class="tpx-chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg><input class="tpx-gn" data-tpgname="${k}" value="${esc(g)}" placeholder="No group" aria-label="Group name" autocomplete="off" maxlength="30"${g?"":" readonly"}><small>${xs.length}</small>${k?`<button type="button" class="tpx-gb" data-tpgup="${k}" aria-label="Move group up" title="Move up"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button>`:""}${g?`<button type="button" class="tpx-gb" data-tpgdel="${k}" aria-label="Remove group, keep its exercises" title="Remove group (keeps exercises)">×</button>`:""}</div>
     <div class="tpx-body">${xs.map(([e,i])=>row(e,i)).join("")}<button type="button" class="tpx-add" data-tpadd="${k}">＋ Exercise</button></div></div>`}).join("")}</div>`}
 let tpDragS=null;
@@ -2340,16 +2345,16 @@ function planForm(d){const P=tPlan,sug=sugMus(P.ex),hasSug=Object.keys(sug).leng
     <div class="tp-lab">Categories<div id="tpCats">${tpCatsHTML()}</div></div>
     <div class="tp-lab">Push or pull<div id="tpPP" class="tp-pp">${tpPPHTML()}</div></div>
     <div class="tp-lab"><span>Days <span style="opacity:.7">(optional, for a fixed schedule)</span></span><div id="tpDays">${tpDaysHTML()}</div></div>
-    <div class="tp-lab">Exercises</div>
+    <div class="tp-lab tpx-lab"><span>Exercises</span><span class="tpx-view" role="group" aria-label="Group layout"><button type="button" data-tpxview="rows" aria-pressed="${tpxView!=="cols"}" title="Groups stacked in rows">Rows</button><button type="button" data-tpxview="cols" aria-pressed="${tpxView==="cols"}" title="Groups side by side in columns">Columns</button></span></div>
     <div class="tp-exl" id="tpEx">${tpExHTML(P)}</div>
     <datalist id="exList">${[...new Set([...byDate(d.workouts).reverse().filter(w=>!w.hk).map(w=>w.name),...Object.values(MUSEX).flat()])].slice(0,80).map(n=>`<option>${esc(n)}</option>`).join("")}</datalist><div class="tp-addrow"><button type="button" class="tp-add" data-tpadd>＋ Add exercise</button><button type="button" class="tp-add" data-tpgadd>＋ Add group</button><button type="button" class="tp-add" data-gfind>Find a machine</button><button type="button" class="tp-add" data-gscan>Scan a machine</button></div></div>
    <div class="tp-r"><div class="tp-q"><b>Which muscles does it target?</b><span>Tap a muscle once for <i class="k2">main</i>, again for <i class="k1">also worked</i>, again to clear.</span></div>
     <div id="tpDiag">${musSvg(P.mus,{tap:true})}</div>
     <div id="tpSug">${hasSug&&!same?`<button type="button" class="tp-sug" data-tpsug>Use muscles from my exercises</button>`:""}</div>
     <div class="tp-chips" id="tpChips">${MUS.map(([k,n])=>`<button type="button" class="tp-chip l${P.mus[k]||0}" data-mtap="${k}">${n}</button>`).join("")}</div></div>
-   <div class="tp-acts"><button class="btn tp-savebtn" data-tpsave>${P.id?"Save changes":"Save workout"}</button><button class="btn ghost" data-tpcancel>Cancel</button>${P.id?`<button class="btn ghost danger" data-tpdelete>Delete</button>`:""}</div></div>`}
+   <div class="tp-acts"><button class="btn" data-tpsave>Save workout</button><button class="btn ghost" data-tpcancel>Cancel</button>${P.id?`<button class="btn ghost danger" data-tpdelete>Delete</button>`:""}</div></div>`}
 function planPanel(d){const PL=d.plans||[];
-  return `<div class="panel tpp" style="margin-top:18px"><div class="ph"><span>${tPlan?(tPlan.id?"Edit workout":"Design a workout"):"My workouts"}</span>${tPlan?"":`<button class="upd-red" data-forceupd title="Get the newest version (you have ${APPV})">Update</button>`}${tPlan?`<span class="tp-hacts"><button class="btn ghost" data-tpcancel>Cancel</button><button class="btn tp-savebtn" data-tpsave>${tPlan.id?"Save changes":"Save workout"}</button></span>`:`<i>${PL.length?PL.length+" saved":""}</i>`}</div>
+  return `<div class="panel tpp" style="margin-top:18px"><div class="ph"><span>${tPlan?(tPlan.id?"Edit workout":"Design a workout"):"My workouts"}</span>${tPlan?"":`<button class="upd-red" data-forceupd title="Get the newest version (you have ${APPV})">Update</button>`}${tPlan?`<span class="tp-hacts"><button class="btn ghost" data-tpcancel>Cancel</button><button class="btn" data-tpsave>Save workout</button></span>`:`<i>${PL.length?PL.length+" saved":""}</i>`}</div>
     ${tPlan?planForm(d):todayHTML(d)+splitHTML()+planList(d,PL)}</div>`}
 async function forceUpdate(b){if(b)b.textContent="Updating…";try{sessionStorage.removeItem("aot-upd2");sessionStorage.removeItem("aot-upd")}catch(e){}
   try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k!=="aot-img").map(k=>caches.delete(k)))}catch(e){}
@@ -4172,7 +4177,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="167";if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
+const APPV="168";if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
