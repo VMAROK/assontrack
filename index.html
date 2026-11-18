@@ -1191,9 +1191,19 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .lines-sw{display:inline-flex}
 
 /* training */
-.tp-card{position:relative}.tp-done{position:absolute;top:10px;right:10px;z-index:2;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;pointer-events:none;color:transparent;border:1.5px solid rgba(61,220,132,.6)}
+.tp-card{position:relative}.tp-done{position:absolute;bottom:10px;right:10px;z-index:2;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;pointer-events:none;color:transparent;border:1.5px solid rgba(61,220,132,.6)}
 .tp-done.part{color:rgba(61,220,132,.5)}.tp-done.on{background:#3ddc84;border-color:#3ddc84;color:#04140b;box-shadow:0 0 10px rgba(61,220,132,.55)}
-.tp-card.has-done .tp-top{padding-right:40px}
+.tp-card.sq{aspect-ratio:1/1;min-height:0!important;overflow:hidden;cursor:pointer;gap:6px;padding:12px}
+.tp-card.sq .tp-top{align-items:flex-start}.tp-card.sq .tp-top b{line-height:1.25;min-width:0}
+.tp-pen{flex:none;width:30px;height:30px;margin:-4px -4px 0 0;padding:0;display:grid;place-items:center;border-radius:8px;cursor:pointer;color:var(--muted);background:rgba(var(--tX),.45);border:1px solid rgba(var(--lr),.3);position:relative;z-index:4}.tp-pen:hover{color:#eef3ff;border-color:rgba(var(--tL),.6)}
+.tp-card.sq .tp-fig{flex:1 1 0;min-height:0;display:flex;justify-content:center}.tp-card.sq .tp-fig .musvg{height:100%;width:auto;max-width:100%;max-height:none}
+.tp-card.sq .tp-tags{flex:none}.tp-foot{display:flex;align-items:center;justify-content:space-between;gap:6px;flex:none}.tp-foot small{font-size:11.5px;color:var(--muted);white-space:nowrap}.tp-foot .tp-dys{min-width:0}.tp-dys .ev{background:rgba(var(--tL),.25)!important;color:#dbe6ff!important}
+.tp-drawer{position:absolute;left:0;right:0;bottom:0;height:50%;z-index:3;padding:9px 12px;overflow-y:auto;overscroll-behavior:contain;background:linear-gradient(180deg,rgba(var(--tX),.94),rgba(var(--tX),.98));border-top:1px solid rgba(var(--tL),.45);border-radius:14px 14px 0 0;box-shadow:0 -8px 22px rgba(0,0,0,.45);transform:translateY(102%);transition:transform .32s cubic-bezier(.22,.9,.24,1);cursor:default}
+.tp-card.sq.open .tp-drawer{transform:none}.tp-card.sq .tp-fig{transition:flex-basis .32s cubic-bezier(.22,.9,.24,1)}.tp-card.sq.open .tp-fig{flex:0 0 calc(50% - 46px)}.tp-card.sq.open .tp-tags,.tp-card.sq.open .tp-foot{visibility:hidden}.tp-drawer .tp-ex{display:grid;gap:4px;font-size:13px}
+.tp-doneov{position:absolute;inset:0;z-index:2;display:grid;place-items:center;pointer-events:none;background:rgba(4,12,10,.5);backdrop-filter:blur(1.5px);-webkit-backdrop-filter:blur(1.5px)}
+.tp-doneov i{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:#3ddc84;color:#04140b;box-shadow:0 0 18px rgba(61,220,132,.7),0 0 40px rgba(61,220,132,.35)}.tp-doneov svg{width:38px;height:38px}
+.tp-card.sq.open .tp-doneov{opacity:.25}
+.wk-cats.compact .tp-card.sq{padding:8px}.wk-cats.compact .tp-pen{width:24px;height:24px}.wk-cats.compact .tp-doneov i{width:46px;height:46px}.wk-cats.compact .tp-doneov svg{width:24px;height:24px}.wk-cats.compact .tp-foot small{font-size:10px}.wk-cats.compact .tp-drawer .tp-ex{font-size:11px}
 .tpd-sel{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 6px;padding:6px 10px;border-radius:8px;font-size:12.5px;color:var(--muted);background:rgba(var(--tL),.1);border:1px solid rgba(var(--tL),.35)}.tpd-sel b{color:#eef3ff}.tpd-sel button{font:inherit;font-size:12px;font-weight:600;color:rgba(var(--tL),1);background:none;border:1px solid rgba(var(--tL),.5);border-radius:99px;padding:3px 10px;cursor:pointer}
 .tpx-r.sel{box-shadow:0 0 0 1.5px rgba(var(--tL),.9);background:rgba(var(--tL),.08)}
 .tp-exi{cursor:pointer;border-radius:5px;padding:1px 4px;margin:0 -4px;transition:background .15s,color .15s}.tp-exi:hover{background:rgba(var(--tL),.1)}.tp-exi.on{background:rgba(var(--tL),.2);color:#fff;box-shadow:inset 0 0 0 1px rgba(var(--tL),.6)}
@@ -2376,13 +2386,20 @@ function splitHTML(){const td=dayIdx(today()),wk0=wkOf(today()),PL=data.plans||[
   </div>`}
 function todayHTML(d){const ti=dayIdx(today()),cs=schedOf(ti),pin=dayPlans(ti);if(!cs.length&&!pin.length)return "";const PL=(d.plans||[]).filter(p=>inDay(p,cs)||pDays(p).includes(ti)),done=new Set(d.workouts.filter(w=>w.d===today()&&w.plan).map(w=>w.plan));
   return `<div class="sp-today"><span>Today${cs.length?" · "+cs.map(c=>`<b style="color:${PPCOL[c]||catCol(c)}">${esc(c)}</b>`).join(" + "):""}</span>${PL.length?PL.map(p=>done.has(p.id)?`<span class="sp-done">✓ ${esc(p.name)}</span>`:`<button class="btn" data-plog="${p.id}">Log ${esc(p.name)}</button>`).join(""):`<button class="btn ghost" data-pnewcat="${esc(cs[0])}">＋ Design a ${esc(cs[0])} workout</button>`}</div>`}
+/* square workout card: name, figure, muscles and days; tap it to slide up its exercise list. Done today = check overlay */
+const PENSVG=`<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>`;
+let cardOpen=new Set();
 function planCard(d,pl,inSh){pl=Object.assign({},pl,{mus:musNorm(pl.mus)});const ms=Object.entries(pl.mus).sort((a,b)=>b[1]-a[1]);
-  const dn=(pl.ex||[]).filter(e=>tlFull(d,pl,e)).length,pt=(pl.ex||[]).some(e=>tckDone(d,pl,e)),dState=pl.ex&&pl.ex.length&&dn===pl.ex.length?"on":pt?"part":"";
-  return `<div class="tp-card${dState?" has-done":""}" data-pid="${esc(pl.id||"")}">${dState?`<span class="tp-done ${dState}" title="${dState==="on"?"Done today":dn+" of "+pl.ex.length+" exercises done today"}" aria-label="${dState==="on"?"Done today":"Partly done today"}">${CKSVG}</span>`:""}<div class="tp-top"><b>${esc(pl.name)}${ppTag(pl.mus)}${inSh?"":pCats(pl).map(c=>`<span class="tp-cat" style="--cc:${catCol(c)}">${esc(c)}${pSub(pl,c)?` · ${esc(pSub(pl,c))}`:""}</span>`).join("")}</b><small>${pl.ex.length} exercise${pl.ex.length===1?"":"s"}</small></div>${musSvg(pl.mus,{lab:false})}
+  const dn=(pl.ex||[]).filter(e=>tlFull(d,pl,e)).length,pt=(pl.ex||[]).some(e=>tckDone(d,pl,e)),dState=pl.ex&&pl.ex.length&&dn===pl.ex.length?"on":pt?"part":"",open=cardOpen.has(pl.id);
+  return `<div class="tp-card sq${open?" open":""}${dState?" has-done "+dState:""}" data-pid="${esc(pl.id||"")}" data-cardtap="${esc(pl.id||"")}" aria-expanded="${open}">
+    <div class="tp-top"><b>${esc(pl.name)}${ppTag(pl.mus)}${inSh?"":pCats(pl).map(c=>`<span class="tp-cat" style="--cc:${catCol(c)}">${esc(c)}${pSub(pl,c)?` · ${esc(pSub(pl,c))}`:""}</span>`).join("")}</b><button type="button" class="tp-pen" data-pedit="${pl.id}" aria-label="Edit ${esc(pl.name)}" title="Edit">${PENSVG}</button></div>
+    <div class="tp-fig">${musSvg(pl.mus,{lab:false})}</div>
     <div class="tp-tags">${ms.length?ms.map(([k,v])=>`<span class="tp-tag l${v}">${MUSN[k]}</span>`).join(""):`<span class="tp-none">No muscles picked</span>`}</div>
-    ${pDays(pl).length?`<div class="tp-dys">${pDays(pl).sort().map(i=>`<span>${DAYS[i]}</span>`).join("")}</div>`:""}
-    <div class="tp-ex">${(G=>G.map(([g,xs])=>`${G.length>1&&g?`<span class="tp-exg">${esc(g)}</span>`:""}${xs.map(([e,i])=>`<span class="tp-exi" data-cex="${esc(pl.id||"")}|${i}" role="button" tabindex="0">${esc(e.name)} <em>${exS(e).replace(/ /g,"")}</em></span>`).join("")}`).join(""))(exGroups(pl.ex))}</div>
-    <div class="tp-btns"><button class="btn" data-plog="${pl.id}">Log today</button><button class="btn ghost" data-pedit="${pl.id}">Edit</button></div></div>`}
+    <div class="tp-foot">${pDays(pl).length?`<div class="tp-dys">${pDays(pl).sort().map(i=>`<span>${DAYS[i]}</span>`).join("")}</div>`:`<div class="tp-dys"><span class="ev">Every day</span></div>`}<small>${pl.ex.length} exercise${pl.ex.length===1?"":"s"} ${open?"▾":"▸"}</small></div>
+    <div class="tp-drawer"><div class="tp-ex">${(G=>G.map(([g,xs])=>`${G.length>1&&g?`<span class="tp-exg">${esc(g)}</span>`:""}${xs.map(([e,i])=>`<span class="tp-exi" data-cex="${esc(pl.id||"")}|${i}" role="button" tabindex="0">${esc(e.name)} <em>${exS(e).replace(/ /g,"")}</em></span>`).join("")}`).join(""))(exGroups(pl.ex))}</div></div>
+    ${dState==="on"?`<span class="tp-doneov" aria-label="Done today"><i>${CKSVG}</i></span>`:dState==="part"?`<span class="tp-done part" title="${dn} of ${pl.ex.length} exercises done today">${CKSVG}</span>`:""}</div>`}
+document.addEventListener("click",e=>{const c=e.target.closest&&e.target.closest("[data-cardtap]");if(!c||e.target.closest("button,[data-cex],input"))return;const id=c.dataset.cardtap;const o=!cardOpen.has(id);o?cardOpen.add(id):cardOpen.delete(id);c.classList.toggle("open",o);c.setAttribute("aria-expanded",o);const sm=c.querySelector(".tp-foot small");if(sm)sm.textContent=sm.textContent.replace(/[▾▸]/,o?"▾":"▸");
+  if(!o){c.querySelectorAll("[data-cex].on").forEach(x=>x.classList.remove("on"));const id2=c.dataset.pid,pl=(data.plans||[]).find(x=>x.id===id2),sv=c.querySelector(".musvg");if(pl&&sv)sv.outerHTML=musSvg(musNorm(pl.mus),{lab:false})}});
 function tpCatsHTML(){const P=tPlan,cs=wcatAll(),sel=P.cats||[];
   const newT=(id,ph,ok)=>`<span class="tp-tnew"><input id="${id}" maxlength="24" placeholder="${ph}" autocomplete="off" aria-label="${ph}"><button type="button" class="tp-tile done" ${ok}>Add</button></span>`;
   return `<div class="tp-tiles" role="group" aria-label="Categories">${cs.map(c=>{const on=sel.includes(c),arm=tpCatDel===c;return `<button type="button" class="tp-tile${on?" on":""}${arm?" arm":""}" style="--cc:${catCol(c)}" aria-pressed="${on}" data-tpcat="${esc(c)}"><span>${arm?"Delete "+esc(c)+"?":esc(c)}</span><i data-tpcatdel="${esc(c)}" aria-label="Delete category ${esc(c)}" role="button">${arm?"✓":"×"}</i></button>`}).join("")}${tpCatAdd?newT("tpCatNew","Category name","data-tpcatok"):`<button type="button" class="tp-tile add" data-tpcatnew>＋ New category</button>`}</div>
@@ -4120,7 +4137,7 @@ function render(){
   placeBranch();applyWall();applyWallBlur();applyLook();preloadWalls();holoMount();eqCards();dbgLabels();
 }
 /* every workout card in the All workouts panel is as tall as the tallest one */
-function eqCards(){const cs=[...document.querySelectorAll("#view .wk-catc .tp-card")];if(!cs.length)return;cs.forEach(c=>c.style.minHeight="");const cmp=!!document.querySelector("#view .wk-cats.compact");if(!cmp){const h=Math.max(...cs.map(c=>c.offsetHeight));cs.forEach(c=>c.style.minHeight=h+"px")}document.querySelectorAll("#view .wk-catc .sh-row,#view .wk-cats").forEach(r=>{let dots=r.nextElementSibling&&r.nextElementSibling.classList.contains("sc-dots")?r.nextElementSibling:null;
+function eqCards(){const cs=[...document.querySelectorAll("#view .wk-catc .tp-card")];if(!cs.length)return;cs.forEach(c=>c.style.minHeight="");const cmp=!!document.querySelector("#view .wk-cats.compact");document.querySelectorAll("#view .wk-catc .sh-row,#view .wk-cats").forEach(r=>{let dots=r.nextElementSibling&&r.nextElementSibling.classList.contains("sc-dots")?r.nextElementSibling:null;
     const kids=[...r.children].filter(x=>x.offsetWidth),per=kids.length?Math.max(1,Math.round(r.clientWidth/(kids[0].offsetWidth||1))):1,pages=Math.max(1,kids.length-per+1);
     if(pages<2){if(dots)dots.remove();return}
     if(!dots){dots=document.createElement("div");dots.className="sc-dots";r.after(dots)}
@@ -4278,7 +4295,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="193",APPT="2026-11-18T17:27:00-05:00";   /* APPT: when this update was made */
+const APPV="194",APPT="2026-11-18T17:38:00-05:00";   /* APPT: when this update was made */
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
