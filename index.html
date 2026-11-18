@@ -1260,6 +1260,13 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .gy-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.gy-btns.col{flex-direction:column;align-items:stretch;margin-top:10px}.gy-btns .btn{padding:9px 12px;font-size:13.5px}
 .linkbtn{font:inherit;font-size:13px;color:rgba(var(--tL),1);background:none;border:0;padding:0;text-decoration:underline;cursor:pointer}
 .trlogp .gy-sc{margin-right:2px}.tp-addrow{display:flex;gap:8px;flex-wrap:wrap}
+.tp-cats{display:flex;flex-wrap:wrap;gap:6px}.tp-cc{font:inherit;font-size:13px;padding:6px 12px;border-radius:99px;cursor:pointer;color:#cfe0ff;background:rgba(150,180,240,.06);border:1px solid rgba(150,180,240,.28);display:inline-flex;align-items:center;gap:6px}
+.tp-cc.on{color:#fff;background:rgba(var(--tL),.22);border-color:rgba(var(--tL),.75)}.tp-cc.sug{border-style:dashed;border-color:rgba(var(--tL),.6)}.tp-cc.add{color:rgba(var(--tL),1);border-style:dashed}
+.tp-cc i{font-style:normal;opacity:.6;font-size:14px;line-height:1;padding:0 2px}.tp-cc i:hover{opacity:1}.tp-cnew{display:inline-flex;gap:6px}.tp-cnew input{width:150px;padding:5px 10px;font-size:13px}
+.tp-csug{font-size:12px;color:var(--muted)}.tp-csug b{color:#dbe7ff}
+.tp-cat{display:inline-block;margin-left:8px;vertical-align:2px;font-size:11px;font-weight:600;letter-spacing:.02em;padding:2px 8px;border-radius:99px;color:rgba(var(--tL),1);background:rgba(var(--tL),.12);border:1px solid rgba(var(--tL),.35)}
+.tp-fil{display:flex;gap:6px;overflow-x:auto;margin:0 0 12px;padding-bottom:2px}.tp-fil button{flex:none;font:inherit;font-size:13px;color:#cfe0ff;background:rgba(var(--tX),.45);border:1px solid rgba(var(--lr),.25);border-radius:999px;padding:6px 12px;cursor:pointer}.tp-fil button[aria-selected=true]{background:rgba(var(--tL),.22);border-color:rgba(var(--tL),.7);color:#fff}.tp-fil em{font-style:normal;opacity:.6;font-size:12px;margin-left:2px}
+.tp-gh{margin:16px 2px 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}.tp-gh:first-of-type{margin-top:2px}
 @media (max-width:760px){.gy-main{grid-template-columns:minmax(0,1fr)}}
 
 /* ===== standalone app ===== */
@@ -2128,14 +2135,27 @@ function musHeat(d){const S=musWeek(d),mx=Math.max(10,...Object.values(S));retur
 function musWeek(d){const plans=d.plans||[],sets={};d.workouts.forEach(w=>{const a=(Date.now()-new Date(w.d+"T12:00"))/864e5;if(a>=7||a<-1)return;const pl=w.plan&&plans.find(x=>x.id===w.plan),m=musNorm((pl&&pl.mus&&Object.keys(pl.mus).length?pl.mus:null)||exMus(w.name)||{});const n=+w.sets||1;Object.entries(m).forEach(([k,v])=>sets[k]=(sets[k]||0)+n*(v===2?1:.5))});return sets}
 
 let tPlan=null;   /* the workout being designed */
+const WCATS=["Push","Pull","Legs","Upper body","Lower body","Full body","Core","Cardio"];let planF="",tpCatAdd=false;
+const wcatAll=()=>{const u=[...WCATS,...(data.wcats||[])];(data.plans||[]).forEach(p=>p.cat&&!u.includes(p.cat)&&u.push(p.cat));return u};
+function wcatGuess(mus,ex){const m=musNorm(mus||{}),g=ks=>ks.reduce((a,k)=>a+(m[k]||0),0);
+  if((ex||[]).length&&ex.every(e=>/treadmill|bike|elliptical|rower|rowing|stair|arc trainer|run|cycle|walk/i.test(e.name||"")))return "Cardio";
+  const push=g(["chest","frontdelts","sidedelts","triceps"]),pull=g(["lats","upperback","reardelts","biceps","traps","forearms"]),legs=g(["quads","hamstrings","glutes","calves","abductors","adductors"]),core=g(["abs","obliques","lowerback"]);
+  const up=push+pull,tot=up+legs+core;if(!tot)return "";
+  if(core>=tot*.6)return "Core";if(legs>=tot*.6)return "Legs";if(up&&legs&&legs>=tot*.25&&up>=tot*.25)return "Full body";
+  if(push>=up*.75&&push>=tot*.5)return "Push";if(pull>=up*.75&&pull>=tot*.5)return "Pull";if(up>=tot*.5)return "Upper body";return "Full body"}
 function planCard(d,pl){pl=Object.assign({},pl,{mus:musNorm(pl.mus)});const ms=Object.entries(pl.mus).sort((a,b)=>b[1]-a[1]);
-  return `<div class="tp-card"><div class="tp-top"><b>${esc(pl.name)}</b><small>${pl.ex.length} exercise${pl.ex.length===1?"":"s"}</small></div>${musSvg(pl.mus,{lab:false})}
+  return `<div class="tp-card"><div class="tp-top"><b>${esc(pl.name)}${pl.cat?`<span class="tp-cat">${esc(pl.cat)}</span>`:""}</b><small>${pl.ex.length} exercise${pl.ex.length===1?"":"s"}</small></div>${musSvg(pl.mus,{lab:false})}
     <div class="tp-tags">${ms.length?ms.map(([k,v])=>`<span class="tp-tag l${v}">${MUSN[k]}</span>`).join(""):`<span class="tp-none">No muscles picked</span>`}</div>
     <div class="tp-ex">${pl.ex.map(e=>`<span>${esc(e.name)} <em>${e.sets}×${e.reps}</em></span>`).join("")}</div>
     <div class="tp-btns"><button class="btn" data-plog="${pl.id}">Log today</button><button class="btn ghost" data-pedit="${pl.id}">Edit</button></div></div>`}
+function tpCatsHTML(){const P=tPlan,gu=wcatGuess(P.mus,P.ex),cs=wcatAll(),cu=data.wcats||[];
+  return `<div class="tp-cats" role="radiogroup" aria-label="Category">${cs.map(c=>`<button type="button" role="radio" aria-checked="${P.cat===c}" class="tp-cc${P.cat===c?" on":""}${!P.cat&&c===gu?" sug":""}" data-tpcat="${esc(c)}">${esc(c)}${cu.includes(c)?`<i data-tpcatdel="${esc(c)}" aria-label="Remove ${esc(c)}" role="button">×</i>`:""}</button>`).join("")}${tpCatAdd?`<span class="tp-cnew"><input id="tpCatNew" maxlength="24" placeholder="New category" autocomplete="off" aria-label="New category"><button type="button" class="tp-cc on" data-tpcatok>Add</button></span>`:`<button type="button" class="tp-cc add" data-tpcatnew>＋ New</button>`}</div>${!P.cat&&gu?`<small class="tp-csug">Looks like <b>${esc(gu)}</b>. It's used if you don't pick one.</small>`:""}`}
+function tpCatAdd1(){const i=$("#tpCatNew"),v=i?i.value.trim().replace(/\s+/g," "):"";if(!v){tpCatAdd=false;tpCatPaint();return}const ex=wcatAll().find(c=>c.toLowerCase()===v.toLowerCase());if(!ex){data.wcats=(data.wcats||[]).concat(v);save()}tPlan.cat=ex||v;tpCatAdd=false;tpCatPaint()}
+function tpCatPaint(){const c=$("#tpCats");if(c&&tPlan)c.innerHTML=tpCatsHTML()}
 function planForm(d){const P=tPlan,sug=sugMus(P.ex),hasSug=Object.keys(sug).length,same=JSON.stringify(sug)===JSON.stringify(P.mus);
   return `<div class="tp-form"><div class="tp-l">
     <label class="tp-lab">Workout name<input id="tpName" value="${esc(P.name)}" autocomplete="off" aria-label="Workout name"></label>
+    <div class="tp-lab">Category<div id="tpCats">${tpCatsHTML()}</div></div>
     <div class="tp-lab">Exercises</div>
     <div class="tp-exl" id="tpEx">${P.ex.map((e,i)=>`<div class="tp-er"><input class="tp-en" data-tpi="${i}" data-tpk="name" list="exList" value="${esc(e.name)}" aria-label="Exercise ${i+1}" autocomplete="off"><input class="tp-n" data-tpi="${i}" data-tpk="sets" inputmode="numeric" value="${e.sets}" aria-label="Sets"><span>×</span><input class="tp-n" data-tpi="${i}" data-tpk="reps" inputmode="numeric" value="${e.reps}" aria-label="Reps"><button type="button" class="x" data-tpdel="${i}" aria-label="Remove exercise">×</button></div>`).join("")}</div>
     <div class="tp-addrow"><button type="button" class="tp-add" data-tpadd>＋ Add exercise</button><button type="button" class="tp-add" data-gfind>Find a machine</button><button type="button" class="tp-add" data-gscan>Scan a machine</button></div></div>
@@ -2146,27 +2166,38 @@ function planForm(d){const P=tPlan,sug=sugMus(P.ex),hasSug=Object.keys(sug).leng
    <div class="tp-acts"><button class="btn" data-tpsave>Save workout</button><button class="btn ghost" data-tpcancel>Cancel</button>${P.id?`<button class="btn ghost danger" data-tpdelete>Delete</button>`:""}</div></div>`}
 function planPanel(d){const PL=d.plans||[];
   return `<div class="panel tpp" style="margin-top:18px"><div class="ph"><span>${tPlan?(tPlan.id?"Edit workout":"Design a workout"):"My workouts"}</span><i>${tPlan?"":PL.length?PL.length+" saved":""}</i></div>
-    ${tPlan?planForm(d):`<div class="tp-grid">${PL.map(pl=>planCard(d,pl)).join("")}<button class="tp-new" data-pnew>${musSvg({},{lab:false})}<b>＋ Design a workout</b><small>Pick the exercises and the muscles they hit</small></button></div>`}</div>`}
+    ${tPlan?planForm(d):planList(d,PL)}</div>`}
+function planList(d,PL){const used=[...new Set(PL.map(p=>p.cat||""))],cats=wcatAll().filter(c=>used.includes(c));if(used.includes(""))cats.push("");if(planF&&!used.includes(planF))planF="";
+  const nw=`<button class="tp-new" data-pnew>${musSvg({},{lab:false})}<b>＋ Design a workout</b><small>Pick the exercises and the muscles they hit</small></button>`;
+  const bar=cats.length>1?`<div class="tp-fil" role="tablist" aria-label="Filter workouts">${[["","All",PL.length],...cats.filter(c=>c).map(c=>[c,c,PL.filter(p=>p.cat===c).length])].map(([v,n,k])=>`<button role="tab" aria-selected="${planF===v}" data-pf="${esc(v)}">${esc(n)} <em>${k}</em></button>`).join("")}</div>`:"";
+  if(planF)return bar+`<div class="tp-grid">${PL.filter(p=>p.cat===planF).map(pl=>planCard(d,pl)).join("")}</div>`;
+  const ord=c=>{const i=cats.indexOf(c||"");return i<0?99:i};
+  return bar+`<div class="tp-grid">${PL.slice().sort((a,b)=>ord(a.cat)-ord(b.cat)).map(pl=>planCard(d,pl)).join("")}${nw}</div>`}
 function musWeekPanel(d){const S=musWeek(d),mx=Math.max(1,...Object.values(S)),H={};Object.entries(S).forEach(([k,v])=>H[k]=v/Math.max(mx,10));const hit=MUS.filter(([k])=>S[k]),miss=MUS.filter(([k])=>!S[k]);
   return `<div class="tp-week"><div>${musSvg(null,{heat:H})}<div class="tp-leg"><span><i style="background:${heatCol(.05)}"></i>A little</span><span><i style="background:${heatCol(1)}"></i>A lot</span><span><i style="background:rgba(150,180,240,.2)"></i>Not yet</span></div></div>
     <div class="tp-wl">${hit.length?hit.sort((a,b)=>S[b[0]]-S[a[0]]).map(([k,n])=>`<div><span>${n}</span><b>${Math.round(S[k])} set${Math.round(S[k])===1?"":"s"}</b></div>`).join(""):`<p class="note" style="margin:0">Log a workout and the muscles you worked light up here.</p>`}
     ${hit.length&&miss.length?`<p class="note" style="margin:8px 0 0">Not trained this week: ${miss.map(x=>x[1]).join(", ")}</p>`:""}</div></div>`}
-function tpPaint(){if(!tPlan)return;const g=$("#tpDiag"),c=$("#tpChips"),sg=$("#tpSug");if(g)g.innerHTML=musSvg(tPlan.mus,{tap:true});if(c)c.querySelectorAll("[data-mtap]").forEach(b=>b.className="tp-chip l"+(tPlan.mus[b.dataset.mtap]||0));if(sg){const sug=sugMus(tPlan.ex);sg.innerHTML=Object.keys(sug).length&&JSON.stringify(sug)!==JSON.stringify(tPlan.mus)?`<button type="button" class="tp-sug" data-tpsug>Use muscles from my exercises</button>`:""}}
+function tpPaint(){if(!tPlan)return;if(!tpCatAdd)tpCatPaint();const g=$("#tpDiag"),c=$("#tpChips"),sg=$("#tpSug");if(g)g.innerHTML=musSvg(tPlan.mus,{tap:true});if(c)c.querySelectorAll("[data-mtap]").forEach(b=>b.className="tp-chip l"+(tPlan.mus[b.dataset.mtap]||0));if(sg){const sug=sugMus(tPlan.ex);sg.innerHTML=Object.keys(sug).length&&JSON.stringify(sug)!==JSON.stringify(tPlan.mus)?`<button type="button" class="tp-sug" data-tpsug>Use muscles from my exercises</button>`:""}}
 document.addEventListener("input",e=>{if(!tPlan)return;const t=e.target;if(t.id==="tpName"){tPlan.name=t.value;return}if(t.dataset&&t.dataset.tpi!=null){const ex=tPlan.ex[+t.dataset.tpi];if(!ex)return;const k=t.dataset.tpk;ex[k]=k==="name"?t.value:(parseInt(t.value)||"");if(k==="name")tpPaint()}});
 document.addEventListener("keydown",e=>{const m=e.target.closest&&e.target.closest("g[data-mtap]");if(m&&(e.key==="Enter"||e.key===" ")){e.preventDefault();m.dispatchEvent(new MouseEvent("click",{bubbles:true}))}});
-document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-mtap],[data-pnew],[data-pedit],[data-plog],[data-tpadd],[data-tpdel],[data-tpsug],[data-tpsave],[data-tpcancel],[data-tpdelete]");if(!t)return;const d=data;
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-tpcat],[data-tpcatdel],[data-tpcatnew],[data-tpcatok],[data-pf],[data-mtap],[data-pnew],[data-pedit],[data-plog],[data-tpadd],[data-tpdel],[data-tpsug],[data-tpsave],[data-tpcancel],[data-tpdelete]");if(!t)return;const d=data;
+  if(e.target.dataset&&e.target.dataset.tpcatdel){const c=e.target.dataset.tpcatdel;data.wcats=(data.wcats||[]).filter(x=>x!==c);if(tPlan&&tPlan.cat===c)tPlan.cat="";save();tpCatPaint();return}
+  if(t.dataset.tpcat!=null&&tPlan){tPlan.cat=tPlan.cat===t.dataset.tpcat?"":t.dataset.tpcat;tpCatPaint();return}
+  if(t.dataset.tpcatnew!==undefined){tpCatAdd=true;tpCatPaint();setTimeout(()=>{const i=$("#tpCatNew");i&&i.focus()},30);return}
+  if(t.dataset.tpcatok!==undefined){tpCatAdd1();return}
+  if(t.dataset.pf!=null){planF=t.dataset.pf;render();return}
   if(t.dataset.mtap){if(!tPlan)return;const k=t.dataset.mtap,v=tPlan.mus[k]||0,n=v===0?2:v===2?1:0;if(n)tPlan.mus[k]=n;else delete tPlan.mus[k];tpPaint();return}
   if(t.dataset.pnew!==undefined){tPlan={name:"",ex:[{name:"",sets:3,reps:10}],mus:{}};render();setTimeout(()=>{const i=$("#tpName");i&&(i.focus({preventScroll:true}),$(".tpp").scrollIntoView({behavior:"smooth",block:"start"}))},60);return}
   if(t.dataset.pedit){const pl=(d.plans||[]).find(x=>x.id===t.dataset.pedit);if(!pl)return;tPlan=JSON.parse(JSON.stringify(pl));tPlan.mus=musNorm(tPlan.mus);render();setTimeout(()=>{const x=$(".tpp");x&&x.scrollIntoView({behavior:"smooth",block:"start"})},60);return}
   if(t.dataset.tpadd!==undefined){tPlan.ex.push({name:"",sets:3,reps:10});render();setTimeout(()=>{const a=document.querySelectorAll(".tp-en");a.length&&a[a.length-1].focus()},40);return}
   if(t.dataset.tpdel){tPlan.ex.splice(+t.dataset.tpdel,1);if(!tPlan.ex.length)tPlan.ex.push({name:"",sets:3,reps:10});render();return}
   if(t.dataset.tpsug!==undefined){tPlan.mus=Object.assign({},sugMus(tPlan.ex));tpPaint();return}
-  if(t.dataset.tpcancel!==undefined){tPlan=null;render();return}
+  if(t.dataset.tpcancel!==undefined){tpCatAdd=false;tPlan=null;render();return}
   if(t.dataset.tpdelete!==undefined){if(t.dataset.armed!=="1"){t.dataset.armed="1";t.textContent="Delete for good?";return}d.plans=(d.plans||[]).filter(x=>x.id!==tPlan.id);tPlan=null;toast("Workout deleted");render();save();return}
   if(t.dataset.tpsave!==undefined){const nm=(tPlan.name||"").trim(),ex=tPlan.ex.map(e=>({name:String(e.name||"").trim(),sets:parseInt(e.sets)||3,reps:parseInt(e.reps)||10})).filter(e=>e.name);
     if(!nm){toast("Give the workout a name");const i=$("#tpName");i&&i.focus();return}if(!ex.length){toast("Add at least one exercise");return}
     if(!Object.keys(tPlan.mus).length){const sg=sugMus(ex);if(Object.keys(sg).length){tPlan.mus=sg;tpPaint();toast("Picked the muscles from your exercises. Check them, then save.");return}toast("Tap the muscles this workout targets");return}
-    d.plans=d.plans||[];const pl={id:tPlan.id||uid(),name:nm,ex,mus:tPlan.mus};const i=d.plans.findIndex(x=>x.id===pl.id);if(i>=0)d.plans[i]=pl;else d.plans.push(pl);tPlan=null;toast(nm+" saved");render();save();return}
+    d.plans=d.plans||[];const pl={id:tPlan.id||uid(),name:nm,ex,mus:tPlan.mus,cat:tPlan.cat||wcatGuess(tPlan.mus,ex)};tpCatAdd=false;const i=d.plans.findIndex(x=>x.id===pl.id);if(i>=0)d.plans[i]=pl;else d.plans.push(pl);tPlan=null;toast(nm+" saved");render();save();return}
   if(t.dataset.plog){const pl=(d.plans||[]).find(x=>x.id===t.dataset.plog);if(!pl)return;let first=null;pl.ex.forEach(e=>{const last=trLast(d,e.name),n={id:uid(),d:today(),name:e.name,sets:e.sets,reps:e.reps,kg:last?last.kg:null,plan:pl.id};first=first||n.id;d.workouts.push(n)});trFlash=first;trFlashAt=Date.now();toast(pl.name+" logged · "+pl.ex.length+" exercise"+(pl.ex.length===1?"":"s"));render();save()}});
 
 /* ---------- gym machines: scan a code on the machine, know what it is, add it to a workout ---------- */
@@ -2238,7 +2269,7 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(t.dataset.gadd){const pl=(data.plans||[]).find(x=>x.id===t.dataset.gadd);if(!pl)return;pl.ex.push({name:m[1],sets:3,reps:10});const mu=musNorm(pl.mus);Object.entries(m[2]).forEach(([k,v])=>mu[k]=Math.max(mu[k]||0,v));pl.mus=mu;save();toast(m[1]+" added to "+pl.name);gymSheet=null;gymShow();render();return}
   if(t.dataset.gnew!==undefined&&tPlan){gymSheet=null;gymShow();const e0=tPlan.ex.find(x=>!String(x.name||"").trim());if(e0)e0.name=m[1];else tPlan.ex.push({name:m[1],sets:3,reps:10});Object.entries(m[2]).forEach(([k,v])=>tPlan.mus[k]=Math.max(tPlan.mus[k]||0,v));render();return}
   if(t.dataset.gnew!==undefined){gymSheet=null;gymShow();if(tab!=="train")go("train");tPlan={name:"",ex:[{name:m[1],sets:3,reps:10}],mus:Object.assign({},m[2])};render();setTimeout(()=>{const i=$("#tpName");i&&(i.focus({preventScroll:true}),$(".tpp").scrollIntoView({behavior:"smooth",block:"start"}))},80)}});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&gymSheet){gymSheet=null;gymShow()}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&gymSheet){gymSheet=null;gymShow()}if(e.target&&e.target.id==="tpCatNew"){if(e.key==="Enter"){e.preventDefault();tpCatAdd1()}else if(e.key==="Escape"){tpCatAdd=false;tpCatPaint()}}});
 function vTrain(){
   const d=D(),u=d.goals.unit,T=trStats(d),F=fitLevel(d),dv=T.lastVol?Math.round((T.vol-T.lastVol)/T.lastVol*100):null,lastW=T.WO.length?T.WO[T.WO.length-1]:null;
   return banner()+`<div class="grid tiles">
@@ -3866,7 +3897,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="126";
+const APPV="127";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
