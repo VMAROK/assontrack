@@ -1242,10 +1242,12 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .mc-stats{display:flex;justify-content:space-between;gap:8px;margin:6px 0 8px;font-size:12px;color:var(--muted)}.mc-stats b{color:#e6eeff;font-size:14px}
 .mc-ex{display:flex;flex-wrap:wrap;gap:6px}.mc-ex button{font:inherit;font-size:12px;padding:4px 9px;border-radius:99px;cursor:pointer;color:#e6eeff;background:color-mix(in srgb,var(--mc) 18%,transparent);border:1px solid color-mix(in srgb,var(--mc) 50%,transparent)}
 
-.gy-box{max-width:460px}.gy-q{width:100%;margin-bottom:8px}.gy-list{display:grid;gap:4px;max-height:52vh;overflow-y:auto;overscroll-behavior:contain}
+.gy-box{max-width:520px}.gy-q{width:100%;margin-bottom:8px}.gy-list{display:grid;gap:4px;max-height:52vh;overflow-y:auto;overscroll-behavior:contain}
 .gy-list button{display:flex;justify-content:space-between;align-items:baseline;gap:10px;text-align:left;font:inherit;color:#e6eeff;background:rgba(var(--tX),.5);border:1px solid rgba(var(--lr),.2);border-radius:10px;padding:9px 12px;cursor:pointer}.gy-list button:hover{border-color:rgba(var(--tL),.6)}.gy-list small{color:var(--muted);font-size:12px}
 .mv{display:block;width:100%;height:auto}.mv .f{fill:none;stroke:#9db7e6;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}.mv .p{fill:#1d3157;stroke:#9db7e6;stroke-width:1.6}.mv .hp{fill:rgba(110,220,255,.25);stroke:#7fe0ff;stroke-width:1.8}.mv .h{fill:none;stroke:#7fe0ff;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}.mv .k{fill:#2f4f86}.mv .a{fill:none;stroke:#ffc978;stroke-width:1.8;stroke-dasharray:3 2.5;stroke-linecap:round}
 .gy-list button .mv{flex:none;width:58px;background:rgba(var(--tX),.35);border-radius:8px}.gy-list button .gy-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.gy-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.gy-list h4,.gy-list>p{grid-column:1/-1}
+.gy-list .gy-card{flex-direction:column;align-items:stretch;justify-content:flex-start;gap:6px;padding:8px}.gy-list .gy-card .mv{width:100%;padding:4px}.gy-list .gy-card b{font-size:14px;line-height:1.2}.gy-list .gy-card small{font-size:11.5px;line-height:1.3}
 .gy-pic .mv{background:none!important;border:0!important}.gy-pic{max-width:240px;margin:0 auto 8px;background:rgba(var(--tX),.35);border:1px solid rgba(var(--lr),.18);border-radius:12px;padding:6px}
 .gy-list h4{margin:8px 2px 2px;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}.gy-list h4:first-child{margin-top:0}
 .gy-gyms{display:flex;gap:6px;overflow-x:auto;margin:0 0 8px;padding-bottom:2px}.gy-gyms button{flex:none;font:inherit;font-size:13px;color:#cfe0ff;background:rgba(var(--tX),.45);border:1px solid rgba(var(--lr),.25);border-radius:999px;padding:6px 12px;cursor:pointer}.gy-gyms button[aria-selected=true]{background:rgba(var(--tL),.22);border-color:rgba(var(--tL),.7);color:#fff}
@@ -2205,7 +2207,7 @@ function gymHTML(){const G=gymSheet;if(!G)return "";
       ${G.brand?`<p class="note" style="margin:0 0 8px">${esc(G.brand)}${G.url?` · <a href="${esc(G.url)}" target="_blank" rel="noopener">open the maker's page</a>`:""}</p>`:G.url?`<p class="note" style="margin:0 0 8px"><a href="${esc(G.url)}" target="_blank" rel="noopener">Open the link on the machine</a></p>`:""}
       ${gu?`<div class="gy-guess"><b>${esc(gu[1])}</b><div class="gy-pic">${mvSvg(gu[0])}</div>${musSvg(gu[2],{lab:false})}<div class="gy-btns"><button class="btn" data-gyes="${gu[0]}">Yes, that's it</button><button class="btn ghost" data-gno>No, pick another</button></div></div>`:
       gymPick(G,q)}`}
-function gymPick(G,q){const gk=gymCur(),gy=GYMS[gk],row=m=>`<button data-gyes="${m[0]}" style="align-items:center">${mvSvg(m[0])}<span class="gy-t"><b>${esc(m[1])}</b><small>${Object.keys(m[2]).map(k=>MUSN[k]).slice(0,3).join(", ")}</small></span></button>`;
+function gymPick(G,q){const gk=gymCur(),gy=GYMS[gk],row=m=>`<button class="gy-card" data-gyes="${m[0]}">${mvSvg(m[0])}<span class="gy-t"><b>${esc(m[1])}</b><small>${Object.keys(m[2]).map(k=>MUSN[k]).slice(0,3).join(", ")}</small></span></button>`;
   const areas=gy.areas.map(([a,ids])=>[a,ids.map(machById).filter(m=>m&&(!q||(m[1]+" "+Object.keys(m[2]).map(k=>MUSN[k]).join(" ")).toLowerCase().includes(q)))]).filter(x=>x[1].length);
   return `<p class="note" style="margin:0 0 8px">${G.code?"This code is new. Pick the machine once and the app will know it next time.":"Pick your gym, then the machine."}</p>
   <div class="gy-gyms" role="tablist">${Object.entries(GYMS).map(([k,g])=>`<button role="tab" aria-selected="${k===gk}" data-ggym="${k}">${esc(g.name)}</button>`).join("")}</div>
@@ -3860,7 +3862,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="124";
+const APPV="125";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
