@@ -2216,7 +2216,7 @@ function splitHTML(){const td=dayIdx(today()),cs=["Push","Pull",...wcatAll()];
 function todayHTML(d){const ti=dayIdx(today()),cs=schedOf(ti),pin=dayPlans(ti);if(!cs.length&&!pin.length)return "";const PL=(d.plans||[]).filter(p=>inDay(p,cs)||pDays(p).includes(ti)),done=new Set(d.workouts.filter(w=>w.d===today()&&w.plan).map(w=>w.plan));
   return `<div class="sp-today"><span>Today${cs.length?" · "+cs.map(c=>`<b style="color:${PPCOL[c]||catCol(c)}">${esc(c)}</b>`).join(" + "):""}</span>${PL.length?PL.map(p=>done.has(p.id)?`<span class="sp-done">✓ ${esc(p.name)}</span>`:`<button class="btn" data-plog="${p.id}">Log ${esc(p.name)}</button>`).join(""):`<button class="btn ghost" data-pnewcat="${esc(cs[0])}">＋ Design a ${esc(cs[0])} workout</button>`}</div>`}
 function planCard(d,pl,inSh){pl=Object.assign({},pl,{mus:musNorm(pl.mus)});const ms=Object.entries(pl.mus).sort((a,b)=>b[1]-a[1]);
-  return `<div class="tp-card"><div class="tp-top"><b>${esc(pl.name)}${ppTag(pl.mus)}${inSh?"":pCats(pl).map(c=>`<span class="tp-cat" style="--cc:${catCol(c)}">${esc(c)}${pSub(pl,c)?` · ${esc(pSub(pl,c))}`:""}</span>`).join("")}</b><small>${pl.ex.length} exercise${pl.ex.length===1?"":"s"}</small></div>${musSvg(pl.mus,{lab:false})}
+  return `<div class="tp-card" data-pid="${esc(pl.id||"")}"><div class="tp-top"><b>${esc(pl.name)}${ppTag(pl.mus)}${inSh?"":pCats(pl).map(c=>`<span class="tp-cat" style="--cc:${catCol(c)}">${esc(c)}${pSub(pl,c)?` · ${esc(pSub(pl,c))}`:""}</span>`).join("")}</b><small>${pl.ex.length} exercise${pl.ex.length===1?"":"s"}</small></div>${musSvg(pl.mus,{lab:false})}
     <div class="tp-tags">${ms.length?ms.map(([k,v])=>`<span class="tp-tag l${v}">${MUSN[k]}</span>`).join(""):`<span class="tp-none">No muscles picked</span>`}</div>
     ${pDays(pl).length?`<div class="tp-dys">${pDays(pl).sort().map(i=>`<span>${DAYS[i]}</span>`).join("")}</div>`:""}
     <div class="tp-ex">${pl.ex.map(e=>`<span>${esc(e.name)} <em>${e.sets}×${e.reps}</em></span>`).join("")}</div>
@@ -2260,6 +2260,25 @@ async function forceUpdate(b){if(b)b.textContent="Updating…";try{sessionStorag
   try{await Promise.race([Promise.all(["./","index.html","sw.js","version.txt"].map(u=>fetch(u,{cache:"reload"}))),new Promise(r=>setTimeout(r,4000))])}catch(e){}
   location.reload()}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-forceupd]");if(b)forceUpdate(b)});
+/* smooth workout-card transitions when a day filter changes: cards that stay glide to their new spot, new ones rise in, removed ones fade out */
+let cmGhosts=null;
+function cardMorph(fn){const v=$("#view");if(!v||!Element.prototype.animate||matchMedia("(prefers-reduced-motion: reduce)").matches){fn();return}
+  if(cmGhosts){cmGhosts.remove();cmGhosts=null}
+  const EZ="cubic-bezier(.22,.9,.24,1)",vh=innerHeight,vis=r=>r.bottom>-40&&r.top<vh+40;
+  const snap=()=>{const m=new Map(),n={};v.querySelectorAll(".tp-card[data-pid]").forEach(el=>{const k=el.dataset.pid,i=n[k]=(n[k]||0)+1;m.set(k+"#"+i,el)});return m};
+  const was=new Map(),hadHead=!!v.querySelector("#wkDayH");snap().forEach((el,k)=>{const r=el.getBoundingClientRect();if(vis(r))was.set(k,{r,el})});
+  fn();
+  const now=snap(),layer=document.createElement("div");layer.style.cssText="position:fixed;inset:0;pointer-events:none;z-index:40";let gone=0,born=0;
+  was.forEach(({r,el},k)=>{if(now.has(k))return;const g=el.cloneNode(true);g.removeAttribute("data-pid");g.style.cssText=`position:fixed;margin:0;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;box-sizing:border-box`;layer.appendChild(g);
+    g.animate([{opacity:1,transform:"none"},{opacity:0,transform:"scale(.92) translateY(-6px)"}],{duration:240,delay:Math.min(gone++,6)*25,easing:"ease-in",fill:"forwards"})});
+  if(layer.childNodes.length){document.body.appendChild(layer);cmGhosts=layer;setTimeout(()=>{layer.remove();if(cmGhosts===layer)cmGhosts=null},520)}
+  const head=v.querySelector("#wkDayH");if(head&&!hadHead)head.animate([{opacity:0,transform:"translateY(-8px)"},{opacity:1,transform:"none"}],{duration:320,easing:EZ});
+  const lift=gone?120:0;
+  now.forEach((el,k)=>{const r=el.getBoundingClientRect();if(!vis(r))return;const o=was.get(k);
+    if(o){const dx=o.r.left-r.left,dy=o.r.top-r.top;if(Math.abs(dx)<1&&Math.abs(dy)<1)return;
+      el.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:"none"}],{duration:480,easing:EZ})}
+    else el.animate([{opacity:0,transform:"translateY(18px) scale(.95)"},{opacity:1,transform:"none"}],{duration:420,delay:lift+Math.min(born++,8)*45,easing:EZ,fill:"backwards"})});
+  v.querySelectorAll(".wk-empty").forEach(el=>el.animate([{opacity:0},{opacity:1}],{duration:300,delay:lift,easing:"ease-out",fill:"backwards"}))}
 function planList(d,PL){ppMigrate(d);const dayF=splitDay>=0;if(dayF)PL=PL.filter(p=>onDay(p,splitDay));const cats=wcatAll().filter(c=>!dayF||PL.some(p=>pCats(p).includes(c))),none=PL.filter(p=>!pCats(p).length);
   const DFULL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],dayHead=dayF?`<div class="wk-dayh" id="wkDayH"><b>${DFULL[splitDay]}</b><span>${PL.length} workout${PL.length===1?"":"s"}</span><button class="tp-tile plain" data-spday="${splitDay}">Show all workouts</button></div>`:"";
   if(dayF&&!PL.length)return dayHead+`<p class="wk-empty" style="margin:4px 2px 0">Nothing planned for ${DFULL[splitDay]}. Set days on a category or a workout.</p>`;if(planF&&!cats.includes(planF))planF="";
@@ -2295,7 +2314,7 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(t.dataset.tpsubnew!=null){tpSubAdd=t.dataset.tpsubnew;tpCatPaint();setTimeout(()=>{const i=$("#tpSubNew");i&&i.focus()},30);return}
   if(t.dataset.tpsubok!=null){tpSubAdd1();return}
   if(t.dataset.tpday!=null&&tPlan){const i=+t.dataset.tpday,a=tPlan.days||[];tPlan.days=a.includes(i)?a.filter(x=>x!==i):a.concat(i).sort();const b=$("#tpDays");if(b)b.innerHTML=tpDaysHTML();return}
-  if(t.dataset.wkfd!=null){const c=t.dataset.wkc,i=+t.dataset.wkfd;catDayF[c]=catDayF[c]===i?-1:i;render();return}
+  if(t.dataset.wkfd!=null){const c=t.dataset.wkc,i=+t.dataset.wkfd;cardMorph(()=>{catDayF[c]=catDayF[c]===i?-1:i;render()});return}
   if(t.dataset.wkcday!=null){catDayToggle(t.dataset.wkc,+t.dataset.wkcday);if(catDayAsk)catDayAsk.src="sec";render();return}
   if(t.dataset.cdall!==undefined&&catDayAsk){const c=catDayAsk.c,ds=catDays(c);catPlans(c).forEach(p=>{if(ds.length)p.days=ds.slice();else delete p.days});catDayAsk=null;save();toast(c+" workouts set to "+ds.map(i=>DAYS[i]).join(", "));render();return}
   if(t.dataset.cdleave!==undefined){catDayAsk=null;render();return}
@@ -2307,7 +2326,7 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(t.dataset.wkput){const p=(d.plans||[]).find(x=>x.id===t.dataset.wkput),c=t.dataset.wkc;if(!p)return;const cs=pCats(p),sb={};cs.forEach(k=>{const v=pSub(p,k);if(v)sb[k]=v});if(cs.includes(c)){p.cats=cs.filter(x=>x!==c);delete sb[c]}else p.cats=cs.concat(c);p.subs=sb;delete p.cat;delete p.sub;save();render();return}
   if(t.dataset.wkcatnew!==undefined){wkNewCat=true;render();setTimeout(()=>{const i=$("#wkCatNew");i&&i.focus()},30);return}
   if(t.dataset.wkcatok!==undefined){wkCatAdd1();return}
-  if(t.dataset.spday!=null){const i=+t.dataset.spday;splitDay=splitDay===i?-1:i;catDayAsk=null;planF="";planS="";render();return}
+  if(t.dataset.spday!=null){const i=+t.dataset.spday;cardMorph(()=>{splitDay=splitDay===i?-1:i;catDayAsk=null;planF="";planS="";render()});return}
   if(t.dataset.spcat!=null&&splitDay>=0){catDayToggle(t.dataset.spcat,splitDay);if(catDayAsk)catDayAsk.src="split";render();return}
   if(t.dataset.spclear!==undefined&&splitDay>=0){if(d.wsched)delete d.wsched[splitDay];splitDay=-1;save();render();return}
   if(t.dataset.spdone!==undefined){splitDay=-1;catDayAsk=null;render();return}
@@ -4029,7 +4048,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="145";
+const APPV="146";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
