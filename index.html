@@ -1280,6 +1280,7 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .wk-bar .cat-tab.add{color:rgba(var(--tL),1);font-weight:600;font-size:13px;padding:8px 14px}.wk-newin{padding:4px 6px!important;gap:6px}.wk-newin input{width:150px;height:32px;font-size:13.5px;padding:0 9px;border-radius:6px}.wk-newin .tp-tile{min-height:32px}
 .wk-asg{margin-left:10px;min-height:30px;font-size:12.5px}.wk-asgbox{display:grid;gap:8px;margin:0 2px 12px;padding:10px;border-radius:8px;background:#0f1933;border:1px solid rgba(var(--lr),.25)}.wk-asgbox small{font-size:12px;color:var(--muted)}
 .wk-empty{margin:0 2px 12px;font-size:13px;color:var(--muted)}
+.wk-dayh{display:flex;align-items:center;gap:12px;margin:0 0 10px;padding:10px 12px;border-radius:8px;background:#14203f;border:1px solid rgba(var(--tL),.6);scroll-margin-top:90px}.wk-dayh b{font-size:16px;color:#eef3ff}.wk-dayh span{font-size:13px;color:var(--muted)}.wk-dayh .tp-tile{margin-left:auto;min-height:34px;padding:0 14px}
 .cd-ask{display:grid;gap:10px;margin:0 2px 12px;padding:12px;border-radius:8px;background:#121d3b;border:1px solid var(--cc);box-shadow:0 0 0 1px color-mix(in srgb,var(--cc) 30%,transparent),0 8px 24px rgba(0,0,0,.35)}.cd-ask p{margin:0;font-size:13.5px;line-height:1.4}.cd-ask>div{display:flex;flex-wrap:wrap;gap:8px}.cd-ask .tp-tile{min-height:38px;padding:0 14px}
 .sp-d b .sp-pin{color:#dbe5fb;font-weight:500}.sp-pickh{font-size:12px;font-weight:600;color:var(--muted);margin:2px 2px -2px}.sp .cd-ask{margin:2px 0 0}
 .dy-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.dy{font:inherit;font-size:12.5px;font-weight:600;min-height:38px;border-radius:6px;cursor:pointer;color:#cfdaf2;background:#14203f;border:1px solid rgba(var(--lr),.34)}
@@ -2252,17 +2253,19 @@ function planPanel(d){const PL=d.plans||[];
   return `<div class="panel tpp" style="margin-top:18px"><div class="ph"><span>${tPlan?(tPlan.id?"Edit workout":"Design a workout"):"My workouts"}</span><i>${tPlan?"":PL.length?PL.length+" saved":""}</i></div>
     ${tPlan?planForm(d):todayHTML(d)+splitHTML()+planList(d,PL)}</div>`}
 function planList(d,PL){ppMigrate(d);const dayF=splitDay>=0;if(dayF)PL=PL.filter(p=>onDay(p,splitDay));const cats=wcatAll().filter(c=>!dayF||PL.some(p=>pCats(p).includes(c))),none=PL.filter(p=>!pCats(p).length);
-  if(dayF&&!PL.length)return `<p class="wk-empty" style="margin:4px 2px 0">Nothing planned for ${DAYS[splitDay]}. Give it a category above, or set days on a workout. Tap ${DAYS[splitDay]} again to show all.</p>`;if(planF&&!cats.includes(planF))planF="";
+  const DFULL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],dayHead=dayF?`<div class="wk-dayh" id="wkDayH"><b>${DFULL[splitDay]}</b><span>${PL.length} workout${PL.length===1?"":"s"}</span><button class="tp-tile plain" data-spday="${splitDay}">Show all workouts</button></div>`:"";
+  if(dayF&&!PL.length)return dayHead+`<p class="wk-empty" style="margin:4px 2px 0">Nothing planned for ${DFULL[splitDay]}. Set days on a category or a workout.</p>`;if(planF&&!cats.includes(planF))planF="";
   const nw=`<button class="tp-new" data-pnew>${musSvg({},{lab:false})}<b>＋ Design a workout</b><small>Pick the exercises and the muscles they hit</small></button>`;
   const tab=(attr,v,n,k,on,c)=>`<button class="cat-tab" role="tab" aria-selected="${on}" ${attr}="${esc(v)}"${c?` style="--cc:${c}"`:""}>${c?`<b class="wk-dot"></b>`:""}${esc(n)}<i>${k}</i></button>`;
   const newCat=wkNewCat?`<span class="cat-tab wk-newin"><input id="wkCatNew" maxlength="24" placeholder="Category name" autocomplete="off" aria-label="New category name"><button class="tp-tile done" data-wkcatok>Add</button></span>`:`<button class="cat-tab add" data-wkcatnew aria-label="New category" title="New category">＋</button>`;
   const bar=`<div class="cat-bar wk-bar" role="tablist" aria-label="Workout categories">${cats.length?tab("data-pf","","All",PL.length,!planF):""}${cats.map(c=>tab("data-pf",c,c,PL.filter(p=>pCats(p).includes(c)).length,planF===c,catCol(c))).join("")}${newCat}</div>`;
+  if(dayF&&!cats.length)return dayHead+`<div class="tp-grid">${PL.map(pl=>planCard(d,pl)).join("")}</div>`;
   if(!cats.length)return bar+`<div class="tp-grid">${PL.map(pl=>planCard(d,pl)).join("")}${nw}</div>`;
   const td=schedOf(dayIdx(today()));let bar2="",show=cats;
   if(planF){show=[planF];const IN=PL.filter(p=>pCats(p).includes(planF)),subs=wsubAll(planF).filter(x=>IN.some(p=>pSub(p,planF)===x));if(planS&&!subs.includes(planS))planS="";
     if(subs.length)bar2=`<div class="cat-bar wk-bar sub" role="tablist" aria-label="Filter ${esc(planF)} by subcategory">${tab("data-ps","","All "+planF,IN.length,!planS)}${subs.map(x=>tab("data-ps",x,x,IN.filter(p=>pSub(p,planF)===x).length,planS===x)).join("")}</div>`}
   else show=cats.slice().sort((a,b)=>(td.includes(b)?1:0)-(td.includes(a)?1:0));
-  return bar+bar2+`<div class="wk-board">${show.map(c=>wkSec(d,c,PL.filter(p=>pCats(p).includes(c)),planF?planS:"",td,PL)).join("")}${!planF&&none.length?wkSec(d,"",none,"",td,PL):""}${!planF?`<section class="wk-sec wk-foot"><div class="sh-row">${wkNewCard("")}</div></section>`:""}</div>`}
+  return (dayF?dayHead:bar+bar2)+`<div class="wk-board">${show.map(c=>wkSec(d,c,PL.filter(p=>pCats(p).includes(c)),planF?planS:"",td,PL)).join("")}${!planF&&none.length?wkSec(d,"",none,"",td,PL):""}${!planF?`<section class="wk-sec wk-foot"><div class="sh-row">${wkNewCard("")}</div></section>`:""}</div>`}
 function wkSec(d,c,IN,only,td,PL){const subs=c?wsubAll(c).filter(x=>IN.some(p=>pSub(p,c)===x)):[],gen=IN.filter(p=>!c||!subs.includes(pSub(p,c)));
   let lanes=subs.map(x=>[x,IN.filter(p=>pSub(p,c)===x)]);if(gen.length)lanes.push([subs.length?"General":"",gen]);if(only)lanes=lanes.filter(l=>l[0]===only);
   const asg=c&&wkAssign===c;
@@ -2293,7 +2296,7 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(t.dataset.wkput){const p=(d.plans||[]).find(x=>x.id===t.dataset.wkput),c=t.dataset.wkc;if(!p)return;const cs=pCats(p),sb={};cs.forEach(k=>{const v=pSub(p,k);if(v)sb[k]=v});if(cs.includes(c)){p.cats=cs.filter(x=>x!==c);delete sb[c]}else p.cats=cs.concat(c);p.subs=sb;delete p.cat;delete p.sub;save();render();return}
   if(t.dataset.wkcatnew!==undefined){wkNewCat=true;render();setTimeout(()=>{const i=$("#wkCatNew");i&&i.focus()},30);return}
   if(t.dataset.wkcatok!==undefined){wkCatAdd1();return}
-  if(t.dataset.spday!=null){const i=+t.dataset.spday;splitDay=splitDay===i?-1:i;catDayAsk=null;render();return}
+  if(t.dataset.spday!=null){const i=+t.dataset.spday;splitDay=splitDay===i?-1:i;catDayAsk=null;planF="";planS="";render();return}
   if(t.dataset.spcat!=null&&splitDay>=0){catDayToggle(t.dataset.spcat,splitDay);if(catDayAsk)catDayAsk.src="split";render();return}
   if(t.dataset.spclear!==undefined&&splitDay>=0){if(d.wsched)delete d.wsched[splitDay];splitDay=-1;save();render();return}
   if(t.dataset.spdone!==undefined){splitDay=-1;catDayAsk=null;render();return}
@@ -4015,7 +4018,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="138";
+const APPV="139";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
