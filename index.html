@@ -1191,6 +1191,8 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .lines-sw{display:inline-flex}
 
 /* training */
+#dbgTog{position:fixed;z-index:1000;top:calc(env(safe-area-inset-top,0px) + 58px);left:50%;transform:translateX(-50%);font:700 13px/1 system-ui;color:#fff;background:#ff2d55;border:2px solid #fff;border-radius:99px;padding:8px 14px;box-shadow:0 3px 10px rgba(0,0,0,.6);cursor:pointer}#dbgTog[aria-pressed=false]{background:rgba(20,30,60,.92);color:#cfe0ff;border-color:rgba(207,224,255,.6)}#dbgTog[hidden]{display:none}
+body.dbg-off .dbg-n{display:none}body.dbg-off .dbg-box{outline:none}
 .dbg-box{outline:2px dashed #ff2d55;outline-offset:-2px}.dbg-n{position:absolute;left:4px;top:4px;z-index:30;pointer-events:none;min-width:22px;height:22px;padding:0 6px;display:grid;place-items:center;box-sizing:border-box;background:#ff2d55;color:#fff;font:800 13px/1 system-ui;border-radius:99px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.6)}
 .trtop>.stack>.trlogp{flex:1 1 0;height:0;min-height:170px;display:flex;flex-direction:column}.trlogp .trlog{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;align-content:start}
 @media (max-width:760px){.trtop>.stack>.trlogp{flex:none;height:auto}.trlogp .trlog{max-height:360px}}
@@ -3908,7 +3910,10 @@ function render(){
 }
 /* TEMPORARY: numbered labels on the Training tab so panels can be referred to by number. Delete this block and the dbgLabels() call above to remove. */
 const DBG_LABELS=true;
-function dbgLabels(){if(!DBG_LABELS||tab!=="train")return;const v=$("#view");let n=0;v.querySelectorAll(".panel,.sp,.wk-sec,.tp-card,.tp-new").forEach(e=>{if(!e.offsetWidth)return;n++;if(getComputedStyle(e).position==="static")e.style.position="relative";e.classList.add("dbg-box");const l=document.createElement("span");l.className="dbg-n";l.textContent=n;e.appendChild(l)})}
+let dbgOff=false;try{dbgOff=localStorage.getItem("aot-dbg-off")==="1"}catch(e){}
+function dbgToggle(){let b=document.getElementById("dbgTog");if(!b){b=document.createElement("button");b.id="dbgTog";b.type="button";b.addEventListener("click",()=>{dbgOff=!dbgOff;try{localStorage.setItem("aot-dbg-off",dbgOff?"1":"0")}catch(e){}dbgToggle()});document.body.appendChild(b)}
+  b.hidden=!DBG_LABELS||tab!=="train";b.textContent=dbgOff?"Labels: off":"Labels: on";b.setAttribute("aria-pressed",!dbgOff);document.body.classList.toggle("dbg-off",dbgOff)}
+function dbgLabels(){dbgToggle();if(!DBG_LABELS||tab!=="train")return;const v=$("#view");let n=0;v.querySelectorAll(".panel,.sp,.wk-sec,.tp-card,.tp-new").forEach(e=>{if(!e.offsetWidth)return;n++;if(getComputedStyle(e).position==="static")e.style.position="relative";e.classList.add("dbg-box");const l=document.createElement("span");l.className="dbg-n";l.textContent=n;e.appendChild(l)})}
 function placeBranch(){const br=document.querySelector(".tkf-branch"),ch=document.querySelector(".tk-top-band .tkfilter .fchip.open");if(!br||!ch)return;const c=ch.getBoundingClientRect(),b=br.getBoundingClientRect();br.style.setProperty("--cx",Math.round(c.left+c.width/2-b.left)+"px");br.style.setProperty("--up",Math.round(b.top-c.bottom)+"px")}
 addEventListener("resize",()=>placeBranch());
 
@@ -4052,7 +4057,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="147";
+const APPV="148";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
