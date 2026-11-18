@@ -2361,7 +2361,7 @@ function planForm(d){const P=tPlan,sug=sugMus(P.ex),hasSug=Object.keys(sug).leng
     <div class="tp-chips" id="tpChips">${MUS.map(([k,n])=>`<button type="button" class="tp-chip l${P.mus[k]||0}" data-mtap="${k}">${n}</button>`).join("")}</div></div>
    <div class="tp-acts"><button class="btn" data-tpsave title="Save and close">Save workout</button><button class="btn ghost" data-tpapply title="Save your changes and keep editing">Apply</button><button class="btn ghost" data-tpcancel>Cancel</button>${P.id?`<button class="btn ghost danger" data-tpdelete>Delete</button>`:""}</div></div>`}
 function planPanel(d){const PL=d.plans||[];
-  return `<div class="panel tpp" style="margin-top:18px"><div class="ph"><span>${tPlan?(tPlan.id?"Edit workout":"Design a workout"):"My workouts"}</span>${tPlan?"":`<button class="upd-red" data-forceupd title="Get the newest version (you have ${APPV})">Update</button>`}<i>${tPlan?"":PL.length?PL.length+" saved":""}</i></div>
+  return `<div class="panel tpp" style="margin-top:18px"><div class="ph"><span>${tPlan?(tPlan.id?"Edit workout":"Design a workout"):"My workouts"}</span>${tPlan?"":`<button class="upd-red" data-forceupd title="Updated ${updStamp()} (version ${APPV}). Tap to get the newest version">${updStamp()}</button>`}<i>${tPlan?"":PL.length?PL.length+" saved":""}</i></div>
     ${tPlan?planForm(d):todayHTML(d)+splitHTML()+planList(d,PL)}</div>`}
 async function forceUpdate(b){if(b)b.textContent="Updating…";try{sessionStorage.removeItem("aot-upd2");sessionStorage.removeItem("aot-upd")}catch(e){}
   try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k!=="aot-img").map(k=>caches.delete(k)))}catch(e){}
@@ -4184,7 +4184,8 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="175";if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
+const APPV="176",APPT="2026-11-18T15:33:00-05:00";   /* APPT: when this update was made */
+const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
