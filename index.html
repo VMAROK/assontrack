@@ -1202,7 +1202,7 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .tpp .sp-d:hover{border-color:rgba(var(--tL),.45)}.tpp .sp-d:active{transform:scale(.97)}
 .sp-top{display:flex;align-items:baseline;justify-content:space-between;gap:4px;margin:-10px -9px 0;padding:9px 9px 8px;background:rgba(4,8,20,.6);border-bottom:1px solid rgba(var(--lr),.14)}.tpp .sp-d .sp-top small{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}.sp-top em{font-style:normal;font-family:var(--mono);font-size:15px;font-weight:600;color:#cfdaf2;line-height:1}
 .tpp .sp-d.td{border-color:rgba(var(--tL),.7);box-shadow:inset 0 2px 0 rgba(var(--tL),1),0 0 14px rgba(var(--tL),.18)}.tpp .sp-d.td .sp-top small,.tpp .sp-d.td .sp-top em{color:rgba(var(--tL),1)}
-.tpp .sp-d.sel{background:linear-gradient(180deg,rgba(var(--tL),.26),rgba(var(--tL),.1));border-color:rgba(var(--tL),1);box-shadow:0 0 0 1px rgba(var(--tL),.6),0 0 18px rgba(var(--tL),.3)}
+.tpp .sp-d.sel{background:linear-gradient(180deg,rgba(var(--tL),.42),rgba(var(--tL),.18));border:2px solid rgba(var(--tL),1);box-shadow:0 0 0 2px rgba(var(--tL),.35),0 0 26px rgba(var(--tL),.55);transform:translateY(-2px)}.tpp .sp-d.sel .sp-top{background:rgba(var(--tL),.35)}.tpp .sp-d.sel .sp-top small,.tpp .sp-d.sel .sp-top em{color:#fff;font-weight:800}
 .sp-chips{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
 .sp-chip{display:flex;align-items:center;gap:5px;min-width:0;padding:3px 6px;border-radius:6px;font-size:11px;font-weight:600;line-height:1.2;color:#e6eeff;background:color-mix(in srgb,var(--cc) 16%,transparent);border:1px solid color-mix(in srgb,var(--cc) 38%,transparent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sp-chip i{flex:none;width:6px;height:6px;border-radius:50%;background:var(--cc);box-shadow:0 0 5px var(--cc)}.sp-chip.pin{font-weight:500;color:#cfdaf2;background:rgba(var(--tX),.45);border-style:dashed}
@@ -2486,18 +2486,18 @@ function planList(d,PL){ppMigrate(d);const dayF=splitDay>=0;if(dayF)PL=PL.filter
     if(subs.length)bar2=`<div class="cat-bar wk-bar sub" role="tablist" aria-label="Filter ${esc(planF)} by subcategory">${tab("data-ps","","All "+planF,IN.length,!planS)}${subs.map(x=>tab("data-ps",x,x,IN.filter(p=>pSub(p,planF)===x).length,planS===x)).join("")}</div>`}
   else show=cats.slice().sort((a,b)=>(td.includes(b)?1:0)-(td.includes(a)?1:0));
   return bar+bar2+`<div class="wk-board">${planF?wkSec(d,planF,PL.filter(p=>pCats(p).includes(planF)),planS,td,PL):wkSec(d,"",PL,"",td,PL,true)}</div>`}
-function wkSec(d,c,IN,only,td,PL,all){const ck=c||"~none",IN0=IN,fd=!all&&catDayF[ck]>=0?catDayF[ck]:-1;if(fd>=0)IN=IN.filter(p=>onDay(p,fd));const subs=c?wsubAll(c).filter(x=>IN.some(p=>pSub(p,c)===x)):[],gen=IN.filter(p=>!c||!subs.includes(pSub(p,c)));
+function wkSec(d,c,IN,only,td,PL,all){const ck=c||"~none";let IN0=IN,fd=-1;if(!all){IN0=(d.plans||[]).filter(p=>c?pCats(p).includes(c):!pCats(p).length);fd=catDayF[ck]>=0?catDayF[ck]:splitDay;if(fd>=0)IN=IN0.filter(p=>onDay(p,fd))}const subs=c?wsubAll(c).filter(x=>IN.some(p=>pSub(p,c)===x)):[],gen=IN.filter(p=>!c||!subs.includes(pSub(p,c)));
   let lanes=subs.map(x=>[x,IN.filter(p=>pSub(p,c)===x)]);if(gen.length)lanes.push([subs.length?"General":"",gen]);if(only)lanes=lanes.filter(l=>l[0]===only);
   const asg=c&&wkAssign===c;
-  return `<section class="wk-sec${all?" wk-allp":""}" style="--cc:${catCol(c)}" aria-label="${esc(c||"No category")} workouts"><div class="sh-h"><i></i><b>${esc(c||(all?"All workouts":"Not in a category"))}</b>${c&&td.includes(c)?`<span class="sh-td">Today</span>`:""}<small>${IN.length} workout${IN.length===1?"":"s"}</small>${all?`<button class="wk-design" data-wkcompact aria-pressed="${wkCompact}" title="${wkCompact?"Back to full size":"Shrink this panel to fit more"}">${wkCompact?"Full view":"Compact view"}</button><button class="wk-design" data-pnew title="Design a new workout">＋ Design a workout</button>`:""}${!all?`<span class="wk-days" title="Tap a day to see its ${esc(c||"uncategorised")} workouts">${dayLoad(dayRow(catDayF[ck]>=0?[catDayF[ck]]:[],"data-wkfd",`data-wkc="${esc(ck)}"`,catCol(c)),IN0)}</span>`:""}${c?`<button class="tp-tile${asg?" done":" add"} wk-asg" data-wkassign="${esc(c)}">${asg?"Done":"＋ Assign workouts"}</button>`:""}</div>
+  return `<section class="wk-sec${all?" wk-allp":""}" style="--cc:${catCol(c)}" aria-label="${esc(c||"No category")} workouts"><div class="sh-h"><i></i><b>${esc(c||(all?"All workouts":"Not in a category"))}</b>${c&&td.includes(c)?`<span class="sh-td">Today</span>`:""}<small>${IN.length} workout${IN.length===1?"":"s"}</small>${all?`<button class="wk-design" data-wkcompact aria-pressed="${wkCompact}" title="${wkCompact?"Back to full size":"Shrink this panel to fit more"}">${wkCompact?"Full view":"Compact view"}</button><button class="wk-design" data-pnew title="Design a new workout">＋ Design a workout</button>`:""}${!all?`<span class="wk-days" title="Tap a day to see its ${esc(c||"uncategorised")} workouts">${dayLoad(dayRow(fd>=0?[fd]:[],"data-wkfd",`data-wkc="${esc(ck)}"`,catCol(c)),IN0)}</span>`:""}${c?`<button class="tp-tile${asg?" done":" add"} wk-asg" data-wkassign="${esc(c)}">${asg?"Done":"＋ Assign workouts"}</button>`:""}</div>
     ${catDayAsk&&catDayAsk.c===c?askHTML("sec"):""}${asg?`<div class="wk-asgbox"><small>Tap a workout to put it in or take it out of ${esc(c)}.</small><div class="tp-tiles">${PL.map(p=>{const on=pCats(p).includes(c);return `<button type="button" class="tp-tile${on?" on":""}" style="--cc:${catCol(c)}" aria-pressed="${on}" data-wkput="${p.id}" data-wkc="${esc(c)}"><span>${esc(p.name)}</span>${ppOf(p.mus).map(x=>`<b class="pp-dot" style="--pp:${PPCOL[x]}" title="${x}"></b>`).join("")}</button>`}).join("")||`<small>No workouts yet. Design one below.</small>`}</div></div>`:""}
     ${all?wkCats(d,IN,td,PL):""}${all?"":IN.length?`<div class="sh-lanes">${lanes.map(([x,ps])=>`<div class="sh-lane">${x?`<div class="sh-lh">${esc(x)} <em>${ps.length}</em></div>`:""}<div class="sh-row">${ps.map(pl=>planCard(d,pl,true)).join("")}</div></div>`).join("")}${c?`<div class="sh-lane"><div class="sh-row">${wkNewCard(c)}</div></div>`:""}</div>`:asg?"":`${fd>=0?`<p class="wk-empty">No ${esc(c||"uncategorised")} workouts on ${["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"][fd]}.</p>`:""}<div class="sh-lanes"><div class="sh-lane"><div class="sh-row">${wkNewCard(c)}</div></div></div>`}</section>`}
 /* All tab: one panel, each category is a card holding its workouts */
 let wkCompact=false;try{wkCompact=localStorage.getItem("aot-wk-compact")==="1"}catch(e){}
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-wkcompact]");if(!t)return;wkCompact=!wkCompact;try{localStorage.setItem("aot-wk-compact",wkCompact?"1":"0")}catch(_){}render()});
-function wkCats(d,PL,td,ALL){const cs=wcatAll().filter(c=>PL.some(p=>pCats(p).includes(c))||splitDay<0),none=PL.filter(p=>!pCats(p).length);
+function wkCats(d,PL,td,ALL){const cs=wcatAll().filter(c=>PL.some(p=>pCats(p).includes(c))||catDayF[c]>=0),none=PL.filter(p=>!pCats(p).length);
   const box=c=>wkSec(d,c,PL.filter(p=>pCats(p).includes(c)),"",td,ALL).replace('<section class="wk-sec"','<section class="wk-sec wk-catc"').replace(`<button class="tp-tile add wk-asg"`,`<button class="wk-catplus" data-pnewcat="${esc(c)}" aria-label="New workout in ${esc(c)}" title="New workout in ${esc(c)}">＋</button><button class="tp-tile add wk-asg"`);
-  return `<div class="wk-cats${wkCompact?" compact":""}">${cs.sort((a,b)=>(td.includes(b)?1:0)-(td.includes(a)?1:0)).map(box).join("")}${none.length?wkSec(d,"",none,"",td,ALL).replace('<section class="wk-sec"','<section class="wk-sec wk-catc"'):""}</div>`}
+  return `<div class="wk-cats${wkCompact?" compact":""}">${cs.sort((a,b)=>(td.includes(b)?1:0)-(td.includes(a)?1:0)).map(box).join("")}${none.length||catDayF["~none"]>=0?wkSec(d,"",none,"",td,ALL).replace('<section class="wk-sec"','<section class="wk-sec wk-catc"'):""}</div>`}
 /* mark the days a category's workouts land on: dashed outline, one dot per workout (up to 3), stronger when the day is heavy */
 const lands=(p,i)=>inDay(p,schedOf(i))||pDays(p).includes(i);
 function dayLoad(html,IN){const n=DAYS.map((_,i)=>IN.filter(p=>onDay(p,i)).length);
@@ -2523,7 +2523,7 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(t.dataset.tpsubnew!=null){tpSubAdd=t.dataset.tpsubnew;tpCatPaint();setTimeout(()=>{const i=$("#tpSubNew");i&&i.focus()},30);return}
   if(t.dataset.tpsubok!=null){tpSubAdd1();return}
   if(t.dataset.tpday!=null&&tPlan){const i=+t.dataset.tpday,a=tPlan.days||[];tPlan.days=a.includes(i)?a.filter(x=>x!==i):a.concat(i).sort();const b=$("#tpDays");if(b)b.innerHTML=tpDaysHTML();return}
-  if(t.dataset.wkfd!=null){const c=t.dataset.wkc,i=+t.dataset.wkfd;cardMorph(()=>{catDayF[c]=catDayF[c]===i?-1:i;render()});return}
+  if(t.dataset.wkfd!=null){const c=t.dataset.wkc,i=+t.dataset.wkfd;cardMorph(()=>{catDayF[c]=i;render()});return}
   if(t.dataset.wkcday!=null){catDayToggle(t.dataset.wkc,+t.dataset.wkcday);if(catDayAsk)catDayAsk.src="sec";render();return}
   if(t.dataset.cdall!==undefined&&catDayAsk){const c=catDayAsk.c,ds=catDays(c);catPlans(c).forEach(p=>{if(ds.length)p.days=ds.slice();else delete p.days});catDayAsk=null;save();toast(c+" workouts set to "+ds.map(i=>DAYS[i]).join(", "));render();return}
   if(t.dataset.cdleave!==undefined){catDayAsk=null;render();return}
@@ -2535,7 +2535,7 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(t.dataset.wkput){const p=(d.plans||[]).find(x=>x.id===t.dataset.wkput),c=t.dataset.wkc;if(!p)return;const cs=pCats(p),sb={};cs.forEach(k=>{const v=pSub(p,k);if(v)sb[k]=v});if(cs.includes(c)){p.cats=cs.filter(x=>x!==c);delete sb[c]}else p.cats=cs.concat(c);p.subs=sb;delete p.cat;delete p.sub;save();render();return}
   if(t.dataset.wkcatnew!==undefined){wkNewCat=true;render();setTimeout(()=>{const i=$("#wkCatNew");i&&i.focus()},30);return}
   if(t.dataset.wkcatok!==undefined){wkCatAdd1();return}
-  if(t.dataset.spday!=null){const i=+t.dataset.spday;cardMorph(()=>{splitDay=i;catDayAsk=null;render()});return}
+  if(t.dataset.spday!=null){const i=+t.dataset.spday;cardMorph(()=>{splitDay=i;catDayF={};catDayAsk=null;render()});return}
   if(t.dataset.spcat!=null&&splitDay>=0){catDayToggle(t.dataset.spcat,splitDay);if(catDayAsk)catDayAsk.src="split";render();return}
   if(t.dataset.spclear!==undefined&&splitDay>=0){if(d.wsched)delete d.wsched[splitDay];save();render();return}
   if(t.dataset.spdone!==undefined){catDayAsk=null;render();return}
@@ -4140,7 +4140,7 @@ addEventListener("resize",()=>placeBranch());
 
 /* ---------- events ---------- */
 let confirmClear=false;
-function go(t){if(t!==tab)sfx("whoosh");if(t==="train"&&t!==tab)splitDay=dayIdx(today());tab=t;confirmClear=false;render();$("#view").scrollTop=0}
+function go(t){if(t!==tab)sfx("whoosh");if(t==="train"&&t!==tab){splitDay=dayIdx(today());catDayF={}}tab=t;confirmClear=false;render();$("#view").scrollTop=0}
 document.addEventListener("change",e=>{const t=e.target;if(!t.dataset||!t.dataset.tkproj)return;const p=data.passions.find(x=>x.id===selP);const k=p&&(p.tasks||[]).find(x=>x.id===t.dataset.tkproj);if(!k)return;k.proj=t.value||null;render();save();toast(t.value?"Moved to "+t.options[t.selectedIndex].text:"Removed from project")});
 document.addEventListener("focusout",e=>{if(e.target.id==="slH"||e.target.id==="seH"){const m=parseHM(e.target.value);if(m!=null)e.target.value=String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&renaming&&e.target.id==="rnIn"){renaming=null;render()}});
@@ -4278,7 +4278,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="192",APPT="2026-11-18T17:20:00-05:00";   /* APPT: when this update was made */
+const APPV="193",APPT="2026-11-18T17:27:00-05:00";   /* APPT: when this update was made */
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
