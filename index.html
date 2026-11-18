@@ -1191,6 +1191,7 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .lines-sw{display:inline-flex}
 
 /* training */
+.tpp input,.tpp select,.tpp textarea{font-size:max(16px,1em)}.tpp .tp-er input,.tpp .tp-er button{touch-action:manipulation}
 .tp-card{position:relative}.tp-done{position:absolute;bottom:10px;right:10px;z-index:2;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;pointer-events:none;color:transparent;border:1.5px solid rgba(61,220,132,.6)}
 .tp-done.part{color:rgba(61,220,132,.5)}.tp-done.on{background:#3ddc84;border-color:#3ddc84;color:#04140b;box-shadow:0 0 10px rgba(61,220,132,.55)}
 .tp-card.sq{aspect-ratio:1/1;min-height:0!important;overflow:hidden;cursor:pointer;gap:6px;padding:12px}
@@ -2449,9 +2450,8 @@ function tpExHTML(P){tpNorm(P);const G=exGroups(P.ex),heads=true;
   return `<div class="tpx">${G.map(([g,xs],k)=>{const shut=tpFold.has(g);return `<div class="tpx-g${shut?" shut":""}" data-tpg="${k}">
     <div class="tpx-gh" data-tpgtog="${k}"><svg class="tpx-chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg><input class="tpx-gn" data-tpgname="${k}" value="${esc(g)}" placeholder="Group name" aria-label="Group name" autocomplete="off" maxlength="30"><small>${xs.length}</small>${k?`<button type="button" class="tpx-gb" data-tpgup="${k}" aria-label="Move group up" title="Move up"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button>`:""}${g&&g!=="All"?`<button type="button" class="tpx-gb" data-tpgdel="${k}" aria-label="Remove group, keep its exercises" title="Remove group (its exercises move to All)">×</button>`:""}</div>
     <div class="tpx-body">${xs.map(([e,i])=>row(e,i)).join("")}${g?tpWarn(g,xs):""}<button type="button" class="tpx-add" data-tpadd="${k}">＋ Exercise</button></div></div>`}).join("")}</div>`}
-document.addEventListener("focusin",e=>{const t=e.target;if(t.classList&&t.classList.contains("tp-n")&&t.closest(".tpx-r"))setTimeout(()=>{try{t.select()}catch(_){}},0)});
 let tpDragS=null;
-document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest(".tp-rbox");if(b&&!e.target.closest(".tp-unit,input")){const i=b.querySelector("input");i&&i.focus()}});
+
 document.addEventListener("pointerdown",e=>{if(!tPlan)return;const r=e.target.closest&&e.target.closest(".tpx-r");if(!r||e.target.closest("[data-tpdrag],[data-tpdel],[data-tpunit],.tp-rbox,.tp-sbox"))return;const i=+r.dataset.tprow;if(tpSel===i&&!e.target.closest("input"))tpSel=-1;else tpSel=i;tpPaint()});
 document.addEventListener("click",e=>{if(e.target.closest&&e.target.closest("[data-tpselall]")){tpSel=-1;tpPaint()}});
 document.addEventListener("pointerdown",e=>{const h=e.target.closest&&e.target.closest("[data-tpdrag]");if(!h||!tPlan)return;e.preventDefault();const row=h.closest(".tpx-r"),r=row.getBoundingClientRect(),k=r.height/(row.offsetHeight||r.height)||1;
@@ -4317,7 +4317,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="202",APPT="2026-11-18T18:34:00-05:00";   /* APPT: when this update was made */
+const APPV="203",APPT="2026-11-18T18:40:00-05:00";   /* APPT: when this update was made */
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
