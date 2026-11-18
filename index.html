@@ -1199,14 +1199,14 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .tp-card.sq .tp-fig{flex:1 1 0;min-height:0;display:flex;justify-content:center}.tp-card.sq .tp-fig .musvg{height:100%;width:auto;max-width:100%;max-height:none}
 .tp-card.sq .tp-tags{flex:none}.tp-foot{display:flex;align-items:center;justify-content:space-between;gap:6px;flex:none}.tp-foot small{font-size:11.5px;color:var(--muted);white-space:nowrap}.tp-foot .tp-dys{min-width:0}.tp-dys .ev{background:rgba(var(--tL),.25)!important;color:#dbe6ff!important}
 .wp-sheet{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:16px;background:rgba(2,6,16,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);animation:wpf .18s ease-out}@keyframes wpf{from{opacity:0}}
-.wp-box{width:min(560px,100%);max-height:min(80vh,640px);display:flex;flex-direction:column;gap:10px;padding:16px;animation:wpu .28s cubic-bezier(.22,.9,.24,1)}@keyframes wpu{from{transform:translateY(14px) scale(.97);opacity:0}}
-.wp-h{display:flex;align-items:center;gap:8px}.wp-h b{flex:1;min-width:0;font-size:17px}.wp-x{font-size:22px}
-.wp-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:14px;min-height:0;overflow:hidden}
-.wp-fig{display:grid;gap:6px;align-content:start;justify-items:center}.wp-fig .musvg{max-height:300px}.wp-fig small{font-size:11.5px;color:var(--muted);text-align:center}.wp-fig small b{color:#eef3ff}.wp-fig small button{font:inherit;color:rgba(var(--tL),1);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
-.wp-ex{display:grid;gap:4px;align-content:start;overflow-y:auto;overscroll-behavior:contain;padding-right:2px}
-.wp-g{margin:8px 2px 2px;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.wp-g:first-child{margin-top:0}
-.wp-r{display:flex;justify-content:space-between;align-items:baseline;gap:10px;width:100%;text-align:left;font:inherit;font-size:13.5px;color:#e6eeff;background:rgba(var(--tX),.45);border:1px solid rgba(var(--lr),.2);border-radius:9px;padding:9px 11px;cursor:pointer}.wp-r em{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}.wp-r.on{border-color:rgba(var(--tL),.9);background:rgba(var(--tL),.16)}
-@media (max-width:560px){.wp-body{grid-template-columns:1fr;overflow-y:auto}.wp-fig .musvg{max-height:200px}}
+.wp-box{width:min(960px,100%);height:min(86vh,820px);max-height:none;display:flex;flex-direction:column;gap:14px;padding:22px;animation:wpu .28s cubic-bezier(.22,.9,.24,1)}@keyframes wpu{from{transform:translateY(14px) scale(.97);opacity:0}}
+.wp-h{display:flex;align-items:center;gap:8px}.wp-h b{flex:1;min-width:0;font-size:22px}.wp-x{font-size:22px}
+.wp-body{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;min-height:0;overflow:hidden}
+.wp-fig{display:grid;gap:6px;align-content:start;justify-items:center}.wp-fig{height:100%;grid-template-rows:minmax(0,1fr) auto}.wp-fig .musvg{height:100%;width:auto;max-width:100%;max-height:none}.wp-fig small{font-size:13px;color:var(--muted);text-align:center}.wp-fig small b{color:#eef3ff}.wp-fig small button{font:inherit;color:rgba(var(--tL),1);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+.wp-ex{display:grid;gap:8px;align-content:start;overflow-y:auto;overscroll-behavior:contain;padding-right:2px}
+.wp-g{margin:12px 2px 4px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.wp-g:first-child{margin-top:0}
+.wp-r{display:flex;justify-content:space-between;align-items:baseline;gap:10px;width:100%;text-align:left;font:inherit;font-size:16px;color:#e6eeff;background:rgba(var(--tX),.45);border:1px solid rgba(var(--lr),.2);border-radius:11px;padding:14px 16px;cursor:pointer}.wp-r em{font-style:normal;font-family:var(--mono);font-size:14px;color:var(--muted);white-space:nowrap}.wp-r.on{border-color:rgba(var(--tL),.9);background:rgba(var(--tL),.16)}
+@media (max-width:640px){.wp-box{height:92vh;padding:16px}.wp-body{grid-template-columns:1fr;grid-template-rows:42% minmax(0,1fr)}}
 .tp-doneov{position:absolute;inset:0;z-index:2;display:grid;place-items:center;pointer-events:none;background:rgba(4,12,10,.5);backdrop-filter:blur(1.5px);-webkit-backdrop-filter:blur(1.5px)}
 .tp-doneov i{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:#3ddc84;color:#04140b;box-shadow:0 0 18px rgba(61,220,132,.7),0 0 40px rgba(61,220,132,.35)}.tp-doneov svg{width:38px;height:38px}
 .tp-card.sq.open .tp-doneov{opacity:.25}.tp-doneov.miss{background:rgba(20,4,8,.5)}.tp-doneov.miss i{background:#ff4d5e;color:#1a0306;box-shadow:0 0 18px rgba(255,77,94,.7),0 0 40px rgba(255,77,94,.35)}
@@ -4311,7 +4311,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="196",APPT="2026-11-18T17:58:00-05:00";   /* APPT: when this update was made */
+const APPV="197",APPT="2026-11-18T18:01:00-05:00";   /* APPT: when this update was made */
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
