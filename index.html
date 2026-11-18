@@ -2258,6 +2258,47 @@ function musSvg(lv,o={}){const col=id=>o.heat?heatCol((o.heat||{})[id]):MCOL[(lv
   const sh=Object.entries(by).map(([id,g])=>{const c=col(id);return `<g class="mu${c?" on":""}" data-mus="${id}" ${o.tap?`data-mtap="${id}" role="button" tabindex="0" aria-label="${MUSN[id]}"`:""} fill="${c||"rgba(150,180,240,.16)"}" stroke="${c?"rgba(255,255,255,.6)":"rgba(150,180,240,.4)"}" stroke-width="6" stroke-linejoin="round"><title>${MUSN[id]}</title>${g.join("")}</g>`}).join("");
   return `<svg class="musvg${o.tap?" tap":""}" viewBox="-20 -20 2140 ${o.lab===false?2040:2130}" role="img" aria-label="Body diagram, front and back"><g fill="rgba(150,180,240,.09)" stroke="rgba(150,180,240,.3)" stroke-width="6">${CBASE.map(([v,pp])=>`<polygon points="${pts(v>0?pp:pp.map((q,k)=>k%2?q:q+1100))}"/>`).join("")}</g>${sh}${o.lab===false?"":`<text x="500" y="2100" text-anchor="middle" font-size="80" fill="#8fa3c8" font-family="Inter,sans-serif">Front</text><text x="1600" y="2100" text-anchor="middle" font-size="80" fill="#8fa3c8" font-family="Inter,sans-serif">Back</text>`}</svg>`}
 /* common exercises and what they work: suggests muscles while you design */
+const EXMUS0=[
+ // core / stability
+ [/\btva\b|transvers|stomach vacuum|vacuum|tummy hold|belly breath|drawing.?in|hollow (hold|body|rock)|dead.?bug|bird.?dog|pallof|bear (hold|crawl|plank)|l.?sit|v.?up|toes.?to.?bar|knees.?to.?(elbow|chest)|hanging (knee|leg)|dragon flag|flutter kick|scissor kick|mountain climber|reverse crunch|bicycle crunch|cable crunch|ab rollout|stir the pot|body ?saw/,{abs:2,obliques:1}],
+ [/russian twist|side plank|copenhagen plank|windshield wiper|suitcase (carry|march)|landmine (twist|rotation)|oblique|side bend|cable (chop|lift)|wood.?chop/,{obliques:2,abs:1}],
+ [/serratus|scap(ular)? (push|protraction)|push.?up plus|wall slide|ytw|y.?t.?w|banded protraction/,{obliques:1,chest:1,frontdelts:1,upperback:1}],
+ // pulls & hangs (calisthenics)
+ [/inverted row|australian (pull|row)|bodyweight row|ring row|table row|tuck front lever|front lever|back lever/,{lats:2,upperback:2,reardelts:1,biceps:1,abs:1}],
+ [/(dead|active|passive|feet.?assisted|assisted|bar|one.?arm) ?hangs?\b|\bhang(ing)? (hold|from)|scap(ular)? pull|scap shrug|scap retraction/,{forearms:2,lats:1,upperback:1,traps:1}],
+ [/muscle.?up/,{lats:2,chest:1,triceps:2,biceps:1,upperback:1}],
+ [/negative (pull|chin)|archer pull|typewriter pull|commando pull|l.?sit pull/,{lats:2,biceps:1,upperback:1,forearms:1}],
+ [/face.?pull|band pull.?apart|pull.?apart|prone (y|t|w) raise|reverse (pec|fly)|rear delt/,{reardelts:2,upperback:2,traps:1}],
+ [/pullover/,{lats:2,chest:1,triceps:1}],[/straight.?arm (pull|push)down/,{lats:2,triceps:1}],
+ [/meadows row|seal row|pendlay|t.?bar row|chest.?supported row|kroc row|yates row/,{lats:2,upperback:2,reardelts:1,biceps:1}],
+ // pushes (calisthenics + gym)
+ [/pike push|handstand|hspu|wall walk|elevated pike/,{frontdelts:2,triceps:2,traps:1,sidedelts:1}],
+ [/diamond push|close.?grip push|triangle push|tiger.?bend|bench dip|chair dip/,{triceps:2,chest:1,frontdelts:1}],
+ [/pseudo planche|planche|maltese/,{frontdelts:2,chest:1,triceps:1,abs:1,forearms:1}],
+ [/archer push|decline push|incline push|knee push|wall push|clap push|plyo push|typewriter push|ring push|deficit push/,{chest:2,frontdelts:1,triceps:1}],
+ [/ring dip|straight bar dip|parallel bar dip|korean dip/,{chest:2,triceps:2,frontdelts:1}],
+ [/landmine press|z press|push press|jerk|thruster/,{frontdelts:2,triceps:1,sidedelts:1,quads:1,glutes:1}],
+ [/close.?grip bench|jm press|floor press|board press/,{triceps:2,chest:1,frontdelts:1}],
+ [/svend|squeeze press|cable crossover|crossover|pec fly|chest fly/,{chest:2,frontdelts:1}],
+ [/cuban|external rotation|internal rotation|rotator|l.?fly/,{reardelts:2,upperback:1}],
+ [/y.?raise|lu raise|cable y/,{sidedelts:2,traps:1,frontdelts:1}],
+ // legs
+ [/pistol|shrimp squat|skater squat|sissy squat|cossack|bulgarian|rear.?foot|split squat/,{quads:2,glutes:2,adductors:1}],
+ [/goblet|front squat|zercher|box squat|wall sit|jump squat|air squat|bodyweight squat|belt squat|pendulum/,{quads:2,glutes:2,adductors:1}],
+ [/single.?leg (rdl|deadlift)|b.?stance|kettlebell swing|kb swing|swing\b|pull.?through|reverse hyper/,{hamstrings:2,glutes:2,lowerback:1}],
+ [/glute.?ham|ghr|nordic|slider curl|swiss ball curl|stability ball curl/,{hamstrings:2,glutes:1}],
+ [/box jump|broad jump|jump|sprint|burpee|bound/,{quads:2,glutes:2,calves:1,hamstrings:1}],
+ [/tibialis|tib raise|toe raise/,{calves:1}],[/donkey kick|frog pump|hip abduction|monster walk|lateral band walk|banded walk/,{glutes:2,abductors:1}],
+ [/hip flexor|psoas|knee raise/,{abs:1,quads:1}],
+ // carries, grip, neck, full body
+ [/farmer|suitcase carry|waiter walk|overhead carry|sled|yoke/,{forearms:2,traps:2,abs:1,glutes:1}],
+ [/clean|snatch|high pull/,{traps:2,glutes:2,hamstrings:2,quads:1,frontdelts:1,upperback:1}],
+ [/turkish get|tgu|get.?up/,{frontdelts:1,abs:2,obliques:1,glutes:1}],
+ [/rice bucket|wrist roller|finger curl|plate pinch|gripper|towel hang/,{forearms:2}],
+ [/hammer curl|reverse curl|zottman/,{biceps:2,forearms:2}],[/preacher|spider curl|concentration|bayesian|drag curl|21s/,{biceps:2}],
+ [/overhead (tricep|extension)|french press|tate press|close.?grip|diamond/,{triceps:2}],
+ [/good morning|jefferson curl|back extension|hyperextension|superman|bird dog row/,{lowerback:2,glutes:1,hamstrings:1}],
+ [/rowing machine|erg|rower/,{lats:1,upperback:1,quads:1,glutes:1,hamstrings:1}],[/cycling|bike|spin/,{quads:2,calves:1,glutes:1}],[/run|jog|treadmill|stair/,{quads:1,calves:2,glutes:1,hamstrings:1}],[/swim/,{lats:2,frontdelts:1,upperback:1,abs:1}]];
 const EXMUS=[[/incline/,{chest:2,frontdelts:2,triceps:1}],[/bench|chest press|push.?up|press.?up/,{chest:2,frontdelts:1,triceps:1}],[/dip/,{chest:2,triceps:2,frontdelts:1}],[/fly|flye|pec deck/,{chest:2,frontdelts:1}],
  [/overhead|shoulder press|military|arnold/,{frontdelts:2,sidedelts:1,triceps:1,traps:1}],[/lateral raise|side raise|upright row/,{sidedelts:2,traps:1}],[/front raise/,{frontdelts:2}],[/face pull|rear delt|reverse fly/,{reardelts:2,upperback:2,traps:1}],
  [/romanian|rdl|stiff/,{hamstrings:2,glutes:2,lowerback:1}],[/deadlift/,{hamstrings:2,glutes:2,lowerback:2,traps:1,upperback:1,forearms:1}],[/squat|leg press|hack/,{quads:2,glutes:2,adductors:1,hamstrings:1}],[/lunge|split squat|step.?up/,{quads:2,glutes:2,adductors:1}],
@@ -2265,7 +2306,10 @@ const EXMUS=[[/incline/,{chest:2,frontdelts:2,triceps:1}],[/bench|chest press|pu
  [/pull.?up|chin.?up|pulldown|pull.?down/,{lats:2,biceps:1,upperback:1,forearms:1}],[/row/,{lats:2,upperback:2,reardelts:1,biceps:1}],[/shrug/,{traps:2,forearms:1}],[/back extension|hyperextension|good morning|superman/,{lowerback:2,glutes:1,hamstrings:1}],
  [/curl/,{biceps:2,forearms:1}],[/tricep|pushdown|skull|extension|kickback/,{triceps:2}],[/wrist|farmer|grip/,{forearms:2}],
  [/plank|crunch|sit.?up|leg raise|ab wheel|hollow/,{abs:2,obliques:1}],[/twist|side plank|woodchop|oblique/,{obliques:2,abs:1}]];
-function exMus(name){const n=String(name||"").toLowerCase();for(const [re,m] of EXMUS)if(re.test(n))return m;return null}
+function exMus(name){const n=String(name||"").toLowerCase().replace(/[-_]/g," ");if(!n.trim())return null;for(const [re,m] of EXMUS0)if(re.test(n))return m;for(const [re,m] of EXMUS)if(re.test(n))return m;return null}
+/* the diagram follows the exercises you type; muscles you tap yourself are kept on top of that */
+function tpMusSync(){if(!tPlan)return;const auto=sugMus(tPlan.ex),ov=tPlan.musOv||{},m=Object.assign({},auto);Object.entries(ov).forEach(([k,v])=>{if(v)m[k]=v;else delete m[k]});tPlan.mus=m}
+function tpMusInit(P){if(!P||P.musOv)return;const auto=sugMus(P.ex),cur=musNorm(P.mus||{}),ov={};new Set([...Object.keys(auto),...Object.keys(cur)]).forEach(k=>{if((cur[k]||0)!==(auto[k]||0))ov[k]=cur[k]||0});P.musOv=ov}
 function sugMus(ex){const m={};(ex||[]).forEach(e=>{const g=exMus(e.name);if(g)Object.entries(g).forEach(([k,v])=>m[k]=Math.max(m[k]||0,v))});return m}
 /* sets worked per muscle over the last 7 days, from what you logged */
 const MUSC=["#f7c59f","#f5b38f","#f5b38f","#f5b38f","#f6dd94","#f6dd94","#b9de9b","#f7c59f","#9fd3c1","#f2a7a0","#f7c59f","#f7c59f","#e9eaee","#8fc7d6","#8fc7d6","#a7b4e6","#a7b4e6","#bba7e6","#d3a6da"];
@@ -2282,7 +2326,7 @@ function musCard(){if(musSel==null||!MUS[musSel])return `<div id="musCard" hidde
     <div class="mc-ex">${(MUSEX[k]||[]).map(x=>`<button data-musex="${esc(x)}">${esc(x)}</button>`).join("")}</div></div>`}
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-muscx],[data-musex]");if(!t)return;if(t.dataset.muscx!==undefined){musPick(null);return}
   exToPlan(t.dataset.musex)});
-function exToPlan(name){if(!tPlan)tPlan={name:"",ex:[],mus:{},cats:[],subs:{}};const em=tPlan.ex.findIndex(e=>!String(e.name||"").trim());if(em>=0)tPlan.ex[em].name=name;else tPlan.ex.push({name,sets:3,reps:10});if(tab!=="train")go("train");render();setTimeout(()=>{const p=$(".tpp");p&&p.scrollIntoView({behavior:"smooth",block:"start"})},60);toast(name+" added to the workout")}
+function exToPlan(name){if(!tPlan)tPlan={name:"",ex:[],mus:{},cats:[],subs:{}};tpMusInit(tPlan);const em=tPlan.ex.findIndex(e=>!String(e.name||"").trim());if(em>=0)tPlan.ex[em].name=name;else tPlan.ex.push({name,sets:3,reps:10});tpMusSync();if(tab!=="train")go("train");render();setTimeout(()=>{const p=$(".tpp");p&&p.scrollIntoView({behavior:"smooth",block:"start"})},60);toast(name+" added to the workout")}
 function musHeat(d){const S=musWeek(d),mx=Math.max(10,...Object.values(S));return MUS.map(([k])=>S[k]?Math.round(Math.max(.12,S[k]/mx)*20)/20:0)}
 function musWeek(d){const plans=d.plans||[],sets={};d.workouts.forEach(w=>{const a=(Date.now()-new Date(w.d+"T12:00"))/864e5;if(a>=7||a<-1)return;const pl=w.plan&&plans.find(x=>x.id===w.plan),m=musNorm((pl&&pl.mus&&Object.keys(pl.mus).length?pl.mus:null)||exMus(w.name)||{});const n=+w.sets||1;Object.entries(m).forEach(([k,v])=>sets[k]=(sets[k]||0)+n*(v===2?1:.5))});return sets}
 
@@ -2455,10 +2499,10 @@ function musWeekPanel(d){const S=musWeek(d),mx=Math.max(1,...Object.values(S)),H
   return `<div class="tp-week"><div>${musSvg(null,{heat:H})}<div class="tp-leg"><span><i style="background:${heatCol(.05)}"></i>A little</span><span><i style="background:${heatCol(1)}"></i>A lot</span><span><i style="background:rgba(150,180,240,.2)"></i>Not yet</span></div></div>
     <div class="tp-wl">${hit.length?hit.sort((a,b)=>S[b[0]]-S[a[0]]).map(([k,n])=>`<div><span>${n}</span><b>${Math.round(S[k])} set${Math.round(S[k])===1?"":"s"}</b></div>`).join(""):`<p class="note" style="margin:0">Log a workout and the muscles you worked light up here.</p>`}
     ${hit.length&&miss.length?`<p class="note" style="margin:8px 0 0">Not trained this week: ${miss.map(x=>x[1]).join(", ")}</p>`:""}</div></div>`}
-function tpPaint(){if(!tPlan)return;const pp=$("#tpPP");if(pp)pp.innerHTML=tpPPHTML();const g=$("#tpDiag"),c=$("#tpChips"),sg=$("#tpSug");if(g)g.innerHTML=musSvg(tPlan.mus,{tap:true});if(c)c.querySelectorAll("[data-mtap]").forEach(b=>b.className="tp-chip l"+(tPlan.mus[b.dataset.mtap]||0));if(sg){const sug=sugMus(tPlan.ex);sg.innerHTML=Object.keys(sug).length&&JSON.stringify(sug)!==JSON.stringify(tPlan.mus)?`<button type="button" class="tp-sug" data-tpsug>Use muscles from my exercises</button>`:""}}
+function tpPaint(){if(!tPlan)return;const pp=$("#tpPP");if(pp)pp.innerHTML=tpPPHTML();const g=$("#tpDiag"),c=$("#tpChips"),sg=$("#tpSug");if(g)g.innerHTML=musSvg(tPlan.mus,{tap:true});if(c)c.querySelectorAll("[data-mtap]").forEach(b=>b.className="tp-chip l"+(tPlan.mus[b.dataset.mtap]||0));if(sg){const ov=tPlan.musOv||{};sg.innerHTML=Object.keys(ov).length?`<button type="button" class="tp-sug" data-tpsug>Reset to the muscles from my exercises</button>`:""}}
 /* catch-handler: sets left blank or 0 become 1 */
 document.addEventListener("focusout",e=>{const t=e.target;if(!tPlan||!t.dataset||t.dataset.tpk!=="sets")return;const ex=tPlan.ex[+t.dataset.tpi];if(!ex)return;const n=parseInt(t.value);if(!(n>0)){ex.sets=1;t.value="1"}});
-document.addEventListener("input",e=>{if(!tPlan)return;const t=e.target;if(t.classList&&t.classList.contains("tp-en")){const box=t.closest(".tpx-body,.tpb-page"),w=box&&box.querySelector(".tpx-warn");if(w)w.hidden=[...box.querySelectorAll(".tp-en")].some(x=>x.value.trim())}if(t.id==="tpName"){tPlan.name=t.value;return}if(t.dataset&&t.dataset.tpgname!=null){const G=exGroups(tPlan.ex),g=G[+t.dataset.tpgname];if(g&&g[0]){const v=t.value.trim()||g[0];if(tpTab===g[0])tpTab=v;const was=tpFold.has(g[0]);g[1].forEach(([x])=>x.g=v);if(was){tpFold.delete(g[0]);tpFold.add(v)}}return}if(t.dataset&&t.dataset.tpi!=null){const ex=tPlan.ex[+t.dataset.tpi];if(!ex)return;const k=t.dataset.tpk;ex[k]=k==="name"?t.value:(parseInt(t.value)||"");if(k==="name")tpPaint()}});
+document.addEventListener("input",e=>{if(!tPlan)return;const t=e.target;if(t.classList&&t.classList.contains("tp-en")){const box=t.closest(".tpx-body,.tpb-page"),w=box&&box.querySelector(".tpx-warn");if(w)w.hidden=[...box.querySelectorAll(".tp-en")].some(x=>x.value.trim())}if(t.id==="tpName"){tPlan.name=t.value;return}if(t.dataset&&t.dataset.tpgname!=null){const G=exGroups(tPlan.ex),g=G[+t.dataset.tpgname];if(g&&g[0]){const v=t.value.trim()||g[0];if(tpTab===g[0])tpTab=v;const was=tpFold.has(g[0]);g[1].forEach(([x])=>x.g=v);if(was){tpFold.delete(g[0]);tpFold.add(v)}}return}if(t.dataset&&t.dataset.tpi!=null){const ex=tPlan.ex[+t.dataset.tpi];if(!ex)return;const k=t.dataset.tpk;ex[k]=k==="name"?t.value:(parseInt(t.value)||"");if(k==="name"){tpMusInit(tPlan);tpMusSync();tpPaint()}}});
 document.addEventListener("keydown",e=>{const m=e.target.closest&&e.target.closest("g[data-mtap]");if(m&&(e.key==="Enter"||e.key===" ")){e.preventDefault();m.dispatchEvent(new MouseEvent("click",{bubbles:true}))}});
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-wkfd],[data-tpcday],[data-tpov],[data-tplv],[data-cdall],[data-cdleave],[data-tpday],[data-wkcday],[data-wkassign],[data-wkput],[data-wkcatnew],[data-wkcatok],[data-spday],[data-spcat],[data-spclear],[data-spdone],[data-pnewcat],[data-tpsub],[data-tpsubdel],[data-tpsubnew],[data-tpsubok],[data-ps],[data-tpcat],[data-tpcatdel],[data-tpcatnew],[data-tpcatok],[data-pf],[data-mtap],[data-pnew],[data-pedit],[data-plog],[data-tpadd],[data-tpgadd],[data-tpgup],[data-tpgdel],[data-tpgtog],[data-tpunit],[data-tpdel],[data-tpsug],[data-tpsave],[data-tpapply],[data-tpcancel],[data-tpdelete]");if(!t)return;const d=data;
   if(e.target.dataset&&e.target.dataset.tpcatdel){const c=e.target.dataset.tpcatdel;if(tpCatDel!==c){tpCatDel=c;tpCatPaint();return}tpCatDel="";wcatDelete(c);toast(c+" deleted");tpCatPaint();return}
@@ -2489,7 +2533,7 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(t.dataset.tpcatnew!==undefined){tpCatAdd=true;tpCatPaint();setTimeout(()=>{const i=$("#tpCatNew");i&&i.focus()},30);return}
   if(t.dataset.tpcatok!==undefined){tpCatAdd1();return}
   if(t.dataset.pf!=null){planF=t.dataset.pf;planS="";render();return}
-  if(t.dataset.mtap){if(!tPlan)return;const k=t.dataset.mtap,v=tPlan.mus[k]||0,n=v===0?2:v===2?1:0;if(n)tPlan.mus[k]=n;else delete tPlan.mus[k];tpPaint();return}
+  if(t.dataset.mtap){if(!tPlan)return;tpMusInit(tPlan);const k=t.dataset.mtap,v=tPlan.mus[k]||0,n=v===0?2:v===2?1:0,a=sugMus(tPlan.ex)[k]||0;if(n===a)delete tPlan.musOv[k];else tPlan.musOv[k]=n;tpMusSync();tpPaint();return}
   if(t.dataset.pnew!==undefined){tPlan={name:"",ex:[{name:"",sets:3,reps:10}],mus:{}};render();setTimeout(()=>{const i=$("#tpName");i&&(i.focus({preventScroll:true}),$(".tpp").scrollIntoView({behavior:"smooth",block:"start"}))},60);return}
   if(t.dataset.pedit){const pl=(d.plans||[]).find(x=>x.id===t.dataset.pedit);if(!pl)return;tPlan=JSON.parse(JSON.stringify(pl));tPlan.mus=musNorm(tPlan.mus);tPlan.cats=pCats(pl);tPlan.days=pDays(pl);tPlan.subs={};tPlan.cats.forEach(c=>{const v=pSub(pl,c);if(v)tPlan.subs[c]=v});delete tPlan.cat;delete tPlan.sub;tpCatDel="";tpAsk="";render();setTimeout(()=>{const x=$(".tpp");x&&x.scrollIntoView({behavior:"smooth",block:"start"})},60);return}
   if(t.dataset.tpadd!==undefined){tpNorm(tPlan);const G=exGroups(tPlan.ex),k=t.dataset.tpadd,ne={name:"",sets:3,reps:10,g:"All"};if(k!==""&&G[+k]){const g=G[+k];if(g[0])ne.g=g[0];tpFold.delete(g[0]);const at=g[1][g[1].length-1][1]+1;tPlan.ex.splice(at,0,ne);tpExPaint();setTimeout(()=>{const x=document.querySelector(`.tp-en[data-tpi="${at}"]`);x&&x.focus()},30);return}tPlan.ex.push(ne);render();setTimeout(()=>{const a=document.querySelectorAll(".tp-en");a.length&&a[a.length-1].focus()},40);return}
@@ -2498,8 +2542,8 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(t.dataset.tpgtog!=null){if(e.target.closest("input:not([readonly]),button"))return;const g=exGroups(tPlan.ex)[+t.dataset.tpgtog];if(!g)return;if(tpxView==="cols"){tpTab=g[0];tpExPaint();return}tpFold.has(g[0])?tpFold.delete(g[0]):tpFold.add(g[0]);tpExPaint();return}
   if(t.dataset.tpgup){const G=exGroups(tPlan.ex),k=+t.dataset.tpgup;if(k<1)return;const o=G.map(x=>x[1].map(y=>y[0]));[o[k-1],o[k]]=[o[k],o[k-1]];tPlan.ex=o.flat();tpExPaint();return}
   if(t.dataset.tpunit){const e=tPlan.ex[+t.dataset.tpunit];if(!e)return;if(e.unit==="s"){delete e.unit;if(+e.reps===30)e.reps=10}else{e.unit="s";if(+e.reps===10)e.reps=30}tpExPaint();return}
-  if(t.dataset.tpdel){tPlan.ex.splice(+t.dataset.tpdel,1);if(!tPlan.ex.length)tPlan.ex.push({name:"",sets:3,reps:10});render();return}
-  if(t.dataset.tpsug!==undefined){tPlan.mus=Object.assign({},sugMus(tPlan.ex));tpPaint();return}
+  if(t.dataset.tpdel){tpMusInit(tPlan);tPlan.ex.splice(+t.dataset.tpdel,1);tpMusSync();if(!tPlan.ex.length)tPlan.ex.push({name:"",sets:3,reps:10});render();return}
+  if(t.dataset.tpsug!==undefined){tPlan.musOv={};tpMusSync();tpPaint();return}
   if(t.dataset.tpcancel!==undefined){tpCatAdd=false;tpSubAdd="";tpCatDel="";tpAsk="";tPlan=null;render();return}
   if(t.dataset.tpdelete!==undefined){if(t.dataset.armed!=="1"){t.dataset.armed="1";t.textContent="Delete for good?";return}d.plans=(d.plans||[]).filter(x=>x.id!==tPlan.id);tPlan=null;toast("Workout deleted");render();save();return}
   if(t.dataset.tpsave!==undefined||t.dataset.tpapply!==undefined){const keep=t.dataset.tpapply!==undefined,nm=(tPlan.name||"").trim(),ex=tPlan.ex.map(e=>{const o={name:String(e.name||"").trim(),sets:Math.max(1,parseInt(e.sets)||1),reps:Math.max(1,parseInt(e.reps)||(e.unit==="s"?30:10))};if(e.unit==="s")o.unit="s";o.g=String(e.g||"").trim()||"All";return o}).filter(e=>e.name);
@@ -4222,7 +4266,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="188",APPT="2026-11-18T16:47:00-05:00";   /* APPT: when this update was made */
+const APPV="189",APPT="2026-11-18T16:58:00-05:00";   /* APPT: when this update was made */
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
