@@ -1194,11 +1194,15 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .tl-cat{margin:0 0 10px;padding:0 12px;border-radius:12px;border:1px solid color-mix(in srgb,var(--cc) 34%,transparent);background:linear-gradient(180deg,color-mix(in srgb,var(--cc) 8%,transparent),transparent 70px);transition:box-shadow .3s}
 .tl-cat.full{box-shadow:0 0 16px color-mix(in srgb,var(--cc) 22%,transparent),inset 0 0 0 1px color-mix(in srgb,var(--cc) 30%,transparent)}
 .tl-ch{display:flex;align-items:baseline;justify-content:space-between;width:100%;font:inherit;background:none;border:0;padding:9px 0 3px;cursor:pointer;color:var(--cc)}.tl-ch b{font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}.tl-ch small{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
-.tl-r{width:100%;font:inherit;color:inherit;text-align:left;background:none;border:0;border-bottom:1px solid rgba(var(--lrd),.7);cursor:pointer;border-radius:0}.tl-cat .tl-r:last-child{border-bottom:0}
-.tl-r .dot{background:transparent;box-shadow:none;border:1.5px solid color-mix(in srgb,var(--c) 55%,transparent);width:9px;height:9px;box-sizing:border-box;transition:background .25s,box-shadow .25s,border-color .25s,transform .2s}
-.tl-r.on .dot{background:var(--c);border-color:var(--c);box-shadow:0 0 8px var(--c),0 0 14px color-mix(in srgb,var(--c) 55%,transparent)}
-.tl-r .m>div,.tl-r .v{transition:color .25s,opacity .25s}.tl-r:not(.on) .m>div{opacity:.82}.tl-r:not(.on) .v{color:var(--muted)}.tl-r.on .v{color:var(--c)}
-.tl-r:active .dot{transform:scale(1.5)}
+.tl-r{align-items:flex-start;gap:12px}.tl-cat .tl-r:last-child{border-bottom:0}
+.tl-ck{flex:none;width:34px;height:34px;margin-top:2px;padding:0;border-radius:50%;display:grid;place-items:center;cursor:pointer;font:inherit;color:transparent;background:transparent;border:1.5px solid rgba(var(--lr),.38);transition:background .25s,border-color .25s,box-shadow .25s,color .25s,transform .15s}
+.tl-ck:active{transform:scale(.9)}
+.tl-r.part .tl-ck{border-color:rgba(61,220,132,.6);color:rgba(61,220,132,.45)}
+.tl-r.on .tl-ck{background:#3ddc84;border-color:#3ddc84;color:#04140b;box-shadow:0 0 10px rgba(61,220,132,.55)}
+.tl-pips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.tl-pip{min-width:24px;height:22px;padding:0 6px;border-radius:99px;font:inherit;font-family:var(--mono);font-size:11px;line-height:1;cursor:pointer;color:var(--muted);background:rgba(var(--tX),.45);border:1px solid rgba(var(--lr),.3);transition:background .2s,border-color .2s,color .2s,box-shadow .2s}
+.tl-pip.on{background:rgba(61,220,132,.18);border-color:rgba(61,220,132,.75);color:#bff5d6;box-shadow:0 0 6px rgba(61,220,132,.35)}
+.tl-r .m>div,.tl-r .v{transition:color .25s,opacity .25s}.tl-r:not(.on) .v{color:var(--muted)}.tl-r.on .v{color:#3ddc84}.tl-r .v{padding-top:8px}
 .dy.ld{position:relative;border-style:dashed;border-color:color-mix(in srgb,var(--cc,#7fb0ff) 70%,transparent);background:color-mix(in srgb,var(--cc,#7fb0ff) 9%,#14203f)}
 .dy.ld2{background:color-mix(in srgb,var(--cc,#7fb0ff) 18%,#14203f)}.dy.ld3{background:color-mix(in srgb,var(--cc,#7fb0ff) 28%,#14203f);border-color:var(--cc,#7fb0ff)}
 .dy .ldd{position:absolute;left:0;right:0;bottom:1px;display:block;text-align:center;white-space:nowrap;font-style:normal;font-size:8px;line-height:6px;letter-spacing:0;color:var(--cc,#7fb0ff);pointer-events:none}.dy.on .ldd{color:#081022}
@@ -2121,24 +2125,31 @@ function trWeekPanel(d,T){const F=fitLevel(d),n=T.thisDays.size,G=T.G,pc=Math.mi
     <div class="tg-bar"><i style="width:${pc.toFixed(1)}%;background:${n>=G?"#3ddc84":"rgba(var(--tL),1)"};box-shadow:0 0 8px ${n>=G?"#3ddc84":"rgba(var(--tL),.8)"}"></i></div>
     <div class="tr-days">${dots}</div>
     ${dayLabel(dayIdx(today())).length?`<p class="tr-cap" style="margin-top:8px">Today: <b>${dayLabel(dayIdx(today())).map(esc).join(" + ")}</b></p>`:""}<p class="tr-cap"><b>${F.name}</b> · ${F.cap}</p></div>`}
-/* workout log: today's planned exercises, boxed by category. Tap a row to mark it done (its dot lights up and it is logged for today); tap again to undo */
+/* workout log: today's planned exercises, boxed by category. The big check marks a whole exercise done; the set pips let you tick sets one by one. Logged for today as you go */
 const tlPlans=d=>{const td=dayIdx(today());return (d.plans||[]).filter(p=>p.ex&&p.ex.length&&onDay(p,td))};
 const tckDone=(d,pl,e)=>(d.workouts||[]).find(w=>w.d===today()&&w.plan===pl.id&&trKey(w.name)===trKey(e.name));
+const tlSets=e=>Math.max(1,Math.min(12,parseInt(e.sets)||1));
+const tlFull=(d,pl,e)=>{const w=tckDone(d,pl,e);return !!w&&(+w.sets||0)>=tlSets(e)};
+const CKSVG=`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
 function trLogPanel(d,T){const u=d.goals.unit,PL=tlPlans(d),groups=[];
   PL.forEach(p=>{const c=pCats(p)[0]||"";let g=groups.find(x=>x.c===c);if(!g)groups.push(g={c,ps:[]});g.ps.push(p)});groups.sort((a,b)=>(a.c?0:1)-(b.c?0:1));
   let all=0,done=0;
-  const box=g=>{const rows=g.ps.flatMap(p=>p.ex.map((e,i)=>{const w=tckDone(d,p,e),last=w||trLast(d,e.name),kg=last&&+last.kg?last.kg+" "+u:"body",fl=w&&trFlash===w.id&&Date.now()-trFlashAt<2500;all++;if(w)done++;
-      return `<button type="button" class="r tl-r${w?" on":""}${fl?" wflash":""}" data-tck="${p.id}|${i}" aria-pressed="${!!w}" style="--c:${catCol(g.c)}"><span class="dot"></span><div class="m"><div>${esc(e.name)}</div><small>${esc(p.name)} · ${e.sets} × ${e.reps}</small></div><div class="v">${kg}</div></button>`}));
-    const n=g.ps.reduce((a,p)=>a+p.ex.filter(e=>tckDone(d,p,e)).length,0),t=g.ps.reduce((a,p)=>a+p.ex.length,0);
+  const box=g=>{const rows=g.ps.flatMap(p=>p.ex.map((e,i)=>{const w=tckDone(d,p,e),S=tlSets(e),k=w?Math.min(S,+w.sets||0):0,full=k>=S,last=w||trLast(d,e.name),kg=last&&+last.kg?last.kg+" "+u:"body",fl=w&&trFlash===w.id&&Date.now()-trFlashAt<2500;all++;if(full)done++;
+      const pips=[...Array(S)].map((_,j)=>`<button type="button" class="tl-pip${j<k?" on":""}" data-tset="${p.id}|${i}|${j}" aria-pressed="${j<k}" aria-label="Set ${j+1} of ${esc(e.name)}">${j+1}</button>`).join("");
+      return `<div class="r tl-r${full?" on":k?" part":""}${fl?" wflash":""}" style="--c:${catCol(g.c)}"><button type="button" class="tl-ck" data-tck="${p.id}|${i}" aria-pressed="${full}" aria-label="${full?"Undo":"Mark done"}: ${esc(e.name)}">${CKSVG}</button><div class="m"><div>${esc(e.name)}</div><small>${esc(p.name)} · ${e.sets} × ${e.reps}${k&&!full?` · ${k}/${S} sets`:""}</small><div class="tl-pips" role="group" aria-label="Sets">${pips}</div></div><div class="v">${kg}</div></div>`}));
+    const n=g.ps.reduce((a,p)=>a+p.ex.filter(e=>tlFull(d,p,e)).length,0),t=g.ps.reduce((a,p)=>a+p.ex.length,0);
     return `<div class="tl-cat${n===t?" full":""}" style="--cc:${catCol(g.c)}"><button type="button" class="tl-ch" data-tckcat="${esc(g.c)}" title="${n===t?"Undo all":"Mark all done"}"><b>${esc(g.c||"Not in a category")}</b><small>${n}/${t}</small></button>${rows.join("")}</div>`};
   const body=groups.map(box).join("");
   return `<div class="panel trlogp"><div class="ph"><span>Workout log</span><i>${all?done+" of "+all+" done":"Today"}</i></div>
     <div class="rows trlog">${body||`<div class="empty">Nothing planned for today</div>`}</div></div>`}
-document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-tck],[data-tckcat]");if(!t||demoOn())return;const d=data;
-  const add=(pl,ex)=>{const last=trLast(d,ex.name),n={id:uid(),d:today(),name:ex.name,sets:ex.sets,reps:ex.reps,kg:last?last.kg:null,plan:pl.id};d.workouts.push(n);trFlash=n.id;trFlashAt=Date.now()};
-  const rm=(pl,ex)=>{const w=tckDone(d,pl,ex);if(w)d.workouts=d.workouts.filter(x=>x!==w)};
-  if(t.dataset.tck){const[id,i]=t.dataset.tck.split("|"),pl=(d.plans||[]).find(x=>x.id===id),ex=pl&&pl.ex[+i];if(!ex)return;tckDone(d,pl,ex)?rm(pl,ex):add(pl,ex)}
-  else{const c=t.dataset.tckcat,ps=tlPlans(d).filter(p=>(pCats(p)[0]||"")===c),items=ps.flatMap(p=>p.ex.map(x=>[p,x])),full=items.every(([p,x])=>tckDone(d,p,x));items.forEach(([p,x])=>{if(full)rm(p,x);else if(!tckDone(d,p,x))add(p,x)});if(!full)toast((c||"Workouts")+" done")}
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-tck],[data-tset],[data-tckcat]");if(!t||demoOn())return;const d=data;
+  const setK=(pl,ex,k)=>{let w=tckDone(d,pl,ex);if(k<=0){if(w)d.workouts=d.workouts.filter(x=>x!==w);return}
+    if(!w){const last=trLast(d,ex.name);w={id:uid(),d:today(),name:ex.name,sets:k,reps:ex.reps,kg:last?last.kg:null,plan:pl.id};d.workouts.push(w)}else w.sets=k;
+    if(k>=tlSets(ex)){trFlash=w.id;trFlashAt=Date.now()}};
+  const find=v=>{const[id,i]=v.split("|"),pl=(d.plans||[]).find(x=>x.id===id),ex=pl&&pl.ex[+i];return ex?[pl,ex]:null};
+  if(t.dataset.tck){const f=find(t.dataset.tck);if(!f)return;const[pl,ex]=f;setK(pl,ex,tlFull(d,pl,ex)?0:tlSets(ex))}
+  else if(t.dataset.tset){const f=find(t.dataset.tset);if(!f)return;const[pl,ex]=f,j=+t.dataset.tset.split("|")[2],w=tckDone(d,pl,ex),cur=w?+w.sets||0:0;setK(pl,ex,cur===j+1?j:j+1)}
+  else{const c=t.dataset.tckcat,items=tlPlans(d).filter(p=>(pCats(p)[0]||"")===c).flatMap(p=>p.ex.map(x=>[p,x])),full=items.every(([p,x])=>tlFull(d,p,x));items.forEach(([p,x])=>setK(p,x,full?0:tlSets(x)));if(!full)toast((c||"Workouts")+" done")}
   render();save()});
 function trProgress(d,T){const u=d.goals.unit,W=T.weeks,mx=Math.max(1,...W.map(x=>x.v)),G=T.G;
   const X0=46,X1=588,Y0=14,Y1=150,bw=(X1-X0)/8,py=v=>Y1-v/mx*(Y1-Y0);
@@ -4104,7 +4115,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="162";if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
+const APPV="163";if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
