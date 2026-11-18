@@ -1193,10 +1193,16 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 /* training */
 .wk-allp>.sh-h{margin-bottom:12px}
 .wk-cats{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;padding-bottom:12px}
-.wk-sec.wk-catc{flex:0 1 auto;width:auto;max-width:100%;min-width:0;padding:12px 12px 2px;border:1px solid color-mix(in srgb,var(--cc) 40%,transparent);border-top:3px solid var(--cc);border-radius:14px;background:linear-gradient(180deg,color-mix(in srgb,var(--cc) 12%,transparent),rgba(var(--tX),.35) 120px);box-shadow:0 0 18px color-mix(in srgb,var(--cc) 12%,transparent)}
-.wk-catc .sh-row{flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x mandatory}.wk-catc .sh-row>.tp-card,.wk-catc .sh-row>.tp-new{flex:0 0 262px}
+.wk-sec.wk-catc{flex:0 0 calc(50% - 6px);width:calc(50% - 6px);max-width:calc(50% - 6px);min-width:0;box-sizing:border-box;padding:10px 10px 0;border:1px solid color-mix(in srgb,var(--cc) 40%,transparent);border-top:3px solid var(--cc);border-radius:14px;background:linear-gradient(180deg,color-mix(in srgb,var(--cc) 12%,transparent),rgba(var(--tX),.35) 120px);box-shadow:0 0 18px color-mix(in srgb,var(--cc) 12%,transparent)}
+.wk-sec.wk-catc .sh-row{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}.wk-catc .sh-row>.tp-card,.wk-catc .sh-row>.tp-new{flex:0 0 262px}
 .wk-catc .sh-row>.wk-newc{flex:0 0 120px;min-height:0}
-.wk-catadd{display:flex}.wk-catadd>.tp-new{min-height:120px;width:262px}
+.wk-catadd{display:flex;flex:0 0 calc(50% - 6px);max-width:calc(50% - 6px)}.wk-catadd>.tp-new{min-height:120px;width:100%}
+.wk-catc>.sh-h{gap:6px;margin:0 0 8px}.wk-catc>.sh-h b{font-size:14px}.wk-catc>.sh-h small{margin-left:auto}
+.wk-catc .wk-days{order:9;flex:1 1 100%;margin:0}.wk-catc .wk-days .dy{min-height:24px;font-size:10.5px}
+.wk-catc .wk-asg{margin-left:0;min-height:26px;font-size:11.5px;padding:3px 8px}
+.wk-catplus{font:inherit;font-size:15px;font-weight:700;line-height:1;width:26px;height:26px;padding:0;display:grid;place-items:center;border-radius:7px;cursor:pointer;color:var(--cc);background:color-mix(in srgb,var(--cc) 14%,transparent);border:1px solid color-mix(in srgb,var(--cc) 50%,transparent)}
+.wk-catc .sh-lanes{display:block}.wk-catc .sh-lane{padding:0}.wk-catc .sh-lanes>.sh-lane:last-child:not(:first-child){display:none}
+.wk-catc .sh-row{padding:0 0 10px}
 #dbgTog{position:fixed;z-index:1000;top:calc(env(safe-area-inset-top,0px) + 58px);left:50%;transform:translateX(-50%);font:700 13px/1 system-ui;color:#fff;background:#ff2d55;border:2px solid #fff;border-radius:99px;padding:8px 14px;box-shadow:0 3px 10px rgba(0,0,0,.6);cursor:pointer}#dbgTog[aria-pressed=false]{background:rgba(20,30,60,.92);color:#cfe0ff;border-color:rgba(207,224,255,.6)}#dbgTog[hidden]{display:none}
 body.dbg-off .dbg-n{display:none}body.dbg-off .dbg-box{outline:none}
 .dbg-box{outline:2px dashed #ff2d55;outline-offset:-2px}.dbg-n{position:absolute;left:4px;top:4px;z-index:30;pointer-events:none;min-width:22px;height:22px;padding:0 6px;display:grid;place-items:center;box-sizing:border-box;background:#ff2d55;color:#fff;font:800 13px/1 system-ui;border-radius:99px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.6)}
@@ -2310,7 +2316,7 @@ function wkSec(d,c,IN,only,td,PL,all){const fd=c&&catDayF[c]>=0?catDayF[c]:-1;if
     ${all?wkCats(d,IN,td,PL):""}${all?"":IN.length?`<div class="sh-lanes">${lanes.map(([x,ps])=>`<div class="sh-lane">${x?`<div class="sh-lh">${esc(x)} <em>${ps.length}</em></div>`:""}<div class="sh-row">${ps.map(pl=>planCard(d,pl,true)).join("")}</div></div>`).join("")}${c?`<div class="sh-lane"><div class="sh-row">${wkNewCard(c)}</div></div>`:""}</div>`:asg?"":`${fd>=0?`<p class="wk-empty">No ${esc(c)} workouts on ${["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"][fd]}.</p>`:""}<div class="sh-lanes"><div class="sh-lane"><div class="sh-row">${wkNewCard(c)}</div></div></div>`}</section>`}
 /* All tab: one panel, each category is a card holding its workouts */
 function wkCats(d,PL,td,ALL){const cs=wcatAll().filter(c=>PL.some(p=>pCats(p).includes(c))||splitDay<0),none=PL.filter(p=>!pCats(p).length);
-  const box=c=>wkSec(d,c,PL.filter(p=>pCats(p).includes(c)),"",td,ALL).replace('<section class="wk-sec"','<section class="wk-sec wk-catc"');
+  const box=c=>wkSec(d,c,PL.filter(p=>pCats(p).includes(c)),"",td,ALL).replace('<section class="wk-sec"','<section class="wk-sec wk-catc"').replace(`<button class="tp-tile add wk-asg"`,`<button class="wk-catplus" data-pnewcat="${esc(c)}" aria-label="New workout in ${esc(c)}" title="New workout in ${esc(c)}">＋</button><button class="tp-tile add wk-asg"`);
   return `<div class="wk-cats">${cs.sort((a,b)=>(td.includes(b)?1:0)-(td.includes(a)?1:0)).map(box).join("")}${none.length?wkSec(d,"",none,"",td,ALL).replace('<section class="wk-sec"','<section class="wk-sec wk-catc"'):""}<div class="wk-catadd">${wkNewCard("")}</div></div>`}
 const wkNewCard=c=>`<button class="tp-new wk-newc" ${c?`data-pnewcat="${esc(c)}"`:"data-pnew"}><b>＋</b><small>${c?"New workout in "+esc(c):"Design a workout"}</small></button>`;
 function musWeekPanel(d){const S=musWeek(d),mx=Math.max(1,...Object.values(S)),H={};Object.entries(S).forEach(([k,v])=>H[k]=v/Math.max(mx,10));const hit=MUS.filter(([k])=>S[k]),miss=MUS.filter(([k])=>!S[k]);
@@ -4067,7 +4073,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="151";
+const APPV="152";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
