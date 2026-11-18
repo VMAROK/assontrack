@@ -4018,14 +4018,18 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="139";
+const APPV="140";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
-      let tried=0;try{tried=+sessionStorage.getItem("aot-upd")||0}catch(e){}if(tried>=v)return;                       // already reloaded for this one: don't loop if the server is still catching up
+      let st={v:0,n:0,t:0};try{st=JSON.parse(sessionStorage.getItem("aot-upd2")||"{}");}catch(e){}if(st.v!==v)st={v,n:0,t:0};
+      if(st.n>=4){updBtn(v);return}                                                       // tried a few times and the server still sends the old page: offer a button
+      if(st.n&&Date.now()-st.t<20000){setTimeout(check,20000);return}                     // give the server a moment between tries
       const go=async()=>{const el=document.activeElement;if(typeof typing==="function"&&typing()&&el&&String(el.value||"").trim()){setTimeout(go,2000);return}   // never yank the page away mid-typing
-        try{sessionStorage.setItem("aot-upd",String(v))}catch(e){}
+        try{st.n++;st.t=Date.now();sessionStorage.setItem("aot-upd2",JSON.stringify(st))}catch(e){}
         try{await Promise.race([(async()=>{const reg=await navigator.serviceWorker.getRegistration();reg&&await reg.update()})(),new Promise(r=>setTimeout(r,1800))])}catch(e){}location.reload()};go()}catch(e){}finally{busy=false}}
+  function updBtn(v){if(document.getElementById("updBtn"))return;const b=document.createElement("button");b.id="updBtn";b.textContent="Update to the newest version";b.style.cssText="position:fixed;z-index:9999;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);font:600 14px/1 inherit;padding:12px 18px;border-radius:8px;border:1px solid rgba(76,201,255,.9);background:#0e2a4a;color:#e8f6ff;box-shadow:0 8px 24px rgba(0,0,0,.45);cursor:pointer";
+    b.onclick=async()=>{b.textContent="Updating…";try{sessionStorage.removeItem("aot-upd2")}catch(e){}try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k!=="aot-img").map(k=>caches.delete(k)))}catch(e){}try{const reg=await navigator.serviceWorker.getRegistration();reg&&await reg.update()}catch(e){}location.replace(location.pathname+"?v="+v)};document.body.appendChild(b)}
   addEventListener("load",()=>setTimeout(check,1500));document.addEventListener("visibilitychange",()=>setTimeout(check,400));addEventListener("pageshow",()=>setTimeout(check,400));addEventListener("focus",()=>setTimeout(check,400));setInterval(check,180000)})();
 /* iPhone sometimes refuses to bring up the keyboard (worst in home-screen apps). Notice when a tapped field gets no keyboard and offer a way out. */
 (function(){const vv=window.visualViewport,coarse=(()=>{try{return matchMedia("(pointer:coarse)").matches}catch(e){return false}})();if(!vv||!coarse)return;let base=vv.height,t=0,off=false;try{off=localStorage.getItem("aot-kbhelp")==="off"}catch(e){}
