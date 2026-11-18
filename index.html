@@ -2209,7 +2209,7 @@ function askHTML(src){const q=catDayAsk;if(!q||q.src!==src)return "";const n=cat
 function splitHTML(){const td=dayIdx(today()),cs=["Push","Pull",...wcatAll()];
   return `<div class="sp"><div class="sp-h"><b>Weekly split</b><small>${splitDay<0?"Tap a day to see its workouts":"Showing "+DAYS[splitDay]+". Tap it again to show all."}</small></div>
   <div class="sp-row" role="group" aria-label="Weekly split">${DAYS.map((dn,i)=>{const c=schedOf(i),pn=dayPlans(i).filter(p=>!pCats(p).some(x=>c.includes(x)));return `<button class="sp-d${i===td?" td":""}${i===splitDay?" sel":""}${c.length||pn.length?" has":""}" data-spday="${i}" aria-pressed="${i===splitDay}"><small>${dn}</small><b>${c.length?c.map(x=>`<span style="--cc:${PPCOL[x]||catCol(x)}">${esc(x)}</span>`).join(""):pn.length?"":"—"}${pn.map(p=>`<span class="sp-pin">${esc(p.name)}</span>`).join("")}</b></button>`}).join("")}</div>
-  ${splitDay>=0?`<div class="sp-pickh">Categories on ${DAYS[splitDay]}</div><div class="tp-tiles sp-pick">${cs.map(c=>{const on=schedOf(splitDay).includes(c);return `<button type="button" class="tp-tile${on?" on":""}" style="--cc:${PPCOL[c]||catCol(c)}" aria-pressed="${on}" data-spcat="${esc(c)}">${esc(c)}</button>`}).join("")}<button type="button" class="tp-tile plain" data-spclear>Rest day</button><button type="button" class="tp-tile done" data-spdone>Show all days</button></div>`:""}${askHTML("split")}</div>`}
+  </div>`}
 function todayHTML(d){const ti=dayIdx(today()),cs=schedOf(ti),pin=dayPlans(ti);if(!cs.length&&!pin.length)return "";const PL=(d.plans||[]).filter(p=>inDay(p,cs)||pDays(p).includes(ti)),done=new Set(d.workouts.filter(w=>w.d===today()&&w.plan).map(w=>w.plan));
   return `<div class="sp-today"><span>Today${cs.length?" · "+cs.map(c=>`<b style="color:${PPCOL[c]||catCol(c)}">${esc(c)}</b>`).join(" + "):""}</span>${PL.length?PL.map(p=>done.has(p.id)?`<span class="sp-done">✓ ${esc(p.name)}</span>`:`<button class="btn" data-plog="${p.id}">Log ${esc(p.name)}</button>`).join(""):`<button class="btn ghost" data-pnewcat="${esc(cs[0])}">＋ Design a ${esc(cs[0])} workout</button>`}</div>`}
 function planCard(d,pl,inSh){pl=Object.assign({},pl,{mus:musNorm(pl.mus)});const ms=Object.entries(pl.mus).sort((a,b)=>b[1]-a[1]);
@@ -4011,7 +4011,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="136";
+const APPV="137";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
