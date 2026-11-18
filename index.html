@@ -2221,7 +2221,7 @@ const schedOf=i=>{const v=(data.wsched||{})[i];return (Array.isArray(v)?v:v?[v]:
 const CATCOL={"Push":"#ff9a8a","Pull":"#7fb8ff","Legs":"#8fdc8a","Upper body":"#c6a6ff","Lower body":"#ffd27a","Full body":"#76dfd4","Core":"#ffb0d6","Cardio":"#ffab6b"};
 const catCol=c=>{if(CATCOL[c])return CATCOL[c];if(!c)return "#9db0d0";let h=0;for(const ch of c)h=(h*31+ch.charCodeAt(0))%360;return `hsl(${h} 72% 72%)`};
 const catPlans=c=>(data.plans||[]).filter(p=>pCats(p).includes(c));const catDays=c=>DAYS.map((_,i)=>i).filter(i=>schedOf(i).includes(c));
-const onDay=(p,i)=>inDay(p,schedOf(i))||pDays(p).includes(i);
+const onDay=(p,i)=>inDay(p,schedOf(i))||pDays(p).includes(i)||(!pDays(p).length&&!DAYS.some((_,k)=>inDay(p,schedOf(k))));   /* a workout with no day of its own (and none from its category) counts as every day */
 function catDayToggle(c,i){const a=schedOf(i),add=!a.includes(c);data.wsched=data.wsched||{};data.wsched[i]=add?a.concat(c):a.filter(x=>x!==c);if(!data.wsched[i].length)delete data.wsched[i];
   catDayAsk=null;save();render()}
 function askHTML(src){const q=catDayAsk;if(!q||q.src!==src)return "";const n=catPlans(q.c).length,ds=catDays(q.c).map(i=>DAYS[i]).join(", ");
@@ -4078,7 +4078,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="157";if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
+const APPV="158";if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
