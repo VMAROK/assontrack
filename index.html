@@ -2337,7 +2337,7 @@ function musHeat(d){const S=musWeek(d),mx=Math.max(10,...Object.values(S));retur
 function musWeek(d){const plans=d.plans||[],sets={};d.workouts.forEach(w=>{const a=(Date.now()-new Date(w.d+"T12:00"))/864e5;if(a>=7||a<-1)return;const pl=w.plan&&plans.find(x=>x.id===w.plan),m=musNorm((pl&&pl.mus&&Object.keys(pl.mus).length?pl.mus:null)||exMus(w.name)||{});const n=+w.sets||1;Object.entries(m).forEach(([k,v])=>sets[k]=(sets[k]||0)+n*(v===2?1:.5))});return sets}
 
 let tPlan=null;   /* the workout being designed */
-let catDayF={},catDayAsk=null,tpAsk="",planF="",planS="",tpCatAdd=false,tpSubAdd="",splitDay=-1,tpCatDel="",wkAssign="",wkNewCat=false;
+let catDayF={},catDayAsk=null,tpAsk="",planF="",planS="",tpCatAdd=false,tpSubAdd="",splitDay=(new Date().getDay()+6)%7,tpCatDel="",wkAssign="",wkNewCat=false;
 /* Push / Pull is worked out from the muscles, never picked. */
 const PPCOL={Push:"#ff6b6b",Pull:"#45d483"};const PPRES=["push","pull"];
 function ppOf(mus){const m=musNorm(mus||{}),g=ks=>ks.reduce((a,k)=>a+(m[k]||0),0),pu=g(["chest","frontdelts","sidedelts","triceps","quads","calves","adductors","abductors"]),pl=g(["lats","upperback","reardelts","biceps","traps","forearms","hamstrings","glutes","lowerback"]),t=pu+pl;
@@ -2371,7 +2371,7 @@ function splitHTML(){const td=dayIdx(today()),wk0=wkOf(today()),PL=data.plans||[
       <span class="sp-top"><small>${dn}</small><em>${x.getDate()}</em></span>
       <span class="sp-chips">${shown.join("")}${more>0?`<span class="sp-more">+${more}</span>`:""}${chips.length?"":`<span class="sp-rest">Rest</span>`}</span>
       <span class="sp-load">${n?[...Array(Math.min(n,5))].map(()=>"<i></i>").join(""):""}</span></button>`};
-  return `<div class="sp"><div class="sp-h"><b>Weekly split</b><small>${splitDay<0?"Tap a day to see its workouts":"Showing "+DAYS[splitDay]+". Tap it again to show all."}</small></div>
+  return `<div class="sp"><div class="sp-h"><b>Weekly split</b><small>${splitDay===dayIdx(today())?"Today":DAYS[splitDay]}</small></div>
   <div class="sp-row" role="group" aria-label="Weekly split">${DAYS.map(tile).join("")}</div>
   </div>`}
 function todayHTML(d){const ti=dayIdx(today()),cs=schedOf(ti),pin=dayPlans(ti);if(!cs.length&&!pin.length)return "";const PL=(d.plans||[]).filter(p=>inDay(p,cs)||pDays(p).includes(ti)),done=new Set(d.workouts.filter(w=>w.d===today()&&w.plan).map(w=>w.plan));
@@ -2474,7 +2474,7 @@ function cardMorph(fn){const v=$("#view");if(!v||!Element.prototype.animate||mat
   v.querySelectorAll(".wk-empty").forEach(el=>el.animate([{opacity:0},{opacity:1}],{duration:300,delay:lift,easing:"ease-out",fill:"backwards"}))}
 function planList(d,PL){ppMigrate(d);const dayF=splitDay>=0;if(dayF)PL=PL.filter(p=>onDay(p,splitDay));const cats=wcatAll().filter(c=>!dayF||PL.some(p=>pCats(p).includes(c))),none=PL.filter(p=>!pCats(p).length);
   const DFULL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],dayHead="";   /* the highlighted day in the weekly split already shows which day is filtered */
-  if(dayF&&!PL.length)return dayHead+`<p class="wk-empty" style="margin:4px 2px 0">Nothing planned for ${DFULL[splitDay]}. Set days on a category or a workout.</p>`;if(planF&&!cats.includes(planF))planF="";
+  if(dayF&&!PL.length)return `<p class="wk-empty" style="margin:4px 2px 0">Nothing planned for ${DFULL[splitDay]}. Set days on a category or a workout.</p>`;if(planF&&!cats.includes(planF))planF="";
   const nw=`<button class="tp-new" data-pnew>${musSvg({},{lab:false})}<b>＋ Design a workout</b><small>Pick the exercises and the muscles they hit</small></button>`;
   const tab=(attr,v,n,k,on,c)=>`<button class="cat-tab" role="tab" aria-selected="${on}" ${attr}="${esc(v)}"${c?` style="--cc:${c}"`:""}>${c?`<b class="wk-dot"></b>`:""}${esc(n)}<i>${k}</i></button>`;
   const newCat=wkNewCat?`<span class="cat-tab wk-newin"><input id="wkCatNew" maxlength="24" placeholder="Category name" autocomplete="off" aria-label="New category name"><button class="tp-tile done" data-wkcatok>Add</button></span>`:`<button class="cat-tab add" data-wkcatnew aria-label="New category" title="New category">＋</button>`;
@@ -2485,7 +2485,7 @@ function planList(d,PL){ppMigrate(d);const dayF=splitDay>=0;if(dayF)PL=PL.filter
   if(planF){show=[planF];const IN=PL.filter(p=>pCats(p).includes(planF)),subs=wsubAll(planF).filter(x=>IN.some(p=>pSub(p,planF)===x));if(planS&&!subs.includes(planS))planS="";
     if(subs.length)bar2=`<div class="cat-bar wk-bar sub" role="tablist" aria-label="Filter ${esc(planF)} by subcategory">${tab("data-ps","","All "+planF,IN.length,!planS)}${subs.map(x=>tab("data-ps",x,x,IN.filter(p=>pSub(p,planF)===x).length,planS===x)).join("")}</div>`}
   else show=cats.slice().sort((a,b)=>(td.includes(b)?1:0)-(td.includes(a)?1:0));
-  return (dayF?dayHead:bar+bar2)+`<div class="wk-board">${planF?wkSec(d,planF,PL.filter(p=>pCats(p).includes(planF)),planS,td,PL):wkSec(d,"",PL,"",td,PL,true)}</div>`}
+  return bar+bar2+`<div class="wk-board">${planF?wkSec(d,planF,PL.filter(p=>pCats(p).includes(planF)),planS,td,PL):wkSec(d,"",PL,"",td,PL,true)}</div>`}
 function wkSec(d,c,IN,only,td,PL,all){const ck=c||"~none",IN0=IN,fd=!all&&catDayF[ck]>=0?catDayF[ck]:-1;if(fd>=0)IN=IN.filter(p=>onDay(p,fd));const subs=c?wsubAll(c).filter(x=>IN.some(p=>pSub(p,c)===x)):[],gen=IN.filter(p=>!c||!subs.includes(pSub(p,c)));
   let lanes=subs.map(x=>[x,IN.filter(p=>pSub(p,c)===x)]);if(gen.length)lanes.push([subs.length?"General":"",gen]);if(only)lanes=lanes.filter(l=>l[0]===only);
   const asg=c&&wkAssign===c;
@@ -2535,10 +2535,10 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(t.dataset.wkput){const p=(d.plans||[]).find(x=>x.id===t.dataset.wkput),c=t.dataset.wkc;if(!p)return;const cs=pCats(p),sb={};cs.forEach(k=>{const v=pSub(p,k);if(v)sb[k]=v});if(cs.includes(c)){p.cats=cs.filter(x=>x!==c);delete sb[c]}else p.cats=cs.concat(c);p.subs=sb;delete p.cat;delete p.sub;save();render();return}
   if(t.dataset.wkcatnew!==undefined){wkNewCat=true;render();setTimeout(()=>{const i=$("#wkCatNew");i&&i.focus()},30);return}
   if(t.dataset.wkcatok!==undefined){wkCatAdd1();return}
-  if(t.dataset.spday!=null){const i=+t.dataset.spday;cardMorph(()=>{splitDay=splitDay===i?-1:i;catDayAsk=null;planF="";planS="";render()});return}
+  if(t.dataset.spday!=null){const i=+t.dataset.spday;cardMorph(()=>{splitDay=i;catDayAsk=null;render()});return}
   if(t.dataset.spcat!=null&&splitDay>=0){catDayToggle(t.dataset.spcat,splitDay);if(catDayAsk)catDayAsk.src="split";render();return}
-  if(t.dataset.spclear!==undefined&&splitDay>=0){if(d.wsched)delete d.wsched[splitDay];splitDay=-1;save();render();return}
-  if(t.dataset.spdone!==undefined){splitDay=-1;catDayAsk=null;render();return}
+  if(t.dataset.spclear!==undefined&&splitDay>=0){if(d.wsched)delete d.wsched[splitDay];save();render();return}
+  if(t.dataset.spdone!==undefined){catDayAsk=null;render();return}
   if(t.dataset.pnewcat!=null){tPlan={name:"",ex:[{name:"",sets:3,reps:10}],mus:{},cats:[t.dataset.pnewcat],subs:{}};tpAsk=catDays(t.dataset.pnewcat).length?t.dataset.pnewcat:"";render();setTimeout(()=>{const i=$("#tpName");i&&(i.focus({preventScroll:true}),$(".tpp").scrollIntoView({behavior:"smooth",block:"start"}))},60);return}
   if(t.dataset.ps!=null){planS=t.dataset.ps;render();return}
   if(t.dataset.tpcat!=null&&tPlan){const c=t.dataset.tpcat;tpCatDel="";tPlan.cats=tPlan.cats||[];if(tPlan.cats.includes(c)){tPlan.cats=tPlan.cats.filter(x=>x!==c);if(tPlan.subs)delete tPlan.subs[c];if(tpSubAdd===c)tpSubAdd=""}else{tPlan.cats.push(c);const cd=catDays(c),own=(tPlan.days||[]).slice().sort().join();tpAsk=cd.length&&cd.join()!==own?c:""}tpCatPaint();return}
@@ -4140,7 +4140,7 @@ addEventListener("resize",()=>placeBranch());
 
 /* ---------- events ---------- */
 let confirmClear=false;
-function go(t){if(t!==tab)sfx("whoosh");tab=t;confirmClear=false;render();$("#view").scrollTop=0}
+function go(t){if(t!==tab)sfx("whoosh");if(t==="train"&&t!==tab)splitDay=dayIdx(today());tab=t;confirmClear=false;render();$("#view").scrollTop=0}
 document.addEventListener("change",e=>{const t=e.target;if(!t.dataset||!t.dataset.tkproj)return;const p=data.passions.find(x=>x.id===selP);const k=p&&(p.tasks||[]).find(x=>x.id===t.dataset.tkproj);if(!k)return;k.proj=t.value||null;render();save();toast(t.value?"Moved to "+t.options[t.selectedIndex].text:"Removed from project")});
 document.addEventListener("focusout",e=>{if(e.target.id==="slH"||e.target.id==="seH"){const m=parseHM(e.target.value);if(m!=null)e.target.value=String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&renaming&&e.target.id==="rnIn"){renaming=null;render()}});
@@ -4278,7 +4278,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="191",APPT="2026-11-18T17:09:00-05:00";   /* APPT: when this update was made */
+const APPV="192",APPT="2026-11-18T17:20:00-05:00";   /* APPT: when this update was made */
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
