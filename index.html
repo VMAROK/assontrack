@@ -3957,7 +3957,7 @@ document.addEventListener("focusout",()=>setTimeout(()=>{if(renderWait&&!typing(
 function render(){
   const v=$("#view"),y=v.scrollTop;
   const SCR=".theme-strip,.fd-list,.lk-row,.cat-bar,.wgrid,.avbg,.av-tabs,.wa-grid,.rows",keep=[];SCR.split(",").forEach(q=>v.querySelectorAll(q).forEach((el,i)=>{if(el.scrollLeft||el.scrollTop)keep.push([q,i,el.scrollLeft,el.scrollTop])}));
-  v.innerHTML={dash:vDash,fuel:vFuel,body:vBody,train:vTrain,pass:vPass,set:vSet}[tab]()+`<footer class="foot">This is not a replacement for measuring your true progress away from the screen. This app is designed for those preferring organization.</footer>`;
+  v.innerHTML={dash:vDash,fuel:vFuel,body:vBody,train:vTrain,pass:vPass,set:vSet}[tab]()+`<footer class="foot">This is not a replacement for measuring your true progress away from the screen. This app is designed for those preferring organization.<br>Inspired by Lose It!</footer>`;
   v.scrollTop=y;keep.forEach(([q,i,x,t])=>{const el=v.querySelectorAll(q)[i];if(el){const sb=el.style.scrollBehavior;el.style.scrollBehavior="auto";el.scrollLeft=x;el.scrollTop=t;el.style.scrollBehavior=sb}});
   $("#ttl").innerHTML=`${TITLES[tab][0]}<small>${TITLES[tab][1]}</small>`;
   document.querySelectorAll(".navbtn").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab));
@@ -4115,7 +4115,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="163";if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
+const APPV="164";if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
