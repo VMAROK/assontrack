@@ -2314,7 +2314,8 @@ function catDayToggle(c,i){const a=schedOf(i),add=!a.includes(c);data.wsched=dat
 function askHTML(src){const q=catDayAsk;if(!q||q.src!==src)return "";const n=catPlans(q.c).length,ds=catDays(q.c).map(i=>DAYS[i]).join(", ");
   return `<div class="cd-ask" role="alertdialog" aria-label="Apply days to workouts" style="--cc:${catCol(q.c)}"><p><b>${esc(q.c)}</b> is now on <b>${DAYS[q.i]}</b>. Put all ${n} of its workout${n===1?"":"s"} on ${esc(ds)} too?</p><div><button class="tp-tile done" data-cdall>Override all ${n===1?"":n+" "}workout${n===1?"":"s"}</button><button class="tp-tile plain" data-cdleave>Leave each workout's own days</button></div></div>`}
 function splitHTML(){const td=dayIdx(today()),wk0=wkOf(today()),PL=data.plans||[];
-  const tile=(dn,i)=>{const c=schedOf(i),pn=dayPlans(i).filter(p=>!pCats(p).some(x=>c.includes(x))),n=PL.filter(p=>lands(p,i)).length,x=new Date(wk0+"T12:00");x.setDate(x.getDate()+i);
+  const every=PL.filter(p=>!pDays(p).length&&!DAYS.some((_,k)=>inDay(p,schedOf(k)))),evC=[...new Set(every.map(p=>pCats(p)[0]).filter(Boolean))],evP=every.filter(p=>!pCats(p).length);   /* no day set = every day */
+  const tile=(dn,i)=>{const c=[...schedOf(i),...evC.filter(k=>!schedOf(i).includes(k))],pn=[...dayPlans(i).filter(p=>!pCats(p).some(x=>c.includes(x))),...evP],n=PL.filter(p=>onDay(p,i)).length,x=new Date(wk0+"T12:00");x.setDate(x.getDate()+i);
     const chips=[...c.map(k=>`<span class="sp-chip" style="--cc:${PPCOL[k]||catCol(k)}"><i></i>${esc(k)}</span>`),...pn.map(p=>`<span class="sp-chip pin" style="--cc:${catCol(pCats(p)[0]||"")}"><i></i>${esc(p.name)}</span>`)],shown=chips.slice(0,3),more=chips.length-shown.length;
     return `<button class="sp-d${i===td?" td":""}${i===splitDay?" sel":""}${chips.length?" has":""}" data-spday="${i}" aria-pressed="${i===splitDay}" aria-label="${dn}${chips.length?": "+[...c,...pn.map(p=>p.name)].join(", "):": rest day"}">
       <span class="sp-top"><small>${dn}</small><em>${x.getDate()}</em></span>
@@ -4220,7 +4221,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="186",APPT="2026-11-18T16:35:00-05:00";   /* APPT: when this update was made */
+const APPV="187",APPT="2026-11-18T16:38:00-05:00";   /* APPT: when this update was made */
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
