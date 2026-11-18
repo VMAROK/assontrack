@@ -1283,7 +1283,9 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .wk-bar{margin:0 0 10px}.wk-bar.sub{margin-top:-2px}.wk-bar .cat-tab{padding:8px 14px}.wk-bar .wk-dot{width:8px;height:8px;border-radius:50%;background:var(--cc);display:inline-block;box-shadow:0 0 6px var(--cc)}
 .wk-board{display:flex;flex-wrap:wrap;gap:0;border:1px solid rgba(var(--lr),.28);border-radius:14px;background:rgba(var(--tX),.32);overflow:hidden}
 .wk-sec{flex:1 1 auto;min-width:0;max-width:100%;padding:12px 14px 4px;border-top:2px solid var(--cc);border-right:1px solid rgba(var(--lr),.2);background:linear-gradient(180deg,color-mix(in srgb,var(--cc) 8%,transparent),transparent 90px)}
-.wk-sec .sh-lane{background:none;border:0;padding:0}.wk-sec .sh-lanes{gap:2px 22px}
+.wk-sec .sh-lane{background:none;border:0;padding:0;max-width:100%}.wk-sec .sh-lanes{gap:2px 22px}
+.wk-board{display:block}.wk-sec{display:block;width:100%;border-right:0}.wk-sec+.wk-sec{border-top-width:2px}
+.wk-sec .sh-row{flex-wrap:wrap;overflow:visible;scroll-snap-type:none}.wk-sec .sh-row>.tp-card{flex:0 0 262px;max-width:100%}
 .sp-d b span{display:block;color:var(--cc)}.sp-today .btn{padding:7px 14px;font-size:13px}
 .sh{--cc:#7fb8ff;margin:0 0 16px;padding:12px 12px 4px;border-radius:16px;border:1px solid color-mix(in srgb,var(--cc) 38%,transparent);background:linear-gradient(180deg,color-mix(in srgb,var(--cc) 10%,transparent),transparent 140px)}
 .sh-h{display:flex;align-items:center;gap:8px;margin:0 2px 10px;flex-wrap:wrap}.sh-h i{width:10px;height:10px;border-radius:50%;background:var(--cc);box-shadow:0 0 8px var(--cc);flex:none}.sh-h b{font-size:15px;color:#eef3ff}.sh-h small{margin-left:auto;color:var(--muted);font-size:12px}
@@ -2241,7 +2243,7 @@ function planList(d,PL){ppMigrate(d);const cats=wcatAll(),none=PL.filter(p=>!pCa
 function wkSec(d,c,IN,only,td,PL){const subs=c?wsubAll(c).filter(x=>IN.some(p=>pSub(p,c)===x)):[],gen=IN.filter(p=>!c||!subs.includes(pSub(p,c)));
   let lanes=subs.map(x=>[x,IN.filter(p=>pSub(p,c)===x)]);if(gen.length)lanes.push([subs.length?"General":"",gen]);if(only)lanes=lanes.filter(l=>l[0]===only);
   const asg=c&&wkAssign===c;
-  return `<section class="wk-sec" style="--cc:${catCol(c)}" aria-label="${esc(c||"No category")} workouts"><div class="sh-h"><i></i><b>${esc(c||"No category")}</b>${c&&td.includes(c)?`<span class="sh-td">Today</span>`:""}<small>${IN.length} workout${IN.length===1?"":"s"}</small>${c?`<button class="tp-tile${asg?" done":" add"} wk-asg" data-wkassign="${esc(c)}">${asg?"Done":"＋ Assign workouts"}</button>`:""}</div>
+  return `<section class="wk-sec" style="--cc:${catCol(c)}" aria-label="${esc(c||"No category")} workouts"><div class="sh-h"><i></i><b>${esc(c||"Not in a category")}</b>${c&&td.includes(c)?`<span class="sh-td">Today</span>`:""}<small>${IN.length} workout${IN.length===1?"":"s"}</small>${c?`<button class="tp-tile${asg?" done":" add"} wk-asg" data-wkassign="${esc(c)}">${asg?"Done":"＋ Assign workouts"}</button>`:""}</div>
     ${asg?`<div class="wk-asgbox"><small>Tap a workout to put it in or take it out of ${esc(c)}.</small><div class="tp-tiles">${PL.map(p=>{const on=pCats(p).includes(c);return `<button type="button" class="tp-tile${on?" on":""}" style="--cc:${catCol(c)}" aria-pressed="${on}" data-wkput="${p.id}" data-wkc="${esc(c)}"><span>${esc(p.name)}</span>${ppOf(p.mus).map(x=>`<b class="pp-dot" style="--pp:${PPCOL[x]}" title="${x}"></b>`).join("")}</button>`}).join("")||`<small>No workouts yet. Design one below.</small>`}</div></div>`:""}
     ${IN.length?`<div class="sh-lanes">${lanes.map(([x,ps])=>`<div class="sh-lane">${x?`<div class="sh-lh">${esc(x)} <em>${ps.length}</em></div>`:""}<div class="sh-row">${ps.map(pl=>planCard(d,pl,true)).join("")}</div></div>`).join("")}</div>`:asg?"":`<p class="wk-empty">Nothing in ${esc(c)} yet. Tap <b>＋ Assign workouts</b> to add some.</p>`}</section>`}
 function musWeekPanel(d){const S=musWeek(d),mx=Math.max(1,...Object.values(S)),H={};Object.entries(S).forEach(([k,v])=>H[k]=v/Math.max(mx,10));const hit=MUS.filter(([k])=>S[k]),miss=MUS.filter(([k])=>!S[k]);
@@ -3983,7 +3985,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="132";
+const APPV="133";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
