@@ -1242,7 +1242,11 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .mc-stats{display:flex;justify-content:space-between;gap:8px;margin:6px 0 8px;font-size:12px;color:var(--muted)}.mc-stats b{color:#e6eeff;font-size:14px}
 .mc-ex{display:flex;flex-wrap:wrap;gap:6px}.mc-ex button{font:inherit;font-size:12px;padding:4px 9px;border-radius:99px;cursor:pointer;color:#e6eeff;background:color-mix(in srgb,var(--mc) 18%,transparent);border:1px solid color-mix(in srgb,var(--mc) 50%,transparent)}
 
-.gy-box{max-width:520px}.gy-q{width:100%;margin-bottom:8px}.gy-list{display:grid;gap:4px;max-height:52vh;overflow-y:auto;overscroll-behavior:contain}
+.gy-box{max-width:520px}
+#gySheet{padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
+.gy-box.gy-big{width:100%;max-width:1100px;height:94vh;height:94dvh;display:flex;flex-direction:column;gap:8px;overflow:hidden}.gy-big>*{flex:none;margin:0!important}
+.gy-big .gy-list{flex:1 1 auto;min-height:0;max-height:none;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));align-content:start;padding-bottom:4px}
+@media (orientation:landscape) and (max-height:560px){.gy-box.gy-big{height:100%;max-height:none;padding:10px 14px}.gy-big .gy-list{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.gy-big .gy-card .mv{max-height:96px}.gy-box.gy-big{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr);gap:8px 12px}.gy-big>.ph,.gy-big>.gy-list{grid-column:1/-1}.gy-big>p.note{display:none}.gy-big>.gy-q{align-self:center}.gy-big>.gy-gyms{align-self:center}}.gy-q{width:100%;margin-bottom:8px}.gy-list{display:grid;gap:4px;max-height:52vh;overflow-y:auto;overscroll-behavior:contain}
 .gy-list button{display:flex;justify-content:space-between;align-items:baseline;gap:10px;text-align:left;font:inherit;color:#e6eeff;background:rgba(var(--tX),.5);border:1px solid rgba(var(--lr),.2);border-radius:10px;padding:9px 12px;cursor:pointer}.gy-list button:hover{border-color:rgba(var(--tL),.6)}.gy-list small{color:var(--muted);font-size:12px}
 .mv{display:block;width:100%;height:auto}.mv .f{fill:none;stroke:#9db7e6;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}.mv .p{fill:#1d3157;stroke:#9db7e6;stroke-width:1.6}.mv .hp{fill:rgba(110,220,255,.25);stroke:#7fe0ff;stroke-width:1.8}.mv .h{fill:none;stroke:#7fe0ff;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}.mv .k{fill:#2f4f86}.mv .a{fill:none;stroke:#ffc978;stroke-width:1.8;stroke-dasharray:3 2.5;stroke-linecap:round}
 .gy-list button .mv{flex:none;width:58px;background:rgba(var(--tX),.35);border-radius:8px}.gy-list button .gy-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
@@ -2219,7 +2223,7 @@ function gymPick(G,q){const gk=gymCur(),gy=GYMS[gk],row=m=>`<button class="gy-ca
     <div class="gy-pic">${mvSvg(m[0])}</div><div class="gy-main">${musSvg(m[2],{lab:false})}<div><div class="tp-tags">${ms.map(([k,v])=>`<span class="tp-tag l${v}">${MUSN[k]}</span>`).join("")}</div>
       <div class="gy-btns col"><button class="btn" data-glog>Log a set on it</button>${pls.map(p=>`<button class="btn ghost" data-gadd="${p.id}">Add to ${esc(p.name)}</button>`).join("")}<button class="btn ghost" data-gnew>${tPlan?"Add to the workout I'm designing":"New workout with it"}</button></div></div></div>
     ${G.code?`<button class="linkbtn" data-gno style="margin-top:8px">Not this machine? Change it</button>`:""}`}
-function gymShow(){let o=document.getElementById("gySheet");if(!gymSheet){o&&o.remove();return}if(!o){o=document.createElement("div");o.id="gySheet";o.className="scan";o.innerHTML=`<div class="scan-box panel gy-box" role="dialog" aria-label="Gym machine"></div>`;document.body.appendChild(o)}o.firstChild.innerHTML=gymHTML()}
+function gymShow(){let o=document.getElementById("gySheet");if(!gymSheet){o&&o.remove();return}if(!o){o=document.createElement("div");o.id="gySheet";o.className="scan";o.innerHTML=`<div class="scan-box panel gy-box" role="dialog" aria-label="Gym machine"></div>`;document.body.appendChild(o)}o.firstChild.innerHTML=gymHTML();o.firstChild.classList.toggle("gy-big",!gymSheet.m&&!gymSheet.guess)}
 document.addEventListener("input",e=>{if(e.target.id==="gyQ"&&gymSheet){gymSheet.q=e.target.value;const pos=e.target.selectionStart;gymShow();const i=$("#gyQ");if(i){i.focus();try{i.setSelectionRange(pos,pos)}catch(_){}}}});
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-gscan],[data-gfind],[data-ggym],[data-gpickopen],[data-gclose],[data-gyes],[data-gno],[data-glog],[data-gadd],[data-gnew],#gySheet");if(!t)return;
   if(t.dataset.gscan!==undefined){scanOpen("gym");return}
@@ -3862,7 +3866,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="125";
+const APPV="126";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
