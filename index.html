@@ -1191,6 +1191,8 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .lines-sw{display:inline-flex}
 
 /* training */
+.tp-card .tp-tags,.tp-card .tp-dys{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;touch-action:pan-x pan-y;mask-image:linear-gradient(90deg,#000 calc(100% - 18px),transparent);-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 18px),transparent);padding-right:14px}
+.tp-card .tp-tags::-webkit-scrollbar,.tp-card .tp-dys::-webkit-scrollbar{display:none}.tp-card .tp-tags>*,.tp-card .tp-dys>*{flex:none;white-space:nowrap}
 .wk-allp>.sh-h{margin-bottom:12px}
 .wk-cats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;gap:12px;padding-bottom:12px}
 .wk-sec.wk-catc{width:auto;max-width:none;min-width:0;box-sizing:border-box;padding:10px 10px 0;border:1px solid color-mix(in srgb,var(--cc) 40%,transparent);border-top:3px solid var(--cc);border-radius:14px;background:linear-gradient(180deg,color-mix(in srgb,var(--cc) 12%,transparent),rgba(var(--tX),.35) 120px);box-shadow:0 0 18px color-mix(in srgb,var(--cc) 12%,transparent)}
@@ -3922,8 +3924,11 @@ function render(){
   v.scrollTop=y;keep.forEach(([q,i,x,t])=>{const el=v.querySelectorAll(q)[i];if(el){const sb=el.style.scrollBehavior;el.style.scrollBehavior="auto";el.scrollLeft=x;el.scrollTop=t;el.style.scrollBehavior=sb}});
   $("#ttl").innerHTML=`${TITLES[tab][0]}<small>${TITLES[tab][1]}</small>`;
   document.querySelectorAll(".navbtn").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab));
-  placeBranch();applyWall();applyWallBlur();applyLook();preloadWalls();holoMount();dbgLabels();
+  placeBranch();applyWall();applyWallBlur();applyLook();preloadWalls();holoMount();eqCards();dbgLabels();
 }
+/* every workout card in the All workouts panel is as tall as the tallest one */
+function eqCards(){const cs=[...document.querySelectorAll("#view .wk-catc .tp-card")];if(!cs.length)return;cs.forEach(c=>c.style.minHeight="");const h=Math.max(...cs.map(c=>c.offsetHeight));cs.forEach(c=>c.style.minHeight=h+"px")}
+addEventListener("resize",()=>eqCards());
 /* TEMPORARY: numbered labels on the Training tab so panels can be referred to by number. Delete this block and the dbgLabels() call above to remove. */
 const DBG_LABELS=true;
 let dbgOff=false;try{dbgOff=localStorage.getItem("aot-dbg-off")==="1"}catch(e){}
@@ -4073,7 +4078,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="156";if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
+const APPV="157";if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
