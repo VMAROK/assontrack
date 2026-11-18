@@ -2418,7 +2418,7 @@ function cardMorph(fn){const v=$("#view");if(!v||!Element.prototype.animate||mat
     else el.animate([{opacity:0,transform:"translateY(18px) scale(.95)"},{opacity:1,transform:"none"}],{duration:420,delay:lift+Math.min(born++,8)*45,easing:EZ,fill:"backwards"})});
   v.querySelectorAll(".wk-empty").forEach(el=>el.animate([{opacity:0},{opacity:1}],{duration:300,delay:lift,easing:"ease-out",fill:"backwards"}))}
 function planList(d,PL){ppMigrate(d);const dayF=splitDay>=0;if(dayF)PL=PL.filter(p=>onDay(p,splitDay));const cats=wcatAll().filter(c=>!dayF||PL.some(p=>pCats(p).includes(c))),none=PL.filter(p=>!pCats(p).length);
-  const DFULL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],dayHead=dayF?`<div class="wk-dayh" id="wkDayH"><b>${DFULL[splitDay]}</b><span>${PL.length} workout${PL.length===1?"":"s"}</span><button class="tp-tile plain" data-spday="${splitDay}">Show all workouts</button></div>`:"";
+  const DFULL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],dayHead="";   /* the highlighted day in the weekly split already shows which day is filtered */
   if(dayF&&!PL.length)return dayHead+`<p class="wk-empty" style="margin:4px 2px 0">Nothing planned for ${DFULL[splitDay]}. Set days on a category or a workout.</p>`;if(planF&&!cats.includes(planF))planF="";
   const nw=`<button class="tp-new" data-pnew>${musSvg({},{lab:false})}<b>＋ Design a workout</b><small>Pick the exercises and the muscles they hit</small></button>`;
   const tab=(attr,v,n,k,on,c)=>`<button class="cat-tab" role="tab" aria-selected="${on}" ${attr}="${esc(v)}"${c?` style="--cc:${c}"`:""}>${c?`<b class="wk-dot"></b>`:""}${esc(n)}<i>${k}</i></button>`;
@@ -4220,7 +4220,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="183",APPT="2026-11-18T16:28:00-05:00";   /* APPT: when this update was made */
+const APPV="184",APPT="2026-11-18T16:30:00-05:00";   /* APPT: when this update was made */
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
