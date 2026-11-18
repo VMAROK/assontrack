@@ -1280,6 +1280,7 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .wk-bar .cat-tab.add{color:rgba(var(--tL),1);font-weight:600;font-size:13px;padding:8px 14px}.wk-newin{padding:4px 6px!important;gap:6px}.wk-newin input{width:150px;height:32px;font-size:13.5px;padding:0 9px;border-radius:6px}.wk-newin .tp-tile{min-height:32px}
 .wk-asg{margin-left:10px;min-height:30px;font-size:12.5px}.wk-asgbox{display:grid;gap:8px;margin:0 2px 12px;padding:10px;border-radius:8px;background:#0f1933;border:1px solid rgba(var(--lr),.25)}.wk-asgbox small{font-size:12px;color:var(--muted)}
 .wk-empty{margin:0 2px 12px;font-size:13px;color:var(--muted)}
+.upd-red{margin-left:12px;margin-right:auto;font:inherit;font-size:13px;font-weight:700;color:#ff4d5e;background:rgba(255,77,94,.1);border:1px solid #ff4d5e;border-radius:6px;padding:4px 12px;cursor:pointer}.upd-red:hover{background:rgba(255,77,94,.2)}
 .wk-dayh{display:flex;align-items:center;gap:12px;margin:0 0 10px;padding:10px 12px;border-radius:8px;background:#14203f;border:1px solid rgba(var(--tL),.6);scroll-margin-top:90px}.wk-dayh b{font-size:16px;color:#eef3ff}.wk-dayh span{font-size:13px;color:var(--muted)}.wk-dayh .tp-tile{margin-left:auto;min-height:34px;padding:0 14px}
 .cd-ask{display:grid;gap:10px;margin:0 2px 12px;padding:12px;border-radius:8px;background:#121d3b;border:1px solid var(--cc);box-shadow:0 0 0 1px color-mix(in srgb,var(--cc) 30%,transparent),0 8px 24px rgba(0,0,0,.35)}.cd-ask p{margin:0;font-size:13.5px;line-height:1.4}.cd-ask>div{display:flex;flex-wrap:wrap;gap:8px}.cd-ask .tp-tile{min-height:38px;padding:0 14px}
 .sp-d b .sp-pin{color:#dbe5fb;font-weight:500}.sp-pickh{font-size:12px;font-weight:600;color:var(--muted);margin:2px 2px -2px}.sp .cd-ask{margin:2px 0 0}
@@ -2250,8 +2251,14 @@ function planForm(d){const P=tPlan,sug=sugMus(P.ex),hasSug=Object.keys(sug).leng
     <div class="tp-chips" id="tpChips">${MUS.map(([k,n])=>`<button type="button" class="tp-chip l${P.mus[k]||0}" data-mtap="${k}">${n}</button>`).join("")}</div></div>
    <div class="tp-acts"><button class="btn" data-tpsave>Save workout</button><button class="btn ghost" data-tpcancel>Cancel</button>${P.id?`<button class="btn ghost danger" data-tpdelete>Delete</button>`:""}</div></div>`}
 function planPanel(d){const PL=d.plans||[];
-  return `<div class="panel tpp" style="margin-top:18px"><div class="ph"><span>${tPlan?(tPlan.id?"Edit workout":"Design a workout"):"My workouts"}</span><i>${tPlan?"":PL.length?PL.length+" saved":""}</i></div>
+  return `<div class="panel tpp" style="margin-top:18px"><div class="ph"><span>${tPlan?(tPlan.id?"Edit workout":"Design a workout"):"My workouts"}</span>${tPlan?"":`<button class="upd-red" data-forceupd title="Get the newest version (you have ${APPV})">Update</button>`}<i>${tPlan?"":PL.length?PL.length+" saved":""}</i></div>
     ${tPlan?planForm(d):todayHTML(d)+splitHTML()+planList(d,PL)}</div>`}
+async function forceUpdate(b){if(b)b.textContent="Updating…";try{sessionStorage.removeItem("aot-upd2");sessionStorage.removeItem("aot-upd")}catch(e){}
+  try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k!=="aot-img").map(k=>caches.delete(k)))}catch(e){}
+  try{const rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(r=>r.unregister()))}catch(e){}
+  try{await Promise.race([Promise.all(["./","index.html","sw.js","version.txt"].map(u=>fetch(u,{cache:"reload"}))),new Promise(r=>setTimeout(r,4000))])}catch(e){}
+  location.reload()}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-forceupd]");if(b)forceUpdate(b)});
 function planList(d,PL){ppMigrate(d);const dayF=splitDay>=0;if(dayF)PL=PL.filter(p=>onDay(p,splitDay));const cats=wcatAll().filter(c=>!dayF||PL.some(p=>pCats(p).includes(c))),none=PL.filter(p=>!pCats(p).length);
   const DFULL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],dayHead=dayF?`<div class="wk-dayh" id="wkDayH"><b>${DFULL[splitDay]}</b><span>${PL.length} workout${PL.length===1?"":"s"}</span><button class="tp-tile plain" data-spday="${splitDay}">Show all workouts</button></div>`:"";
   if(dayF&&!PL.length)return dayHead+`<p class="wk-empty" style="margin:4px 2px 0">Nothing planned for ${DFULL[splitDay]}. Set days on a category or a workout.</p>`;if(planF&&!cats.includes(planF))planF="";
@@ -4018,7 +4025,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="141";
+const APPV="142";
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
   async function check(){if(busy||document.visibilityState!=="visible")return;busy=true;try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=parseInt((await r.text()).trim(),10);if(!(v>+APPV))return;
