@@ -1191,10 +1191,10 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .lines-sw{display:inline-flex}
 
 /* training */
-.trwk .tr-days{gap:8px;align-items:stretch}
-.trwk .tr-day{align-content:start;min-height:112px;padding:10px 6px 8px;border-radius:12px;background:rgba(var(--tX),.4);border:1px solid rgba(var(--lr),.22)}
-.trwk .tr-day.td{border:2px solid rgba(var(--tL),1);box-shadow:0 0 12px rgba(var(--tL),.3)}
-.trwk .tr-day.on{background:rgba(61,220,132,.12);border-color:rgba(61,220,132,.6)}.trwk .tr-day.on.td{border-color:#3ddc84}
+.trwk .tr-days{gap:0;align-items:stretch;border:1px solid rgba(var(--lr),.28);border-radius:12px;overflow:hidden}
+.trwk .tr-day{position:relative;align-content:start;min-height:112px;padding:10px 6px 8px;border-radius:0;background:rgba(var(--tX),.4);border:0;border-left:1px solid rgba(var(--lr),.22)}.trwk .tr-day:first-child{border-left:0}
+.trwk .tr-day.td{box-shadow:inset 0 0 0 2px rgba(var(--tL),1);z-index:1}
+.trwk .tr-day.on{background:rgba(61,220,132,.14)}.trwk .tr-day.on.td{box-shadow:inset 0 0 0 2px #3ddc84}
 .trwk .tr-day.fut{opacity:.7}.trwk .tr-day.fut i{opacity:1}
 .trwk .tr-day i{width:34px;height:34px;border-radius:8px;border-color:transparent;background:rgba(var(--tX),.55)}.trwk .tr-day.td i{border:0;color:#fff;font-weight:700}
 .trwk .tr-day small{font-size:11px;font-weight:600;letter-spacing:.06em}.trwk .tr-cat{font-size:10px}
@@ -4396,7 +4396,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="219",APPT="2026-11-18T20:06:00-05:00";   /* APPT: when this update was made */
+const APPV="220",APPT="2026-11-18T20:04:00-05:00";   /* APPT: when this update was made */
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
