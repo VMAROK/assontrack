@@ -2213,11 +2213,9 @@ function trLast(d,name){const k=trKey(name);if(!k)return null;const W=byDate(d.w
 function trNext(d,w){if(!w||!+w.kg)return "";const step=d.goals.unit==="kg"?2.5:5;return (Math.round((+w.kg+step)*10)/10)}
 function trWeekPanel(d,T){const F=fitLevel(d),n=T.thisDays.size,G=T.G,pc=Math.min(100,n/G*100);
   const dots=DAYS.map((dn,i)=>{const x=new Date(T.wk0+"T12:00");x.setDate(x.getDate()+i);const ds=ymd(x),on=T.thisDays.has(ds),td=ds===today(),fut=ds>today();return `<div class="tr-day${on?" on":""}${td?" td":""}${fut?" fut":""}" title="${fmtDate(ds)}${on?": trained":""}"><i>${on?`<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`:x.getDate()}</i><small>${dn.slice(0,1)}</small>${dayLabel(i).length?`<em class="tr-cat">${dayLabel(i).map(esc).join(" + ")}</em>`:""}</div>`}).join("");
-  return `<div class="panel trwk"><div class="ph"><span>This week</span>${demoOn()?"<i></i>":trEdit?`<span class="tg-acts"><button class="dview" data-trcancel style="margin:0">Cancel</button><button class="dview" data-trsave style="margin:0;color:rgba(var(--tL),1);opacity:1">Save</button></span>`:`<button class="dview" data-tredit style="margin:0">Edit goal</button>`}</div>
-    <div class="tr-goal"><b>${n}<em> of ${trEdit?`<select id="trG" aria-label="Training days per week">${[1,2,3,4,5,6,7].map(k=>`<option ${k===G?"selected":""}>${k}</option>`).join("")}</select>`:G} days</em></b><small style="${n>=G?"color:#3ddc84":""}">${n>=G?"Goal reached this week":G-n===1?"1 more day to go":(G-n)+" more days to go"}</small></div>
-    <div class="tg-bar"><i style="width:${pc.toFixed(1)}%;background:${n>=G?"#3ddc84":"rgba(var(--tL),1)"};box-shadow:0 0 8px ${n>=G?"#3ddc84":"rgba(var(--tL),.8)"}"></i></div>
+  return `<div class="panel trwk"><div class="ph"><span>This week</span></div>
     <div class="tr-days">${dots}</div>
-    ${dayLabel(dayIdx(today())).length?`<p class="tr-cap" style="margin-top:8px">Today: <b>${dayLabel(dayIdx(today())).map(esc).join(" + ")}</b></p>`:""}<p class="tr-cap"><b>${F.name}</b> · ${F.cap}</p></div>`}
+    </div>`}
 /* workout log: today's planned exercises, boxed by category. The big check marks a whole exercise done; the set pips let you tick sets one by one. Logged for today as you go */
 /* "3 × 10" or "3 × 30 s" for timed exercises */
 const exS=e=>`${e.sets} × ${e.reps}${e.unit==="s"?" s":""}`;
@@ -4396,7 +4394,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="221",APPT="2026-11-18T20:14:00-05:00";   /* APPT: when this update was made */
+const APPV="222",APPT="2026-11-18T20:16:00-05:00";   /* APPT: when this update was made */
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
