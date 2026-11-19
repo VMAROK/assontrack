@@ -1191,6 +1191,7 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .lines-sw{display:inline-flex}
 
 /* training */
+.tile.tdn{gap:4px;padding:14px}.tdonut{width:86px;height:86px}
 .trwk .tr-days{gap:0;align-items:stretch;border:1px solid rgba(var(--lr),.28);border-radius:12px;overflow:hidden}
 .trwk .tr-day{position:relative;align-content:start;min-height:112px;padding:10px 6px 8px;border-radius:0;background:rgba(var(--tX),.4);border:0;border-left:1px solid rgba(var(--lr),.22)}.trwk .tr-day:first-child{border-left:0}
 .trwk .tr-day.td{box-shadow:inset 0 0 0 2px rgba(var(--tL),1);z-index:1}
@@ -2227,6 +2228,15 @@ const dsDone=(d,pl,e,ds)=>(d.workouts||[]).find(w=>w.d===ds&&w.plan===pl.id&&trK
 const tlSets=e=>Math.max(1,Math.min(12,parseInt(e.sets)||1));
 const tlFull=(d,pl,e)=>{const w=tckDone(d,pl,e);return !!w&&(+w.sets||0)>=tlSets(e)};
 const CKSVG=`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
+/* top tiles: today's sets done (donut), this week's planned workouts done (donut), what you moved today */
+function donut(pc,col,txt){const R=30,C=2*Math.PI*R,f=Math.max(0,Math.min(1,pc));return `<svg class="tdonut" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="${R}" fill="none" stroke="rgba(150,180,240,.16)" stroke-width="8"/><circle cx="40" cy="40" r="${R}" fill="none" stroke="${col}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${(C*f).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 40 40)" style="filter:drop-shadow(0 0 4px ${col})"/><text x="40" y="45" text-anchor="middle" font-size="17" font-weight="700" fill="#eef3ff" font-family="var(--mono)">${txt}</text></svg>`}
+function trTiles(d){const T=today(),u=d.goals.unit,PL=tlPlans(d);let sp=0,sd=0;PL.forEach(p=>p.ex.forEach(e=>{const S=tlSets(e);sp+=S;const w=dsDone(d,p,e,T);sd+=w?Math.min(S,+w.sets||0):0}));
+  const wk0=wkOf(T);let wp=0,wd=0;for(let i=0;i<7;i++){const x=new Date(wk0+"T12:00");x.setDate(x.getDate()+i);const ds=ymd(x);(d.plans||[]).filter(p=>p.ex&&p.ex.length&&onDay(p,i)).forEach(p=>{wp++;if(p.ex.every(e=>{const w=dsDone(d,p,e,ds);return w&&(+w.sets||0)>=tlSets(e)}))wd++})}
+  const WO=(d.workouts||[]).filter(w=>w.d===T&&!w.hk);let vol=0,secs=0,reps=0;WO.forEach(w=>{const k=(+w.sets||0)*(+w.reps||0);if(w.unit==="s")secs+=k;else{reps+=k;vol+=k*(+w.kg||0)}});
+  const fmt=v=>v>=1e4?(v/1e3).toFixed(1)+"k":n0(v);const mt=s=>s>=60?Math.floor(s/60)+"m "+(s%60?s%60+"s":""):s+"s";
+  return `<div class="panel tile tdn" style="--c:var(--lime)"><small>Today</small>${donut(sp?sd/sp:0,"#3ddc84",sp?Math.round(sd/sp*100)+"%":"–")}<em>${sp?sd+" of "+sp+" sets":"nothing planned"}</em></div>
+    <div class="panel tile tdn" style="--c:var(--cyan)"><small>This week</small>${donut(wp?wd/wp:0,"rgba(var(--tL),1)",wp?wd+"/"+wp:"–")}<em>${wp?"planned workouts done":"nothing planned"}</em></div>
+    <div class="panel tile" style="--c:var(--amber)">${ic("bolt")}<small>Moved today</small><b>${vol?fmt(vol):reps?n0(reps):secs?mt(secs):"0"}</b><em>${vol?u+" lifted":reps?"reps":secs?"held":"nothing logged yet"}${vol&&secs?" · "+mt(secs)+" held":""}</em></div>`}
 function trLogPanel(d,T){const u=d.goals.unit,PL=tlPlans(d),groups=[];
   PL.forEach(p=>{const c=pCats(p)[0]||"";let g=groups.find(x=>x.c===c);if(!g)groups.push(g={c,ps:[]});g.ps.push(p)});groups.sort((a,b)=>(a.c?0:1)-(b.c?0:1));
   let all=0,done=0;
@@ -2742,9 +2752,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&gymSheet){gymSheet=
 function vTrain(){
   const d=D(),u=d.goals.unit,T=trStats(d),F=fitLevel(d),dv=T.lastVol?Math.round((T.vol-T.lastVol)/T.lastVol*100):null,lastW=T.WO.length?T.WO[T.WO.length-1]:null;
   return banner()+`<div class="grid tiles">
-    <div class="panel tile" style="--c:var(--lime)">${ic("dumb")}<small>This week</small><b>${T.thisDays.size}/${T.G}</b><em>training days</em></div>
-    <div class="panel tile" style="--c:var(--amber)">${ic("fire")}<small>Streak</small><b>${T.streak}</b><em>${T.streak===1?"week":"weeks"} on goal</em></div>
-    <div class="panel tile" style="--c:var(--cyan)">${ic("bolt")}<small>Lifted this week</small><b>${T.vol>=1e4?(T.vol/1e3).toFixed(1)+"k":n0(T.vol)}</b><em>${T.lastVol?u+" · last week "+(T.lastVol>=1e4?(T.lastVol/1e3).toFixed(1)+"k":n0(T.lastVol)):u}</em></div>
+${trTiles(d)}
     <div class="panel tile" style="--c:var(--violet)">${ic("star")}<small>Fitness</small><b>${F.name}</b><em>${lastW?"last workout "+(lastW.d===today()?"today":fmtDate(lastW.d)):"no workouts yet"}</em></div>
   </div>
   <div class="passtop figtop bodytop trtop" style="margin-top:18px">${figurePanel()}
@@ -3942,10 +3950,10 @@ const WALLS=[
   {id:"liveportal",name:"Live portal",live:"portal",src:"wp/m/portal.jpg",pos:"50% 50%",shade:.1},
   {id:"livedub",name:"Live dub",live:"dub",src:"wp/m/deepdub.jpg",pos:"50% 50%",shade:0},
   {id:"livechrome",name:"Live silver",live:"chrome",src:"wp/m/pearl.jpg",pos:"50% 50%",shade:0},
-  {id:"fracseahorse",name:"Chrome seahorse",live:"fseahorse",src:"wp/m/fracseahorse.jpg",pos:"50% 50%",shade:0},
-  {id:"fracswirl",name:"Chrome swirl",live:"fswirl",src:"wp/m/fracswirl.jpg",pos:"50% 50%",shade:0},
-  {id:"fracspiral",name:"Chrome spiral",live:"fspiral",src:"wp/m/fracspiral.jpg",pos:"50% 50%",shade:0},
-  {id:"fracbolt",name:"Chrome lightning",live:"fbolt",src:"wp/m/fracbolt.jpg",pos:"50% 50%",shade:0}];
+  {id:"fracseahorse",name:"Gold seahorse",live:"fseahorse",src:"wp/m/fracseahorse.jpg",pos:"50% 50%",shade:0},
+  {id:"fracswirl",name:"Rose gold swirl",live:"fswirl",src:"wp/m/fracswirl.jpg",pos:"50% 50%",shade:0},
+  {id:"fracspiral",name:"Gunmetal spiral",live:"fspiral",src:"wp/m/fracspiral.jpg",pos:"50% 50%",shade:0},
+  {id:"fracbolt",name:"Champagne lightning",live:"fbolt",src:"wp/m/fracbolt.jpg",pos:"50% 50%",shade:0}];
 const WGROUPS=[["Live · animated",["livefire","liveportal","livedub","livechrome"]],["Fractal zoom",["fracseahorse","fracswirl","fracspiral","fracbolt"]],["Landscape",["alpine","serenity","snow","moonlit","aurora","sunset","ocean","forest","dunes","sakura"]],["Kaleidoscope",["hyperspace","portal","royalgold","gilded","inferno","deepdub","pearl","chrome"]],["Fire",["fire","serpent"]],["Dream & space",["liminal","nebula","midnight"]]];
 const wallGroups=()=>{const A=allWalls(),out=WGROUPS.map(([n,ids])=>[n,ids.map(i=>A.find(w=>w.id===i)).filter(Boolean)]);const seen=new Set(WGROUPS.flatMap(g=>g[1]));const rest=A.filter(w=>!w.custom&&!seen.has(w.id));if(rest.length)out[out.length-1][1].push(...rest);const mine=A.filter(w=>w.custom);if(mine.length)out.push(["Yours",mine]);return out.filter(g=>g[1].length)};
 const stripWalls=f=>wallGroups().map(([n,ws])=>`<span class="tgroup">${esc(n)}</span>`+ws.map(f).join("")).join("");
@@ -3967,8 +3975,8 @@ function bestSrc(w,spin){if(w.custom||!HDW.has(w.id))return w.src;const need=Mat
 const spinner=on=>{const e=$("#bgspin");if(e)e.classList.toggle("show",on)};
 /* live kaleidoscope: one shader, three palettes */
 /* fractal zoom: an endless dive into the Mandelbrot set, glowing along its edges */
-const FRAC_PAL={fseahorse:{sh:1,ctr:[-0.743643887037151,0.131825904205330],s0:1.6,s1:2e-4},fswirl:{sh:2,ctr:[0,0],jc:[-0.8,0.156],s0:1.8,s1:.003},
-  fspiral:{sh:2,ctr:[0,0],jc:[-0.7269,0.1889],s0:1.6,s1:.004},fbolt:{sh:2,ctr:[0,0],jc:[0,1],s0:1.6,s1:.003}};
+const FRAC_PAL={fseahorse:{tint:[1,.78,.36],sh:1,ctr:[-0.743643887037151,0.131825904205330],s0:1.6,s1:2e-4},fswirl:{tint:[.96,.62,.55],sh:2,ctr:[0,0],jc:[-0.8,0.156],s0:1.8,s1:.003},
+  fspiral:{tint:[.46,.5,.56],sh:2,ctr:[0,0],jc:[-0.7269,0.1889],s0:1.6,s1:.004},fbolt:{tint:[.93,.84,.64],sh:2,ctr:[0,0],jc:[0,1],s0:1.6,s1:.003}};
 const FRAC_FS=`precision highp float;uniform vec2 R;uniform float T;uniform vec2 Ctr,Jc;uniform float P,S0,S1,RO,SH;uniform vec3 TINT;float f(vec2 c){vec2 z=SH>1.5&&SH<2.5?c:vec2(0.);vec2 k=SH>1.5&&SH<2.5?Jc:c;float n=0.,m2=0.;for(int i=0;i<170;i++){if(SH>2.5&&SH<3.5)z=abs(z);if(SH>3.5)z.y=-z.y;z=vec2(z.x*z.x-z.y*z.y,2.*z.x*z.y)+k;m2=dot(z,z);if(m2>1e4)break;n+=1.;}return n>=169.?-1.:n-log2(log2(m2));}void main(){vec2 uv=(gl_FragCoord.xy-.5*R)/min(R.x,R.y);float ph=fract(T/P);float sc=S0*exp(-ph*log(S0/S1));float an=T*RO;mat2 rot=mat2(cos(an),-sin(an),sin(an),cos(an));uv=rot*uv;vec2 c=Ctr+uv*sc;float px=sc/min(R.x,R.y)*1.5;float h=f(c);vec3 col=vec3(.01);if(h>=0.){float hx=f(c+vec2(px,0.)),hy=f(c+vec2(0.,px));if(hx<0.)hx=h;if(hy<0.)hy=h;vec3 nrm=normalize(vec3((h-hx)*1.6,(h-hy)*1.6,1.));vec3 L=normalize(vec3(-.5,.6,.65));vec3 V=vec3(0.,0.,1.);vec3 Hh=normalize(L+V);float dif=max(dot(nrm,L),0.);float spe=pow(max(dot(nrm,Hh),0.),60.);vec3 rf=reflect(-V,nrm);float env=.5+.5*cos(rf.y*6.+rf.x*2.+h*.06);float band=.55+.45*cos(h*.18+T*.05);vec3 base=TINT*(.25+.75*env)*band;col=base*(.25+.9*dif)+vec3(1.)*spe*1.1+TINT*.04;}float fade=smoothstep(0.,.04,ph)*smoothstep(1.,.96,ph);float vig=1.-.45*dot(uv,uv);gl_FragColor=vec4(clamp(col*vig*fade,0.,1.),1.);}`;
 const LIVE_PAL={
   inferno:{ramp:[[.6,.03,.02],[1,.36,.05],[1,.8,.32]],gain:1.15,n:8,cx:-.55,cy:-.6},
@@ -3992,7 +4000,7 @@ function liveStart(cv,pal){const gl=cv.getContext("webgl",{antialias:false,alpha
   const uR=U("R"),uT=U("T");
   const fp=gl.createProgram();gl.attachShader(fp,sh(gl.VERTEX_SHADER,"attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}"));gl.attachShader(fp,sh(gl.FRAGMENT_SHADER,FRAC_FS));gl.bindAttribLocation(fp,loc,"p");gl.linkProgram(fp);const fOK=gl.getProgramParameter(fp,gl.LINK_STATUS);
   const FU=n=>gl.getUniformLocation(fp,n);let cur=pr,uR2=uR,uT2=uT;
-  const set=k=>{if(FRAC_PAL[k]&&fOK){const q=FRAC_PAL[k];gl.useProgram(fp);cur=fp;gl.uniform2fv(FU("Ctr"),q.ctr);gl.uniform2fv(FU("Jc"),q.jc||[0,0]);gl.uniform1f(FU("SH"),q.sh);gl.uniform3fv(FU("TINT"),[.82,.85,.9]);gl.uniform1f(FU("P"),75);gl.uniform1f(FU("S0"),q.s0);gl.uniform1f(FU("S1"),q.s1);gl.uniform1f(FU("RO"),.008);uR2=FU("R");uT2=FU("T")}else{gl.useProgram(pr);cur=pr;uR2=uR;uT2=uT;if(LIVE_PAL[k])setPal(k)}};
+  const set=k=>{if(FRAC_PAL[k]&&fOK){const q=FRAC_PAL[k];gl.useProgram(fp);cur=fp;gl.uniform2fv(FU("Ctr"),q.ctr);gl.uniform2fv(FU("Jc"),q.jc||[0,0]);gl.uniform1f(FU("SH"),q.sh);gl.uniform3fv(FU("TINT"),q.tint);gl.uniform1f(FU("P"),75);gl.uniform1f(FU("S0"),q.s0);gl.uniform1f(FU("S1"),q.s1);gl.uniform1f(FU("RO"),.008);uR2=FU("R");uT2=FU("T")}else{gl.useProgram(pr);cur=pr;uR2=uR;uT2=uT;if(LIVE_PAL[k])setPal(k)}};
   return {setPal:set,draw(t){gl.viewport(0,0,cv.width,cv.height);gl.uniform2f(uR2,cv.width,cv.height);gl.uniform1f(uT2,t);gl.drawArrays(gl.TRIANGLES,0,3)},gl}}
 
 let liveEng=null,liveRAF=0,liveKey=null,liveFail=false,liveLast=0;const liveT0=performance.now()-Math.random()*6e5;
@@ -4394,7 +4402,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="222",APPT="2026-11-18T20:16:00-05:00";   /* APPT: when this update was made */
+const APPV="223",APPT="2026-11-18T20:26:00-05:00";   /* APPT: when this update was made */
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
