@@ -1194,7 +1194,7 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .wk-sec.wk-allp{padding:0;border:0;background:none;box-shadow:none}.wk-allp .wk-cats{padding-bottom:0}
 /* binder tabs on top of the workouts page */
 .tpp .wk-barrow{margin:0;align-items:flex-end}
-.tpp .wk-barrow>.cat-bar{border:0!important;background:none!important;border-radius:0!important;overflow:visible!important;gap:4px;padding:0 6px;width:auto;margin:0}
+.tpp .wk-barrow>.cat-bar{border:0!important;background:none!important;border-radius:0!important;overflow:visible!important;gap:4px;padding:0;width:auto;margin:0}
 .tpp .wk-barrow .cat-tab{flex:0 0 auto;border:1px solid rgba(var(--lr),.24)!important;border-bottom:0!important;border-radius:10px 10px 0 0!important;background:rgba(var(--tX),.35)!important;margin-bottom:-1px;padding:8px 14px;color:var(--muted)}
 .tpp .wk-barrow .cat-tab[aria-selected=true]{background:color-mix(in srgb,rgb(var(--tL)) 16%,rgb(var(--tX)))!important;border-color:rgba(var(--tL),.6)!important;color:#eef3ff;padding-top:10px;padding-bottom:9px;margin-bottom:-1px;z-index:3;position:relative}
 .tpp .wk-barrow .cat-tab[aria-selected=true]::after{display:none}
@@ -4465,7 +4465,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="239",APPT="2026-11-18T21:22:00-05:00";   /* APPT: when this update was made */
+const APPV="240",APPT="2026-11-18T21:25:00-05:00";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
