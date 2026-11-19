@@ -1191,7 +1191,7 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .lines-sw{display:inline-flex}
 
 /* training */
-.tpx-r.dragmate{opacity:.45}
+.tpx-r.dragmate{display:none!important}.tpx-r.drag[data-carry]::after{content:attr(data-carry);position:absolute;right:-8px;top:-8px;min-width:24px;height:24px;padding:0 6px;border-radius:99px;display:grid;place-items:center;font-size:12px;font-weight:800;color:#081022;background:rgba(var(--tL),1);box-shadow:0 0 10px rgba(var(--tL),.7)}.tpx-r.drag[data-carry]{box-shadow:0 10px 26px rgba(0,0,0,.55),0 0 0 2px rgba(var(--tL),1),6px 6px 0 -1px rgba(var(--tX),.95),6px 6px 0 1px rgba(var(--tL),.7)}
 .tp-pick{width:44px;height:46px;margin-right:-8px;padding:0;display:grid;place-items:center;border:0;background:none;border-radius:10px;cursor:pointer;color:rgba(var(--lr),.75);-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;touch-action:manipulation}.tp-pick:hover{color:#cfe0ff}.tp-pick.on{color:rgba(var(--tL),1);filter:drop-shadow(0 0 5px rgba(var(--tL),.6))}.tp-pick.multi:not(.on){color:rgba(var(--tL),.7)}
 .tpm-bar{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:0 0 8px;padding:8px 10px;border-radius:10px;background:rgba(var(--tL),.12);border:1px solid rgba(var(--tL),.45)}.tpm-bar b{font-size:13px;margin-right:auto;color:#eef3ff}.tpm-bar.ask{background:rgba(255,77,94,.12);border-color:rgba(255,77,94,.55)}.tpm-bar.ask span{margin-right:auto;font-size:13px;color:#ffb3ba}
 .tpm-b{font:inherit;font-size:13px;font-weight:600;min-width:36px;height:34px;padding:0 12px;border-radius:8px;cursor:pointer;color:#e6eeff;background:rgba(var(--tX),.6);border:1px solid rgba(var(--lr),.35)}.tpm-b:disabled{opacity:.4;cursor:default}.tpm-b.danger{color:#ff8a95;border-color:rgba(255,93,108,.55)}.tpm-bar.ask .tpm-b.danger{background:#ff4d5e;color:#1a0306;border-color:#ff4d5e}
@@ -2477,15 +2477,17 @@ let tpDragS=null;
 
 document.addEventListener("click",e=>{if(e.target.closest&&e.target.closest("[data-tpselall]")){tpSel=-1;tpPaint()}});
 document.addEventListener("pointerdown",e=>{const h=e.target.closest&&e.target.closest("[data-tpdrag]");if(!h||!tPlan)return;e.preventDefault();const row=h.closest(".tpx-r"),r=row.getBoundingClientRect(),k=r.height/(row.offsetHeight||r.height)||1;
-  tpDragS={i:+h.dataset.tpdrag,row,y0:e.clientY,k,tgt:null,raf:0};row.classList.add("drag");if(tpMulti&&tpMulti.has(tPlan.ex[+h.dataset.tpdrag]))document.querySelectorAll(".tpx-r.sel").forEach(x=>x!==row&&x.classList.add("dragmate"));try{h.setPointerCapture(e.pointerId)}catch(_){}document.body.classList.add("tpx-dragging")});
+  tpDragS={i:+h.dataset.tpdrag,row,y0:e.clientY,k,tgt:null,raf:0};row.classList.add("drag");if(tpMulti&&tpMulti.has(tPlan.ex[+h.dataset.tpdrag])&&tpMulti.size>1){document.querySelectorAll(".tpx-r.sel").forEach(x=>x!==row&&x.classList.add("dragmate"));row.dataset.carry="+"+(tpMulti.size-1);const r2=row.getBoundingClientRect();tpDragS.y0=e.clientY-(r2.top-row.getBoundingClientRect().top)}try{h.setPointerCapture(e.pointerId)}catch(_){}document.body.classList.add("tpx-dragging")});
 document.addEventListener("pointermove",e=>{const D=tpDragS;if(!D)return;e.preventDefault();D.row.style.transform=`translateY(${(e.clientY-D.y0)/D.k}px)`;
   const v=$("#view");if(v){const vr=v.getBoundingClientRect();if(e.clientY<vr.top+60)v.scrollTop-=12;else if(e.clientY>vr.bottom-60)v.scrollTop+=12}
   document.querySelectorAll(".tpx .dropb,.tpx .dropa,.tpx .dropin").forEach(x=>x.classList.remove("dropb","dropa","dropin"));D.tgt=null;
-  D.row.style.visibility="hidden";const el=document.elementFromPoint(e.clientX,e.clientY);D.row.style.visibility="";if(!el)return;
-  const r2=el.closest(".tpx-r"),gh=el.closest(".tpx-gh");
-  if(r2&&r2!==D.row){const b=r2.getBoundingClientRect(),aft=e.clientY>b.top+b.height/2;r2.classList.add(aft?"dropa":"dropb");D.tgt={row:+r2.dataset.tprow,aft}}
+  D.row.style.visibility="hidden";const el=document.elementFromPoint(e.clientX,e.clientY);D.row.style.visibility="";
+  const gh=el&&el.closest(".tpx-gh");let r2=null,aft=false;
+  if(!gh){const box=D.row.closest(".tpx-body,.tpb-page,.tpx")||document,rows=[...document.querySelectorAll("#tpEx .tpx-r")].filter(x=>x!==D.row&&!x.classList.contains("dragmate")&&x.offsetParent);   /* nearest row by height, so the drop never gets lost */
+    let best=1e9;rows.forEach(x=>{const b=x.getBoundingClientRect(),c=(b.top+b.bottom)/2,d=Math.abs(e.clientY-c);if(d<best){best=d;r2=x;aft=e.clientY>c}})}
+  if(r2){r2.classList.add(aft?"dropa":"dropb");D.tgt={row:+r2.dataset.tprow,aft}}
   else if(gh){gh.classList.add("dropin");D.tgt={grp:+gh.dataset.tpgtog}}},{passive:false});
-const tpDragEnd=()=>{const D=tpDragS;if(!D)return;tpDragS=null;document.body.classList.remove("tpx-dragging");document.querySelectorAll(".tpx .dropb,.tpx .dropa,.tpx .dropin").forEach(x=>x.classList.remove("dropb","dropa","dropin"));document.querySelectorAll(".dragmate").forEach(x=>x.classList.remove("dragmate"));D.row.classList.remove("drag");D.row.style.transform="";
+const tpDragEnd=()=>{const D=tpDragS;if(!D)return;tpDragS=null;document.body.classList.remove("tpx-dragging");document.querySelectorAll(".tpx .dropb,.tpx .dropa,.tpx .dropin").forEach(x=>x.classList.remove("dropb","dropa","dropin"));document.querySelectorAll(".dragmate").forEach(x=>x.classList.remove("dragmate"));delete D.row.dataset.carry;D.row.classList.remove("drag");D.row.style.transform="";
   const T=D.tgt;if(!T||!tPlan)return;const G=exGroups(tPlan.ex),ex=tPlan.ex[D.i];if(!ex)return;let g,at;
   if(T.grp!=null){const x=G[T.grp];if(!x)return;g=x[0];at=x[1][x[1].length-1][1]+1;tpFold.delete(g);tpTab=g}else{const te=tPlan.ex[T.row];if(!te)return;g=String(te.g||"All");at=T.row+(T.aft?1:0)}
   const grp=tpMulti&&tpMulti.has(ex)?tPlan.ex.filter(x=>tpMulti.has(x)):[ex];   /* dragging a selected exercise moves every selected one */
@@ -4342,7 +4344,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="207",APPT="2026-11-18T19:03:00-05:00";   /* APPT: when this update was made */
+const APPV="208",APPT="2026-11-18T19:09:00-05:00";   /* APPT: when this update was made */
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
