@@ -2464,13 +2464,13 @@ function tpExHTML(P){tpNorm(P);if(tpMulti)tpMulti.forEach(x=>{if(!P.ex.includes(
     <div class="tpx-body">${xs.map(([e,i])=>row(e,i)).join("")}${g?tpWarn(g,xs):""}<button type="button" class="tpx-add" data-tpadd="${k}">＋ Exercise</button></div></div>`}).join("")}</div>`}
 /* select button: tap = select one (diagram shows it); hold = pick several to move or delete */
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("[data-tppick]");if(!b||!tPlan)return;tpHeld=false;clearTimeout(tpHold);
-  tpHold=setTimeout(()=>{const ex=tPlan.ex[+b.dataset.tppick];if(!ex)return;tpHeld=true;if(!tpMulti)tpMulti=new Set();tpMulti.add(ex);tpDelAsk=false;try{navigator.vibrate&&navigator.vibrate(15)}catch(_){}tpExPaint()},450)});
+  tpHold=setTimeout(()=>{const ex=tPlan.ex[+b.dataset.tppick];if(!ex)return;tpHeld=true;if(!tpMulti)tpMulti=new Set();tpMulti.add(ex);tpDelAsk=false;tpSel=tpMulti.size===1?tPlan.ex.indexOf(ex):-1;tpPaint();try{navigator.vibrate&&navigator.vibrate(15)}catch(_){}tpExPaint()},450)});
 ["pointerup","pointercancel","pointerleave"].forEach(k=>document.addEventListener(k,()=>clearTimeout(tpHold)));
 document.addEventListener("contextmenu",e=>{if(e.target.closest&&e.target.closest("[data-tppick]"))e.preventDefault()});
 document.addEventListener("click",e=>{if(!tPlan||!e.target.closest)return;const b=e.target.closest("[data-tppick]");
-  if(b){if(tpHeld){tpHeld=false;return}const i=+b.dataset.tppick,ex=tPlan.ex[i];if(!ex)return;if(tpMulti){tpMulti.has(ex)?tpMulti.delete(ex):tpMulti.add(ex);tpDelAsk=false;tpExPaint()}else{tpSel=tpSel===i?-1:i;tpExPaint();tpPaint()}return}
+  if(b){if(tpHeld){tpHeld=false;return}const i=+b.dataset.tppick,ex=tPlan.ex[i];if(!ex)return;if(!tpMulti)tpMulti=new Set();tpMulti.has(ex)?tpMulti.delete(ex):tpMulti.add(ex);tpDelAsk=false;if(!tpMulti.size)tpMulti=null;tpSel=tpMulti&&tpMulti.size===1?tPlan.ex.indexOf([...tpMulti][0]):-1;tpExPaint();tpPaint();return}
   const m=e.target.closest("[data-tpm]");if(!m||!tpMulti)return;const a=m.dataset.tpm,E=tPlan.ex;
-  if(a==="done"){tpMulti=null;tpDelAsk=false}
+  if(a==="done"){tpMulti=null;tpDelAsk=false;tpSel=-1;tpPaint()}
   else if(a==="del")tpDelAsk=true;else if(a==="delno")tpDelAsk=false;
   else if(a==="delyes"){tpMusInit(tPlan);tPlan.ex=E.filter(x=>!tpMulti.has(x));if(!tPlan.ex.length)tPlan.ex.push({name:"",sets:3,reps:10,g:"All"});tpMulti=null;tpDelAsk=false;tpSel=-1;tpMusSync();tpPaint()}
   else if(a==="up"||a==="down"){const d=a==="up"?-1:1,idx=E.map((x,i)=>tpMulti.has(x)?i:-1).filter(i=>i>=0);(d<0?idx:idx.reverse()).forEach(i=>{const j=i+d;if(j<0||j>=E.length||tpMulti.has(E[j])||String(E[j].g||"All")!==String(E[i].g||"All"))return;[E[i],E[j]]=[E[j],E[i]]})}
@@ -4365,7 +4365,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="214",APPT="2026-11-18T19:37:00-05:00";   /* APPT: when this update was made */
+const APPV="215",APPT="2026-11-18T19:40:00-05:00";   /* APPT: when this update was made */
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
