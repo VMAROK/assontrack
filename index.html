@@ -3148,7 +3148,7 @@ function bCard(it){const m=bMo(it),nx=it.paused?null:bNext(it),dd=nx?bDays(nx):n
     <b class="bi-nm">${esc(bTitle(it))}</b>${bSubT(it)?`<small class="bi-sub">${esc(bSubT(it))}</small>`:""}<span class="bi-amt">${it.kind==="inc"?"+":""}${bMoneyI(it)}</span><small class="bi-cy">${cy}${(it.cur||bHome())!==bHome()?" · ≈"+bMoney(m)+"/mo":it.cyc==="mo"?" · "+bMoney(m*12,0)+"/yr":" · "+bMoney(m)+"/mo"}</small></button>`}
 const bAddCard=k=>`<button type="button" class="bi-card bi-add" data-bnew="${k}"><span class="bi-ic">＋</span><b class="bi-nm">${BKN[k][0]}</b><small class="bi-cy">${k==="sub"?"Netflix, Spotify…":k==="bill"?"Rent, phone…":"Salary, side work…"}</small></button>`;
 function bCatsShown(S){const b=B(),it=b.items.filter(i=>i.kind!=="inc");return b.cats.filter(c=>c.own||!BDEF.some(z=>z[0]===c.n)||it.some(i=>bItCat(i)===c.n)||S.spCat[c.n]||+c.lim)}
-function bAll(S,only){const b=B(),it=b.items.filter(i=>i.kind!=="inc");const cs=(bDragAll?b.cats:bCatsShown(S)).filter(c=>!only||c.n===only);
+function bAll(S,only){const b=B(),it=b.items.filter(i=>i.kind!=="inc");const cs=bCatsShown(S).filter(c=>!only||c.n===only);
   if(!cs.length)return `<div class="bi-grid">${bAddCard("sub")}${bAddCard("bill")}</div>`;
   const srt=(a,z)=>(bLvR(a.lvl)-bLvR(z.lvl))||(bMo(z)-bMo(a));
   return `<div class="bk-cats${only?" one":""}">${cs.map(c=>{const L=it.filter(i=>bItCat(i)===c.n).sort(srt),GS=bGroups(c.n),loose=L.filter(i=>!i.grp||!GS.includes(i.grp)),used=(S.fixCat[c.n]||0)+(S.spCat[c.n]||0),lim=+c.lim||0,f=lim?used/lim:0;
@@ -3223,19 +3223,18 @@ let bCmT=null,bHoldT=null,bDragAll=false,bHeldCard=null,bDrag=null;
 /* hold a card, then drag it onto any category or group in All to move it there */
 function bDragStart(c,x,y){const it=B().items.find(i=>i.id===c.dataset.bid);if(!it||it.kind==="inc")return false;cmShow(null);
   const r0=c.getBoundingClientRect(),g=c.cloneNode(true);g.classList.remove("cm-src","cm-press");g.classList.add("bdrag-ghost");g.style.cssText=(c.getAttribute("style")||"")+`;position:fixed;left:${r0.left}px;top:${r0.top}px;width:${r0.width}px;height:${r0.height}px;margin:0;z-index:320;pointer-events:none`;document.body.appendChild(g);
-  const keep=document.createElement("div");keep.style.cssText="position:fixed;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;pointer-events:none";document.body.appendChild(keep);keep.appendChild(c);
-  bDrag={id:it.id,g,keep,ox:x-r0.left,oy:y-r0.top,r0,x,y,tgt:null,raf:0};bDragAll=true;const v=document.getElementById("view"),st=v?v.scrollTop:0;render();if(v)v.scrollTop=st;document.body.classList.add("bdragging");
-  const src=document.querySelector(`.bi-card[data-bid="${it.id}"]`);if(src)src.classList.add("bdrag-src");bDragMove(x,y);bDragLoop();return true}
+  c.classList.remove("cm-src");c.classList.add("bdrag-src");
+  bDrag={id:it.id,g,src:c,ox:x-r0.left,oy:y-r0.top,r0,x,y,tgt:null,raf:0};document.body.classList.add("bdragging");bDragMove(x,y);bDragLoop();return true}
 function bDragMove(x,y){const d=bDrag;if(!d)return;d.x=x;d.y=y;d.g.style.left=(x-d.ox)+"px";d.g.style.top=(y-d.oy)+"px";
   const el=document.elementFromPoint(x,y),gp=el&&el.closest&&el.closest("[data-bdg]"),ct=el&&el.closest&&el.closest("[data-bkcat]");let t=null,node=null;
   if(gp){const [cn,gn]=JSON.parse(gp.dataset.bdg);t={cat:cn,grp:gn};node=gp}else if(ct){t={cat:ct.dataset.bkcat,grp:""};node=ct}
   document.querySelectorAll(".bdrop").forEach(n=>{if(n!==node)n.classList.remove("bdrop")});if(node)node.classList.add("bdrop");d.tgt=t}
 function bDragLoop(){const d=bDrag;if(!d)return;const v=document.getElementById("view");if(v){const r=v.getBoundingClientRect(),e=70;let dy=0;if(d.y<r.top+e)dy=-Math.ceil((r.top+e-d.y)/5);else if(d.y>r.bottom-e)dy=Math.ceil((d.y-(r.bottom-e))/5);if(dy){v.scrollTop+=dy;bDragMove(d.x,d.y)}}d.raf=requestAnimationFrame(bDragLoop)}
 function bDragEnd(drop){const d=bDrag;if(!d)return;bDrag=null;cancelAnimationFrame(d.raf);document.body.classList.remove("bdragging");const b=B(),it=b.items.find(i=>i.id===d.id),t=drop?d.tgt:null;
-  const finish=()=>{d.g.remove();d.keep.remove();bDragAll=false;const v=document.getElementById("view"),st=v?v.scrollTop:0;render();if(v)v.scrollTop=st;
+  const finish=()=>{d.g.remove();if(d.src)d.src.classList.remove("bdrag-src");const v=document.getElementById("view"),st=v?v.scrollTop:0;render();if(v)v.scrollTop=st;
     if(t){const sel=t.grp?`[data-bdg='${JSON.stringify([t.cat,t.grp]).replace(/'/g,"&#39;")}']`:`[data-bkcat="${t.cat.replace(/"/g,'\\"')}"]`;let n=null;try{n=document.querySelector(sel)}catch(_){}if(!n)n=[...document.querySelectorAll("[data-bkcat]")].find(x=>x.dataset.bkcat===t.cat);if(n){n.classList.add("bdrop-in");setTimeout(()=>n.classList.remove("bdrop-in"),700);try{n.scrollIntoView({block:"nearest",behavior:"smooth"})}catch(_){}}}};
   if(t&&it&&(bItCat(it)!==t.cat||(it.grp||"")!==t.grp)){it.cat=t.cat;if(t.grp){const c=bCat(t.cat);if(c){c.groups=c.groups||[];if(!c.groups.includes(t.grp))c.groups.push(t.grp)}it.grp=t.grp}else delete it.grp;save();sfx("blip");toast(bTitle(it)+" → "+(t.grp?t.grp+" · ":"")+t.cat);d.g.style.transition="transform .25s ease, opacity .25s";d.g.style.transform="scale(.6)";d.g.style.opacity="0";setTimeout(finish,200)}
-  else{const src=document.querySelector(`.bi-card[data-bid="${d.id}"]`),r=src?src.getBoundingClientRect():d.r0;d.g.style.transition="left .45s cubic-bezier(.34,1.56,.64,1),top .45s cubic-bezier(.34,1.56,.64,1),transform .45s";d.g.style.left=r.left+"px";d.g.style.top=r.top+"px";d.g.style.transform="none";setTimeout(finish,430)}}
+  else{const r=d.src&&d.src.isConnected?d.src.getBoundingClientRect():d.r0;d.g.style.transition="left .45s cubic-bezier(.34,1.56,.64,1),top .45s cubic-bezier(.34,1.56,.64,1),transform .45s";d.g.style.left=r.left+"px";d.g.style.top=r.top+"px";d.g.style.transform="none";setTimeout(finish,430)}}
 document.addEventListener("pointermove",e=>{if(bDrag){e.preventDefault();bDragMove(e.clientX,e.clientY);return}if(bHeldCard&&bTab==="all"&&Math.hypot(e.clientX-(cmPt.x||0),e.clientY-(cmPt.y||0))>14){const c=bHeldCard;bHeldCard=null;bDragStart(c,e.clientX,e.clientY)}},{capture:true,passive:false});
 document.addEventListener("pointerup",e=>{bHeldCard=null;if(bDrag){cmHeld=true;cmAt=Date.now();bDragEnd(true)}},true);
 document.addEventListener("pointercancel",()=>{bHeldCard=null;if(bDrag)bDragEnd(false)},true);
@@ -5077,7 +5076,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="280",APPT="2026-11-19T11:35:00-05:00";   /* APPT: when this update was made */
+const APPV="281",APPT="2026-11-19T11:33:00-05:00";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
