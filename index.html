@@ -1191,6 +1191,9 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .lines-sw{display:inline-flex}
 
 /* training */
+.ib-list{display:grid;gap:16px}.ib-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px}.ib-h span{font-size:13.5px;color:#e6eeff;font-weight:600}.ib-h b{font-family:var(--mono);font-size:13.5px;font-weight:600;color:#e6eeff}
+.ib-bar{display:flex;height:8px;border-radius:99px;overflow:hidden;background:rgba(150,180,240,.14)}.ib-bar i{display:block;height:100%;border-radius:99px;box-shadow:0 0 8px currentColor}.ib-bar i+i{border-radius:0 99px 99px 0}
+.ib small{display:block;margin-top:5px;font-size:12px;color:var(--muted)}
 .wp-r.tl-r{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;cursor:default}.wp-r.tl-r.done{border-color:rgba(61,220,132,.55);background:rgba(61,220,132,.08)}
 .wp-rm{flex:1;min-width:0;cursor:pointer}.wp-rt{display:flex;justify-content:space-between;align-items:baseline;gap:10px}.wp-rt span{font-size:16px}.wp-rt em{font-style:normal;font-family:var(--mono);font-size:14px;color:var(--muted);white-space:nowrap}
 .wp-r .tl-ck{width:40px;height:40px;margin-top:0}.wp-r .tl-pip{min-width:30px;height:28px;font-size:13px}.wp-r .tl-pip:disabled,.wp-r .tl-ck:disabled{cursor:default;opacity:.6}
@@ -2255,6 +2258,27 @@ function trTiles(d){const T=today(),u=d.goals.unit,PL=tlPlans(d);let sp=0,sd=0;P
   const fmt=v=>v>=1e4?(v/1e3).toFixed(1)+"k":n0(v);const mt=s=>s>=60?Math.floor(s/60)+"m "+(s%60?s%60+"s":""):s+"s";
   return `<div class="panel tile tdn" style="--c:var(--cyan)"><small>This week</small>${donut(wp?wd/wp:0,"rgba(var(--tL),1)",wp?wd+"/"+wp:"–")}<em>${wp?"planned workouts done":"nothing planned"}</em></div>
     <div class="panel tile" style="--c:var(--amber)">${ic("bolt")}<small>Moved today</small><b>${vol?fmt(vol):reps?n0(reps):secs?mt(secs):"0"}</b><em>${vol?u+" lifted":reps?"reps":secs?"held":"nothing logged yet"}${vol&&secs?" · "+mt(secs)+" held":""}</em></div>`}
+/* insights: five bars worked out from what you check off */
+function trInsights(d){const TD=today(),add=(ds,n)=>{const x=new Date(ds+"T12:00");x.setDate(x.getDate()+n);return ymd(x)},WO=(d.workouts||[]).filter(w=>!w.hk);
+  const full=(p,ds)=>p.ex.every(e=>{const w=dsDone(d,p,e,ds);return w&&(+w.sets||0)>=tlSets(e)});
+  /* 1 plan */ let pt=0,pd=0;const miss=[0,0,0,0,0,0,0];for(let k=27;k>=0;k--){const ds=add(TD,-k),i=dayIdx(ds);(d.plans||[]).filter(p=>p.ex&&p.ex.length&&onDay(p,i)).forEach(p=>{pt++;if(full(p,ds))pd++;else if(ds<TD)miss[i]++})}
+  const mx=Math.max(...miss),FD=["Mondays","Tuesdays","Wednesdays","Thursdays","Fridays","Saturdays","Sundays"];
+  /* 2 load */ const wk0=wkOf(TD),sets=(a,b)=>WO.filter(w=>w.d>=a&&w.d<=b).reduce((t,w)=>t+(+w.sets||0),0),tw=sets(wk0,TD),lw=sets(add(wk0,-7),add(TD,-7)),dl=lw?Math.round((tw-lw)/lw*100):null;
+  /* muscles from what was logged */ const musOf=w=>{const pl=w.plan&&(d.plans||[]).find(x=>x.id===w.plan);return exMus(w.name)||(pl?musNorm(pl.mus):{})};
+  const PUSH=["chest","frontdelts","sidedelts","triceps"],PULL=["lats","upperback","reardelts","biceps"];let pu=0,pl=0;WO.filter(w=>w.d>=wk0&&w.d<=TD).forEach(w=>{const m=musOf(w),n=+w.sets||0;if(PUSH.some(k=>m[k]===2))pu+=n;if(PULL.some(k=>m[k]===2))pl+=n});
+  /* 4 weakest */ const ms={};MUS.forEach(([k])=>ms[k]=0);WO.filter(w=>w.d>add(TD,-14)).forEach(w=>{const m=musOf(w),n=+w.sets||0;Object.entries(m).forEach(([k,v])=>{if(k in ms)ms[k]+=v===2?n:n/2})});
+  const vals=Object.values(ms),avg=vals.reduce((a,b)=>a+b,0)/vals.length,weak=Object.entries(ms).sort((a,b)=>a[1]-b[1])[0];
+  /* 5 stronger */ const by={};WO.filter(w=>w.d>add(TD,-28)).forEach(w=>{const k=trKey(w.name);(by[k]=by[k]||[]).push(w)});let up=0,cmp=0,best=null,stuck=null;
+  Object.values(by).forEach(L=>{L.sort((a,b)=>a.d<b.d?-1:1);const days=[...new Set(L.map(w=>w.d))];if(days.length<2)return;const sc=w=>(+w.kg||0)>0?(+w.kg)*(+w.reps||0):(+w.reps||0);const last=L.filter(w=>w.d===days[days.length-1]),prev=L.filter(w=>w.d===days[days.length-2]);
+    const a=Math.max(...last.map(sc)),b=Math.max(...prev.map(sc));cmp++;const nm=last[0].name;if(a>b){up++;const g=+last[0].kg&&+prev[0].kg?(+last[0].kg-+prev[0].kg)+" "+d.goals.unit:(a-b)+(last[0].unit==="s"?" s":" reps");if(!best)best=nm+" up "+g}else if(!stuck)stuck=nm+" stuck at last time"});
+  const bar=(lab,val,pc,col,ins,split)=>`<div class="ib"><div class="ib-h"><span>${lab}</span><b>${val}</b></div><div class="ib-bar">${split?`<i style="width:${(pc*100).toFixed(1)}%;background:#ff7a85"></i><i style="flex:1;background:#4cc9ff"></i>`:`<i style="width:${Math.max(0,Math.min(1,pc))*100}%;background:${col}"></i>`}</div><small>${ins}</small></div>`;
+  const out=[
+    bar("Sticking to the plan",pt?Math.round(pd/pt*100)+"% · "+pd+" of "+pt:"–",pt?pd/pt:0,"#3ddc84",pt?(mx?"You miss most on "+FD[miss.indexOf(mx)]+".":"No missed workouts in 4 weeks."):"Plan workouts on days to track this."),
+    bar("Training load",tw+" sets"+(dl!==null?` · ${dl>=0?"+":""}${dl}%`:""),lw?Math.min(1,tw/(lw*1.5)):tw?1:0,"rgba(var(--tL),1)",lw?(tw>=lw?"Ahead of last week by "+(tw-lw)+" sets.":"Behind last week by "+(lw-tw)+" sets."):"Compared with last week at this point."),
+    bar("Push / pull",pu+pl?Math.round(pu/(pu+pl)*100)+" / "+Math.round(pl/(pu+pl)*100):"–",pu+pl?pu/(pu+pl):.5,"",pu+pl?(Math.abs(pu-pl)/(pu+pl)<.2?"Balanced this week.":(pu>pl?"Pull is falling behind.":"Push is falling behind.")):"Push in red, pull in blue.",true),
+    bar("Weakest muscle",avg?MUSN[weak[0]]+" · "+Math.round(weak[1])+" sets":"–",avg?weak[1]/Math.max(1,avg):0,"#ffb648",avg?"Your average is "+Math.round(avg)+" sets per muscle (14 days).":"Log workouts to find gaps."),
+    bar("Getting stronger",cmp?Math.round(up/cmp*100)+"% · "+up+" of "+cmp:"–",cmp?up/cmp:0,"#b48cff",cmp?[best,stuck].filter(Boolean).join(" · ")+".":"Repeat an exercise to compare.")];
+  return `<div class="panel trins"><div class="ph"><span>Insights</span><i>last 2–4 weeks</i></div><div class="ib-list">${out.join("")}</div></div>`}
 function trLogPanel(d,T){const u=d.goals.unit,PL=tlPlans(d),groups=[];
   PL.forEach(p=>{const c=pCats(p)[0]||"";let g=groups.find(x=>x.c===c);if(!g)groups.push(g={c,ps:[]});g.ps.push(p)});groups.sort((a,b)=>(a.c?0:1)-(b.c?0:1));
   let all=0,done=0;
@@ -2773,7 +2797,7 @@ function vTrain(){
   return banner()+`<div class="passtop figtop bodytop trtop">${figurePanel()}
    <div class="stack"><div class="grid tiles trtiles">${trTiles(d)}
     <div class="panel tile" style="--c:var(--violet)">${ic("star")}<small>Fitness</small><b>${F.name}</b><em>${lastW?"last workout "+(lastW.d===today()?"today":fmtDate(lastW.d)):"no workouts yet"}</em></div></div>
-   ${trWeekPanel(d,T)}</div></div>${planPanel(d)}${trProgress(d,T)}`;
+   ${trWeekPanel(d,T)}${trInsights(d)}</div></div>${planPanel(d)}${trProgress(d,T)}`;
 }
 /* typing an exercise you've done before fills in last time's numbers and suggests the next step up */
 document.addEventListener("input",e=>{if(e.target.id!=="woName")return;const w=trLast(D(),e.target.value),h=$("#trHint"),u=D().goals.unit;if(!h)return;
@@ -4419,7 +4443,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="228",APPT="2026-11-18T20:33:00-05:00";   /* APPT: when this update was made */
+const APPV="229",APPT="2026-11-18T20:42:00-05:00";   /* APPT: when this update was made */
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
