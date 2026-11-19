@@ -1191,6 +1191,9 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .lines-sw{display:inline-flex}
 
 /* training */
+.wk-barrow{display:flex;flex-direction:row-reverse;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 10px}.wk-barrow>.wk-bar{margin:0}.wk-tools{display:flex;gap:6px}
+.wk-allp>.sh-h{display:none}
+.upd-top{margin:0 6px 0 auto!important;align-self:center}
 .trsplit .sp-chips{gap:0!important;margin:-1px -9px 0;border-top:1px solid rgba(var(--lr),.22)}
 .trsplit .sp-chip{display:block!important;border-radius:0!important;border:0!important;border-bottom:1px solid rgba(var(--lr),.22)!important;background:color-mix(in srgb,var(--cc) 10%,transparent)!important;padding:7px 8px!important;font-size:10px!important;font-weight:600;color:#e6eeff!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:inset 2px 0 0 var(--cc)}
 .trsplit .sp-chip i{display:none!important}.trsplit .sp-chip.pin{font-weight:500!important}
@@ -1521,6 +1524,7 @@ body.dbg-off .dbg-n{display:none}body.dbg-off .dbg-box{outline:none}
       <div><b>Ass<span>On</span>Track</b><small>Progress &amp; diet tracker</small></div>
       </div>
       <h1 id="ttl">Dashboard<small>Mission overview</small></h1>
+      <button class="upd-red upd-top" data-forceupd id="updTop" title="Tap to get the newest version">…</button>
       <button class="pill" data-go="fuel">+ Log meal</button>
       <button class="pill mag" data-go="pass">+ Log passion</button>
       <div class="clock"><b id="clk">--:--</b><br><span id="sd"></span></div>
@@ -2605,7 +2609,7 @@ function planForm(d){setTimeout(()=>{if(tPlan&&tpHist.id!==tPlan)tpHistSync()},0
     <div class="tp-chips" id="tpChips">${MUS.map(([k,n])=>`<button type="button" class="tp-chip l${P.mus[k]||0}" data-mtap="${k}">${n}</button>`).join("")}</div></div>
    <div class="tp-acts"><button class="btn" data-tpsave title="Save and close">Save workout</button><button class="btn ghost" data-tpapply title="Save your changes and keep editing">Apply</button><button class="btn ghost" data-tpcancel>Cancel</button>${P.id?`<button class="btn ghost danger" data-tpdelete>Delete</button>`:""}</div></div>`}
 function planPanel(d){const PL=d.plans||[];
-  return `<div class="panel tpp" style="margin-top:18px"><div class="ph">${tPlan?`<span>${tPlan.id?"Edit workout":"Design a workout"}</span>`:""}${tPlan?"":`<button class="upd-red" data-forceupd title="Updated ${updStamp()} (version ${APPV}). Tap to get the newest version">${updStamp()}</button>`}<i>${tPlan?"":PL.length?PL.length+" saved":""}</i></div>
+  return `<div class="panel tpp" style="margin-top:18px">${tPlan?`<div class="ph"><span>${tPlan.id?"Edit workout":"Design a workout"}</span></div>`:""}
     ${tPlan?planForm(d):planList(d,PL)}</div>`}
 async function forceUpdate(b){if(b)b.textContent="Updating…";try{sessionStorage.removeItem("aot-upd2");sessionStorage.removeItem("aot-upd")}catch(e){}
   try{const ks=await caches.keys();await Promise.all(ks.filter(k=>k!=="aot-img").map(k=>caches.delete(k)))}catch(e){}
@@ -2638,7 +2642,8 @@ function planList(d,PL){ppMigrate(d);const dayF=splitDay>=0;if(dayF)PL=PL.filter
   const nw=`<button class="tp-new" data-pnew>${musSvg({},{lab:false})}<b>＋ Design a workout</b><small>Pick the exercises and the muscles they hit</small></button>`;
   const tab=(attr,v,n,k,on,c)=>`<button class="cat-tab" role="tab" aria-selected="${on}" ${attr}="${esc(v)}"${c?` style="--cc:${c}"`:""}>${c?`<b class="wk-dot"></b>`:""}${esc(n)}<i>${k}</i></button>`;
   const newCat=wkNewCat?`<span class="cat-tab wk-newin"><input id="wkCatNew" maxlength="24" placeholder="Category name" autocomplete="off" aria-label="New category name"><button class="tp-tile done" data-wkcatok>Add</button></span>`:`<button class="cat-tab add" data-wkcatnew aria-label="New category" title="New category">＋</button>`;
-  const bar=`<div class="cat-bar wk-bar" role="tablist" aria-label="Workout categories">${cats.length?tab("data-pf","","All",PL.length,!planF):""}${cats.map(c=>tab("data-pf",c,c,PL.filter(p=>pCats(p).includes(c)).length,planF===c,catCol(c))).join("")}${newCat}</div>`;
+  const tools=`<span class="wk-tools"><button class="wk-design" data-wkcompact aria-pressed="${wkCompact}" title="${wkCompact?"Back to full size":"Shrink this panel to fit more"}">${wkCompact?"Full view":"Compact view"}</button><button class="wk-design" data-pnew title="Design a new workout">＋ Design a workout</button></span>`;
+  const bar=`<div class="wk-barrow">${tools}<div class="cat-bar wk-bar" role="tablist" aria-label="Workout categories">${cats.length?tab("data-pf","","All",PL.length,!planF):""}${cats.map(c=>tab("data-pf",c,c,PL.filter(p=>pCats(p).includes(c)).length,planF===c,catCol(c))).join("")}${newCat}</div></div>`;
   if(dayF&&!cats.length)return dayHead+`<div class="wk-board">${wkSec(d,"",PL,"",[],PL,true)}</div>`;
   if(!cats.length)return bar+`<div class="wk-board">${wkSec(d,"",PL,"",[],PL,true)}</div>`;
   const td=schedOf(dayIdx(today()));let bar2="",show=cats;
@@ -2649,7 +2654,7 @@ function planList(d,PL){ppMigrate(d);const dayF=splitDay>=0;if(dayF)PL=PL.filter
 function wkSec(d,c,IN,only,td,PL,all){const ck=c||"~none";let IN0=IN,fd=-1;if(!all){IN0=(d.plans||[]).filter(p=>c?pCats(p).includes(c):!pCats(p).length);fd=catDayF[ck]>=0?catDayF[ck]:splitDay;if(fd>=0)IN=IN0.filter(p=>onDay(p,fd))}cardDs=(()=>{const i=fd>=0?fd:splitDay>=0?splitDay:dayIdx(today()),x=new Date(wkOf(today())+"T12:00");x.setDate(x.getDate()+i);return ymd(x)})();const subs=c?wsubAll(c).filter(x=>IN.some(p=>pSub(p,c)===x)):[],gen=IN.filter(p=>!c||!subs.includes(pSub(p,c)));
   let lanes=subs.map(x=>[x,IN.filter(p=>pSub(p,c)===x)]);if(gen.length)lanes.push([subs.length?"General":"",gen]);if(only)lanes=lanes.filter(l=>l[0]===only);
   const asg=c&&wkAssign===c;
-  return `<section class="wk-sec${all?" wk-allp":""}" style="--cc:${catCol(c)}" aria-label="${esc(c||"No category")} workouts"><div class="sh-h"><i></i><b>${esc(c||(all?"All workouts":"Not in a category"))}</b>${c&&td.includes(c)?`<span class="sh-td">Today</span>`:""}<small>${IN.length} workout${IN.length===1?"":"s"}</small>${all?`<button class="wk-design" data-wkcompact aria-pressed="${wkCompact}" title="${wkCompact?"Back to full size":"Shrink this panel to fit more"}">${wkCompact?"Full view":"Compact view"}</button><button class="wk-design" data-pnew title="Design a new workout">＋ Design a workout</button>`:""}${!all?`<span class="wk-days" title="Tap a day to see its ${esc(c||"uncategorised")} workouts">${dayLoad(dayRow(fd>=0?[fd]:[],"data-wkfd",`data-wkc="${esc(ck)}"`,catCol(c)),IN0)}</span>`:""}${c?`<button class="tp-tile${asg?" done":" add"} wk-asg" data-wkassign="${esc(c)}">${asg?"Done":"＋ Assign workouts"}</button>`:""}</div>
+  return `<section class="wk-sec${all?" wk-allp":""}" style="--cc:${catCol(c)}" aria-label="${esc(c||"No category")} workouts"><div class="sh-h"><i></i><b>${esc(c||(all?"All workouts":"Not in a category"))}</b>${c&&td.includes(c)?`<span class="sh-td">Today</span>`:""}<small>${IN.length} workout${IN.length===1?"":"s"}</small>${all&&0?`<button class="wk-design" data-wkcompact aria-pressed="${wkCompact}" title="${wkCompact?"Back to full size":"Shrink this panel to fit more"}">${wkCompact?"Full view":"Compact view"}</button><button class="wk-design" data-pnew title="Design a new workout">＋ Design a workout</button>`:""}${!all?`<span class="wk-days" title="Tap a day to see its ${esc(c||"uncategorised")} workouts">${dayLoad(dayRow(fd>=0?[fd]:[],"data-wkfd",`data-wkc="${esc(ck)}"`,catCol(c)),IN0)}</span>`:""}${c?`<button class="tp-tile${asg?" done":" add"} wk-asg" data-wkassign="${esc(c)}">${asg?"Done":"＋ Assign workouts"}</button>`:""}</div>
     ${catDayAsk&&catDayAsk.c===c?askHTML("sec"):""}${asg?`<div class="wk-asgbox"><small>Tap a workout to put it in or take it out of ${esc(c)}.</small><div class="tp-tiles">${PL.map(p=>{const on=pCats(p).includes(c);return `<button type="button" class="tp-tile${on?" on":""}" style="--cc:${catCol(c)}" aria-pressed="${on}" data-wkput="${p.id}" data-wkc="${esc(c)}"><span>${esc(p.name)}</span>${ppOf(p.mus).map(x=>`<b class="pp-dot" style="--pp:${PPCOL[x]}" title="${x}"></b>`).join("")}</button>`}).join("")||`<small>No workouts yet. Design one below.</small>`}</div></div>`:""}
     ${all?wkCats(d,IN,td,PL):""}${all?"":IN.length?`<div class="sh-lanes">${lanes.map(([x,ps])=>`<div class="sh-lane">${x?`<div class="sh-lh">${esc(x)} <em>${ps.length}</em></div>`:""}<div class="sh-row">${ps.map(pl=>planCard(d,pl,true)).join("")}</div></div>`).join("")}${c?`<div class="sh-lane"><div class="sh-row">${wkNewCard(c)}</div></div>`:""}</div>`:asg?"":`${fd>=0?`<p class="wk-empty">No ${esc(c||"uncategorised")} workouts on ${["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"][fd]}.</p>`:""}<div class="sh-lanes"><div class="sh-lane"><div class="sh-row">${wkNewCard(c)}</div></div></div>`}</section>`}
 /* All tab: one panel, each category is a card holding its workouts */
@@ -4446,7 +4451,8 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="235",APPT="2026-11-18T20:59:00-05:00";   /* APPT: when this update was made */
+const APPV="236",APPT="2026-11-18T21:05:00-05:00";   /* APPT: when this update was made */
+setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
