@@ -3055,6 +3055,7 @@ const bCat=n=>B().cats.find(c=>c.n===n);
 const bCol=n=>(bCat(n)||{c:"#9db0d0"}).c;
 const bItCat=it=>it.kind==="inc"?"":(bCat(it.cat)?it.cat:"Other");
 const bTitle=it=>(it.coTitle&&it.co?it.co:it.name)||it.co||"Untitled",bSubT=it=>it.co&&it.name&&it.co!==it.name?(it.coTitle?it.name:it.co):"";
+const bAmtF=v=>+v?(+v).toFixed(2):"";
 const bMo=it=>(+it.amt||0)*((BCYC.find(x=>x[0]===it.cyc)||BCYC[1])[2]);
 const bMoney=(v,dp)=>{const n=Math.abs(v||0);return (v<0?"-":"")+B().cur+n.toLocaleString(undefined,{minimumFractionDigits:dp===0?0:2,maximumFractionDigits:dp===0?0:2})};
 const bDate=s=>new Date(s+"T12:00");
@@ -3124,13 +3125,13 @@ function bSheet(){let o=document.getElementById("bSheet");if(!bEdit){if(o){o.cla
     o.dataset.t="item";acts=`${v.kind==="sub"&&!isNew?`<button type="button" class="btn ghost" data-bpause>${v.paused?"Resume":"Pause"}</button>`:""}${isNew?"":bHoldBtn}`;
     var body=`<div class="bsh-2"><label class="tp-lab">Name<input id="beName" value="${esc(v.name||"")}" placeholder="${v.kind==="sub"?"Music":v.kind==="bill"?"Rent":"Salary"}"></label><label class="tp-lab">Company<input id="beCo" value="${esc(v.co||"")}" placeholder="Optional · ${v.kind==="sub"?"Spotify":v.kind==="bill"?"Con Edison":"Employer"}"></label></div>
       <div class="tp-lab bsh-ct"${v.co?"":" hidden"}>Show as the title<div class="bsh-seg"><button type="button" data-becot="0" aria-pressed="${!v.coTitle}">Name</button><button type="button" data-becot="1" aria-pressed="${!!v.coTitle}">Company</button></div></div>
-      <div class="bsh-2"><label class="tp-lab">Amount (${esc(b.cur)})<input id="beAmt" inputmode="decimal" value="${v.amt||""}" placeholder="0.00"></label><label class="tp-lab">${v.kind==="inc"?"Next payday":"Next charge"}<input id="beStart" type="date" value="${v.start||""}"></label></div>
+      <div class="bsh-2"><label class="tp-lab">Amount (${esc(b.cur)})<input id="beAmt" inputmode="decimal" value="${bAmtF(v.amt)}" placeholder="0.00"></label><label class="tp-lab">${v.kind==="inc"?"Next payday":"Next charge"}<input id="beStart" type="date" value="${v.start||""}"></label></div>
       <div class="tp-lab">How often<div class="bsh-seg">${BCYC.map(([k,n])=>`<button type="button" data-becyc="${k}" aria-pressed="${v.cyc===k}">${n}</button>`).join("")}</div></div>
       ${v.kind!=="inc"?`<div class="tp-lab">Category${catChips(v.cat)}</div>`:""}`}
   else if(e.t==="spend"){h=`<b>${isNew?"New":"Edit"} expense</b>`;acts=isNew?"":bHoldBtn;
-    var body=`<div class="bsh-2"><label class="tp-lab">Amount (${esc(b.cur)})<input id="beAmt" inputmode="decimal" value="${v.amt||""}"></label><label class="tp-lab">Date<input id="beStart" type="date" value="${v.d||today()}"></label></div><label class="tp-lab">What for<input id="beName" value="${esc(v.note||"")}"></label><div class="tp-lab">Category${catChips(v.cat)}</div>`}
+    var body=`<div class="bsh-2"><label class="tp-lab">Amount (${esc(b.cur)})<input id="beAmt" inputmode="decimal" value="${bAmtF(v.amt)}"></label><label class="tp-lab">Date<input id="beStart" type="date" value="${v.d||today()}"></label></div><label class="tp-lab">What for<input id="beName" value="${esc(v.note||"")}"></label><div class="tp-lab">Category${catChips(v.cat)}</div>`}
   else{h=`<b>${isNew?"New":"Edit"} category</b>`;const cnt=b.items.filter(i=>i.kind!=="inc"&&i.cat===e.orig).length;acts=isNew||e.orig==="Other"?"":bHoldBtn;
-    var body=`<div class="bsh-2"><label class="tp-lab">Name<input id="beName" value="${esc(v.n||"")}" placeholder="Groceries"${e.orig==="Other"?" disabled":""}></label><label class="tp-lab">Monthly limit (${esc(b.cur)})<input id="beAmt" inputmode="decimal" value="${+v.lim||""}" placeholder="No limit"></label></div>
+    var body=`<div class="bsh-2"><label class="tp-lab">Name<input id="beName" value="${esc(v.n||"")}" placeholder="Groceries"${e.orig==="Other"?" disabled":""}></label><label class="tp-lab">Monthly limit (${esc(b.cur)})<input id="beAmt" inputmode="decimal" value="${bAmtF(v.lim)}" placeholder="No limit"></label></div>
       <div class="tp-lab">Color<div class="bsh-sw">${BPAL.map(c=>`<button type="button" data-becol="${c}" aria-pressed="${v.c===c}" style="--cc:${c}" aria-label="Color ${c}"></button>`).join("")}</div></div>${!isNew&&cnt?`<p class="note" style="margin:0">${cnt} item${cnt===1?"":"s"} in this category. Deleting it moves them to Other.</p>`:""}`}
   o.innerHTML=`<div class="wp-box panel bsh" role="dialog" aria-label="Edit"><div class="wp-h">${h}<button type="button" class="x wp-x" data-bclose aria-label="Close">×</button></div><div class="bsh-g">${body}</div><div class="bsh-acts">${acts}<span style="flex:1"></span><button type="button" class="btn ghost" data-bclose>Cancel</button><button type="button" class="btn" data-bsave>Save</button></div></div>`}
 function bRead(){const e=bEdit;if(!e)return;const g=id=>{const x=document.getElementById(id);return x?x.value:null},num=s=>parseFloat(String(s||"").replace(/[^0-9.]/g,""))||0,v=e.v;
@@ -3183,6 +3184,7 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
     else if(e.t==="spend"){if(!v.amt)return toast("Enter an amount");const i=b.spends.findIndex(x=>x.id===v.id);if(i>=0)b.spends[i]=v;else b.spends.push(v);toast("Expense saved")}
     else{if(!v.n)return toast("Give it a name");if(v.n!==e.orig&&bCat(v.n))return toast(v.n+" already exists");if(e.isNew){v.own=true;b.cats.push(v);bTab="c:"+v.n;bFlash=v.n}else{if(bTab==="c:"+e.orig)bTab="c:"+v.n;const c=bCat(e.orig);Object.assign(c,v);if(v.n!==e.orig){b.items.forEach(i=>{if(i.cat===e.orig)i.cat=v.n});b.spends.forEach(s=>{if(s.cat===e.orig)s.cat=v.n})}}toast(v.n+" saved")}
     bEdit=null;bSheet();render();save();if(bFlash){const n=bFlash;bFlash=null;setTimeout(()=>{const el=[...document.querySelectorAll("[data-bkcat]")].find(x=>x.dataset.bkcat===n);if(el)el.scrollIntoView({behavior:"smooth",block:"center"})},60)}return}});
+document.addEventListener("focusout",e=>{const t=e.target;if(!t||!["beAmt","bsAmt"].includes(t.id))return;const n=parseFloat(String(t.value).replace(/[^0-9.]/g,""));if(isFinite(n)&&n>0)t.value=n.toFixed(2)});
 document.addEventListener("input",e=>{if(e.target.id!=="beCo")return;const ct=document.querySelector("#bSheet .bsh-ct");if(ct)ct.hidden=!e.target.value.trim()});
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="beNC"){e.preventDefault();const a=document.querySelector("[data-bncadd]");a&&a.click()}else if(e.key==="Escape"&&bEdit){bEdit=null;bSheet()}});
 document.addEventListener("submit",e=>{if(e.target.id!=="bsForm")return;e.preventDefault();const b=B(),a=parseFloat(String($("#bsAmt").value).replace(/[^0-9.]/g,""));if(!a){toast("Enter an amount");$("#bsAmt").focus();return}bAddCat=$("#bsCat").value;b.spends.push({id:uid(),d:today(),amt:a,note:$("#bsNote").value.trim(),cat:bAddCat});toast(bMoney(a)+" added");render();save();setTimeout(()=>{const i=$("#bsAmt");i&&i.focus()},50)},true);
@@ -4567,7 +4569,7 @@ function affPanel(){const L=AFF();return `<div class="panel affp" style="margin-
 /* the floating player */
 function affStop(){clearInterval(affTk);affTk=null;clearTimeout(affGuard);try{affYT&&affYT.destroy&&affYT.destroy()}catch(_){}affYT=null;if(affEl){try{affEl.pause()}catch(_){}affEl.src="";affEl=null}if(affURL){URL.revokeObjectURL(affURL);affURL=null}affState="load";try{navigator.mediaSession&&(navigator.mediaSession.metadata=null)}catch(_){}}
 function affUI(){const w=document.getElementById("affPlayer");if(!w)return;const a=AFF().find(x=>x.id===affPlaying);if(!a)return;let cur=0,dur=0;
-  try{if(affEl){cur=affEl.currentTime;dur=affEl.duration}else if(affYT&&affYT.getCurrentTime){cur=affYT.getCurrentTime();dur=affYT.getDuration()}}catch(_){}
+  try{if(affEl){cur=affEl.currentTime;dur=affEl.duration}else if(affYT&&affYT.getCurrentTime){cur=affYT.getCurrentTime();dur=affYT.getDuration();const ps=affYT.getPlayerState&&affYT.getPlayerState();if(ps===1){affState="play";if(affVid==="need")affVid=affMode()==="video"}else if(ps===2||ps===0||ps===5)affState="pause"}}catch(_){}
   const pl=affState==="play";w.classList.toggle("vid",!!affVid);w.classList.toggle("playing",pl);const pp=w.querySelector("[data-affpp]");if(pp){pp.innerHTML=affState==="load"?`<span class="aff-spin"></span>`:pl?AFFI.pause:AFFI.play;pp.setAttribute("aria-label",pl?"Pause":"Play")}
   const f=w.querySelector(".aff-prog i");if(f)f.style.width=(dur>0?Math.min(100,cur/dur*100):0)+"%";const tm=w.querySelector(".aff-tm");if(tm)tm.textContent=dur>0&&isFinite(dur)?affFmt(cur)+" / "+affFmt(dur):affState==="load"?"Loading…":a.list?"Playlist":"";
   const hint=w.querySelector(".aff-hint");if(hint)hint.hidden=!(affVid==="need")}
@@ -4931,7 +4933,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="268",APPT="2026-11-19T01:20:00-05:00";   /* APPT: when this update was made */
+const APPV="269",APPT="2026-11-19T01:24:00-05:00";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
