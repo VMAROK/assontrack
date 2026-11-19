@@ -1259,6 +1259,8 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .bk-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:0 2px;font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:left}
 .bk-t{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:800;color:#fff}.bk-t i{width:9px;height:9px;border-radius:50%;background:var(--cc);box-shadow:0 0 8px var(--cc)}.bk-v{font-family:var(--mono);font-size:14px;font-weight:600}.bk-v em{font-style:normal;color:var(--muted)}
 .bk-bar{height:6px;border-radius:99px;background:rgba(150,180,240,.14);overflow:hidden}.bk-bar i{display:block;height:100%;border-radius:99px;transition:width .6s cubic-bezier(.34,1.56,.64,1)}
+.bk-empty{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px;border:1px dashed color-mix(in srgb,var(--cc) 45%,transparent);border-radius:10px;font-size:12.5px;color:var(--muted)}.bk-empty span{flex:1 1 100%;margin-bottom:2px}.bk-empty button{font:inherit;font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:99px;cursor:pointer;color:#fff;background:color-mix(in srgb,var(--cc) 22%,transparent);border:1px solid color-mix(in srgb,var(--cc) 55%,transparent)}
+.bk-cat.flash{animation:bkFl 1.1s cubic-bezier(.34,1.56,.64,1)}@keyframes bkFl{0%{transform:scale(.9);box-shadow:0 0 0 0 var(--cc)}40%{transform:scale(1.02);box-shadow:0 0 0 4px var(--cc)}100%{transform:none;box-shadow:none}}
 .bk-sp{justify-self:start;font:inherit;font-size:12px;font-weight:600;color:#ffb648;background:none;border:0;padding:0 2px;cursor:pointer}
 .bs-add{display:grid;grid-template-columns:110px minmax(0,1fr) 150px auto;gap:8px;margin-bottom:12px}.bs-add .btn{padding:10px 18px}@media (max-width:600px){.bs-add{grid-template-columns:1fr 1fr}}
 .bs-g{border:1px solid rgba(var(--lr),.25);border-radius:12px;overflow:hidden;margin-bottom:8px}.bs-gh{display:flex;justify-content:space-between;padding:7px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:rgba(4,8,20,.6)}.bs-gh b{font-family:var(--mono);letter-spacing:0;color:#cfdaf2}
@@ -3021,7 +3023,7 @@ const BDEF=[["Housing","#7c8cff"],["Utilities","#4cc9ff"],["Food","#3ddc84"],["T
 const BPAL=["#7c8cff","#4cc9ff","#3ddc84","#ffb648","#ff6fb5","#b48cff","#ff7a85","#ffd166","#5ee3d0","#9db0d0","#ff8a4c","#a3e635"];
 const BCYC=[["wk","Weekly",52/12],["mo","Monthly",1],["qtr","Every 3 months",1/3],["yr","Yearly",1/12]];
 const BKN={sub:["Subscription","Subscriptions"],bill:["Bill","Bills"],inc:["Income","Income"]};
-let bTab="all",bEdit=null,bSel=null,bMon=0,bAddCat="Food";
+let bTab="all",bEdit=null,bSel=null,bMon=0,bAddCat="Food",bFlash=null;
 const B=()=>{if(!data.budget)data.budget={};const b=data.budget;b.items=b.items||[];b.spends=b.spends||[];b.cur=b.cur||"$";if(!b.cats)b.cats=BDEF.map(([n,c])=>({n,c,lim:(b.limits||{})[n]||0}));return b};
 const bCat=n=>B().cats.find(c=>c.n===n);
 const bCol=n=>(bCat(n)||{c:"#9db0d0"}).c;
@@ -3061,13 +3063,13 @@ function bCard(it){const m=bMo(it),nx=it.paused?null:bNext(it),dd=nx?bDays(nx):n
   return `<button type="button" class="bi-card${it.paused?" paused":""}" data-bedit="${it.id}" data-bid="${it.id}" style="--cc:${c}"><span class="bi-top"><span class="bi-ic">${esc((it.name||"?").trim().slice(0,1).toUpperCase())}</span>${it.paused?`<span class="bi-next">paused</span>`:nx?`<span class="bi-next${dd<=3?" soon":""}">${bIn(dd)}</span>`:""}</span>
     <b class="bi-nm">${esc(it.name||"Untitled")}</b><span class="bi-amt">${it.kind==="inc"?"+":""}${bMoney(+it.amt||0)}</span><small class="bi-cy">${cy}${it.cyc==="mo"?" · "+bMoney(m*12,0)+"/yr":" · "+bMoney(m)+"/mo"}</small></button>`}
 const bAddCard=k=>`<button type="button" class="bi-card bi-add" data-bnew="${k}"><span class="bi-ic">＋</span><b class="bi-nm">${BKN[k][0]}</b><small class="bi-cy">${k==="sub"?"Netflix, Spotify…":k==="bill"?"Rent, phone…":"Salary, side work…"}</small></button>`;
-function bAll(S){const b=B(),it=b.items.filter(i=>i.kind!=="inc");const cs=b.cats.filter(c=>it.some(i=>bItCat(i)===c.n)||S.spCat[c.n]||+c.lim);
+function bAll(S){const b=B(),it=b.items.filter(i=>i.kind!=="inc");const cs=b.cats.filter(c=>c.own||!BDEF.some(z=>z[0]===c.n)||it.some(i=>bItCat(i)===c.n)||S.spCat[c.n]||+c.lim);
   if(!cs.length)return `<div class="bi-grid">${bAddCard("sub")}${bAddCard("bill")}</div>`;
   return `<div class="bk-cats">${cs.map(c=>{const L=it.filter(i=>bItCat(i)===c.n).sort((a,z)=>bMo(z)-bMo(a)),used=(S.fixCat[c.n]||0)+(S.spCat[c.n]||0),lim=+c.lim||0,f=lim?used/lim:0;
-    return `<section class="bk-cat" style="--cc:${c.c}"><button type="button" class="bk-h" data-bcat="${esc(c.n)}"><span class="bk-t"><i></i>${esc(c.n)}</span><span class="bk-v">${bMoney(used,0)}${lim?`<em> / ${bMoney(lim,0)}</em>`:""}</span></button>
+    return `<section class="bk-cat${bFlash===c.n?" flash":""}" data-bkcat="${esc(c.n)}" style="--cc:${c.c}"><button type="button" class="bk-h" data-bcat="${esc(c.n)}"><span class="bk-t"><i></i>${esc(c.n)}</span><span class="bk-v">${bMoney(used,0)}${lim?`<em> / ${bMoney(lim,0)}</em>`:""}</span></button>
       ${lim?`<div class="bk-bar"><i style="width:${Math.min(100,f*100)}%;background:${f>1?"#ff4d5e":f>.85?"#ffb648":c.c}"></i></div>`:""}
       ${S.spCat[c.n]?`<button type="button" class="bk-sp" data-btab="spend">${bMoney(S.spCat[c.n])} spent this month</button>`:""}
-      ${L.length?`<div class="bi-grid">${L.map(bCard).join("")}</div>`:""}</section>`}).join("")}</div>`}
+      ${L.length?`<div class="bi-grid">${L.map(bCard).join("")}</div>`:`<div class="bk-empty"><span>Nothing here yet</span><button type="button" data-bnew="sub" data-bnc-cat="${esc(c.n)}">＋ Subscription</button><button type="button" data-bnew="bill" data-bnc-cat="${esc(c.n)}">＋ Bill</button></div>`}</section>`}).join("")}</div>`}
 function bSpend(S){const b=B(),L=b.spends.filter(s=>(s.d||"").slice(0,7)===today().slice(0,7)).sort((a,z)=>a.d<z.d?1:a.d>z.d?-1:0),G=[];L.forEach(s=>{let g=G.find(x=>x[0]===s.d);if(!g)G.push(g=[s.d,[]]);g[1].push(s)});
   return `<form class="bs-add" id="bsForm" autocomplete="off"><input id="bsAmt" inputmode="decimal" placeholder="${esc(b.cur)}0.00" aria-label="Amount"><input id="bsNote" placeholder="What for?" aria-label="What for"><select id="bsCat" aria-label="Category">${b.cats.map(c=>`<option${c.n===bAddCat?" selected":""}>${esc(c.n)}</option>`).join("")}</select><button class="btn" type="submit">Add</button></form>
     ${G.length?G.map(([d,A])=>`<div class="bs-g"><div class="bs-gh"><span>${d===today()?"Today":bDate(d).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}</span><b>${bMoney(A.reduce((a,s)=>a+(+s.amt||0),0))}</b></div>${A.map(s=>`<button type="button" class="bs-r" data-bsedit="${s.id}" style="--cc:${bCol(s.cat)}"><i></i><span>${esc(s.note||s.cat)}<small>${esc(s.cat)}</small></span><b>${bMoney(+s.amt||0)}</b></button>`).join("")}</div>`).join(""):`<p class="note" style="margin:10px 2px 0">Log what you spend day to day. It counts against this month and its category.</p>`}`}
@@ -3132,7 +3134,7 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(d.btab){bTab=d.btab;render();return}
   if(d.bmon!=null){bMon=d.bmon==="0"?0:bMon+(+d.bmon);bSel=null;render();return}
   if(d.bday){bSel=d.bday;render();return}
-  if(d.bnew){const k=d.bnew;bOpen("item",{id:uid(),kind:k,name:"",amt:"",cyc:"mo",cat:k==="sub"?"Subscriptions":k==="bill"?(b.cats.find(c=>c.n==="Housing")?"Housing":"Other"):"",start:""},true);return}
+  if(d.bnew){const k=d.bnew;bOpen("item",{id:uid(),kind:k,name:"",amt:"",cyc:"mo",cat:d.bncCat&&bCat(d.bncCat)?d.bncCat:k==="sub"?"Subscriptions":k==="bill"?(b.cats.find(c=>c.n==="Housing")?"Housing":"Other"):"",start:""},true);return}
   if(d.bedit){const it=b.items.find(x=>x.id===d.bedit);if(it)bOpen("item",it,false);return}
   if(d.bsedit){const s=b.spends.find(x=>x.id===d.bsedit);if(s)bOpen("spend",s,false);return}
   if(d.bcat){const c=bCat(d.bcat);if(c)bOpen("cat",c,false,c.n);return}
@@ -3143,13 +3145,13 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(d.becat){bRead();bEdit.v.cat=d.becat;bSheet();return}
   if(d.becol){bRead();bEdit.v.c=d.becol;bSheet();return}
   if(d.bnc!=null){bRead();bEdit.nc=true;bSheet();setTimeout(()=>{const i=document.getElementById("beNC");i&&i.focus()},30);return}
-  if(d.bncadd!=null){const i=document.getElementById("beNC"),n=(i&&i.value||"").trim();bRead();if(n){if(!bCat(n)){const used=b.cats.map(c=>c.c);b.cats.push({n,c:BPAL.find(c=>!used.includes(c))||BPAL[b.cats.length%BPAL.length],lim:0});save()}bEdit.v.cat=n}bEdit.nc=false;bSheet();return}
+  if(d.bncadd!=null){const i=document.getElementById("beNC"),n=(i&&i.value||"").trim();bRead();if(n){if(!bCat(n)){const used=b.cats.map(c=>c.c);b.cats.push({n,c:BPAL.find(c=>!used.includes(c))||BPAL[b.cats.length%BPAL.length],lim:0,own:true});save()}bEdit.v.cat=n}bEdit.nc=false;bSheet();return}
   if(d.bpause!=null){bRead();bEdit.v.paused=!bEdit.v.paused;bSheet();return}
   if(d.bsave!=null){bRead();const e=bEdit,v=e.v;
     if(e.t==="item"){if(!v.name)return toast("Give it a name");if(!v.amt)return toast("Enter an amount");const i=b.items.findIndex(x=>x.id===v.id);if(i>=0)b.items[i]=v;else b.items.push(v);if(e.isNew&&bTab!=="all")bTab=v.kind;toast(v.name+" saved")}
     else if(e.t==="spend"){if(!v.amt)return toast("Enter an amount");const i=b.spends.findIndex(x=>x.id===v.id);if(i>=0)b.spends[i]=v;else b.spends.push(v);toast("Expense saved")}
-    else{if(!v.n)return toast("Give it a name");if(v.n!==e.orig&&bCat(v.n))return toast(v.n+" already exists");if(e.isNew)b.cats.push(v);else{const c=bCat(e.orig);Object.assign(c,v);if(v.n!==e.orig){b.items.forEach(i=>{if(i.cat===e.orig)i.cat=v.n});b.spends.forEach(s=>{if(s.cat===e.orig)s.cat=v.n})}}toast(v.n+" saved")}
-    bEdit=null;bSheet();render();save();return}});
+    else{if(!v.n)return toast("Give it a name");if(v.n!==e.orig&&bCat(v.n))return toast(v.n+" already exists");if(e.isNew){v.own=true;b.cats.push(v);bTab="all";bFlash=v.n}else{const c=bCat(e.orig);Object.assign(c,v);if(v.n!==e.orig){b.items.forEach(i=>{if(i.cat===e.orig)i.cat=v.n});b.spends.forEach(s=>{if(s.cat===e.orig)s.cat=v.n})}}toast(v.n+" saved")}
+    bEdit=null;bSheet();render();save();if(bFlash){const n=bFlash;bFlash=null;setTimeout(()=>{const el=[...document.querySelectorAll("[data-bkcat]")].find(x=>x.dataset.bkcat===n);if(el)el.scrollIntoView({behavior:"smooth",block:"center"})},60)}return}});
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="beNC"){e.preventDefault();const a=document.querySelector("[data-bncadd]");a&&a.click()}else if(e.key==="Escape"&&bEdit){bEdit=null;bSheet()}});
 document.addEventListener("submit",e=>{if(e.target.id!=="bsForm")return;e.preventDefault();const b=B(),a=parseFloat(String($("#bsAmt").value).replace(/[^0-9.]/g,""));if(!a){toast("Enter an amount");$("#bsAmt").focus();return}bAddCat=$("#bsCat").value;b.spends.push({id:uid(),d:today(),amt:a,note:$("#bsNote").value.trim(),cat:bAddCat});toast(bMoney(a)+" added");render();save();setTimeout(()=>{const i=$("#bsAmt");i&&i.focus()},50)},true);
 
@@ -4804,7 +4806,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="260",APPT="2026-11-19T00:55:00-05:00";   /* APPT: when this update was made */
+const APPV="261",APPT="2026-11-19T00:58:00-05:00";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
