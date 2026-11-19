@@ -1191,6 +1191,7 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .lines-sw{display:inline-flex}
 
 /* training */
+.passtop.trtop{grid-template-columns:380px minmax(0,1fr)}.trtop .holopanel{align-self:stretch}.trtop .holo3d{max-width:340px}
 .ib-list{display:grid;gap:12px}.trtop>.stack{display:flex;flex-direction:column}.trtop>.stack>.trins{flex:1}.trins .ib-list{align-content:space-evenly;height:calc(100% - 40px)}.ib-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:5px}.ib-h span{font-size:13.5px;color:#e6eeff;font-weight:600}.ib-h b{font-family:var(--mono);font-size:13.5px;font-weight:600;color:#e6eeff}
 .ib-bar{display:flex;height:4px;border-radius:99px;overflow:hidden;background:rgba(150,180,240,.14)}.ib-bar i{display:block;height:100%;border-radius:99px;box-shadow:0 0 8px currentColor}.ib-bar i+i{border-radius:0 99px 99px 0}
 .ib small{display:block;margin-top:5px;font-size:12px;color:var(--muted)}
@@ -4441,7 +4442,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="231",APPT="2026-11-18T20:49:00-05:00";   /* APPT: when this update was made */
+const APPV="232",APPT="2026-11-18T20:55:00-05:00";   /* APPT: when this update was made */
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
