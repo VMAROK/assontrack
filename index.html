@@ -1191,6 +1191,9 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .lines-sw{display:inline-flex}
 
 /* training */
+.cm-menu{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;justify-content:center;gap:8px;padding:18px;border-radius:inherit;background:rgba(4,8,20,.86);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);cursor:default}
+.cm-menu b{font-size:15px;text-align:center;margin-bottom:4px;color:#fff}.cm-menu .tpm-b{height:40px;width:100%}.cm-menu .tpm-hold{min-width:0;background:rgba(255,77,94,.16);color:#ffc2c8;border-color:#ff4d5e}.cm-menu .tpm-hold i{background:#ff4d5e}.cm-menu .tpm-hold.go span{color:#1a0306}
+.tp-card.sq{-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
 #tpSug{display:flex;gap:8px;flex-wrap:wrap}
 .tpp .tp-subrow{margin-top:6px;padding:6px 8px 6px 10px;display:grid;gap:5px}
 .tp-subl{display:flex;align-items:center;gap:8px;min-width:0}.tp-subl .tp-subh{margin:0;flex:0 0 72px;font-size:12px;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.tp-subl .tp-subh span{font-weight:500;color:var(--muted)}
@@ -2517,6 +2520,18 @@ function planCard(d,pl,inSh){pl=Object.assign({},pl,{mus:musNorm(pl.mus)});const
     <div class="tp-foot">${pDays(pl).length?`<div class="tp-dys">${pDays(pl).sort().map(i=>`<span>${DAYS[i]}</span>`).join("")}</div>`:`<div class="tp-dys"><span class="ev">Every day</span></div>`}<small>${pl.ex.length} exercise${pl.ex.length===1?"":"s"}</small></div>
     ${dState==="on"?`<span class="tp-doneov" aria-label="Done"><i>${CKSVG}</i></span>`:dState==="miss"?`<span class="tp-doneov miss" aria-label="Missed"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></i></span>`:dState==="part"?`<span class="tp-done part" title="${dn} of ${pl.ex.length} exercises done today">${CKSVG}</span>`:""}</div>`}
 let wpOpen="",wpSel=-1,wpCan=true;
+/* hold a workout card for a menu: Duplicate / Delete (hold to delete) */
+let cmT=null,cmHeld=false,cmDelT=null,cmAt=0;
+function cmShow(card){document.querySelectorAll(".cm-menu").forEach(m=>m.remove());if(!card)return;const id=card.dataset.pid,pl=(data.plans||[]).find(x=>x.id===id);if(!pl)return;
+  const m=document.createElement("div");m.className="cm-menu";m.innerHTML=`<b>${esc(pl.name)}</b><button type="button" class="tpm-b" data-cmdup="${id}">Duplicate</button><button type="button" class="tpm-b danger tpm-hold" data-cmrm="${id}"><i></i><span>Hold to delete</span></button><button type="button" class="tpm-b" data-cmx>Cancel</button>`;card.appendChild(m)}
+document.addEventListener("pointerdown",e=>{const c=e.target.closest&&e.target.closest(".tp-card.sq[data-pid]");if(!c||e.target.closest("button,.cm-menu"))return;cmHeld=false;clearTimeout(cmT);cmT=setTimeout(()=>{cmHeld=true;cmAt=Date.now()+500;try{navigator.vibrate&&navigator.vibrate(15)}catch(_){}cmShow(c)},500)});
+["pointerup","pointercancel","pointermove"].forEach(k=>document.addEventListener(k,e=>{if(k==="pointermove"&&!(e.movementX||e.movementY))return;if(k!=="pointermove"||Math.abs(e.movementX)+Math.abs(e.movementY)>4)clearTimeout(cmT)},true));
+document.addEventListener("contextmenu",e=>{if(e.target.closest&&e.target.closest(".tp-card.sq"))e.preventDefault()});
+document.addEventListener("click",e=>{if(cmHeld&&Date.now()-cmAt<700){e.stopPropagation();e.preventDefault();cmHeld=false;return}cmHeld=false;
+  const t=e.target.closest&&e.target.closest("[data-cmdup],[data-cmx],[data-cmrm]");if(!t)return;e.stopPropagation();if(t.dataset.cmrm)return;
+  if(t.dataset.cmdup){cmHeld=false;const pl=(data.plans||[]).find(x=>x.id===t.dataset.cmdup);if(pl){const c=JSON.parse(JSON.stringify(pl));c.id=uid();c.name=pl.name+" copy";const i=data.plans.indexOf(pl);data.plans.splice(i+1,0,c);toast("Duplicated "+pl.name);render();save()}}else cmShow(null)},true);
+document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("[data-cmrm]");if(!b)return;e.preventDefault();e.stopPropagation();b.classList.add("go");clearTimeout(cmDelT);cmDelT=setTimeout(()=>{const id=b.dataset.cmrm,pl=(data.plans||[]).find(x=>x.id===id);if(pl){cmHeld=true;cmAt=Date.now();data.plans=data.plans.filter(x=>x.id!==id);toast(pl.name+" deleted");render();save()}},1200)},true);
+["pointerup","pointercancel","pointerleave"].forEach(k=>document.addEventListener(k,e=>{if(cmDelT&&(k!=="pointerleave"||(e.target.closest&&e.target.closest("[data-cmrm]")))){clearTimeout(cmDelT);cmDelT=null;document.querySelectorAll("[data-cmrm].go").forEach(b=>b.classList.remove("go"))}},true));
 function wpHTML(){const pl=(data.plans||[]).find(x=>x.id===wpOpen);if(!pl)return "";wpCan=!cardDs||cardDs===today();const P=Object.assign({},pl,{mus:musNorm(pl.mus)}),se=wpSel>=0&&pl.ex[wpSel],G=exGroups(pl.ex);
   return `<div class="wp-box panel" role="dialog" aria-label="${esc(pl.name)}"><div class="wp-h"><b>${esc(pl.name)}${ppTag(P.mus)}</b><button type="button" class="tp-pen" data-pedit="${pl.id}" data-wpclose aria-label="Edit ${esc(pl.name)}" title="Edit">${PENSVG}</button><button type="button" class="x wp-x" data-wpclose aria-label="Close">×</button></div>
     <div class="wp-body"><div class="wp-fig">${musSvg(se?(exMus(se.name)||{}):P.mus,{lab:false})}<small>${se?`Showing <b>${esc(se.name)}</b> · <button type="button" data-wpsel="-1">Show all</button>`:"Tap an exercise to see its muscles"}</small></div>
@@ -4489,7 +4504,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="251",APPT="2026-11-18T22:11:00-05:00";   /* APPT: when this update was made */
+const APPV="252",APPT="2026-11-18T22:16:00-05:00";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
