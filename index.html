@@ -1196,13 +1196,14 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .tpp .wk-barrow{margin:0;align-items:flex-end}
 .tpp .wk-barrow>.cat-bar{border:0!important;background:none!important;border-radius:0!important;overflow:visible!important;gap:4px;padding:0 6px;width:auto;margin:0}
 .tpp .wk-barrow .cat-tab{flex:0 0 auto;border:1px solid rgba(var(--lr),.24)!important;border-bottom:0!important;border-radius:10px 10px 0 0!important;background:rgba(var(--tX),.35)!important;margin-bottom:-1px;padding:8px 14px;color:var(--muted)}
-.tpp .wk-barrow .cat-tab[aria-selected=true]{background:rgba(var(--tL),.14)!important;border-color:rgba(var(--tL),.45)!important;color:#eef3ff;padding-top:10px;z-index:1}
+.tpp .wk-barrow .cat-tab[aria-selected=true]{background:color-mix(in srgb,rgb(var(--tL)) 16%,rgb(var(--tX)))!important;border-color:rgba(var(--tL),.6)!important;color:#eef3ff;padding-top:10px;padding-bottom:9px;margin-bottom:-1px;z-index:3;position:relative}
 .tpp .wk-barrow .cat-tab[aria-selected=true]::after{display:none}
 .tpp .wk-barrow .wk-tools{padding-bottom:6px}
-.tpp .wk-board{border:1px solid rgba(var(--tL),.45)!important;border-radius:0 12px 12px 12px!important;background:linear-gradient(180deg,rgba(var(--tL),.14),rgba(var(--tX),.3) 90px)!important;padding:0;overflow:hidden}
+.tpp .wk-board{position:relative;z-index:1;border:1px solid rgba(var(--tL),.6)!important;border-radius:0 12px 12px 12px!important;background:linear-gradient(180deg,color-mix(in srgb,rgb(var(--tL)) 16%,rgb(var(--tX))),rgba(var(--tX),.55) 140px)!important;padding:0;overflow:hidden}
+.tpp .wk-barrow{position:relative;z-index:2}.tpp .wk-board>.wk-sec{border-top:0!important;background:none!important}.tpp .wk-barrow .cat-tab:not([aria-selected=true]){margin-bottom:0}
 /* category boxes touch edge to edge */
 .tpp .wk-cats{gap:0!important;padding:0!important}
-.tpp .wk-cats>.wk-sec.wk-catc{border-radius:0!important;border:0!important;border-left:1px solid rgba(var(--lr),.28)!important;box-shadow:none!important;border-top:3px solid var(--cc)!important}
+.tpp .wk-cats>.wk-sec.wk-catc{border-radius:0!important;border:0!important;border-left:1px solid rgba(var(--lr),.28)!important;box-shadow:none!important;background:none!important}
 .tpp .wk-cats>.wk-sec.wk-catc:first-child{border-left:0!important}
 .wk-barrow{display:flex;flex-direction:row-reverse;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 10px}.wk-barrow>.wk-bar{margin:0}.wk-tools{display:flex;gap:6px}
 .wk-allp>.sh-h{display:none}
@@ -2818,7 +2819,7 @@ function vTrain(){
   return banner()+`<div class="passtop figtop bodytop trtop">${figurePanel()}
    <div class="stack"><div class="grid tiles trtiles">${trTiles(d)}
     <div class="panel tile" style="--c:var(--violet)">${ic("star")}<small>Fitness</small><b>${F.name}</b><em>${lastW?"last workout "+(lastW.d===today()?"today":fmtDate(lastW.d)):"no workouts yet"}</em></div></div>
-   ${trWeekPanel(d,T)}${trInsights(d)}</div></div>${planPanel(d)}${trProgress(d,T)}`;
+   ${trInsights(d)}${trWeekPanel(d,T)}</div></div>${planPanel(d)}${trProgress(d,T)}`;
 }
 /* typing an exercise you've done before fills in last time's numbers and suggests the next step up */
 document.addEventListener("input",e=>{if(e.target.id!=="woName")return;const w=trLast(D(),e.target.value),h=$("#trHint"),u=D().goals.unit;if(!h)return;
@@ -4464,7 +4465,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="238",APPT="2026-11-18T21:16:00-05:00";   /* APPT: when this update was made */
+const APPV="239",APPT="2026-11-18T21:22:00-05:00";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
