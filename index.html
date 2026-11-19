@@ -1191,8 +1191,8 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .lines-sw{display:inline-flex}
 
 /* training */
-.ib-list{display:grid;gap:16px}.ib-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px}.ib-h span{font-size:13.5px;color:#e6eeff;font-weight:600}.ib-h b{font-family:var(--mono);font-size:13.5px;font-weight:600;color:#e6eeff}
-.ib-bar{display:flex;height:8px;border-radius:99px;overflow:hidden;background:rgba(150,180,240,.14)}.ib-bar i{display:block;height:100%;border-radius:99px;box-shadow:0 0 8px currentColor}.ib-bar i+i{border-radius:0 99px 99px 0}
+.ib-list{display:grid;gap:12px}.trtop>.stack{display:flex;flex-direction:column}.trtop>.stack>.trins{flex:1}.trins .ib-list{align-content:space-evenly;height:calc(100% - 40px)}.ib-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:5px}.ib-h span{font-size:13.5px;color:#e6eeff;font-weight:600}.ib-h b{font-family:var(--mono);font-size:13.5px;font-weight:600;color:#e6eeff}
+.ib-bar{display:flex;height:4px;border-radius:99px;overflow:hidden;background:rgba(150,180,240,.14)}.ib-bar i{display:block;height:100%;border-radius:99px;box-shadow:0 0 8px currentColor}.ib-bar i+i{border-radius:0 99px 99px 0}
 .ib small{display:block;margin-top:5px;font-size:12px;color:var(--muted)}
 .wp-r.tl-r{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;cursor:default}.wp-r.tl-r.done{border-color:rgba(61,220,132,.55);background:rgba(61,220,132,.08)}
 .wp-rm{flex:1;min-width:0;cursor:pointer}.wp-rt{display:flex;justify-content:space-between;align-items:baseline;gap:10px}.wp-rt span{font-size:16px}.wp-rt em{font-style:normal;font-family:var(--mono);font-size:14px;color:var(--muted);white-space:nowrap}
@@ -2271,11 +2271,9 @@ function trInsights(d){const TD=today(),add=(ds,n)=>{const x=new Date(ds+"T12:00
   /* 5 stronger */ const by={};WO.filter(w=>w.d>add(TD,-28)).forEach(w=>{const k=trKey(w.name);(by[k]=by[k]||[]).push(w)});let up=0,cmp=0,best=null,stuck=null;
   Object.values(by).forEach(L=>{L.sort((a,b)=>a.d<b.d?-1:1);const days=[...new Set(L.map(w=>w.d))];if(days.length<2)return;const sc=w=>(+w.kg||0)>0?(+w.kg)*(+w.reps||0):(+w.reps||0);const last=L.filter(w=>w.d===days[days.length-1]),prev=L.filter(w=>w.d===days[days.length-2]);
     const a=Math.max(...last.map(sc)),b=Math.max(...prev.map(sc));cmp++;const nm=last[0].name;if(a>b){up++;const g=+last[0].kg&&+prev[0].kg?(+last[0].kg-+prev[0].kg)+" "+d.goals.unit:(a-b)+(last[0].unit==="s"?" s":" reps");if(!best)best=nm+" up "+g}else if(!stuck)stuck=nm+" stuck at last time"});
-  const bar=(lab,val,pc,col,ins,split)=>`<div class="ib"><div class="ib-h"><span>${lab}</span><b>${val}</b></div><div class="ib-bar">${split?`<i style="width:${(pc*100).toFixed(1)}%;background:#ff7a85"></i><i style="flex:1;background:#4cc9ff"></i>`:`<i style="width:${Math.max(0,Math.min(1,pc))*100}%;background:${col}"></i>`}</div><small>${ins}</small></div>`;
+  const bar=(lab,val,pc,col,ins,split)=>`<div class="ib"><div class="ib-h"><span>${lab}</span><b>${val}</b></div><div class="ib-bar">${split?`<i style="width:${(pc*100).toFixed(1)}%;background:#ff7a85"></i><i style="flex:1;background:#4cc9ff"></i>`:`<i style="width:${Math.max(0,Math.min(1,pc))*100}%;background:${col}"></i>`}</div></div>`;
   const out=[
-    bar("Sticking to the plan",pt?Math.round(pd/pt*100)+"% · "+pd+" of "+pt:"–",pt?pd/pt:0,"#3ddc84",pt?(mx?"You miss most on "+FD[miss.indexOf(mx)]+".":"No missed workouts in 4 weeks."):"Plan workouts on days to track this."),
     bar("Training load",tw+" sets"+(dl!==null?` · ${dl>=0?"+":""}${dl}%`:""),lw?Math.min(1,tw/(lw*1.5)):tw?1:0,"rgba(var(--tL),1)",lw?(tw>=lw?"Ahead of last week by "+(tw-lw)+" sets.":"Behind last week by "+(lw-tw)+" sets."):"Compared with last week at this point."),
-    bar("Push / pull",pu+pl?Math.round(pu/(pu+pl)*100)+" / "+Math.round(pl/(pu+pl)*100):"–",pu+pl?pu/(pu+pl):.5,"",pu+pl?(Math.abs(pu-pl)/(pu+pl)<.2?"Balanced this week.":(pu>pl?"Pull is falling behind.":"Push is falling behind.")):"Push in red, pull in blue.",true),
     bar("Weakest muscle",avg?MUSN[weak[0]]+" · "+Math.round(weak[1])+" sets":"–",avg?weak[1]/Math.max(1,avg):0,"#ffb648",avg?"Your average is "+Math.round(avg)+" sets per muscle (14 days).":"Log workouts to find gaps."),
     bar("Getting stronger",cmp?Math.round(up/cmp*100)+"% · "+up+" of "+cmp:"–",cmp?up/cmp:0,"#b48cff",cmp?[best,stuck].filter(Boolean).join(" · ")+".":"Repeat an exercise to compare.")];
   return `<div class="panel trins"><div class="ph"><span>Insights</span><i>last 2–4 weeks</i></div><div class="ib-list">${out.join("")}</div></div>`}
@@ -4443,7 +4441,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="229",APPT="2026-11-18T20:42:00-05:00";   /* APPT: when this update was made */
+const APPV="230",APPT="2026-11-18T20:46:00-05:00";   /* APPT: when this update was made */
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
