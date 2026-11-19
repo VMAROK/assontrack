@@ -4386,6 +4386,8 @@ const WALLS=[
   {id:"sakura",name:"Sakura",src:"wp/sakura.jpg",pos:"50% 50%",shade:.3},
   {id:"midnight",name:"Midnight",src:"wp/midnight.jpg",pos:"50% 50%",shade:0},
   {id:"liveaqua",name:"Aquarium",live:"aqua",src:"wp/m/liveaqua.jpg",pos:"50% 50%",shade:0},
+  {id:"livesky",name:"Sky flight",live:"sky",src:"wp/m/livesky.jpg",pos:"50% 50%",shade:.12},
+  {id:"liveember",name:"Embers",live:"ember",src:"wp/m/liveember.jpg",pos:"50% 50%",shade:0},
   {id:"livefire",name:"Live inferno",live:"inferno",src:"wp/m/inferno.jpg",pos:"50% 50%",shade:.05},
   {id:"liveportal",name:"Live portal",live:"portal",src:"wp/m/portal.jpg",pos:"50% 50%",shade:.1},
   {id:"livedub",name:"Live dub",live:"dub",src:"wp/m/deepdub.jpg",pos:"50% 50%",shade:0},
@@ -4394,7 +4396,7 @@ const WALLS=[
   {id:"fracswirl",name:"Ember swirl",live:"fswirl",src:"wp/m/fracswirl.jpg",pos:"50% 50%",shade:0},
   {id:"fracspiral",name:"Ice spiral",live:"fspiral",src:"wp/m/fracspiral.jpg",pos:"50% 50%",shade:0},
   {id:"fracbolt",name:"Neon lightning",live:"fbolt",src:"wp/m/fracbolt.jpg",pos:"50% 50%",shade:0}];
-const WGROUPS=[["Live · animated",["liveaqua","livefire","liveportal","livedub","livechrome"]],["Fractal zoom",["fracseahorse","fracswirl","fracspiral","fracbolt"]],["Landscape",["alpine","serenity","snow","moonlit","aurora","sunset","ocean","forest","dunes","sakura"]],["Kaleidoscope",["hyperspace","portal","royalgold","gilded","inferno","deepdub","pearl","chrome"]],["Fire",["fire","serpent"]],["Dream & space",["liminal","nebula","midnight"]]];
+const WGROUPS=[["Live · animated",["liveaqua","livesky","liveember","livefire","liveportal","livedub","livechrome"]],["Fractal zoom",["fracseahorse","fracswirl","fracspiral","fracbolt"]],["Landscape",["alpine","serenity","snow","moonlit","aurora","sunset","ocean","forest","dunes","sakura"]],["Kaleidoscope",["hyperspace","portal","royalgold","gilded","inferno","deepdub","pearl","chrome"]],["Fire",["fire","serpent"]],["Dream & space",["liminal","nebula","midnight"]]];
 const wallGroups=()=>{const A=allWalls(),out=WGROUPS.map(([n,ids])=>[n,ids.map(i=>A.find(w=>w.id===i)).filter(Boolean)]);const seen=new Set(WGROUPS.flatMap(g=>g[1]));const rest=A.filter(w=>!w.custom&&!seen.has(w.id));if(rest.length)out[out.length-1][1].push(...rest);const mine=A.filter(w=>w.custom);if(mine.length)out.push(["Yours",mine]);return out.filter(g=>g[1].length)};
 const stripWalls=f=>wallGroups().map(([n,ws])=>`<span class="tgroup">${esc(n)}</span>`+ws.map(f).join("")).join("");
 const allWalls=()=>[...WALLS,...((D().customWalls)||[]).map(c=>({id:c.id,name:c.name||"My wallpaper",src:c.src,thumb:c.thumb,pos:"50% 50%",shade:.15,custom:true}))];
@@ -4434,6 +4436,49 @@ void main(){vec2 uv=gl_FragCoord.xy/R;float asp=R.x/R.y;vec2 p=vec2(uv.x*asp,uv.
   float sp=step(.9965,h1(floor(p.x*260.)+floor((p.y+t*.006)*260.)*311.7));col+=vec3(.6,.8,.85)*sp*.12*uv.y;
   col*=1.-.38*pow(length((uv-.5)*vec2(1.,1.1)),1.6);gl_FragColor=vec4(col,1.);}
 `;
+/* live sky: flying forward through soft clouds toward the sun */
+const SKY_FS=`precision highp float;uniform vec2 R;uniform float T;
+float h2(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+float nz(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h2(i),h2(i+vec2(1,0)),f.x),mix(h2(i+vec2(0,1)),h2(i+1.),f.x),f.y);}
+float fbm(vec2 p){float v=0.,a=.5;mat2 m=mat2(1.6,1.2,-1.2,1.6);for(int i=0;i<5;i++){v+=a*nz(p);p=m*p;a*=.5;}return v;}
+void main(){vec2 uv=(gl_FragCoord.xy-.5*R)/R.y;float t=T*.5;float bank=.045*sin(t*.08);uv=mat2(cos(bank),-sin(bank),sin(bank),cos(bank))*uv;uv.y+=.025*sin(t*.11);
+  float hy=uv.y+.06;vec3 zen=vec3(.1,.3,.64),sky=vec3(.36,.56,.84),hor=vec3(.72,.82,.93),warm=vec3(1.,.84,.62);
+  vec3 col=mix(hor,sky,smoothstep(0.,.25,hy));col=mix(col,zen,smoothstep(.2,.75,hy));
+  vec2 sun=vec2(.38,.26);float sd=length(uv-sun);col+=warm*(.22*exp(-sd*7.)+.12*exp(-sd*2.2));col+=vec3(1.,.98,.92)*exp(-sd*40.)*.55;
+  /* sea of clouds below, rushing toward you */
+  if(hy<.012){float dd=.12/(max(-hy,0.)+.012);vec2 pc=vec2(uv.x*dd,dd+t*.75)*.9;float d=fbm(pc)*.8+fbm(pc*2.3+5.)*.3;
+    float lit=clamp((d-fbm(pc+vec2(.0,.18)))*4.+.55,0.,1.);vec3 cs=mix(vec3(.6,.68,.82),vec3(1.,.99,.97),lit);cs=mix(cs,cs*warm,.25);
+    float cov=smoothstep(.44,.64,d);vec3 sea=mix(vec3(.4,.52,.72),cs,cov);float fog=smoothstep(1.6,5.5,dd);sea=mix(sea,hor,fog);col=mix(col,sea,smoothstep(.012,-.004,hy));}
+  /* wisps and puffs flying past */
+  const float N=6.;float sp=.12,base=fract(t*sp),cyc=floor(t*sp);
+  for(int j=0;j<6;j++){float k=float(j),z=(N-k-base)/N,seed=cyc-k;float zz=.12+z*1.4;
+    vec2 q=uv*zz*2.2+vec2(h2(vec2(seed,1.7))*40.,h2(vec2(seed,8.3))*40.);
+    float d=fbm(q)*.72+fbm(q*2.1+3.1)*.36;float c=smoothstep(.62,.84,d);c*=smoothstep(0.,.28,z)*smoothstep(1.,.75,z)*(.55+.45*smoothstep(-.3,.25,uv.y+.2));if(c<.002)continue;
+    vec2 ld=normalize(sun-uv+1e-4);float lit=clamp((d-(fbm(q+ld*.2)*.72+fbm((q+ld*.2)*2.1+3.1)*.36))*5.+.6,0.,1.);
+    vec3 cc=mix(vec3(.74,.8,.9),vec3(1.,1.,.99),lit);cc=mix(cc,cc*warm,.3*exp(-length(uv-sun)*2.5));cc=mix(cc,col,z*.5);col=mix(col,cc,c*.92);}
+  col*=1.-.18*pow(length(uv*vec2(.75,1.)),2.2);gl_FragColor=vec4(col,1.);}
+`;
+/* live embers: dim, flickering firelight with sparks drifting up through the dark */
+const EMBER_FS=`precision highp float;uniform vec2 R;uniform float T;
+float h1(float n){return fract(sin(n*127.1)*43758.5453);}
+float h2(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+float nz(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h2(i),h2(i+vec2(1,0)),f.x),mix(h2(i+vec2(0,1)),h2(i+1.),f.x),f.y);}
+float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*nz(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return v;}
+vec3 ramp(float x){return mix(mix(vec3(.25,.02,0.),vec3(.85,.22,.02),smoothstep(0.,.5,x)),vec3(1.,.62,.22),smoothstep(.5,1.,x));}
+void main(){vec2 uv=gl_FragCoord.xy/R;float asp=R.x/R.y;vec2 p=vec2((uv.x-.5)*asp,uv.y);float t=T*.5;
+  float fl=.82+.1*sin(t*2.3)+.06*sin(t*5.7+1.3)+.05*(nz(vec2(t*3.,0.))-.5);
+  vec3 col=vec3(.018,.009,.006);
+  float g=exp(-pow(length(vec2(p.x*.85,uv.y+.15)),2.)*2.2);col+=vec3(.55,.17,.04)*g*.55*fl;
+  float hz=fbm(vec2(p.x*2.2,uv.y*2.6-t*.55))*.9+fbm(vec2(p.x*4.5+3.,uv.y*5.-t*1.1))*.35;float fh=hz-uv.y*2.1-.05+.18*exp(-p.x*p.x*1.8);float fv=smoothstep(.0,.55,fh)*smoothstep(.55,0.,uv.y);
+  col+=ramp(clamp(fh*1.4,0.,1.))*fv*.45*fl;
+  float sm=fbm(vec2(p.x*1.3-t*.03,uv.y*1.1-t*.12));col*=1.-.35*smoothstep(.45,.8,sm)*smoothstep(.2,.9,uv.y);
+  for(int j=0;j<46;j++){float i=float(j),sp=.035+.06*h1(i*3.7),ph=h1(i*1.31),life=fract(ph+t*sp);float x0=(h1(i*7.9)-.5)*asp*.9;
+    float y=life*1.15-.05,x=x0*(.35+.65*life)+sin(life*9.+i)*.04*life+(nz(vec2(i,t*.4))-.5)*.08*life;
+    float r=.0022+.0034*h1(i*5.1);vec2 d=p-vec2(x,y);float e=exp(-dot(d,d)/(r*r));float hal=exp(-dot(d,d)/(r*r*14.))*.18;
+    float tw=.6+.4*sin(t*(6.+5.*h1(i))+i*3.);float a=smoothstep(0.,.08,life)*smoothstep(1.,.45,life)*tw;
+    col+=mix(vec3(1.,.42,.08),vec3(1.,.8,.45),h1(i*2.2))*(e+hal)*a*.9;}
+  col*=1.-.55*pow(length((uv-vec2(.5,.35))*vec2(1.,.9)),1.8);col=max(col,vec3(0.));col=pow(col,vec3(1.05));gl_FragColor=vec4(col,1.);}
+`;
 const LIVE_PAL={
   inferno:{ramp:[[.6,.03,.02],[1,.36,.05],[1,.8,.32]],gain:1.15,n:8,cx:-.55,cy:-.6},
   portal:{a:[.5,.5,.5],b:[.5,.5,.5],c:[1,1,1],d:[0,.33,.67],gain:1,n:12,cx:-.62,cy:-.48},
@@ -4456,8 +4501,8 @@ function liveStart(cv,pal){const gl=cv.getContext("webgl",{antialias:false,alpha
   const uR=U("R"),uT=U("T");
   const fp=gl.createProgram();gl.attachShader(fp,sh(gl.VERTEX_SHADER,"attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}"));gl.attachShader(fp,sh(gl.FRAGMENT_SHADER,FRAC_FS));gl.bindAttribLocation(fp,loc,"p");gl.linkProgram(fp);const fOK=gl.getProgramParameter(fp,gl.LINK_STATUS);
   const FU=n=>gl.getUniformLocation(fp,n);let cur=pr,uR2=uR,uT2=uT;
-  const ap=gl.createProgram();gl.attachShader(ap,sh(gl.VERTEX_SHADER,"attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}"));gl.attachShader(ap,sh(gl.FRAGMENT_SHADER,AQUA_FS));gl.bindAttribLocation(ap,loc,"p");gl.linkProgram(ap);const aOK=gl.getProgramParameter(ap,gl.LINK_STATUS);
-  const set=k=>{if(k==="aqua"&&aOK){gl.useProgram(ap);cur=ap;uR2=gl.getUniformLocation(ap,"R");uT2=gl.getUniformLocation(ap,"T")}else if(FRAC_PAL[k]&&fOK){const q=FRAC_PAL[k];gl.useProgram(fp);cur=fp;gl.uniform2fv(FU("Ctr"),q.ctr);gl.uniform2fv(FU("Jc"),q.jc||[0,0]);gl.uniform1f(FU("SH"),q.sh);gl.uniform3fv(FU("TINT"),q.tint);gl.uniform3fv(FU("A"),q.a);gl.uniform3fv(FU("B"),q.b);gl.uniform3fv(FU("C"),q.c);gl.uniform3fv(FU("Dd"),q.d);gl.uniform1f(FU("P"),75);gl.uniform1f(FU("S0"),q.s0);gl.uniform1f(FU("S1"),q.s1);gl.uniform1f(FU("RO"),.008);uR2=FU("R");uT2=FU("T")}else{gl.useProgram(pr);cur=pr;uR2=uR;uT2=uT;if(LIVE_PAL[k])setPal(k)}};
+  const XFS={aqua:AQUA_FS,sky:SKY_FS,ember:EMBER_FS},XP={};const xp=k=>{if(XP[k]!==undefined)return XP[k];const q=gl.createProgram();gl.attachShader(q,sh(gl.VERTEX_SHADER,"attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}"));gl.attachShader(q,sh(gl.FRAGMENT_SHADER,XFS[k]));gl.bindAttribLocation(q,loc,"p");gl.linkProgram(q);return XP[k]=gl.getProgramParameter(q,gl.LINK_STATUS)?q:null};
+  const set=k=>{const X=XFS[k]&&xp(k);if(X){gl.useProgram(X);cur=X;uR2=gl.getUniformLocation(X,"R");uT2=gl.getUniformLocation(X,"T")}else if(FRAC_PAL[k]&&fOK){const q=FRAC_PAL[k];gl.useProgram(fp);cur=fp;gl.uniform2fv(FU("Ctr"),q.ctr);gl.uniform2fv(FU("Jc"),q.jc||[0,0]);gl.uniform1f(FU("SH"),q.sh);gl.uniform3fv(FU("TINT"),q.tint);gl.uniform3fv(FU("A"),q.a);gl.uniform3fv(FU("B"),q.b);gl.uniform3fv(FU("C"),q.c);gl.uniform3fv(FU("Dd"),q.d);gl.uniform1f(FU("P"),75);gl.uniform1f(FU("S0"),q.s0);gl.uniform1f(FU("S1"),q.s1);gl.uniform1f(FU("RO"),.008);uR2=FU("R");uT2=FU("T")}else{gl.useProgram(pr);cur=pr;uR2=uR;uT2=uT;if(LIVE_PAL[k])setPal(k)}};
   return {setPal:set,draw(t){gl.viewport(0,0,cv.width,cv.height);gl.uniform2f(uR2,cv.width,cv.height);gl.uniform1f(uT2,t);gl.drawArrays(gl.TRIANGLES,0,3)},gl}}
 
 let liveEng=null,liveRAF=0,liveKey=null,liveFail=false,liveLast=0;const liveT0=performance.now()-Math.random()*6e5;
@@ -4934,7 +4979,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="270",APPT="2026-11-19T01:27:00-05:00";   /* APPT: when this update was made */
+const APPV="271",APPT="2026-11-19T01:35:00-05:00";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
