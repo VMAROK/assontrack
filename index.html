@@ -1221,6 +1221,7 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .nwat{margin-top:12px;padding-top:10px;border-top:1px solid rgba(var(--lr),.16)}.nwat-h{display:flex;align-items:center;gap:10px;font-size:13px}.nwat-h span{font-weight:700}.nwat-h b{font-family:var(--mono);font-size:13px;color:#4cc9ff;margin-left:auto}
 .nwat-m{width:26px;height:26px;border-radius:8px;font:inherit;font-size:16px;line-height:1;cursor:pointer;color:var(--muted);background:rgba(var(--tX),.5);border:1px solid rgba(var(--lr),.3)}.nwat-m:disabled{opacity:.4}
 .nwat-cups{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.nwat-c{width:34px;height:36px;display:grid;place-items:center;cursor:pointer;color:rgba(150,180,240,.5);background:none;border:0;border-radius:8px;transition:transform .35s cubic-bezier(.34,1.7,.5,1),color .2s}.nwat-c.on{color:#4cc9ff;filter:drop-shadow(0 0 5px rgba(76,201,255,.6))}.nwat-c:active{transform:scale(.85)}
+.fd-chh{display:flex;align-items:center;gap:10px;padding:0 2px 8px}.fd-chh b{font-size:15px}.fd-chh small{margin-left:auto;font-size:12px;color:var(--muted)}.fd-back{width:30px;height:30px;border-radius:8px;font:inherit;font-size:20px;line-height:1;cursor:pointer;color:#e6eeff;background:rgba(var(--tX),.6);border:1px solid rgba(var(--lr),.3)}
 .fd-chains{display:flex;flex-wrap:wrap;gap:6px;padding:4px 2px 8px}.fd-chain{font:inherit;font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:99px;cursor:pointer;color:#e6eeff;background:rgba(var(--tX),.5);border:1px solid rgba(var(--lr),.3);transition:border-color .2s,transform .3s cubic-bezier(.34,1.56,.64,1)}.fd-chain:hover{border-color:rgba(var(--tL),.8)}.fd-chain:active{transform:scale(.93)}
 .nq{display:grid;gap:8px;padding:10px 2px 2px}.nq-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.nq-h>span,.nq-h2{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .nq-seg{display:flex;flex-wrap:wrap;gap:5px}.nq-seg button{font:inherit;font-size:12.5px;font-weight:600;padding:5px 11px;border-radius:99px;cursor:pointer;color:var(--muted);background:rgba(var(--tX),.45);border:1px solid rgba(var(--lr),.3);transition:transform .3s cubic-bezier(.34,1.56,.64,1)}.nq-seg button:active{transform:scale(.93)}.nq-seg button[aria-pressed=true]{color:#081022;background:var(--cc);border-color:var(--cc)}
@@ -2308,17 +2309,17 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(d.nemt){nRead();nEdit.type=d.nemt;nSheet();return}
   if(d.nsave!=null){nRead();if(!nEdit.name)return toast("Give it a name");const i=data.meals.findIndex(x=>x.id===nEdit.id);if(i>=0)data.meals[i]=nEdit;toast("Saved");nEdit=null;nSheet();render();save()}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&nEdit){nEdit=null;nSheet()}});
-document.addEventListener("click",e=>{const c=e.target.closest&&e.target.closest("[data-fchain]");if(!c)return;e.preventDefault();e.stopPropagation();const i=$("#fdQ");fq=c.dataset.fchain;fSel=null;if(i){i.value=fq;i.focus({preventScroll:true})}const o=$("#fdOut");if(o)o.innerHTML=foodResults()},true);
+document.addEventListener("click",e=>{const c=e.target.closest&&e.target.closest("[data-fchain],[data-fchainx]");if(!c)return;e.preventDefault();e.stopPropagation();fChain=c.dataset.fchainx!=null?null:c.dataset.fchain;fSel=null;const i=$("#fdQ");if(i){i.placeholder=fChain?"Search "+fChain:"";}const o=$("#fdOut");if(o)o.innerHTML=foodResults()},true);
 document.addEventListener("pointerdown",e=>{if(!e.target.closest||e.target.closest(".cm-menu"))return;document.querySelectorAll(".cm-lift").forEach(n=>{if(!document.querySelector(".cm-menu"))n.classList.remove("cm-lift")})},true);
 
 /* food log: the search row opens a floating list, so the panel itself never changes size */
 function fdPopShow(on){fOpen=on;const p=$("#fdPop");if(!p)return;const open=fOpen||!!fq||!!fSel||!!fForm;p.hidden=!open;if(open&&!fSel&&!(fForm&&fForm.kind==="food"))fdOut()}
 document.addEventListener("focusin",e=>{if(e.target.id==="fdQ"&&!fOpen)fdPopShow(true)});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&tab==="fuel"&&(fOpen||fq||fSel)&&!fForm&&!scan){fOpen=false;fq="";fSel=null;render()}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&tab==="fuel"&&(fOpen||fq||fSel)&&!fForm&&!scan){fOpen=false;fq="";fSel=null;fChain=null;render()}});
 document.addEventListener("click",e=>{const t=e.target;if(!t.closest)return;
   if(t.closest("[data-flog],[data-fquick],[data-fsave],[data-fcancel]"))fOpen=false;                                  // these finish the job: the list closes once they have run
-  const o=t.closest("[data-fopen]");if(o){e.stopPropagation();if(fOpen||fq||fSel||fForm){fOpen=false;fq="";fSel=null;fForm=null}else fOpen=true;render();return}
-  if(tab==="fuel"&&(fOpen||fq||fSel)&&!fForm&&t.isConnected&&!t.closest(".flogp")&&!t.closest(".scan")&&!t.closest(".askbox")){fOpen=false;fq="";fSel=null;const p=$("#fdPop"),i=$("#fdQ");if(p)p.hidden=true;if(i)i.value=""}
+  const o=t.closest("[data-fopen]");if(o){e.stopPropagation();if(fOpen||fq||fSel||fForm){fOpen=false;fq="";fSel=null;fChain=null;fForm=null}else fOpen=true;render();return}
+  if(tab==="fuel"&&(fOpen||fq||fSel)&&!fForm&&t.isConnected&&!t.closest(".flogp")&&!t.closest(".scan")&&!t.closest(".askbox")){fOpen=false;fq="";fSel=null;fChain=null;const p=$("#fdPop"),i=$("#fdQ");if(p)p.hidden=true;if(i)i.value=""}
   const g=t.closest("[data-tgedit],[data-tgcancel],[data-tgsave]");if(!g)return;
   if(g.dataset.tgedit!==undefined){tgEdit=true;render();return}if(g.dataset.tgcancel!==undefined){tgEdit=false;render();return}
   const nv=id=>{const el=$(id),m=el&&String(el.value).replace(/,/g,"").match(/\d+(\.\d+)?/);return m?Math.round(+m[0]):null},k=nv("#tgK"),pr=nv("#tgP");if(k==null||k<500||k>10000){toast("Enter a calorie target between 500 and 10,000");return}if(pr!=null&&pr>600){toast("That protein target doesn't look right");return}
@@ -2450,7 +2451,7 @@ const MEALT=["Breakfast","Lunch","Dinner","Snack"];
 const mealNow=()=>{const h=new Date().getHours();return h<11?"Breakfast":h<15?"Lunch":h<21?"Dinner":"Snack"};
 const fr1=v=>Math.round((+v||0)*10)/10;
 const fNum=v=>{const n=parseFloat(String(v==null?"":v).replace(",","."));return isFinite(n)&&n>=0?n:0};
-let fq="",fSel=null,fOn=[],fBusy=false,fErr="",fTok=0,fTimer=0,fForm=null,fList=[],fDelArm=null,fType=null;
+let fChain=null,fq="",fSel=null,fOn=[],fBusy=false,fErr="",fTok=0,fTimer=0,fForm=null,fList=[],fDelArm=null,fType=null;
 const myFoods=()=>((demoOn()?[]:data.foods)||[]).slice().sort((a,b)=>(b.used||0)-(a.used||0));
 function foodCalc(f,qty,unit){const q=fNum(qty);if(f.ps)return {kcal:f.kcal*q,p:f.p*q,c:f.c*q,f:f.f*q,txt:q===1?"":q+" × "};
   const g=unit==="sv"?q*(f.sv||100):unit==="oz"?q*28.35:q,k=g/100;return {kcal:f.kcal*k,p:f.p*k,c:f.c*k,f:f.f*k,g,txt:unit==="sv"?(q===1?"":q+" × ")+(f.svl||"serving"):unit==="oz"?q+" oz":Math.round(g)+" g"}}
@@ -2470,7 +2471,121 @@ async function offBarcode(code){const j=await offJSON(`https://world.openfoodfac
 /* fast food menus (US, approximate published nutrition; menus change) */
 const FFALIAS={"McDonald's":"mcd mcdonalds mickey d","Burger King":"bk","Chick-fil-A":"cfa chickfila chick fil a","Taco Bell":"tacobell","Dunkin'":"dunkin donuts","In-N-Out":"in n out innout","Five Guys":"5 guys fiveguys","Panda Express":"panda","Domino's":"dominos","Pizza Hut":"pizzahut","Arby's":"arbys","Wendy's":"wendys","Jack in the Box":"jack","KFC":"kentucky fried chicken"};
 const ffNorm=x=>String(x||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9 ]+/g,"").replace(/\s+/g," ").trim();
-const FASTFOODS=`McDonald's|Big Mac|590|25|46|34|1 sandwich
+const FASTFOODS=`Arby's|Classic Roast Beef|360|23|37|14|1 sandwich
+Arby's|Beef 'n Cheddar|450|23|45|20|1 sandwich
+Arby's|Curly Fries, medium|550|7|65|29|medium
+Burger King|Whopper|670|31|51|40|1 sandwich
+Burger King|Whopper with Cheese|760|35|52|47|1 sandwich
+Burger King|Double Whopper|920|51|51|59|1 sandwich
+Burger King|Whopper Jr.|330|16|27|18|1 sandwich
+Burger King|Impossible Whopper|630|28|58|34|1 sandwich
+Burger King|Bacon King|1200|67|49|79|1 sandwich
+Burger King|Original Chicken Sandwich|680|28|50|40|1 sandwich
+Burger King|Chicken Fries, 9 piece|280|13|20|17|9 pieces
+Burger King|Chicken Nuggets, 8 piece|380|17|23|24|8 pieces
+Burger King|French Fries, medium|370|5|53|15|medium
+Burger King|Onion Rings, medium|410|6|52|20|medium
+Burger King|Croissan'wich Sausage, Egg & Cheese|500|19|27|34|1 sandwich
+Burger King|Ham, Egg & Cheese Croissan'wich|340|17|27|18|1 sandwich
+Burger King|Hash Browns, medium|490|3|48|31|medium
+Burger King|Chocolate Shake, medium|680|15|112|17|medium
+Burger King|Rodeo Burger|340|13|39|15|1 burger
+Chick-fil-A|Chicken Sandwich|440|28|41|17|1 sandwich
+Chick-fil-A|Spicy Chicken Sandwich|450|28|42|19|1 sandwich
+Chick-fil-A|Deluxe Chicken Sandwich|500|29|44|22|1 sandwich
+Chick-fil-A|Grilled Chicken Sandwich|390|28|44|12|1 sandwich
+Chick-fil-A|Nuggets, 8 count|250|27|11|11|8 nuggets
+Chick-fil-A|Nuggets, 12 count|380|40|16|17|12 nuggets
+Chick-fil-A|Grilled Nuggets, 8 count|130|25|1|3|8 nuggets
+Chick-fil-A|Chick-n-Strips, 3 count|310|29|16|14|3 strips
+Chick-fil-A|Waffle Potato Fries, medium|420|5|45|24|medium
+Chick-fil-A|Mac & Cheese, medium|450|20|29|28|medium
+Chick-fil-A|Chicken Biscuit|460|19|45|23|1 biscuit
+Chick-fil-A|Chick-fil-A Sauce|140|0|7|13|1 packet
+Chick-fil-A|Spicy Deluxe Sandwich|540|30|47|25|1 sandwich
+Chick-fil-A|Cool Wrap|660|42|32|43|1 wrap
+Chick-fil-A|Cobb Salad, no dressing|720|40|27|50|1 salad
+Chick-fil-A|Chick-fil-A Chicken Biscuit|460|19|45|23|1 biscuit
+Chick-fil-A|Chick-n-Minis, 4 count|360|19|41|13|4 minis
+Chick-fil-A|Egg White Grill|300|27|29|8|1 sandwich
+Chick-fil-A|Hash Brown Scramble Burrito|700|34|47|42|1 burrito
+Chick-fil-A|Hash Browns|270|3|23|18|1 order
+Chick-fil-A|Lemonade, medium|300|0|76|0|medium
+Chick-fil-A|Frosted Lemonade, small|330|8|65|6|small
+Chick-fil-A|Cookies & Cream Milkshake, small|630|13|90|25|small
+Chick-fil-A|Sweet Tea, medium|130|0|33|0|medium
+Chick-fil-A|Polynesian Sauce|110|0|13|6|1 packet
+Chipotle|Chicken burrito, typical (rice, beans, salsa, cheese)|975|58|117|30|1 burrito
+Chipotle|Chicken bowl, typical (rice, beans, salsa, cheese)|655|50|67|21|1 bowl
+Chipotle|Flour tortilla (burrito)|320|8|50|9|1 tortilla
+Chipotle|Chicken|180|32|0|7|1 portion
+Chipotle|Steak|150|21|1|6|1 portion
+Chipotle|Carnitas|210|23|0|12|1 portion
+Chipotle|Barbacoa|170|24|2|7|1 portion
+Chipotle|Sofritas|150|8|9|10|1 portion
+Chipotle|White rice|210|4|40|4|1 portion
+Chipotle|Brown rice|210|4|36|6|1 portion
+Chipotle|Black beans|130|8|22|2|1 portion
+Chipotle|Pinto beans|130|8|21|2|1 portion
+Chipotle|Fajita veggies|20|1|5|0|1 portion
+Chipotle|Fresh tomato salsa|25|0|4|0|1 portion
+Chipotle|Roasted chili-corn salsa|80|3|16|2|1 portion
+Chipotle|Cheese|110|6|1|8|1 portion
+Chipotle|Sour cream|110|2|2|9|1 portion
+Chipotle|Guacamole|230|2|8|22|1 portion
+Chipotle|Queso blanco|120|5|4|9|1 portion
+Chipotle|Chips|540|7|73|25|1 bag
+Chipotle|Steak burrito, typical (rice, beans, salsa, cheese)|945|47|118|29|1 burrito
+Chipotle|Chips & Guacamole|770|9|81|47|1 order
+Chipotle|Quesadilla, chicken|1130|76|78|56|1 quesadilla
+Domino's|Hand Tossed Cheese Pizza, large, 1 slice|290|12|36|11|1 slice
+Domino's|Hand Tossed Pepperoni Pizza, large, 1 slice|320|13|36|14|1 slice
+Dunkin'|Glazed Donut|240|3|33|11|1 donut
+Dunkin'|Boston Kreme Donut|300|3|39|14|1 donut
+Dunkin'|Iced Coffee with cream & sugar, medium|260|2|46|8|medium
+Dunkin'|Latte, medium, whole milk|210|11|17|11|medium
+Dunkin'|Sausage, Egg & Cheese on Croissant|700|23|38|51|1 sandwich
+Dunkin'|Hash Browns, 6 piece|130|1|15|7|6 pieces
+Dunkin'|Chocolate Frosted Donut|270|3|35|14|1 donut
+Dunkin'|Jelly Donut|260|3|36|11|1 donut
+Dunkin'|Old Fashioned Donut|280|3|28|17|1 donut
+Dunkin'|Munchkins, glazed, 5|240|3|31|11|5 pieces
+Dunkin'|Bacon, Egg & Cheese on English Muffin|370|19|29|20|1 sandwich
+Dunkin'|Wake-Up Wrap, Bacon Egg & Cheese|210|10|14|13|1 wrap
+Dunkin'|Plain Bagel|300|11|62|2|1 bagel
+Dunkin'|Bagel with Cream Cheese|450|14|64|16|1 bagel
+Dunkin'|Hot Coffee with cream & sugar, medium|150|2|23|6|medium
+Dunkin'|Hot Coffee, black, medium|5|0|0|0|medium
+Dunkin'|Matcha Latte, medium, whole milk|320|11|46|11|medium
+Dunkin'|Iced Signature Caramel Latte, medium|380|11|58|12|medium
+Dunkin'|Frozen Coffee, medium|600|8|99|19|medium
+Dunkin'|Strawberry Coolatta, medium|350|0|87|0|medium
+Five Guys|Hamburger|840|39|39|43|1 burger
+Five Guys|Cheeseburger|980|47|40|55|1 burger
+Five Guys|Little Hamburger|540|23|39|26|1 burger
+Five Guys|Fries, regular|950|13|131|41|regular
+Five Guys|Fries, little|530|8|72|23|little
+In-N-Out|Double-Double|670|37|39|41|1 burger
+In-N-Out|Double-Double, Protein Style|520|33|11|39|1 burger
+In-N-Out|Cheeseburger|480|22|39|27|1 burger
+In-N-Out|Hamburger|390|16|39|19|1 burger
+In-N-Out|French Fries|370|6|52|15|1 order
+Jack in the Box|Jumbo Jack|570|26|42|33|1 burger
+Jack in the Box|Tacos, 2|340|12|32|18|2 tacos
+KFC|Original Recipe Chicken Breast|390|39|11|21|1 piece
+KFC|Original Recipe Thigh|280|19|8|19|1 piece
+KFC|Original Recipe Drumstick|130|12|4|8|1 piece
+KFC|Extra Crispy Chicken Breast|530|35|18|35|1 piece
+KFC|Famous Bowl|740|26|81|35|1 bowl
+KFC|Chicken Sandwich|650|34|49|35|1 sandwich
+KFC|Mashed Potatoes & Gravy, individual|130|3|19|5|individual
+KFC|Mac & Cheese, individual|170|6|17|9|individual
+KFC|Biscuit|180|4|22|8|1 biscuit
+KFC|Popcorn Nuggets, large|620|30|42|38|large
+KFC|Chicken Tenders, 3 piece|400|33|20|21|3 pieces
+KFC|Coleslaw, individual|170|1|19|10|individual
+KFC|Pot Pie|720|26|60|41|1 pie
+McDonald's|Big Mac|590|25|46|34|1 sandwich
 McDonald's|Quarter Pounder with Cheese|520|30|42|26|1 sandwich
 McDonald's|Double Quarter Pounder with Cheese|740|48|43|42|1 sandwich
 McDonald's|McDouble|400|22|33|20|1 sandwich
@@ -2492,29 +2607,146 @@ McDonald's|Hotcakes with syrup and butter|580|9|101|15|1 order
 McDonald's|McFlurry with Oreo, regular|510|12|80|16|regular
 McDonald's|Apple Pie|230|2|33|11|1 pie
 McDonald's|Coca-Cola, medium|200|0|55|0|medium
-Burger King|Whopper|670|31|51|40|1 sandwich
-Burger King|Whopper with Cheese|760|35|52|47|1 sandwich
-Burger King|Double Whopper|920|51|51|59|1 sandwich
-Burger King|Whopper Jr.|330|16|27|18|1 sandwich
-Burger King|Impossible Whopper|630|28|58|34|1 sandwich
-Burger King|Bacon King|1200|67|49|79|1 sandwich
-Burger King|Original Chicken Sandwich|680|28|50|40|1 sandwich
-Burger King|Chicken Fries, 9 piece|280|13|20|17|9 pieces
-Burger King|Chicken Nuggets, 8 piece|380|17|23|24|8 pieces
-Burger King|French Fries, medium|370|5|53|15|medium
-Burger King|Onion Rings, medium|410|6|52|20|medium
-Burger King|Croissan'wich Sausage, Egg & Cheese|500|19|27|34|1 sandwich
-Wendy's|Dave's Single|590|29|39|34|1 sandwich
-Wendy's|Dave's Double|860|49|40|53|1 sandwich
-Wendy's|Baconator|960|57|38|64|1 sandwich
-Wendy's|Jr. Cheeseburger|290|15|26|14|1 sandwich
-Wendy's|Spicy Chicken Sandwich|500|28|50|20|1 sandwich
-Wendy's|Classic Chicken Sandwich|490|28|49|20|1 sandwich
-Wendy's|Chicken Nuggets, 10 piece|450|23|27|29|10 pieces
-Wendy's|French Fries, medium|350|5|45|16|medium
-Wendy's|Chocolate Frosty, small|340|9|55|9|small
-Wendy's|Chili, small|250|17|23|9|small
-Wendy's|Baked Potato, plain|270|7|61|0|1 potato
+McDonald's|Double Cheeseburger|450|25|34|24|1 sandwich
+McDonald's|Quarter Pounder Deluxe|630|30|44|37|1 sandwich
+McDonald's|Bacon Quarter Pounder with Cheese|630|37|43|35|1 sandwich
+McDonald's|Chicken McNuggets, 4 piece|170|9|10|10|4 pieces
+McDonald's|Chicken McNuggets, 20 piece|830|46|51|49|20 pieces
+McDonald's|Spicy McCrispy|530|26|50|26|1 sandwich
+McDonald's|Deluxe McCrispy|530|27|48|26|1 sandwich
+McDonald's|Bacon, Egg & Cheese Biscuit|460|17|39|26|1 sandwich
+McDonald's|Bacon, Egg & Cheese McGriddle|430|17|47|19|1 sandwich
+McDonald's|Sausage McGriddle|430|11|44|23|1 sandwich
+McDonald's|Sausage Burrito|310|13|25|17|1 burrito
+McDonald's|Big Breakfast with Hotcakes|1340|36|158|63|1 platter
+McDonald's|Fruit & Maple Oatmeal|320|6|64|4|1 bowl
+McDonald's|Chocolate Shake, medium|630|14|106|17|medium
+McDonald's|Vanilla Cone|200|5|33|5|1 cone
+McDonald's|McFlurry with M&M's, regular|640|14|95|23|regular
+McDonald's|Caramel Frappé, medium|510|8|75|20|medium
+McDonald's|Iced Coffee, medium|180|2|28|7|medium
+McDonald's|Sweet Tea, medium|140|0|36|0|medium
+McDonald's|Sprite, medium|200|0|54|0|medium
+Panda Express|Orange Chicken|490|25|51|23|1 entrée
+Panda Express|Beijing Beef|470|13|46|26|1 entrée
+Panda Express|Broccoli Beef|150|9|13|7|1 entrée
+Panda Express|Kung Pao Chicken|290|16|14|19|1 entrée
+Panda Express|Honey Walnut Shrimp|360|13|35|23|1 entrée
+Panda Express|Grilled Teriyaki Chicken|275|36|8|10|1 entrée
+Panda Express|Chow Mein|510|13|80|20|1 side
+Panda Express|Fried Rice|520|11|85|16|1 side
+Panda Express|Super Greens|90|6|10|3|1 side
+Panda Express|Mushroom Chicken|220|13|10|14|1 entrée
+Panda Express|String Bean Chicken Breast|210|12|13|12|1 entrée
+Panda Express|Black Pepper Angus Steak|180|19|10|7|1 entrée
+Panda Express|White Steamed Rice|380|7|87|0|1 side
+Panda Express|Chicken Egg Roll|200|6|20|10|1 roll
+Panda Express|Cream Cheese Rangoon, 3|190|5|24|8|3 pieces
+Pizza Hut|Pan Pepperoni Pizza, medium, 1 slice|290|11|29|14|1 slice
+Pizza Hut|Hand-Tossed Cheese Pizza, medium, 1 slice|220|10|26|8|1 slice
+Popeyes|Classic Chicken Sandwich|700|28|50|42|1 sandwich
+Popeyes|Spicy Chicken Sandwich|700|28|50|42|1 sandwich
+Popeyes|Chicken Tenders, 3 piece|440|33|23|24|3 pieces
+Popeyes|Cajun Fries, regular|260|4|35|13|regular
+Popeyes|Red Beans & Rice, regular|230|7|24|12|regular
+Popeyes|Biscuit|200|3|23|11|1 biscuit
+Popeyes|Chicken Tenders, 5 piece|730|56|38|40|5 pieces
+Popeyes|Mashed Potatoes with Cajun Gravy, regular|110|2|17|4|regular
+Popeyes|Mac & Cheese, regular|300|11|26|17|regular
+Popeyes|Bonafide Chicken Breast, mild|380|35|16|20|1 piece
+Sonic|Sonic Cheeseburger|720|31|53|43|1 burger
+Sonic|Tots, medium|360|3|36|23|medium
+Starbucks|Matcha Latte, hot, 2% milk|240|12|34|7|D
+Starbucks|Iced Matcha Latte, 2% milk|200|9|28|5|DI
+Starbucks|Chai Latte, hot, 2% milk|240|8|45|5|D
+Starbucks|Iced Chai Latte, 2% milk|240|7|45|4|DI
+Starbucks|Dirty Chai Latte, 2% milk|260|9|46|5|D
+Starbucks|Caffè Latte, hot, 2% milk|190|13|19|7|D
+Starbucks|Iced Caffè Latte, 2% milk|130|8|13|5|DI
+Starbucks|Vanilla Latte, hot, 2% milk|250|12|37|6|D
+Starbucks|Iced Vanilla Latte, 2% milk|190|8|30|4|DI
+Starbucks|Oatmilk Latte, hot|270|5|33|12|D
+Starbucks|Cappuccino, 2% milk|140|10|14|5|D
+Starbucks|Flat White, whole milk|220|12|18|11|D
+Starbucks|Caffè Americano|15|1|3|0|D
+Starbucks|Iced Caffè Americano|15|1|3|0|DI
+Starbucks|Brewed Coffee, Pike Place|5|1|0|0|D
+Starbucks|Caffè Misto, 2% milk|110|7|10|4|D
+Starbucks|Caramel Macchiato, hot|250|10|35|7|D
+Starbucks|Iced Caramel Macchiato|250|10|37|7|DI
+Starbucks|Caffè Mocha, hot|370|14|43|15|D
+Starbucks|Iced Caffè Mocha|350|10|43|16|DI
+Starbucks|White Chocolate Mocha, hot|430|15|53|18|D
+Starbucks|Iced White Chocolate Mocha|420|12|55|17|DI
+Starbucks|Hot Chocolate, 2% milk|370|14|43|15|D
+Starbucks|Pumpkin Spice Latte, hot|390|14|52|14|D
+Starbucks|Iced Pumpkin Spice Latte|300|10|42|10|DI
+Starbucks|Peppermint Mocha, hot|440|15|63|15|D
+Starbucks|London Fog Tea Latte|180|6|30|4|D
+Starbucks|Honey Citrus Mint Tea|130|0|32|0|D
+Starbucks|Brewed Tea, hot|0|0|0|0|D
+Starbucks|Iced Black Tea, unsweetened|0|0|0|0|DI
+Starbucks|Iced Green Tea Lemonade|90|0|22|0|DI
+Starbucks|Iced Coffee, sweetened|80|0|20|0|DI
+Starbucks|Cold Brew|5|0|0|0|DI
+Starbucks|Vanilla Sweet Cream Cold Brew|110|1|14|5|DI
+Starbucks|Salted Caramel Cream Cold Brew|240|3|30|12|DI
+Starbucks|Pumpkin Cream Cold Brew|250|3|31|12|DI
+Starbucks|Nitro Cold Brew|5|0|0|0|DI
+Starbucks|Iced Brown Sugar Oatmilk Shaken Espresso|120|1|20|3|DI
+Starbucks|Iced Chocolate Almondmilk Shaken Espresso|100|2|17|3|DI
+Starbucks|Iced Shaken Espresso|100|1|19|2|DI
+Starbucks|Caramel Frappuccino|380|5|54|16|DI
+Starbucks|Mocha Frappuccino|370|5|54|15|DI
+Starbucks|Java Chip Frappuccino|440|6|66|18|DI
+Starbucks|Coffee Frappuccino|230|3|46|3|DI
+Starbucks|Strawberry Crème Frappuccino|370|5|55|15|DI
+Starbucks|Vanilla Bean Crème Frappuccino|380|5|54|16|DI
+Starbucks|Matcha Crème Frappuccino|420|6|63|16|DI
+Starbucks|Pink Drink|140|1|27|3|DI
+Starbucks|Dragon Drink|130|1|26|3|DI
+Starbucks|Strawberry Açaí Refresher|100|0|24|0|DI
+Starbucks|Mango Dragonfruit Refresher|90|0|22|0|DI
+Starbucks|Lemonade|140|0|35|0|DI
+Starbucks|Espresso, solo|5|0|1|0|1 shot
+Starbucks|Espresso, doppio|10|1|2|0|2 shots
+Starbucks|Bacon, Gouda & Egg Sandwich|360|19|34|17|1 sandwich
+Starbucks|Sausage, Cheddar & Egg Sandwich|480|18|34|29|1 sandwich
+Starbucks|Double-Smoked Bacon, Cheddar & Egg Sandwich|500|21|40|28|1 sandwich
+Starbucks|Turkey Bacon, Cheddar & Egg White Sandwich|230|17|28|6|1 sandwich
+Starbucks|Impossible Breakfast Sandwich|420|22|36|22|1 sandwich
+Starbucks|Spinach, Feta & Egg White Wrap|290|20|34|8|1 wrap
+Starbucks|Egg Bites, Bacon & Gruyère|300|19|9|20|2 bites
+Starbucks|Egg Bites, Egg White & Roasted Red Pepper|170|12|11|8|2 bites
+Starbucks|Egg Bites, Kale & Mushroom|230|15|11|14|2 bites
+Starbucks|Butter Croissant|260|5|30|14|1 croissant
+Starbucks|Chocolate Croissant|300|6|31|17|1 croissant
+Starbucks|Blueberry Muffin|360|5|52|15|1 muffin
+Starbucks|Banana Nut Bread|420|6|52|21|1 slice
+Starbucks|Iced Lemon Loaf|470|5|68|20|1 slice
+Starbucks|Cheese Danish|290|7|31|16|1 danish
+Starbucks|Plain Bagel|280|11|56|2|1 bagel
+Starbucks|Chocolate Chip Cookie|360|4|50|17|1 cookie
+Starbucks|Birthday Cake Pop|160|2|21|8|1 pop
+Starbucks|Classic Oatmeal|160|5|28|3|1 bowl
+Starbucks|Eggs & Cheddar Protein Box|460|22|40|24|1 box
+Subway|Turkey Breast, 6 inch|270|20|40|3|6 inch
+Subway|Italian B.M.T., 6 inch|410|20|43|18|6 inch
+Subway|Spicy Italian, 6 inch|450|19|42|24|6 inch
+Subway|Meatball Marinara, 6 inch|460|20|56|18|6 inch
+Subway|Steak & Cheese, 6 inch|360|25|42|10|6 inch
+Subway|Tuna, 6 inch|450|19|40|24|6 inch
+Subway|Rotisserie-Style Chicken, 6 inch|290|25|40|5|6 inch
+Subway|Veggie Delite, 6 inch|230|9|42|3|6 inch
+Subway|Cookie, chocolate chip|210|2|29|10|1 cookie
+Subway|Turkey Breast, footlong|540|40|80|6|footlong
+Subway|Italian B.M.T., footlong|820|40|86|36|footlong
+Subway|Meatball Marinara, footlong|920|40|112|36|footlong
+Subway|Steak & Cheese, footlong|720|50|84|20|footlong
+Subway|Chicken & Bacon Ranch, 6 inch|570|36|42|28|6 inch
+Subway|Black Forest Ham, 6 inch|270|18|40|4|6 inch
+Subway|Oven Roasted Turkey & Ham, 6 inch|290|20|40|5|6 inch
+Subway|Sweet Onion Teriyaki, 6 inch|330|25|50|4|6 inch
 Taco Bell|Crunchy Taco|170|8|13|10|1 taco
 Taco Bell|Soft Taco|180|9|18|8|1 taco
 Taco Bell|Doritos Locos Taco|170|8|13|9|1 taco
@@ -2527,108 +2759,33 @@ Taco Bell|Chicken Quesadilla|510|27|37|27|1 quesadilla
 Taco Bell|Nachos BellGrande|740|16|80|38|1 order
 Taco Bell|Mexican Pizza|540|20|46|30|1 pizza
 Taco Bell|Cinnamon Twists|170|1|26|6|1 order
-Chick-fil-A|Chicken Sandwich|440|28|41|17|1 sandwich
-Chick-fil-A|Spicy Chicken Sandwich|450|28|42|19|1 sandwich
-Chick-fil-A|Deluxe Chicken Sandwich|500|29|44|22|1 sandwich
-Chick-fil-A|Grilled Chicken Sandwich|390|28|44|12|1 sandwich
-Chick-fil-A|Nuggets, 8 count|250|27|11|11|8 nuggets
-Chick-fil-A|Nuggets, 12 count|380|40|16|17|12 nuggets
-Chick-fil-A|Grilled Nuggets, 8 count|130|25|1|3|8 nuggets
-Chick-fil-A|Chick-n-Strips, 3 count|310|29|16|14|3 strips
-Chick-fil-A|Waffle Potato Fries, medium|420|5|45|24|medium
-Chick-fil-A|Mac & Cheese, medium|450|20|29|28|medium
-Chick-fil-A|Chicken Biscuit|460|19|45|23|1 biscuit
-Chick-fil-A|Chick-fil-A Sauce|140|0|7|13|1 packet
-Subway|Turkey Breast, 6 inch|270|20|40|3|6 inch
-Subway|Italian B.M.T., 6 inch|410|20|43|18|6 inch
-Subway|Spicy Italian, 6 inch|450|19|42|24|6 inch
-Subway|Meatball Marinara, 6 inch|460|20|56|18|6 inch
-Subway|Steak & Cheese, 6 inch|360|25|42|10|6 inch
-Subway|Tuna, 6 inch|450|19|40|24|6 inch
-Subway|Rotisserie-Style Chicken, 6 inch|290|25|40|5|6 inch
-Subway|Veggie Delite, 6 inch|230|9|42|3|6 inch
-Subway|Cookie, chocolate chip|210|2|29|10|1 cookie
-Chipotle|Chicken burrito, typical (rice, beans, salsa, cheese)|975|58|117|30|1 burrito
-Chipotle|Chicken bowl, typical (rice, beans, salsa, cheese)|655|50|67|21|1 bowl
-Chipotle|Flour tortilla (burrito)|320|8|50|9|1 tortilla
-Chipotle|Chicken|180|32|0|7|1 portion
-Chipotle|Steak|150|21|1|6|1 portion
-Chipotle|Carnitas|210|23|0|12|1 portion
-Chipotle|Barbacoa|170|24|2|7|1 portion
-Chipotle|Sofritas|150|8|9|10|1 portion
-Chipotle|White rice|210|4|40|4|1 portion
-Chipotle|Brown rice|210|4|36|6|1 portion
-Chipotle|Black beans|130|8|22|2|1 portion
-Chipotle|Pinto beans|130|8|21|2|1 portion
-Chipotle|Fajita veggies|20|1|5|0|1 portion
-Chipotle|Fresh tomato salsa|25|0|4|0|1 portion
-Chipotle|Roasted chili-corn salsa|80|3|16|2|1 portion
-Chipotle|Cheese|110|6|1|8|1 portion
-Chipotle|Sour cream|110|2|2|9|1 portion
-Chipotle|Guacamole|230|2|8|22|1 portion
-Chipotle|Queso blanco|120|5|4|9|1 portion
-Chipotle|Chips|540|7|73|25|1 bag
-KFC|Original Recipe Chicken Breast|390|39|11|21|1 piece
-KFC|Original Recipe Thigh|280|19|8|19|1 piece
-KFC|Original Recipe Drumstick|130|12|4|8|1 piece
-KFC|Extra Crispy Chicken Breast|530|35|18|35|1 piece
-KFC|Famous Bowl|740|26|81|35|1 bowl
-KFC|Chicken Sandwich|650|34|49|35|1 sandwich
-KFC|Mashed Potatoes & Gravy, individual|130|3|19|5|individual
-KFC|Mac & Cheese, individual|170|6|17|9|individual
-KFC|Biscuit|180|4|22|8|1 biscuit
-Popeyes|Classic Chicken Sandwich|700|28|50|42|1 sandwich
-Popeyes|Spicy Chicken Sandwich|700|28|50|42|1 sandwich
-Popeyes|Chicken Tenders, 3 piece|440|33|23|24|3 pieces
-Popeyes|Cajun Fries, regular|260|4|35|13|regular
-Popeyes|Red Beans & Rice, regular|230|7|24|12|regular
-Popeyes|Biscuit|200|3|23|11|1 biscuit
-Starbucks|Caffè Latte, grande, 2% milk|190|13|19|7|grande
-Starbucks|Caramel Macchiato, grande|250|10|35|7|grande
-Starbucks|Caffè Mocha, grande|370|14|43|15|grande
-Starbucks|Pumpkin Spice Latte, grande|390|14|52|14|grande
-Starbucks|Caramel Frappuccino, grande|380|5|54|16|grande
-Starbucks|Iced Coffee, grande, sweetened|80|0|20|0|grande
-Starbucks|Cold Brew, grande|5|0|0|0|grande
-Starbucks|Bacon, Gouda & Egg Sandwich|360|19|34|17|1 sandwich
-Starbucks|Egg Bites, Bacon & Gruyère|300|19|9|20|2 bites
-Starbucks|Butter Croissant|260|5|30|14|1 croissant
-Dunkin'|Glazed Donut|240|3|33|11|1 donut
-Dunkin'|Boston Kreme Donut|300|3|39|14|1 donut
-Dunkin'|Iced Coffee with cream & sugar, medium|260|2|46|8|medium
-Dunkin'|Latte, medium, whole milk|210|11|17|11|medium
-Dunkin'|Sausage, Egg & Cheese on Croissant|700|23|38|51|1 sandwich
-Dunkin'|Hash Browns, 6 piece|130|1|15|7|6 pieces
-Domino's|Hand Tossed Cheese Pizza, large, 1 slice|290|12|36|11|1 slice
-Domino's|Hand Tossed Pepperoni Pizza, large, 1 slice|320|13|36|14|1 slice
-Pizza Hut|Pan Pepperoni Pizza, medium, 1 slice|290|11|29|14|1 slice
-Pizza Hut|Hand-Tossed Cheese Pizza, medium, 1 slice|220|10|26|8|1 slice
-Five Guys|Hamburger|840|39|39|43|1 burger
-Five Guys|Cheeseburger|980|47|40|55|1 burger
-Five Guys|Little Hamburger|540|23|39|26|1 burger
-Five Guys|Fries, regular|950|13|131|41|regular
-Five Guys|Fries, little|530|8|72|23|little
-In-N-Out|Double-Double|670|37|39|41|1 burger
-In-N-Out|Double-Double, Protein Style|520|33|11|39|1 burger
-In-N-Out|Cheeseburger|480|22|39|27|1 burger
-In-N-Out|Hamburger|390|16|39|19|1 burger
-In-N-Out|French Fries|370|6|52|15|1 order
-Panda Express|Orange Chicken|490|25|51|23|1 entrée
-Panda Express|Beijing Beef|470|13|46|26|1 entrée
-Panda Express|Broccoli Beef|150|9|13|7|1 entrée
-Panda Express|Kung Pao Chicken|290|16|14|19|1 entrée
-Panda Express|Honey Walnut Shrimp|360|13|35|23|1 entrée
-Panda Express|Grilled Teriyaki Chicken|275|36|8|10|1 entrée
-Panda Express|Chow Mein|510|13|80|20|1 side
-Panda Express|Fried Rice|520|11|85|16|1 side
-Panda Express|Super Greens|90|6|10|3|1 side
-Arby's|Classic Roast Beef|360|23|37|14|1 sandwich
-Arby's|Beef 'n Cheddar|450|23|45|20|1 sandwich
-Arby's|Curly Fries, medium|550|7|65|29|medium
-Sonic|Sonic Cheeseburger|720|31|53|43|1 burger
-Sonic|Tots, medium|360|3|36|23|medium
-Jack in the Box|Jumbo Jack|570|26|42|33|1 burger
-Jack in the Box|Tacos, 2|340|12|32|18|2 tacos`.split("\n").map(l=>{const a=l.split("|");return {id:"ff:"+a[0]+":"+a[1],brand:a[0],name:a[1],kcal:+a[2],p:+a[3],c:+a[4],f:+a[5],ps:1,sv:1,svl:a[6],src:"ff",key:ffNorm(a[0]+" "+a[0].replace(/[^A-Za-z]/g,"")+" "+(FFALIAS[a[0]]||"")+" "+a[1])}});
+Taco Bell|Cheesy Bean and Rice Burrito|420|9|55|17|1 burrito
+Taco Bell|Beefy 5-Layer Burrito|490|18|63|19|1 burrito
+Taco Bell|Chicken Chipotle Melt|380|19|38|17|1 burrito
+Taco Bell|Grilled Cheese Burrito, beef|720|26|73|35|1 burrito
+Taco Bell|Chips and Nacho Cheese Sauce|220|3|24|12|1 order
+Taco Bell|Black Bean Crunchwrap Supreme|510|13|76|17|1 crunchwrap
+Taco Bell|Cantina Chicken Bowl|490|26|40|26|1 bowl
+Taco Bell|Baja Blast, medium|290|0|77|0|medium
+Wendy's|Dave's Single|590|29|39|34|1 sandwich
+Wendy's|Dave's Double|860|49|40|53|1 sandwich
+Wendy's|Baconator|960|57|38|64|1 sandwich
+Wendy's|Jr. Cheeseburger|290|15|26|14|1 sandwich
+Wendy's|Spicy Chicken Sandwich|500|28|50|20|1 sandwich
+Wendy's|Classic Chicken Sandwich|490|28|49|20|1 sandwich
+Wendy's|Chicken Nuggets, 10 piece|450|23|27|29|10 pieces
+Wendy's|French Fries, medium|350|5|45|16|medium
+Wendy's|Chocolate Frosty, small|340|9|55|9|small
+Wendy's|Chili, small|250|17|23|9|small
+Wendy's|Baked Potato, plain|270|7|61|0|1 potato
+Wendy's|Big Bacon Classic|570|33|40|30|1 sandwich
+Wendy's|Son of Baconator|540|30|37|30|1 sandwich
+Wendy's|Crispy Chicken Sandwich|330|15|36|14|1 sandwich
+Wendy's|Spicy Chicken Nuggets, 10 piece|470|23|30|29|10 pieces
+Wendy's|Apple Pecan Salad|470|38|28|24|1 salad
+Wendy's|Chocolate Frosty, medium|470|12|74|12|medium
+Wendy's|Breakfast Baconator|730|36|36|49|1 sandwich`.split("\n").flatMap(l=>{const a=l.split("|"),mk=(nm,k,sv,hot)=>({id:"ff:"+a[0]+":"+nm,brand:a[0],name:nm,kcal:Math.round(+a[2]*k),p:Math.round(+a[3]*k),c:Math.round(+a[4]*k),f:Math.round(+a[5]*k),ps:1,sv:1,svl:sv,src:"ff",key:ffNorm(a[0]+" "+a[0].replace(/[^A-Za-z]/g,"")+" "+(FFALIAS[a[0]]||"")+" "+nm+(hot?" hot":" iced cold"))});
+  if(a[6]==="D"||a[6]==="DI"){const iced=a[6]==="DI";return [["tall",.75],["grande",1],["venti",iced?1.4:1.25]].map(([z,k])=>mk(a[1]+", "+z,k,z,!iced))}return [mk(a[1],1,a[6],/coffee|latte|tea|chocolate|mocha|cappuccino/i.test(a[1])&&!/iced|frapp|cold|frozen|coolatta/i.test(a[1]))]});
 const FFCHAINS=[...new Set(FASTFOODS.map(f=>f.brand))];
 function foodRow(f,mine){const i=fList.push(f)-1;return `<div class="fd-r" data-fpick="${i}" role="button" tabindex="0"><div class="fd-rm"><b>${esc(f.name)}${f.kind==="recipe"?`<em>Recipe</em>`:""}</b><small>${f.brand?esc(f.brand)+" · ":""}${foodSub(f)}</small></div>${mine&&f.kind==="recipe"?`<button class="fd-ic" data-fedit="${i}" aria-label="Edit recipe ${esc(f.name)}" title="Edit"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>`:""}${mine?`<button class="fd-ic${fDelArm===f.id?" arm":""}" data-fdel="${i}" aria-label="Remove ${esc(f.name)} from your foods">${fDelArm===f.id?"Sure?":"×"}</button>`:""}${fForm?"":`<button class="fd-add" data-fquick="${i}" aria-label="Log ${esc(f.name)}" title="Log one serving"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>`}</div>`}
 function foodMac(m){return [["kcal",n0(m.kcal)],["Protein",fr1(m.p)+"g"],["Carbs",fr1(m.c)+"g"],["Fat",fr1(m.f)+"g"]].map(([l,v])=>`<div><b>${v}</b><small>${l}</small></div>`).join("")}
@@ -2636,7 +2793,8 @@ function foodSelCard(){const f=fSel.f,q=fSel.q,u=fSel.u;const units=f.ps?[["sv",
   return `<div class="fd-sel"><div class="fd-selh"><div><b>${esc(f.name)}</b>${f.brand?`<small>${esc(f.brand)}</small>`:""}</div><button class="x" data-fback aria-label="Back to results">×</button></div>
     <div class="fd-amt${fForm?" two":""}"><label>Amount<input id="fdQty" inputmode="decimal" autocomplete="off" value="${q}"></label><label>Unit<select id="fdUnit">${units.map(([v,l])=>`<option value="${v}"${v===u?" selected":""}>${esc(l)}</option>`).join("")}</select></label>${fForm?"":`<label>Meal<select id="fdType">${MEALT.map(t=>`<option${t===(fType||mealNow())?" selected":""}>${t}</option>`).join("")}</select></label>`}</div>
     <div class="fd-mac" id="fdMac">${foodMac(foodCalc(f,q,u))}</div><button class="btn mag" data-flog>${fForm?"Add to recipe":"Log it"}</button></div>`}
-function foodResults(){fList=[];if(fSel)return foodSelCard();const q=fq.trim().toLowerCase(),mine=myFoods(),has=f=>(f.name+" "+(f.brand||"")).toLowerCase().includes(q),ids={};
+function foodResults(){fList=[];if(fSel)return foodSelCard();if(fChain){const nq=ffNorm(fq),nw=nq.split(" ").filter(Boolean),L=FASTFOODS.filter(f=>f.brand===fChain&&nw.every(w=>f.key.includes(w)));return `<div class="fd-chh"><button type="button" class="fd-back" data-fchainx aria-label="Back to all foods">‹</button><b>${esc(fChain)}</b><small>${L.length} item${L.length===1?"":"s"}</small></div>${L.length?`<div class="fd-list">${L.map(f=>foodRow(f)).join("")}</div>`:`<p class="note fd-empty">Nothing on the ${esc(fChain)} menu matches. Create it yourself below.</p>`}`}
+  const q=fq.trim().toLowerCase(),mine=myFoods(),has=f=>(f.name+" "+(f.brand||"")).toLowerCase().includes(q),ids={};
   if(!q){const ch=`<div class="fd-h">Fast food</div><div class="fd-chains">${FFCHAINS.map(c=>`<button type="button" class="fd-chain" data-fchain="${esc(c)}">${esc(c)}</button>`).join("")}</div>`;return (mine.length?`<div class="fd-h">Your foods and recipes</div><div class="fd-list">${mine.slice(0,40).map(f=>foodRow(f,true)).join("")}</div>`:`<p class="note fd-empty">Search for a food, scan a barcode, or create your own. Everything you log is kept here so you never type it twice.</p>`)+ch}
   const a=mine.filter(has).slice(0,8);a.forEach(f=>ids[f.id]=1);const nq=ffNorm(q),nw=nq.split(" ").filter(Boolean),ffm=nw.length?FASTFOODS.filter(f=>!ids[f.id]&&nw.every(w=>f.key.includes(w))).slice(0,40):[];const words=q.split(/\s+/),b=BASEFOODS.filter(f=>!ids[f.id]&&words.every(w=>f.name.toLowerCase().includes(w))).slice(0,8),c=fOn.filter(f=>!ids[f.id]).slice(0,20);
   return (a.length?`<div class="fd-h">Your foods</div><div class="fd-list">${a.map(f=>foodRow(f,true)).join("")}</div>`:"")+(ffm.length?`<div class="fd-h">Fast food</div><div class="fd-list">${ffm.map(f=>foodRow(f)).join("")}</div>`:"")+(b.length?`<div class="fd-h">Common foods</div><div class="fd-list">${b.map(f=>foodRow(f)).join("")}</div>`:"")
@@ -5435,7 +5593,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="293",APPT="2026-11-19T17:50:00-05:00";   /* APPT: when this update was made */
+const APPV="294",APPT="2026-11-19T18:05:00-05:00";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
