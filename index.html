@@ -1195,7 +1195,7 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .tpm-hold.go i{width:100%;transition:width 1.2s linear}.tpm-bar.ask .tpm-b.danger.tpm-hold{background:rgba(255,77,94,.16);color:#ffc2c8;border-color:#ff4d5e}.tpm-bar.ask .tpm-hold i{background:#ff4d5e}.tpm-bar.ask .tpm-hold.go span{color:#1a0306}.tpm-bar.ask{flex-wrap:nowrap}.tpm-bar.ask span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .tp-addrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.tpx-tools{display:flex;align-items:center;gap:8px}.tp-hist{display:flex;gap:6px}.tp-hist .tpm-b{width:38px;height:36px;min-width:0;padding:0;display:grid;place-items:center}.tp-hist .tpm-b svg{width:18px;height:18px}
 
-.tp-pick{width:44px;height:46px;margin-right:-8px;padding:0;display:grid;place-items:center;border:0;background:none;border-radius:10px;cursor:pointer;color:rgba(var(--lr),.75);-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;touch-action:manipulation}.tp-pick:hover{color:#cfe0ff}.tp-pick.on{color:rgba(var(--tL),1);filter:drop-shadow(0 0 5px rgba(var(--tL),.6))}.tp-pick.multi:not(.on){color:rgba(var(--tL),.7)}
+.tp-pick{touch-action:none!important;width:44px;height:46px;margin-right:-8px;padding:0;display:grid;place-items:center;border:0;background:none;border-radius:10px;cursor:pointer;color:rgba(var(--lr),.75);-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;touch-action:manipulation}.tp-pick:hover{color:#cfe0ff}.tp-pick.on{color:rgba(var(--tL),1);filter:drop-shadow(0 0 5px rgba(var(--tL),.6))}.tp-pick.multi:not(.on){color:rgba(var(--tL),.7)}
 .tpm-bar{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:0 0 8px;padding:8px 10px;border-radius:10px;background:rgba(var(--tL),.12);border:1px solid rgba(var(--tL),.45)}.tpm-bar b{font-size:13px;margin-right:auto;color:#eef3ff}.tpm-bar.ask{background:rgba(255,77,94,.12);border-color:rgba(255,77,94,.55)}.tpm-bar.ask span{margin-right:auto;font-size:13px;color:#ffb3ba}
 .tpm-b{font:inherit;font-size:13px;font-weight:600;min-width:36px;height:34px;padding:0 12px;border-radius:8px;cursor:pointer;color:#e6eeff;background:rgba(var(--tX),.6);border:1px solid rgba(var(--lr),.35)}.tpm-b:disabled{opacity:.4;cursor:default}.tpm-b.danger{color:#ff8a95;border-color:rgba(255,93,108,.55)}.tpm-bar.ask .tpm-b.danger{background:#ff4d5e;color:#1a0306;border-color:#ff4d5e}
 .tpp .tpm-sel{width:auto;height:34px;padding:0 8px;font-size:16px;border-radius:8px}
@@ -2477,6 +2477,15 @@ document.addEventListener("click",e=>{if(!tPlan||!e.target.closest)return;const 
   tpExPaint()});
 document.addEventListener("change",e=>{const t=e.target;if(!t.dataset||t.dataset.tpmgrp==null||!tPlan||!tpMulti||!t.value)return;const g=t.value,moved=tPlan.ex.filter(x=>tpMulti.has(x));moved.forEach(x=>x.g=g);const rest=tPlan.ex.filter(x=>!tpMulti.has(x));let at=-1;rest.forEach((x,i)=>{if((x.g||"All")===g)at=i});rest.splice(at+1,0,...moved);tPlan.ex=rest;tpFold.delete(g);tpTab=g;tpExPaint()});
 /* hold-to-delete: press and hold, the bar fills, then the exercises are deleted */
+/* swipe down (or up) across the check bubbles to select several at once */
+const CIRPICK='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/></svg>',CHKPICK='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="#081022" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+let tpSw=null;
+document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("[data-tppick]");if(!b||!tPlan)return;const ex=tPlan.ex[+b.dataset.tppick];if(!ex)return;
+  tpSw={y0:e.clientY,on:!(tpMulti&&tpMulti.has(ex)),first:ex,moved:false,seen:new Set()};try{b.releasePointerCapture&&b.releasePointerCapture(e.pointerId)}catch(_){}});
+document.addEventListener("pointermove",e=>{const S=tpSw;if(!S||!tPlan)return;if(!S.moved){if(Math.abs(e.clientY-S.y0)<10)return;S.moved=true;clearTimeout(tpHold);if(!tpMulti)tpMulti=new Set();S.on?tpMulti.add(S.first):tpMulti.delete(S.first);S.seen.add(S.first)}
+  e.preventDefault();const el=document.elementFromPoint(e.clientX,e.clientY),row=el&&el.closest(".tpx-r"),ex=row&&tPlan.ex[+row.dataset.tprow];
+  if(ex&&!S.seen.has(ex)){S.seen.add(ex);S.on?tpMulti.add(ex):tpMulti.delete(ex);const pk=row.querySelector(".tp-pick");row.classList.toggle("sel",S.on);if(pk){pk.classList.toggle("on",S.on);pk.innerHTML=S.on?CHKPICK:CIRPICK}}},{passive:false});
+["pointerup","pointercancel"].forEach(k=>document.addEventListener(k,()=>{const S=tpSw;tpSw=null;if(!S||!S.moved||!tPlan)return;tpHeld=true;if(tpMulti&&!tpMulti.size)tpMulti=null;tpDelAsk=false;tpSel=tpMulti&&tpMulti.size===1?tPlan.ex.indexOf([...tpMulti][0]):-1;tpExPaint();tpPaint()}));
 let tpDelT=null;
 const tpDelStop=()=>{clearTimeout(tpDelT);tpDelT=null;document.querySelectorAll(".tpm-hold.go").forEach(b=>b.classList.remove("go"))};
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("[data-tpmhold]");if(!b||!tPlan||!tpMulti)return;e.preventDefault();tpDelStop();b.classList.add("go");
@@ -4365,7 +4374,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="215",APPT="2026-11-18T19:40:00-05:00";   /* APPT: when this update was made */
+const APPV="216",APPT="2026-11-18T19:47:00-05:00";   /* APPT: when this update was made */
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
