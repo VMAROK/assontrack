@@ -3944,10 +3944,11 @@ const WALLS=[
   {id:"liveportal",name:"Live portal",live:"portal",src:"wp/m/portal.jpg",pos:"50% 50%",shade:.1},
   {id:"livedub",name:"Live dub",live:"dub",src:"wp/m/deepdub.jpg",pos:"50% 50%",shade:0},
   {id:"livechrome",name:"Live silver",live:"chrome",src:"wp/m/pearl.jpg",pos:"50% 50%",shade:0},
-  {id:"fracneon",name:"Fractal neon",live:"fneon",src:"wp/m/fracneon.jpg",pos:"50% 50%",shade:.05},
-  {id:"fracember",name:"Fractal ember",live:"fember",src:"wp/m/fracember.jpg",pos:"50% 50%",shade:.05},
-  {id:"fracice",name:"Fractal ice",live:"fice",src:"wp/m/fracice.jpg",pos:"50% 50%",shade:.1}];
-const WGROUPS=[["Live · animated",["livefire","liveportal","livedub","livechrome"]],["Fractal zoom",["fracneon","fracember","fracice"]],["Landscape",["alpine","serenity","snow","moonlit","aurora","sunset","ocean","forest","dunes","sakura"]],["Kaleidoscope",["hyperspace","portal","royalgold","gilded","inferno","deepdub","pearl","chrome"]],["Fire",["fire","serpent"]],["Dream & space",["liminal","nebula","midnight"]]];
+  {id:"fracseahorse",name:"Chrome seahorse",live:"fseahorse",src:"wp/m/fracseahorse.jpg",pos:"50% 50%",shade:0},
+  {id:"fracswirl",name:"Chrome swirl",live:"fswirl",src:"wp/m/fracswirl.jpg",pos:"50% 50%",shade:0},
+  {id:"fracspiral",name:"Chrome spiral",live:"fspiral",src:"wp/m/fracspiral.jpg",pos:"50% 50%",shade:0},
+  {id:"fracbolt",name:"Chrome lightning",live:"fbolt",src:"wp/m/fracbolt.jpg",pos:"50% 50%",shade:0}];
+const WGROUPS=[["Live · animated",["livefire","liveportal","livedub","livechrome"]],["Fractal zoom",["fracseahorse","fracswirl","fracspiral","fracbolt"]],["Landscape",["alpine","serenity","snow","moonlit","aurora","sunset","ocean","forest","dunes","sakura"]],["Kaleidoscope",["hyperspace","portal","royalgold","gilded","inferno","deepdub","pearl","chrome"]],["Fire",["fire","serpent"]],["Dream & space",["liminal","nebula","midnight"]]];
 const wallGroups=()=>{const A=allWalls(),out=WGROUPS.map(([n,ids])=>[n,ids.map(i=>A.find(w=>w.id===i)).filter(Boolean)]);const seen=new Set(WGROUPS.flatMap(g=>g[1]));const rest=A.filter(w=>!w.custom&&!seen.has(w.id));if(rest.length)out[out.length-1][1].push(...rest);const mine=A.filter(w=>w.custom);if(mine.length)out.push(["Yours",mine]);return out.filter(g=>g[1].length)};
 const stripWalls=f=>wallGroups().map(([n,ws])=>`<span class="tgroup">${esc(n)}</span>`+ws.map(f).join("")).join("");
 const allWalls=()=>[...WALLS,...((D().customWalls)||[]).map(c=>({id:c.id,name:c.name||"My wallpaper",src:c.src,thumb:c.thumb,pos:"50% 50%",shade:.15,custom:true}))];
@@ -3968,10 +3969,9 @@ function bestSrc(w,spin){if(w.custom||!HDW.has(w.id))return w.src;const need=Mat
 const spinner=on=>{const e=$("#bgspin");if(e)e.classList.toggle("show",on)};
 /* live kaleidoscope: one shader, three palettes */
 /* fractal zoom: an endless dive into the Mandelbrot set, glowing along its edges */
-const FRAC_PAL={fneon:{a:[.5,.5,.5],b:[.5,.5,.5],c:[1,1,1],d:[0,.33,.67],ctr:[-0.743643887037151,0.131825904205330],g:1},
-  fember:{a:[.5,.25,.12],b:[.5,.3,.15],c:[1,.9,.6],d:[0,.12,.25],ctr:[-0.7746806106269039,-0.1374168856037867],g:1},
-  fice:{a:[.35,.5,.65],b:[.3,.35,.3],c:[1,1,1],d:[.55,.6,.68],ctr:[-0.10109636384562,0.95628651080914],g:.9}};
-const FRAC_FS=`precision highp float;uniform vec2 R;uniform float T;uniform vec3 A,B,C,Dd;uniform vec2 Ctr;uniform float P,G,S0,S1,RO;void main(){vec2 uv=(gl_FragCoord.xy-.5*R)/min(R.x,R.y);float ph=fract(T/P);float sc=S0*exp(-ph*log(S0/S1));float an=T*RO;uv=mat2(cos(an),-sin(an),sin(an),cos(an))*uv;vec2 c=Ctr+uv*sc;vec2 z=vec2(0.),dz=vec2(0.);float n=0.;float m2=0.;for(int i=0;i<240;i++){dz=2.*vec2(z.x*dz.x-z.y*dz.y,z.x*dz.y+z.y*dz.x)+vec2(1.,0.);z=vec2(z.x*z.x-z.y*z.y,2.*z.x*z.y)+c;m2=dot(z,z);if(m2>1e4)break;n+=1.;}vec3 col=vec3(0.);if(n<239.){float de=.5*sqrt(m2/dot(dz,dz))*log(m2);float px=sc/min(R.x,R.y)*2.;float edge=exp(-de/(px*6.));float halo=exp(-de/(px*60.))*.22;float sn=n-log2(log2(m2))+4.;float t=sn*.03+T*.025;vec3 pal=A+B*cos(6.2831853*(C*t+Dd));col=pal*(edge*1.1+halo)+pal*.04;}float fade=smoothstep(0.,.04,ph)*smoothstep(1.,.96,ph);float vig=1.-.4*dot(uv,uv);gl_FragColor=vec4(clamp(col*G*vig*fade,0.,1.),1.);}`;
+const FRAC_PAL={fseahorse:{sh:1,ctr:[-0.743643887037151,0.131825904205330],s0:1.6,s1:2e-4},fswirl:{sh:2,ctr:[0,0],jc:[-0.8,0.156],s0:1.8,s1:.003},
+  fspiral:{sh:2,ctr:[0,0],jc:[-0.7269,0.1889],s0:1.6,s1:.004},fbolt:{sh:2,ctr:[0,0],jc:[0,1],s0:1.6,s1:.003}};
+const FRAC_FS=`precision highp float;uniform vec2 R;uniform float T;uniform vec2 Ctr,Jc;uniform float P,S0,S1,RO,SH;uniform vec3 TINT;float f(vec2 c){vec2 z=SH>1.5&&SH<2.5?c:vec2(0.);vec2 k=SH>1.5&&SH<2.5?Jc:c;float n=0.,m2=0.;for(int i=0;i<170;i++){if(SH>2.5&&SH<3.5)z=abs(z);if(SH>3.5)z.y=-z.y;z=vec2(z.x*z.x-z.y*z.y,2.*z.x*z.y)+k;m2=dot(z,z);if(m2>1e4)break;n+=1.;}return n>=169.?-1.:n-log2(log2(m2));}void main(){vec2 uv=(gl_FragCoord.xy-.5*R)/min(R.x,R.y);float ph=fract(T/P);float sc=S0*exp(-ph*log(S0/S1));float an=T*RO;mat2 rot=mat2(cos(an),-sin(an),sin(an),cos(an));uv=rot*uv;vec2 c=Ctr+uv*sc;float px=sc/min(R.x,R.y)*1.5;float h=f(c);vec3 col=vec3(.01);if(h>=0.){float hx=f(c+vec2(px,0.)),hy=f(c+vec2(0.,px));if(hx<0.)hx=h;if(hy<0.)hy=h;vec3 nrm=normalize(vec3((h-hx)*1.6,(h-hy)*1.6,1.));vec3 L=normalize(vec3(-.5,.6,.65));vec3 V=vec3(0.,0.,1.);vec3 Hh=normalize(L+V);float dif=max(dot(nrm,L),0.);float spe=pow(max(dot(nrm,Hh),0.),60.);vec3 rf=reflect(-V,nrm);float env=.5+.5*cos(rf.y*6.+rf.x*2.+h*.06);float band=.55+.45*cos(h*.18+T*.05);vec3 base=TINT*(.25+.75*env)*band;col=base*(.25+.9*dif)+vec3(1.)*spe*1.1+TINT*.04;}float fade=smoothstep(0.,.04,ph)*smoothstep(1.,.96,ph);float vig=1.-.45*dot(uv,uv);gl_FragColor=vec4(clamp(col*vig*fade,0.,1.),1.);}`;
 const LIVE_PAL={
   inferno:{ramp:[[.6,.03,.02],[1,.36,.05],[1,.8,.32]],gain:1.15,n:8,cx:-.55,cy:-.6},
   portal:{a:[.5,.5,.5],b:[.5,.5,.5],c:[1,1,1],d:[0,.33,.67],gain:1,n:12,cx:-.62,cy:-.48},
@@ -3994,7 +3994,7 @@ function liveStart(cv,pal){const gl=cv.getContext("webgl",{antialias:false,alpha
   const uR=U("R"),uT=U("T");
   const fp=gl.createProgram();gl.attachShader(fp,sh(gl.VERTEX_SHADER,"attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}"));gl.attachShader(fp,sh(gl.FRAGMENT_SHADER,FRAC_FS));gl.bindAttribLocation(fp,loc,"p");gl.linkProgram(fp);const fOK=gl.getProgramParameter(fp,gl.LINK_STATUS);
   const FU=n=>gl.getUniformLocation(fp,n);let cur=pr,uR2=uR,uT2=uT;
-  const set=k=>{if(FRAC_PAL[k]&&fOK){const q=FRAC_PAL[k];gl.useProgram(fp);cur=fp;gl.uniform3fv(FU("A"),q.a);gl.uniform3fv(FU("B"),q.b);gl.uniform3fv(FU("C"),q.c);gl.uniform3fv(FU("Dd"),q.d);gl.uniform2fv(FU("Ctr"),q.ctr);gl.uniform1f(FU("G"),q.g);gl.uniform1f(FU("P"),75);gl.uniform1f(FU("S0"),1.6);gl.uniform1f(FU("S1"),2e-4);gl.uniform1f(FU("RO"),.008);uR2=FU("R");uT2=FU("T")}else{gl.useProgram(pr);cur=pr;uR2=uR;uT2=uT;if(LIVE_PAL[k])setPal(k)}};
+  const set=k=>{if(FRAC_PAL[k]&&fOK){const q=FRAC_PAL[k];gl.useProgram(fp);cur=fp;gl.uniform2fv(FU("Ctr"),q.ctr);gl.uniform2fv(FU("Jc"),q.jc||[0,0]);gl.uniform1f(FU("SH"),q.sh);gl.uniform3fv(FU("TINT"),[.82,.85,.9]);gl.uniform1f(FU("P"),75);gl.uniform1f(FU("S0"),q.s0);gl.uniform1f(FU("S1"),q.s1);gl.uniform1f(FU("RO"),.008);uR2=FU("R");uT2=FU("T")}else{gl.useProgram(pr);cur=pr;uR2=uR;uT2=uT;if(LIVE_PAL[k])setPal(k)}};
   return {setPal:set,draw(t){gl.viewport(0,0,cv.width,cv.height);gl.uniform2f(uR2,cv.width,cv.height);gl.uniform1f(uT2,t);gl.drawArrays(gl.TRIANGLES,0,3)},gl}}
 
 let liveEng=null,liveRAF=0,liveKey=null,liveFail=false,liveLast=0;const liveT0=performance.now()-Math.random()*6e5;
@@ -4396,7 +4396,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="220",APPT="2026-11-18T20:04:00-05:00";   /* APPT: when this update was made */
+const APPV="221",APPT="2026-11-18T20:14:00-05:00";   /* APPT: when this update was made */
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
