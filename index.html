@@ -1191,13 +1191,13 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 .lines-sw{display:inline-flex}
 
 /* training */
-.wd-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
-.wd{display:flex;flex-direction:column;min-height:120px;border-radius:12px;overflow:hidden;background:linear-gradient(180deg,rgba(var(--tX),.55),rgba(var(--tX),.3));border:1px solid rgba(var(--lr),.2)}
+.wd-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0;border:1px solid rgba(var(--lr),.28);border-radius:12px;overflow:hidden}
+.wd{position:relative;display:flex;flex-direction:column;min-height:120px;border-radius:0;overflow:hidden;background:linear-gradient(180deg,rgba(var(--tX),.55),rgba(var(--tX),.3));border:0;border-left:1px solid rgba(var(--lr),.2)}.wd:first-child{border-left:0}
 .wd-top{display:flex;align-items:baseline;justify-content:space-between;gap:4px;padding:9px 9px 8px;background:rgba(4,8,20,.6);border-bottom:1px solid rgba(var(--lr),.14)}
 .wd-top small{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}.wd-top em{font-style:normal;font-family:var(--mono);font-size:15px;font-weight:600;color:#cfdaf2;line-height:1}
 .wd-mid{flex:1;display:grid;place-items:center;padding:8px}.wd-ring{width:100%;max-width:64px;height:auto}
 .wd-ck{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:#3ddc84;color:#04140b;box-shadow:0 0 12px rgba(61,220,132,.55)}.wd-ck svg{width:24px;height:24px}
-.wd.td{border:2px solid rgba(var(--tL),1);background:linear-gradient(180deg,rgba(var(--tL),.42),rgba(var(--tL),.18));box-shadow:0 0 0 2px rgba(var(--tL),.35),0 0 26px rgba(var(--tL),.55);transform:translateY(-2px)}.wd.td .wd-top{background:rgba(var(--tL),.35)}.wd.td .wd-top small,.wd.td .wd-top em{color:#fff;font-weight:800}
+.wd.td{z-index:1;background:linear-gradient(180deg,rgba(var(--tL),.42),rgba(var(--tL),.18));box-shadow:inset 0 0 0 2px rgba(var(--tL),1),0 0 22px rgba(var(--tL),.45)}.wd.td .wd-top{background:rgba(var(--tL),.35)}.wd.td .wd-top small,.wd.td .wd-top em{color:#fff;font-weight:800}
 .wd.fut{opacity:.65}
 .tile.tdn{gap:4px;padding:14px}.tdonut{width:86px;height:86px}
 .trwk .tr-days{gap:0;align-items:stretch;border:1px solid rgba(var(--lr),.28);border-radius:12px;overflow:hidden}
@@ -4412,7 +4412,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="225",APPT="2026-11-18T20:36:00-05:00";   /* APPT: when this update was made */
+const APPV="226",APPT="2026-11-18T20:39:00-05:00";   /* APPT: when this update was made */
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
 (function(){if(location.protocol!=="https:"||!/github\.io$/.test(location.hostname))return;let busy=false;
