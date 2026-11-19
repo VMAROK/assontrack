@@ -156,8 +156,10 @@ label{font-size:13px;font-weight:500}
 .panel{border-radius:14px;border-color:rgba(var(--lr),.24);background:linear-gradient(180deg,rgba(40,100,220,.12),rgba(8,14,42,.72));box-shadow:inset 0 1px 0 rgba(120,200,255,.12),0 0 24px rgba(30,110,255,.08)}
 .panel::before,.panel::after{display:none}
 .navbtn{border-radius:10px}
-.navbtn.navsub{margin-left:18px;width:calc(100% - 18px);font-size:13.5px;padding-top:0;padding-bottom:0;max-height:0;opacity:0;overflow:hidden;border-width:0;pointer-events:none;transition:max-height .45s cubic-bezier(.34,1.3,.64,1),opacity .25s,padding .3s,margin .3s}.navbtn.navsub.open{max-height:52px;opacity:1;padding-top:8px;padding-bottom:8px;border-width:1px;pointer-events:auto}.navbtn.navsub::before{content:"";position:absolute;left:-8px;top:50%;width:8px;height:1px;background:rgba(var(--lr),.5)}
-@media (max-width:760px){.navbtn.navsub{margin-left:0;width:auto}.navbtn.navsub:not(.open){display:none}.navbtn.navsub::before{display:none}}
+.navgrp{display:grid;grid-template-rows:0fr;opacity:0;transform:translateY(-6px);transition:grid-template-rows .45s cubic-bezier(.4,0,.2,1),opacity .35s ease,transform .45s cubic-bezier(.4,0,.2,1)}.navgrp.open{grid-template-rows:1fr;opacity:1;transform:none}.navgrp-in{min-height:0;overflow:hidden;padding-left:18px}
+.navbtn.navsub{font-size:13.5px;padding-top:8px;padding-bottom:8px}.navbtn.navsub::after{content:"";position:absolute;left:-8px;top:50%;width:8px;height:1px;background:rgba(var(--lr),.5)}.navgrp:not(.open) .navsub{pointer-events:none}
+.navcar{margin-left:auto;width:24px;height:24px;margin-right:-4px;border-radius:6px;display:grid;place-items:center;color:var(--muted);transition:transform .42s cubic-bezier(.22,1,.36,1),color .2s,background .2s}.navcar svg{width:16px!important;height:16px!important;color:currentColor!important}.navcar:hover{color:#fff;background:rgba(var(--lr),.18)}.navgrp-closed .navcar{transform:rotate(-90deg)}
+@media (max-width:760px){.navcar{display:none}.navgrp{display:contents}.navgrp-in{display:contents}.navgrp:not(.open) .navsub{display:none}.navbtn.navsub::after{display:none}}
 #bgimg,#bgimg2{position:fixed;inset:0;z-index:0;pointer-events:none;background:#05060c no-repeat 50% 50%/cover;opacity:0;transition:opacity .35s ease,filter .45s ease}
 #bgimg.on,#bgimg2.on{opacity:1}
 #bgimg,#bgimg2,#bglive{filter:blur(var(--wblur,0px));transform:scale(var(--wbs,1))}
@@ -1722,8 +1724,8 @@ body.dbg-off .dbg-n{display:none}body.dbg-off .dbg-box{outline:none}
     <button class="navbtn" data-tab="dash" style="--c:var(--cyan)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="10" width="8" height="11" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/></svg>Dashboard</button>
     <button class="navbtn" data-tab="rem" style="--c:#ffd166"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.3 20a2 2 0 003.4 0"/></svg>Reminders</button>
     <button class="navbtn" data-tab="fuel" style="--c:var(--magenta)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3c3 4 6 7 6 11a6 6 0 0 1-12 0c0-4 3-7 6-11z"/></svg>Nutrition</button>
-    <button class="navbtn" data-tab="train" style="--c:var(--lime)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg>Training</button>
-    <button class="navbtn navsub" data-tab="body" style="--c:var(--violet)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>Body</button>
+    <button class="navbtn" data-tab="train" style="--c:var(--lime)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg>Training<span class="navcar" role="button" tabindex="0" data-navtog aria-label="Show or hide Body" aria-expanded="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></button>
+    <div class="navgrp open" id="navGrp"><div class="navgrp-in">    <button class="navbtn navsub open" data-tab="body" style="--c:var(--violet)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>Body</button></div></div>
     <button class="navbtn" data-tab="pass" style="--c:var(--amber)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>Passions</button>
     <button class="navbtn" data-tab="budget" style="--c:#3ddc84"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18M16 14.5h2"/><path d="M6 6V5a2 2 0 012-2h9"/></svg>Budget</button>
     <button class="navbtn" data-tab="set" style="--c:var(--muted)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Settings</button>
@@ -4974,7 +4976,7 @@ function render(){
   v.innerHTML={dash:vDash,fuel:vFuel,body:vBody,train:vTrain,pass:vPass,budget:vBudget,rem:vRem,set:vSet}[tab]()+`<footer class="foot">This is not a replacement for measuring your true progress away from the screen. This app is designed for those preferring organization.<br>Inspired by Lose It!</footer>`;
   v.scrollTop=y;keep.forEach(([q,i,x,t])=>{const el=v.querySelectorAll(q)[i];if(el){const sb=el.style.scrollBehavior;el.style.scrollBehavior="auto";el.scrollLeft=x;el.scrollTop=t;el.style.scrollBehavior=sb}});
   $("#ttl").innerHTML=`${TITLES[tab][0]}<small>${TITLES[tab][1]}</small>`;
-  document.querySelectorAll(".navbtn").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab));document.querySelectorAll(".navsub").forEach(b=>b.classList.toggle("open",tab==="train"||tab==="body"));try{rBadge()}catch(_){}
+  document.querySelectorAll(".navbtn").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab));navGrpSet();try{rBadge()}catch(_){}
   placeBranch();applyWall();applyWallBlur();applyLook();preloadWalls();holoMount();eqCards();dbgLabels();
 }
 /* every workout card in the All workouts panel is as tall as the tallest one */
@@ -4998,6 +5000,9 @@ addEventListener("resize",()=>placeBranch());
 
 /* ---------- events ---------- */
 let confirmClear=false;
+function navGrpSet(){const g=document.getElementById("navGrp"),open=(()=>{try{return localStorage.getItem("aot-navtr")!=="0"}catch(_){return true}})();if(!g)return;g.classList.toggle("open",open);const t=document.querySelector('.navbtn[data-tab="train"]');if(t){t.classList.toggle("navgrp-closed",!open);const c=t.querySelector(".navcar");if(c)c.setAttribute("aria-expanded",String(open))}}
+document.addEventListener("click",e=>{const c=e.target.closest&&e.target.closest("[data-navtog]");if(!c)return;e.preventDefault();e.stopPropagation();const open=document.getElementById("navGrp").classList.contains("open");try{localStorage.setItem("aot-navtr",open?"0":"1")}catch(_){}navGrpSet()},true);
+document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.dataset&&e.target.dataset.navtog!=null){e.preventDefault();e.stopPropagation();e.target.click()}},true);
 function go(t){if(t!==tab)sfx("whoosh");if(t==="train"&&t!==tab){splitDay=dayIdx(today());catDayF={}}tab=t;confirmClear=false;render();$("#view").scrollTop=0}
 document.addEventListener("change",e=>{const t=e.target;if(!t.dataset||!t.dataset.tkproj)return;const p=data.passions.find(x=>x.id===selP);const k=p&&(p.tasks||[]).find(x=>x.id===t.dataset.tkproj);if(!k)return;k.proj=t.value||null;render();save();toast(t.value?"Moved to "+t.options[t.selectedIndex].text:"Removed from project")});
 document.addEventListener("focusout",e=>{if(e.target.id==="slH"||e.target.id==="seH"){const m=parseHM(e.target.value);if(m!=null)e.target.value=String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}});
@@ -5136,7 +5141,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="290",APPT="2026-11-19T12:27:00-05:00";   /* APPT: when this update was made */
+const APPV="291",APPT="2026-11-19T14:18:00-05:00";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
