@@ -1,5 +1,5 @@
 // Offline support: the app opens without a connection; data syncs when back online.
-const VERSION = "aot-v350";
+const VERSION = "aot-v351";
 const LIB = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4";
 const SHELL = ["./", "./index.html", "./config.js", "./ramsau.jpg", "./manifest.webmanifest",
   "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", LIB];
@@ -18,6 +18,11 @@ self.addEventListener("fetch", e => {
   if (url.hostname.endsWith("supabase.co")) return;            // account data: always live
   if (req.url.startsWith(LIB)) {                                // pinned library: cache first
     e.respondWith(caches.match(req).then(hit => hit || fetch(req)));
+    return;
+  }
+  // restaurant icons: keep a copy so the tiles still show them offline
+  if (url.hostname === "www.google.com" && url.pathname.startsWith("/s2/favicons") || url.hostname === "icons.duckduckgo.com") {
+    e.respondWith(caches.open("aot-img").then(c => c.match(req).then(hit => hit || fetch(req).then(res => { if (res.ok || res.type === "opaque") c.put(req, res.clone()); return res; }))));
     return;
   }
   if (url.origin !== location.origin) return;
