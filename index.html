@@ -1259,7 +1259,7 @@ button.us-empty{width:100%;font:inherit;text-align:left;cursor:pointer;backgroun
 button.us-emptyadd{width:100%;font:inherit;cursor:pointer;background:none;color:var(--cc)}
 .fpic{flex:none;width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:22px;line-height:1;background:rgba(255,255,255,.07) center/cover no-repeat;border:1px solid rgba(var(--lr),.22);font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}.fpic.sm{width:32px;height:32px;font-size:18px;border-radius:9px}.fpic.xs{width:22px;height:22px;font-size:14px;border-radius:6px;border:0;background-color:transparent;margin-right:2px}
 .fd-r{display:flex;align-items:center;gap:10px}.fd-r .fd-rm{flex:1;min-width:0}.fpic.nm-ic{width:34px;height:34px;font-size:20px;color:inherit;background-color:color-mix(in srgb,var(--cc) 22%,rgba(255,255,255,.05));border-color:color-mix(in srgb,var(--cc) 45%,transparent)}.fpic.nm-ic.sm{width:30px;height:30px;font-size:17px}.nq-c{align-items:center}
-.tgt-in{all:unset;display:inline-block;font-variant-numeric:tabular-nums;font:inherit;color:inherit;letter-spacing:inherit;line-height:inherit;text-align:center;min-width:2ch;border-bottom:1px dashed currentColor;cursor:text;-webkit-user-select:text;user-select:text}.tgt-in:focus{border-bottom-style:solid}.tgt-in::placeholder{color:inherit;opacity:.6}
+.tgt-in{all:unset;display:inline-block;font-variant-numeric:tabular-nums;text-shadow:inherit;font:inherit;color:inherit;letter-spacing:inherit;line-height:inherit;text-align:center;min-width:2ch;border-bottom:1px dashed currentColor;cursor:text;-webkit-user-select:text;user-select:text}.tgt-in:focus{border-bottom-style:solid}.tgt-in::placeholder{color:inherit;opacity:.6}
 .fd-acts2{display:flex;gap:8px}.fd-acts2 .btn{flex:1}
 /* affirmations */
 .aff-add{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) auto auto;gap:8px;margin:4px 0 12px}.aff-up{display:inline-flex;align-items:center;justify-content:center;cursor:pointer;white-space:nowrap}@media (max-width:700px){.aff-add{grid-template-columns:1fr 1fr}.aff-add #affUrl{grid-column:1/-1}}
@@ -2238,8 +2238,8 @@ document.addEventListener("keydown",e=>{if(e.target.id==="kcalTgt"&&e.key==="Ent
 function vFuel(){
   const d=D(),S=fuelStats(d,nD()),g=S.g,T=+g.kcal||0,left=T-S.kcal,day=nD()===today()?"today":nDayLbl(nD()),w=nWater(),W=nWGoal();
   return banner()+`<div class="grid tiles">
-    <div class="panel tile" style="--c:var(--cyan)">${ic("fire")}<small>Calories ${day}</small><b>${n0(S.kcal)}</b><em>of <input class="tgt-in" id="kcalTgt" inputmode="numeric" value="${T?n0(T):""}" placeholder="set" aria-label="Daily calorie target" style="width:${Math.max(3,String(T?n0(T):"set").length)+.3}ch"> kcal</em></div>
-    <div class="panel tile" style="--c:var(--${T&&left<0?"amber":"violet"})">${ic("star")}<small>${T&&left<0?"Over target":"Remaining"}</small><b>${T?n0(Math.abs(left)):"--"}</b><em>${T?"kcal "+(left<0?"over":"left"):"set a target"}</em></div>
+    <div class="panel tile" style="--c:var(--cyan)">${ic("fire")}<small>Daily calorie limit</small><b><input class="tgt-in" id="kcalTgt" inputmode="numeric" value="${T?n0(T):""}" placeholder="Set" aria-label="Daily calorie limit" style="width:${Math.max(3,String(T?n0(T):"Set").length)+.3}ch"></b><em>${T?"tap to change":"tap to set yours"}</em></div>
+    <div class="panel tile" style="--c:var(--${T&&left<0?"amber":"violet"})">${ic("star")}<small>Calories eaten ${day}</small><b>${n0(S.kcal)}</b><em>${T?n0(Math.abs(left))+" kcal "+(left<0?"over":"left"):"no limit set"}</em></div>
     <div class="panel tile" style="--c:var(--magenta)">${ic("bolt")}<small>Protein</small><b>${n0(S.pro)}</b><em>${g.protein?"of "+n0(g.protein)+" g":"g"}</em></div>
     <div class="panel tile" style="--c:var(--cyan)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z"/></svg><small>Water</small><b>${w}</b><em>of ${W} cups</em></div>
   </div>
@@ -5739,7 +5739,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="308",APPT="2026-11-19T23:45:00-05:00";   /* APPT: when this update was made */
+const APPV="309",APPT="2026-11-20T00:08:00-05:00";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
