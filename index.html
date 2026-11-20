@@ -2232,9 +2232,13 @@ function fuelTrend(S){const g=S.g,T=+g.kcal||0,D14=S.days,mx=Math.max(T*1.15,...
     <div class="wtr-sum">${cell("Today",n0(S.kcal)+" kcal",T?(S.kcal>T?n0(S.kcal-T)+" over target":n0(T-S.kcal)+" under target"):"no target set",T&&S.kcal>T?OV:S.tm.length?UN:"")}${cell("7-day average",S.avg==null?"--":n0(S.avg)+" kcal",S.avg==null?"nothing logged this week":dv==null?wk.length+" days logged":(dv>0?"↑ "+n0(dv)+" over target":"↓ "+n0(-dv)+" under target"),dv==null?"":dv>0?OV:UN)}${cell("This week",`<span style="color:${UN}">↓ ${under}</span> <span style="color:${OV}">↑ ${over}</span>`,"days under · over")}${cell("Protein average",S.avgP==null?"--":n0(S.avgP)+" g",g.protein?"target "+n0(g.protein)+" g":"per logged day")}</div>
     <svg class="wtr-svg" viewBox="0 0 600 182" role="img" aria-label="Calories for each of the last 14 days against your target.">${grid}${bars}${tl}</svg>
     <div class="wtr-leg"><span><i style="background:${UN}"></i>↓ At or under target</span><span><i style="background:${OV}"></i>↑ Over target</span>${T?`<span><i class="dash"></i>Target</span>`:""}</div></div>`}
-document.addEventListener("input",e=>{if(e.target.id!=="kcalTgt")return;const t=e.target,v=t.value.replace(/\D/g,"").slice(0,5);const f=v?Number(v).toLocaleString():"";if(t.value!==f)t.value=f;t.style.width=(Math.max(3,(f||"set").length)+.3)+"ch"});
-document.addEventListener("change",e=>{if(e.target.id!=="kcalTgt")return;const v=+e.target.value.replace(/\D/g,"");data.goals.kcal=v>0?v:0;save();render();toast(v>0?"Daily target "+v.toLocaleString()+" kcal":"Calorie target cleared")});
+/* the calorie limit saves as you type (no reliance on "change", which iPad Safari can skip) */
+let tgtT=null,tgtDirty=false;
+function tgtCommit(show){clearTimeout(tgtT);tgtT=null;const i=document.getElementById("kcalTgt");if(i){const v=+String(i.value).replace(/\D/g,"");data.goals.kcal=v>0?v:0}if(tgtDirty){tgtDirty=false;save();if(show)toast(data.goals.kcal?"Calorie limit saved: "+data.goals.kcal.toLocaleString()+" kcal":"Calorie limit cleared")}}
+document.addEventListener("input",e=>{if(e.target.id!=="kcalTgt")return;const t=e.target,v=t.value.replace(/\D/g,"").slice(0,5),f=v?Number(v).toLocaleString():"";if(t.value!==f){t.value=f;try{t.setSelectionRange(f.length,f.length)}catch(_){}}t.style.width=(Math.max(3,(f||"Set").length)+.3)+"ch";data.goals.kcal=v?+v:0;tgtDirty=true;clearTimeout(tgtT);tgtT=setTimeout(()=>tgtCommit(false),700)});
+document.addEventListener("focusout",e=>{if(e.target.id!=="kcalTgt")return;tgtCommit(true);setTimeout(()=>{if(!typing())render()},50)});
 document.addEventListener("keydown",e=>{if(e.target.id==="kcalTgt"&&e.key==="Enter"){e.preventDefault();e.target.blur()}});
+addEventListener("pagehide",()=>{if(tgtDirty)tgtCommit(false)});document.addEventListener("visibilitychange",()=>{if(document.hidden&&tgtDirty)tgtCommit(false)});
 function vFuel(){
   const d=D(),S=fuelStats(d,nD()),g=S.g,T=+g.kcal||0,left=T-S.kcal,day=nD()===today()?"today":nDayLbl(nD()),w=nWater(),W=nWGoal();
   return banner()+`<div class="grid tiles">
@@ -5739,7 +5743,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="309",APPT="2026-11-20T00:08:00-05:00";   /* APPT: when this update was made */
+const APPV="310",APPT="2026-11-20T00:30:00-05:00";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
