@@ -1854,12 +1854,13 @@ function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");cl
 const isEmpty=d=>!d.meals.length&&!d.weights.length&&!d.meas.length&&!d.workouts.length&&!d.passions.length&&!d.sessions.length&&!(d.events||[]).length;
 const demoOn=()=>false;
 
-let writing=false,pending=false,lastLocal=0;const canceledRuns=new Set();
+let writing=false,pending=false,lastLocal=0,pulledOnce=false;const canceledRuns=new Set();
 const stripCanceled=d=>{let n=0;(d.passions||[]).forEach(p=>(p.tasks||[]).forEach(t=>{const b=(t.runs||[]).length;t.runs=(t.runs||[]).filter(r=>!canceledRuns.has(t.id+":"+r.s));n+=b-t.runs.length}));return n};
 async function save(){
   lastLocal=Date.now();data._rev=Math.max(Date.now(),(data._rev||0)+1);
   try{localStorage.setItem("aot",JSON.stringify(data))}catch(e){}
   if(!saveRef)return;
+  if(!pulledOnce){syncDirty=true;return}
   if(!navigator.onLine){syncDirty=true;if(!storeNote){storeNote="You're offline. Changes are kept on this device and will sync when you're back online.";render()}return}
   if(writing){pending=true;return}
   writing=true;
@@ -1888,12 +1889,13 @@ async function pull(){
       else if((data._rev||0)>(inc._rev||0)||syncDirty)save()}
     else if(!isEmpty(data))save();
     try{localStorage.setItem("aot-owner",sbUser.id)}catch(e){}
+    pulledOnce=true;
   }catch(e){storeNote=navigator.onLine?"Couldn't reach your account. Changes are kept on this device and will sync later.":"You're offline. Changes are kept on this device and will sync when you're back online.";syncDirty=true}
   pulling=false;softRender();
 }
 async function onSession(session){
   const u=session&&session.user||null;if((u&&u.id)===(sbUser&&sbUser.id))return;
-  sbUser=u;
+  sbUser=u;pulledOnce=false;
   saveRef=sbUser?{set:async v=>{const {error}=await sb.from("trackers").upsert({user_id:sbUser.id,data:v,updated_at:new Date().toISOString()});if(error)throw error}}:null;
   setUplink();
   if(sbUser){if(recovering)showAuth("reset");else hideAuth();await pull()}else render();
@@ -1967,7 +1969,7 @@ document.addEventListener("change",async e=>{if(e.target.id!=="importIn")return;
 if(sb){
   sb.auth.getSession().then(({data:r})=>{if(r&&r.session)onSession(r.session);else if(!skipAuth())showAuth(isEmpty(data)?"up":"in")}).catch(()=>{});
   sb.auth.onAuthStateChange((ev,session)=>{if(ev==="PASSWORD_RECOVERY"){recovering=true;onSession(session);showAuth("reset");return}if(ev==="SIGNED_OUT")onSession(null);else if(session)onSession(session)});
-  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")pull()});
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")pull();else if(sbUser&&!writing&&!pending)setTimeout(()=>{if(document.visibilityState!=="visible")pulledOnce=false},60000)});
   addEventListener("online",()=>{storeNote="";pull()});
   setInterval(()=>{if(document.visibilityState==="visible")pull()},60000);
 }
@@ -3709,7 +3711,7 @@ document.addEventListener("pointerdown",e=>{const h=e.target.closest&&e.target.c
 ["pointerup","pointercancel","pointerleave"].forEach(k=>document.addEventListener(k,e=>{if(!rHoldT)return;if(k==="pointerleave"&&!(e.target.closest&&e.target.closest("[data-rhold]")))return;clearTimeout(rHoldT);rHoldT=null;document.querySelectorAll("[data-rhold].go").forEach(b=>b.classList.remove("go"))},true));
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&rEditId){rEditId=null;render()}});
 /* while the app is open: when a timed reminder comes due, show it (and a system alert if allowed) */
-function rTick(){let hit=false;RM().forEach(r=>{if(r.done||!r.d||!r.tm||r.ntf===r.d+r.tm)return;const at=rAt(r);if(at<=Date.now()&&Date.now()-at<36e5){r.ntf=r.d+r.tm;hit=true;toast("⏰ "+r.t);try{if(typeof Notification!=="undefined"&&Notification.permission==="granted"){const o={body:r.t,tag:r.id,icon:"icon-192.png"};navigator.serviceWorker&&navigator.serviceWorker.getRegistration?navigator.serviceWorker.getRegistration().then(g=>g?g.showNotification("Reminder",o):new Notification("Reminder",o)).catch(()=>{}):new Notification("Reminder",o)}}catch(_){}}});if(hit){save();if(tab==="rem"&&!typing())render();else rBadge()}}
+function rTick(){let hit=false;RM().forEach(r=>{if(r.done||!r.d||!r.tm||r.ntf===r.d+r.tm)return;const at=rAt(r);if(at<=Date.now()&&Date.now()-at<36e5){r.ntf=r.d+r.tm;hit=true;toast("⏰ "+r.t);try{if(typeof Notification!=="undefined"&&Notification.permission==="granted"){const o={body:r.t,tag:r.id,icon:"icon-192.png"};navigator.serviceWorker&&navigator.serviceWorker.getRegistration?navigator.serviceWorker.getRegistration().then(g=>g?g.showNotification("Reminder",o):new Notification("Reminder",o)).catch(()=>{}):new Notification("Reminder",o)}}catch(_){}}});if(hit){try{localStorage.setItem("aot",JSON.stringify(data))}catch(_){}if(tab==="rem"&&!typing())render();else rBadge()}}
 setInterval(rTick,30000);setTimeout(rTick,3000);
 
 /* ---------- money: currencies, live exchange rates and cash-register style amount fields ---------- */
@@ -5758,7 +5760,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="320",APPT="2026-11-20T10:25:00-05:00";   /* APPT: when this update was made */
+const APPV="321",APPT="2026-11-20T13:25:00-05:00";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
