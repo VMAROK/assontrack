@@ -87,6 +87,9 @@
 .us2-tick{position:absolute;left:10px;right:10px;bottom:10px;text-align:center;background:var(--cc);color:#0b1020;font-weight:800;font-size:12.5px;border-radius:10px;padding:7px}
 .us2-add{opacity:.6;border-style:dashed!important;box-shadow:none}
 .us2-add .us2-pic{font-size:40px}
+
+.us2-edit{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:12px;font-weight:600;padding:6px 11px;border-radius:99px;cursor:pointer;color:var(--cc);background:color-mix(in srgb,var(--cc) 10%,transparent);border:1px solid color-mix(in srgb,var(--cc) 45%,transparent);transition:background .2s}
+.us2-edit:hover{background:color-mix(in srgb,var(--cc) 22%,transparent)}
 </style>
 </head><body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2421,6 +2424,7 @@ function usGroupCard(g,gi){const c=g.c||UPAL[gi%UPAL.length],I=(g.items||[]).sli
   const fl=usFlash&&Date.now()<usFlash.until?usFlash:null;
   return `<section class="us-g us2-g" data-usg="${g.id}" style="--cc:${c}">
     <div class="us2-h">${usRing(I)}<div class="us2-ht"><button type="button" class="us-ht" data-usgedit="${g.id}" title="Rename or change colour"><i></i>${esc(g.n)}</button><small>${I.length} item${I.length===1?"":"s"} · ${n0(tot)} cal total</small></div>
+      <button type="button" class="us2-edit" data-usgedit="${g.id}" aria-label="Edit ${esc(g.n)}: name and colour" title="Edit name and colour"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg><span>Edit</span></button>
       <span class="us2-sp"></span><div class="us2-meal" role="group" aria-label="Logs to">${MEALT.map(m=>`<button type="button" data-usmeal="${g.id}|${m}" aria-pressed="${m===ml}">${m}</button>`).join("")}</div>
       ${I.length?`<button type="button" class="us-all" data-usall="${g.id}">Log all</button>`:""}</div>
     <div class="us2-shelf">${order.map(([x,n])=>{const on=fl&&(fl.id===x.id||fl.g===g.id);return `<button type="button" class="us-it us2-c${on?" logged":""}" data-usit="${x.id}">
@@ -5947,7 +5951,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="352",APPT="2026-11-20T19:12:00Z";   /* APPT: when this update was made */
+const APPV="353",APPT="2026-11-20T19:12:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
