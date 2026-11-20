@@ -1280,10 +1280,10 @@ button.us-emptyadd{width:100%;font:inherit;cursor:pointer;background:none;color:
 .mgt-d circle{transition:stroke-dasharray .55s cubic-bezier(.34,1.2,.64,1),stroke-dashoffset .55s cubic-bezier(.34,1.2,.64,1)}
 .mgt-in{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%}
 .mgt-in label{display:flex;flex-direction:column;align-items:center;gap:0;font-size:11px;color:var(--mc)}
-.mgt-in input{all:unset;box-sizing:border-box;width:4.2ch;text-align:center;font:700 22px var(--mono);font-variant-numeric:tabular-nums;color:var(--mc);cursor:text;-webkit-user-select:text;user-select:text;touch-action:manipulation}
+.mgt-in input{all:unset;box-sizing:border-box;text-align:center;font:700 22px var(--mono);font-variant-numeric:tabular-nums;color:var(--mc);cursor:text;-webkit-user-select:text;user-select:text;touch-action:manipulation}
 .mgt-in input::placeholder{color:var(--mc);opacity:1;font:inherit}
 .mgt-in input:focus::placeholder{opacity:.35}
-.mgt-in input:focus{border-radius:8px;box-shadow:0 0 0 3px color-mix(in srgb,var(--mc) 22%,transparent),0 0 14px color-mix(in srgb,var(--mc) 35%,transparent);outline:1px solid var(--mc)}
+.mgt-in input:focus{outline:none;border-radius:0;box-shadow:0 0 0 3px color-mix(in srgb,var(--mc) 45%,transparent),0 0 14px color-mix(in srgb,var(--mc) 35%,transparent)}
 
 .mg-b{display:flex;gap:6px;justify-content:center;align-items:baseline}
 .mg-b i{font-style:normal;color:var(--muted);font-size:.6em}
@@ -2296,7 +2296,7 @@ function vFuel(){
     <div class="panel tile" style="--c:var(--cyan)">${ic("fire")}<small>Calorie limit${nD()===today()?"":" · "+nDayLbl(nD())}</small><b><input class="tgt-in" id="kcalTgt" inputmode="numeric" value="${T?n0(T):""}" placeholder="Set" aria-label="Daily calorie limit" style="width:${Math.max(3,String(T?n0(T):"Set").length)+.3}ch"></b><em>${T?"tap to change":"tap to set yours"}</em></div>
     <div class="panel tile" style="--c:var(--${T&&left<0?"amber":"violet"})">${ic("star")}<small>Calories eaten ${day}</small><b>${n0(S.kcal)}</b><em>${T?n0(Math.abs(left))+" kcal "+(left<0?"over":"left"):"no limit set"}</em></div>
     <div class="panel tile" style="--c:var(--magenta)">${ic("bolt")}<small>Protein</small><b>${n0(S.pro)}</b><em>${g.protein?"of "+n0(g.protein)+" g":"g"}</em></div>
-    <div class="panel tile mgt" style="--c:var(--cyan)"><small>Macros</small>${(()=>{const V=[+S.carbs||0,+S.pro||0,+S.fiber||0],CL=MGCL;mgV=V;const G=data.goals||{};return `${mgDonut(V)}<div class="mgt-in">${[["carbs","Carbs",CL[0]],["protein","Protein",CL[1]],["fiber","Fiber",CL[2]]].map(([k,l,c])=>`<label style="--mc:${c}"><span>${l}</span><input data-mgin="${k}" inputmode="numeric" enterkeyhint="done" placeholder="0" value="${+G[k]||""}" aria-label="${l} goal in grams"></label>`).join("")}</div>`})()}</div>
+    <div class="panel tile mgt" style="--c:var(--cyan)"><small>Macros</small>${(()=>{const V=[+S.carbs||0,+S.pro||0,+S.fiber||0],CL=MGCL;mgV=V;const G=data.goals||{};return `${mgDonut(V)}<div class="mgt-in">${[["carbs","Carbs",CL[0]],["protein","Protein",CL[1]],["fiber","Fiber",CL[2]]].map(([k,l,c])=>`<label style="--mc:${c}"><span>${l}</span><input data-mgin="${k}" inputmode="numeric" enterkeyhint="done" placeholder="0" value="${+G[k]||""}" style="width:${String(+G[k]||0).length+.6}ch" aria-label="${l} goal in grams"></label>`).join("")}</div>`})()}</div>
   </div>
   ${nWeekPanel(d,S)}
   <div class="passtop figtop bodytop fueltop" style="margin-top:18px">${figurePanel()}
@@ -2347,7 +2347,7 @@ function mgDonut(V){const q=mgGeo(V),c=(r,w,col,[len,off],C,k)=>`<circle data-mg
   return `<svg class="mgt-d" viewBox="0 0 80 80" aria-hidden="true"><defs>${MGCL.map((cl,i)=>`<linearGradient id="mgm${i}" gradientUnits="userSpaceOnUse" x1="10" y1="12" x2="70" y2="68"><stop offset="0" stop-color="${cl}"/><stop offset=".2" stop-color="${cl}"/><stop offset=".27" stop-color="${mgMix(cl,"#ffffff",.5)}"/><stop offset=".34" stop-color="${cl}"/><stop offset=".6" stop-color="${mgMix(cl,"#000000",.18)}"/><stop offset=".74" stop-color="${cl}"/><stop offset=".79" stop-color="${mgMix(cl,"#ffffff",.35)}"/><stop offset=".85" stop-color="${cl}"/><stop offset="1" stop-color="${cl}"/></linearGradient>`).join("")}<filter id="mgglow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="40" cy="40" r="34" fill="none" stroke="rgba(150,180,240,.14)" stroke-width="8"/><circle cx="40" cy="40" r="24" fill="none" stroke="rgba(150,180,240,.10)" stroke-width="7"/><g filter="url(#mgglow)">${q.O.map((a,i)=>c(34,8,MGCL[i],a,q.Co,"o"+i)).join("")}</g>${q.I.map((a,i)=>c(24,7,`url(#mgm${i})`,a,q.Ci,"i"+i)).join("")}<text x="40" y="44" text-anchor="middle">${n0(q.t)}g</text></svg>`}
 /* change the rings in place so they animate */
 function mgUpd(V){const d=document.querySelector(".mgt-d");if(!d)return;const q=mgGeo(V);[["o",q.O,q.Co],["i",q.I,q.Ci]].forEach(([k,A,C])=>A.forEach(([len,off],i)=>{const e=d.querySelector(`[data-mg="${k}${i}"]`);if(e){e.setAttribute("stroke-dasharray",len.toFixed(2)+" "+C.toFixed(2));e.setAttribute("stroke-dashoffset",(-off).toFixed(2))}}))}
-document.addEventListener("input",e=>{const t=e.target;if(!t.dataset||t.dataset.mgin==null)return;const dg=t.value.replace(/\D/g,"").slice(0,4);if(t.value!==dg)t.value=dg;const v=+String(t.value).replace(/\D/g,"");data.goals=data.goals||{};if(v>0)data.goals[t.dataset.mgin]=v;else delete data.goals[t.dataset.mgin];mgUpd(mgV);clearTimeout(mgT);mgT=setTimeout(()=>save(),600)});
+document.addEventListener("input",e=>{const t=e.target;if(!t.dataset||t.dataset.mgin==null)return;const dg=t.value.replace(/\D/g,"").slice(0,4);if(t.value!==dg)t.value=dg;t.style.width=(Math.max(1,dg.length)+.6)+"ch";const v=+String(t.value).replace(/\D/g,"");data.goals=data.goals||{};if(v>0)data.goals[t.dataset.mgin]=v;else delete data.goals[t.dataset.mgin];mgUpd(mgV);clearTimeout(mgT);mgT=setTimeout(()=>save(),600)});
 document.addEventListener("focusout",e=>{const t=e.target;if(!t.dataset||t.dataset.mgin==null)return;clearTimeout(mgT);save();setTimeout(()=>{if(!typing())render()},50)});
 let mgT=null;
 document.addEventListener("focusin",e=>{if(e.target.dataset&&e.target.dataset.mgin!=null)setTimeout(()=>{try{e.target.select()}catch(_){}},0)});
@@ -5824,7 +5824,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="343",APPT="2026-11-20T19:12:00Z";   /* APPT: when this update was made */
+const APPV="345",APPT="2026-11-20T19:12:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
