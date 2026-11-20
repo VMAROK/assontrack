@@ -1268,6 +1268,7 @@ button.us-emptyadd{width:100%;font:inherit;cursor:pointer;background:none;color:
 .mbar-b{display:flex;gap:3px;height:14px;margin-top:6px;border-radius:99px;overflow:hidden;background:rgba(150,180,240,.14)}.mbar-b i{display:block;min-width:4px;background:var(--mc);box-shadow:none;transition:flex .6s cubic-bezier(.34,1.3,.64,1)}
 .mbar-l{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:8px}.mbar-l span{display:flex;align-items:center;gap:6px;font-size:13px;color:#cfdaf2}.mbar-l i{width:10px;height:10px;border-radius:3px;background:var(--mc)}.mbar-l b{font-family:var(--mono);color:var(--mc)}.mbar-l em{font-style:normal;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
 .tg-mac .mc-c{--mc:#ffd166}.tg-mac .mc-p{--mc:#ff6fb5}.tg-mac .mc-f{--mc:#3ddc84}.tg-mac>div[class^="mc-"]{border-color:color-mix(in srgb,var(--mc) 45%,transparent)!important;background:linear-gradient(180deg,color-mix(in srgb,var(--mc) 16%,transparent),rgba(var(--tX),.35))!important;box-shadow:inset 0 3px 0 var(--mc)}.tg-mac>div[class^="mc-"] small{color:color-mix(in srgb,var(--mc) 70%,#fff)}.tg-mac>div[class^="mc-"] b{color:var(--mc);text-shadow:0 0 10px color-mix(in srgb,var(--mc) 40%,transparent)}
+.lostp{margin-bottom:18px;border-color:rgba(255,182,72,.6)!important;background:linear-gradient(180deg,rgba(255,182,72,.12),rgba(var(--tX),.4))!important}.lostp .ph span{color:#ffd166}.lost-list{max-height:320px;margin-bottom:10px}
 .fd-acts2{display:flex;gap:8px}.fd-acts2 .btn{flex:1}
 /* affirmations */
 .aff-add{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) auto auto;gap:8px;margin:4px 0 12px}.aff-up{display:inline-flex;align-items:center;justify-content:center;cursor:pointer;white-space:nowrap}@media (max-width:700px){.aff-add{grid-template-columns:1fr 1fr}.aff-add #affUrl{grid-column:1/-1}}
@@ -2252,9 +2253,21 @@ document.addEventListener("input",e=>{if(e.target.id!=="kcalTgt")return;const t=
 document.addEventListener("focusout",e=>{if(e.target.id!=="kcalTgt")return;tgtCommit(true);setTimeout(()=>{if(!typing())render()},50)});
 document.addEventListener("keydown",e=>{if(e.target.id==="kcalTgt"&&e.key==="Enter"){e.preventDefault();e.target.blur()}});
 addEventListener("pagehide",()=>{if(tgtDirty)tgtCommit(false)});document.addEventListener("visibilitychange",()=>{if(document.hidden&&tgtDirty)tgtCommit(false)});
+/* recover foods that exist in this device's earlier versions but are missing now (adds them back, never replaces anything) */
+let lostSel=null;
+function lostMeals(){let L=[];try{L=JSON.parse(localStorage.getItem("aot-snaps")||"[]")}catch(e){}const have=new Set((data.meals||[]).map(m=>m.id)),gone=new Set((data.mealsGone||[])),cut=dayStr(21),seen={},out=[];
+  L.forEach(x=>{((x.data&&x.data.meals)||[]).forEach(m=>{if(!m||!m.id||have.has(m.id)||gone.has(m.id)||seen[m.id]||(m.d||"")<cut||(m.name||"").toLowerCase()==="daily total")return;seen[m.id]=1;out.push(m)})});return out.sort((a,b)=>a.d<b.d?1:-1)}
+function lostPanel(){const L=lostMeals();if(!L.length)return "";if(!lostSel)lostSel=new Set(L.map(m=>m.id));const n=L.filter(m=>lostSel.has(m.id)).length;
+  return `<div class="panel lostp"><div class="ph"><span>Found ${L.length} food${L.length===1?"":"s"} missing from your log</span><i>from an earlier version on this device</i></div><p class="note" style="margin-top:0">These were in your log before and aren't now. Untick anything you deleted on purpose, then restore. Nothing you have now is changed.</p>
+    <div class="us-rec lost-list">${L.map(m=>{const on=lostSel.has(m.id);return `<button type="button" class="us-ri${on?" on":""}" data-lostm="${m.id}" aria-pressed="${on}"><span class="us-ck">${on?"✓":""}</span>${fPic(m,"sm")}<span class="us-t"><b>${esc(m.name)}</b><small>${nDayLbl(m.d)} · ${esc(m.type||"Snack")}${m.protein?" · "+n0(m.protein)+"g protein":""}</small></span><span class="us-k">${n0(m.kcal)} kcal</span></button>`}).join("")}</div>
+    <div class="bsh-acts"><button type="button" class="btn ghost" data-lostno>Not now</button><span style="flex:1"></span><button type="button" class="btn" data-lostgo${n?"":" disabled"}>Restore ${n}</button></div></div>`}
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-lostm],[data-lostgo],[data-lostno]");if(!t)return;const d=t.dataset;
+  if(d.lostm){lostSel.has(d.lostm)?lostSel.delete(d.lostm):lostSel.add(d.lostm);render();return}
+  if(d.lostno!=null){data.mealsGone=[...(data.mealsGone||[]),...lostMeals().filter(m=>!lostSel||!lostSel.has(m.id)).map(m=>m.id)].slice(-500);lostSel=null;render();save();return}
+  if(d.lostgo!=null){const L=lostMeals(),pick=L.filter(m=>lostSel.has(m.id));pick.forEach(m=>data.meals.push(JSON.parse(JSON.stringify(m))));data.mealsGone=[...(data.mealsGone||[]),...L.filter(m=>!lostSel.has(m.id)).map(m=>m.id)].slice(-500);lostSel=null;save();sfx("blip");toast(pick.length+" food"+(pick.length===1?"":"s")+" restored");render()}});
 function vFuel(){
   const d=D(),S=fuelStats(d,nD()),g=S.g,T=+g.kcal||0,left=T-S.kcal,day=nD()===today()?"today":nDayLbl(nD()),w=nWater(),W=nWGoal();
-  return banner()+`<div class="grid tiles">
+  return banner()+lostPanel()+`<div class="grid tiles">
     <div class="panel tile" style="--c:var(--cyan)">${ic("fire")}<small>Calorie limit${nD()===today()?"":" · "+nDayLbl(nD())}</small><b><input class="tgt-in" id="kcalTgt" inputmode="numeric" value="${T?n0(T):""}" placeholder="Set" aria-label="Daily calorie limit" style="width:${Math.max(3,String(T?n0(T):"Set").length)+.3}ch"></b><em>${T?"tap to change":"tap to set yours"}</em></div>
     <div class="panel tile" style="--c:var(--${T&&left<0?"amber":"violet"})">${ic("star")}<small>Calories eaten ${day}</small><b>${n0(S.kcal)}</b><em>${T?n0(Math.abs(left))+" kcal "+(left<0?"over":"left"):"no limit set"}</em></div>
     <div class="panel tile" style="--c:var(--magenta)">${ic("bolt")}<small>Protein</small><b>${n0(S.pro)}</b><em>${g.protein?"of "+n0(g.protein)+" g":"g"}</em></div>
@@ -2405,7 +2418,7 @@ document.addEventListener("pointerup",()=>{if(nCmT){clearTimeout(nCmT);nCmT=null
 document.addEventListener("pointercancel",()=>{if(nCmT){clearTimeout(nCmT);nCmT=null}nHeld=null;if(nDrag)nDragEnd(false)},true);
 document.addEventListener("touchmove",e=>{if(nDrag||nHeld)e.preventDefault()},{passive:false});
 document.addEventListener("contextmenu",e=>{if(e.target.closest&&e.target.closest(".nm-card,.nm-row"))e.preventDefault()});
-document.addEventListener("pointerdown",e=>{const h=e.target.closest&&e.target.closest("[data-nhold]");if(!h)return;e.preventDefault();e.stopPropagation();h.classList.add("go");clearTimeout(nHoldT);nHoldT=setTimeout(()=>{nHoldT=null;const k=h.dataset.nhold,id=k==="sheet"?nEdit&&nEdit.id:k.slice(3),m=data.meals.find(x=>x.id===id);cmHeld=true;cmAt=Date.now();cmShow(null);if(k==="sheet"){nEdit=null;nSheet()}if(m){data.meals=data.meals.filter(x=>x.id!==id);toast(m.name+" deleted");render();save()}},1200)},true);
+document.addEventListener("pointerdown",e=>{const h=e.target.closest&&e.target.closest("[data-nhold]");if(!h)return;e.preventDefault();e.stopPropagation();h.classList.add("go");clearTimeout(nHoldT);nHoldT=setTimeout(()=>{nHoldT=null;const k=h.dataset.nhold,id=k==="sheet"?nEdit&&nEdit.id:k.slice(3),m=data.meals.find(x=>x.id===id);cmHeld=true;cmAt=Date.now();cmShow(null);if(k==="sheet"){nEdit=null;nSheet()}if(m){data.meals=data.meals.filter(x=>x.id!==id);data.mealsGone=[...(data.mealsGone||[]),id].slice(-500);toast(m.name+" deleted");render();save()}},1200)},true);
 ["pointerup","pointercancel","pointerleave"].forEach(k=>document.addEventListener(k,e=>{if(!nHoldT)return;if(k==="pointerleave"&&!(e.target.closest&&e.target.closest("[data-nhold]")))return;clearTimeout(nHoldT);nHoldT=null;document.querySelectorAll("[data-nhold].go").forEach(b=>b.classList.remove("go"))},true));
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-nday],[data-nwk],[data-ndon],[data-nmacv],[data-nmode],[data-nview],[data-nadd],[data-nmt],[data-nq],[data-nwat],[data-nwatset],[data-nm],[data-nmedit],[data-nmdup],[data-nmmv],[data-nclose],[data-nemt],[data-nsave],[data-nhold],#nSheet");if(!t)return;const d=t.dataset;
   if(t.id==="nSheet"){if(e.target.id==="nSheet"){nEdit=null;nSheet()}return}
@@ -5750,7 +5763,7 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
   else if(b.dataset.cal!==undefined){const k=+b.dataset.cal;if(!k){const n=new Date();calMonth=new Date(n.getFullYear(),n.getMonth(),1);calSel=today()}else calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+k,1);render()}
   else if(b.hasAttribute("data-demo-off")){demoOff=true;try{localStorage.setItem("aot-demo-off","1")}catch(e){}render();toast("Demo data cleared")}
   else if(b.hasAttribute("data-demo-on")){demoOff=false;try{localStorage.removeItem("aot-demo-off")}catch(e){}render()}
-  else if(b.dataset.del){const[k,id]=b.dataset.del.split(":");data[k]=data[k].filter(x=>x.id!==id);render();save();toast("Entry deleted")}
+  else if(b.dataset.del){const[k,id]=b.dataset.del.split(":");data[k]=data[k].filter(x=>x.id!==id);if(k==="meals")data.mealsGone=[...(data.mealsGone||[]),id].slice(-500);render();save();toast("Entry deleted")}
   else if(b.dataset.delp){if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="Remove?";b.style.fontSize="11px";b.style.color="var(--red)";return}
     const id=b.dataset.delp;if(selP===id)selP=null;data.passions=data.passions.filter(p=>p.id!==id);data.sessions=data.sessions.filter(s=>s.pid!==id);data.projects=(data.projects||[]).filter(x=>x.pid!==id);if(projFilter===id)projFilter="all";render();save();toast("Passion removed")}
   else if(b.id==="clearBtn"){if(!confirmClear){confirmClear=true;b.textContent="Tap again to erase everything";return}
@@ -5760,7 +5773,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="321",APPT="2026-11-20T13:25:00-05:00";   /* APPT: when this update was made */
+const APPV="322",APPT="2026-11-20T13:45:00-05:00";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
