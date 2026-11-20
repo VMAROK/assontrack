@@ -1328,11 +1328,25 @@ button,[role=button],a,input,select,label{touch-action:manipulation}@media (poin
 .nm-none{padding:12px;border:1px dashed color-mix(in srgb,var(--cc) 40%,transparent);border-radius:10px;font-size:12.5px;color:var(--muted);text-align:center}
 .nm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px}
 .nmp .nm-secs:not(.list){align-items:start}
-/* cards: each meal takes a full row and its cards sit side by side in one line, swiping sideways when there are more */
+/* (was) cards: each meal takes a full row, cards side by side in one line
+ and its cards sit side by side in one line, swiping sideways when there are more *\/
 .nmp .nm-secs:not(.list){grid-template-columns:minmax(0,1fr)}
 .nm-secs:not(.list) .nm-grid{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding:2px 2px 6px;margin:0 -2px;scrollbar-width:thin;scrollbar-color:rgba(var(--tL),.35) transparent}
 .nm-secs:not(.list) .nm-grid::-webkit-scrollbar{height:4px}.nm-secs:not(.list) .nm-grid::-webkit-scrollbar-thumb{background:rgba(var(--tL),.35);border-radius:9px}
 .nm-secs:not(.list) .nm-card{flex:0 0 156px;scroll-snap-align:start}
+*/
+/* cards: the four meals side by side in one row; each food is a small icon with its calories (tap for details) */
+.nmp .nm-secs:not(.list){grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;align-items:stretch}
+.nm-secs:not(.list) .nm-sec{padding:9px 8px 10px;gap:9px}
+.nm-secs:not(.list) .nm-h{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 6px;align-items:center}
+.nm-secs:not(.list) .nm-ht{font-size:13px;min-width:0}.nm-secs:not(.list) .nm-hv{grid-column:1/-1;grid-row:2;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nmp .nm-secs:not(.list) .nm-add{grid-column:2;grid-row:1;margin:0;width:24px;height:24px;padding:0;font-size:0;border-radius:50%;display:grid;place-items:center}.nmp .nm-secs:not(.list) .nm-add::before{content:"+";font-size:15px;font-weight:700;line-height:1}
+.nm-secs:not(.list) .nm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px}
+.nm-secs:not(.list) .nm-card{min-height:0;aspect-ratio:auto;align-items:center;gap:3px;padding:7px 3px 6px;border-radius:12px}
+.nm-secs:not(.list) .nm-card .nm-ct{display:contents}.nm-secs:not(.list) .nm-card .fpic.nm-ic{width:34px;height:34px;font-size:20px;margin:0}
+.nm-secs:not(.list) .nm-card .nm-k{font-size:11.5px;flex-direction:row;align-items:baseline;gap:2px;order:2}.nm-secs:not(.list) .nm-card .nm-k small{font-size:8.5px;margin:0}
+.nm-secs:not(.list) .nm-card .nm-nm,.nm-secs:not(.list) .nm-card .nm-cs,.nm-secs:not(.list) .nm-card .nm-mc{display:none}
+.nm-secs:not(.list) button.nm-none{padding:12px 4px;font-size:11px}
 .nm-secs:not(.list) .nm-sec{border:1px solid rgba(var(--lr),.18);border-top:0;box-shadow:inset 0 2px 0 var(--cc);background:linear-gradient(180deg,color-mix(in srgb,var(--cc) 9%,transparent),rgba(var(--tX),.3) 90px);padding:10px 10px 11px}
 .nm-secs:not(.list) .nm-h{padding:2px 2px 0}.nm-secs:not(.list) .nm-ht{font-size:14px}.nm-secs:not(.list) .nm-hv{font-size:11.5px}.nm-secs:not(.list) .nm-add{padding:3px 9px;font-size:11.5px}
 .nm-secs:not(.list) .nm-empty{background:rgba(var(--tX),.22);box-shadow:inset 0 2px 0 color-mix(in srgb,var(--cc) 45%,transparent)}.nm-secs:not(.list) .nm-empty .nm-ht{color:var(--muted)}.nm-secs:not(.list) .nm-empty .nm-ht i{opacity:.5;box-shadow:none}.nm-secs:not(.list) .nm-empty .nm-add{display:none}
@@ -6166,7 +6180,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="360",APPT="2026-11-20T19:12:00Z";   /* APPT: when this update was made */
+const APPV="361",APPT="2026-11-20T19:12:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
