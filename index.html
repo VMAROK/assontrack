@@ -1196,6 +1196,8 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 
 /* training */
 /* nutrition */
+button,[role=button],a,input,select,label{touch-action:manipulation}@media (pointer:coarse){input,select,textarea{font-size:max(16px,1em)}}
+#czSheet,#nSheet,#bSheet{touch-action:pan-y}
 .nw-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border:1px solid rgba(var(--lr),.28);border-radius:12px;overflow:hidden}
 .nw-d{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;padding:0 0 10px;font:inherit;color:inherit;cursor:pointer;background:linear-gradient(180deg,rgba(var(--tX),.5),rgba(var(--tX),.28));border:0;border-left:1px solid rgba(var(--lr),.16);transition:background .2s}.nw-d:first-child{border-left:0}.nw-d.fut{opacity:.45;cursor:default}
 .nw-t{display:flex;justify-content:space-between;align-items:baseline;width:100%;padding:8px 9px;background:rgba(4,8,20,.6);border-bottom:1px solid rgba(var(--lr),.14)}.nw-t small{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}.nw-t em{font-style:normal;font-family:var(--mono);font-size:14px;font-weight:600;color:#cfdaf2}
@@ -2327,7 +2329,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&tab==="fuel"&&(fOpe
 document.addEventListener("click",e=>{const t=e.target;if(!t.closest)return;
   if(t.closest("[data-flog],[data-fquick],[data-fsave],[data-fcancel]"))fOpen=false;                                  // these finish the job: the list closes once they have run
   const o=t.closest("[data-fopen]");if(o){e.stopPropagation();if(fOpen||fq||fSel||fForm){fOpen=false;fq="";fSel=null;fChain=null;fForm=null}else fOpen=true;render();return}
-  if(tab==="fuel"&&(fOpen||fq||fSel)&&!fForm&&t.isConnected&&!t.closest(".flogp")&&!t.closest(".scan")&&!t.closest(".askbox")){fOpen=false;fq="";fSel=null;fChain=null;const p=$("#fdPop"),i=$("#fdQ");if(p)p.hidden=true;if(i)i.value=""}
+  if(tab==="fuel"&&(fOpen||fq||fSel)&&!fForm&&t.isConnected&&!t.closest(".flogp")&&!t.closest(".scan")&&!t.closest(".askbox")&&!t.closest("#czSheet,#nSheet,.cm-menu")){fOpen=false;fq="";fSel=null;fChain=null;const p=$("#fdPop"),i=$("#fdQ");if(p)p.hidden=true;if(i)i.value=""}
   const g=t.closest("[data-tgedit],[data-tgcancel],[data-tgsave]");if(!g)return;
   if(g.dataset.tgedit!==undefined){tgEdit=true;render();return}if(g.dataset.tgcancel!==undefined){tgEdit=false;render();return}
   const nv=id=>{const el=$(id),m=el&&String(el.value).replace(/,/g,"").match(/\d+(\.\d+)?/);return m?Math.round(+m[0]):null},k=nv("#tgK"),pr=nv("#tgP");if(k==null||k<500||k>10000){toast("Enter a calorie target between 500 and 10,000");return}if(pr!=null&&pr>600){toast("That protein target doesn't look right");return}
@@ -2823,7 +2825,7 @@ function czSheet(){let o=document.getElementById("czSheet");if(!fSel||!fSel.czWi
     <div class="czw-foot"><div class="czw-tot"><b>${n0(tot.kcal)} kcal</b><small>${add?`${add>0?"+":"−"}${Math.abs(add)} from your changes · `:""}${fr1(tot.p)}g protein · ${fr1(tot.c)}g carbs · ${fr1(tot.f)}g fat</small></div>${czTxt(f,cz)?`<button type="button" class="btn ghost" data-czreset>Reset</button>`:""}<button type="button" class="btn" data-czdone>Done</button></div></div>`;
   const ns=o.querySelector(".cz-scroll");if(ns&&!fresh)ns.scrollTop=sc}
 function czRefresh(){czSheet();const m=$("#fdMac");if(m&&fSel)m.innerHTML=foodMac(foodCalcZ(fSel.f,fSel.q,fSel.u,fSel.cz));const t=document.querySelector(".cz-tog small");if(t&&fSel){const x=czTxt(fSel.f,fSel.cz);t.textContent=x||"milk, syrups, cold foam, toppings"}}
-window.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-czopen],[data-czdone],[data-czreset],[data-czmilk],[data-czsy],[data-czfoam],[data-cztop],[data-czshot],#czSheet");if(!t||!fSel)return;if(t.id==="czSheet"){if(e.target.id==="czSheet"){fSel.czWin=false;czSheet()}return}e.preventDefault();e.stopPropagation();const d=t.dataset,cz=fSel.cz||(fSel.cz=czNew(fSel.f));
+window.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-czopen],[data-czdone],[data-czreset],[data-czmilk],[data-czsy],[data-czfoam],[data-cztop],[data-czshot],#czSheet");if(!t||!fSel)return;if(t.id==="czSheet"){e.stopPropagation();if(e.target.id==="czSheet"){fSel.czWin=false;czSheet()}return}e.preventDefault();e.stopPropagation();const d=t.dataset,cz=fSel.cz||(fSel.cz=czNew(fSel.f));
   if(d.czopen!=null){fSel.czWin=true;czSheet();return}if(d.czdone!=null){fSel.czWin=false;czSheet();return}if(d.czreset!=null)fSel.cz=czNew(fSel.f);else if(d.czmilk)cz.milk=d.czmilk;else if(d.czsy){const [k,v]=d.czsy.split("|");cz.sy[k]=Math.max(0,Math.min(12,(+cz.sy[k]||0)+(+v)))}else if(d.czfoam!=null)cz.foam=d.czfoam;else if(d.cztop){const on=!cz.top[d.cztop];if(/whip/.test(d.cztop))["lwhip","whip","xwhip"].forEach(k=>cz.top[k]=false);cz.top[d.cztop]=on}else if(d.czshot)cz.shots=Math.max(0,Math.min(6,cz.shots+(+d.czshot)));czRefresh()},true);
 
 const foodCalcZ=(f,q,u,cz)=>{const m=foodCalc(f,q,u),a=czCalc(f,cz),n=f.ps?fNum(q):1;return Object.assign({},m,{kcal:m.kcal+a.kcal*n,p:m.p+a.p*n,c:m.c+a.c*n,f:m.f+a.f*n})};
@@ -2870,7 +2872,7 @@ document.addEventListener("click",e=>{const T=e.target;if(!T.closest)return;cons
   if(ds.fback!=null){fSel=null;fdOut();return}
   if(ds.flog!=null){if(!fSel)return;const f=fSel.f,q=fNum(fSel.q);if(!q){toast("Enter an amount");return}
     if(fForm&&fForm.kind==="recipe"){const m=foodCalc(f,q,fSel.u);fForm.items.push({name:f.name,txt:(m.txt||"1 × "+(f.svl||"serving")).replace(/ × $/," serving"),kcal:m.kcal,p:m.p,c:m.c,f:m.f});fSel=null;fq="";fOn=[];render();return}
-    foodLog(f,q,fSel.u,fType||($("#fdType")||{}).value,czIs(f)?fSel.cz:null);fSel=null;fq="";fOn=[];toast(f.name+" logged");render();save();return}
+    foodLog(f,q,fSel.u,fType||($("#fdType")||{}).value,czIs(f)?fSel.cz:null);fSel=null;fq="";fChain=null;fOn=[];toast(f.name+" logged");render();save();return}
   if(ds.fnew){fForm=ds.fnew==="recipe"?{kind:"recipe",name:"",serves:1,items:[]}:{kind:"food",name:fq.trim()};fSel=null;fq="";fOn=[];render();return}
   if(ds.fcancel!=null){fForm=null;fSel=null;fq="";render();return}
   if(ds.fitem!=null){fForm.items.splice(+ds.fitem,1);render();return}
@@ -5639,7 +5641,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="301",APPT="2026-11-19T20:22:00-05:00";   /* APPT: when this update was made */
+const APPV="303",APPT="2026-11-19T20:45:00-05:00";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -5724,8 +5726,9 @@ setInterval(()=>{if(typing())return;if(tab==="dash"||(tab==="pass"&&selP))render
 
 
 /* always show the full desktop site: scale it down to fit narrow screens */
-function fit(){const sh=$(".shell"),W=1180,vw=document.documentElement.clientWidth;
-  if(vw<W){const k=vw/W;sh.style.cssText=`position:fixed;left:0;top:0;width:${W}px;height:${innerHeight/k}px;transform:scale(${k});transform-origin:0 0`}
+function fit(){const sh=$(".shell"),W=1180,de=document.documentElement,vw=de.clientWidth,vv=window.visualViewport;
+  if(vv&&vv.scale>1.02&&sh.style.cssText)return; /* pinch-zoomed in: keep the layout as it was */
+  if(vw<W){const k=vw/W,h=de.clientHeight||innerHeight;sh.style.cssText=`position:fixed;left:0;top:0;width:${W}px;height:${h/k}px;transform:scale(${k});transform-origin:0 0`}
   else sh.style.cssText=""}
 addEventListener("resize",fit);fit();
 
