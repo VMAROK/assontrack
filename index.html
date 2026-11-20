@@ -30,6 +30,10 @@
 @keyframes wtGlow{50%{box-shadow:0 0 0 1px rgba(76,201,255,.8),0 0 38px rgba(76,201,255,.55)}}
 .wdone em{color:#4cc9ff!important}
 @media (prefers-reduced-motion:reduce){.wt-w1,.wt-w2,.wt-b,.wdone,.wt-lvl{animation:none}}
+
+/* Add food panel: usuals, fast food and create buttons sit right in the panel instead of a dropdown */
+.flogp .fd-pop.fd-inline{position:static;max-height:none;overflow:visible;z-index:auto;padding:4px 0 0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.flogp .fd-inline #fdOut{max-height:min(520px,60vh);overflow-y:auto;overscroll-behavior:contain;padding-right:2px}
 </style>
 </head><body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1143,7 +1147,7 @@ aside{background:rgba(var(--tD),calc(.82*var(--go)))!important;backdrop-filter:b
 @media (max-width:760px){.bodytop>.stack>.wlogp{flex:none;height:auto;min-height:0}}
 .hk-steps{margin:0 0 12px;padding-left:20px;display:grid;gap:5px;font-size:13.5px;color:var(--muted);line-height:1.4}.hk-steps b{color:#e6eeff;font-weight:600}.hk-prog{height:7px;border-radius:99px;background:rgba(var(--lr),.18);overflow:hidden}.hk-prog i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,rgba(var(--tL),.55),rgba(var(--tL),1));box-shadow:0 0 8px rgba(var(--tL),.7);transition:width .2s}.ts-io .hk-btn{color:rgba(var(--tL),1);border-color:rgba(var(--tL),.5)}
 .fueltop{position:relative;z-index:4}.bodytop>.stack>.flogp{flex:1 1 0;height:0;min-height:150px;display:flex;flex-direction:column;z-index:6}.flogp .flog{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;align-content:start}
-.flogp .x{width:28px;height:28px;padding:0;display:grid;place-items:center;flex:none}.flogp .wok,.flogp .fd-sc{color:rgba(var(--tL),1);background:rgba(var(--tL),.1);border:1px solid rgba(var(--tL),.42);border-radius:8px}.flogp .wok:hover,.flogp .fd-sc:hover{color:rgba(var(--tL),1);background:rgba(var(--tL),.22)}
+.flogp .x{width:28px;height:28px;padding:0;display:grid;place-items:center;flex:none}.flogp .x[hidden]{display:none}.flogp .wok,.flogp .fd-sc{color:rgba(var(--tL),1);background:rgba(var(--tL),.1);border:1px solid rgba(var(--tL),.42);border-radius:8px}.flogp .wok:hover,.flogp .fd-sc:hover{color:rgba(var(--tL),1);background:rgba(var(--tL),.22)}
 .fnew .fd-q{display:flex;align-items:center;gap:8px;color:var(--muted)}.fnew .fd-q svg{flex:none}.fnew #fdQ{flex:1;min-width:0;width:100%;font:inherit;color:#e6eeff;background:none;border:0;border-bottom:1px solid rgba(var(--tL),.45);border-radius:0;padding:3px 2px;outline:0;box-shadow:none;-webkit-appearance:none;appearance:none}.fnew #fdQ:focus{border-bottom-color:rgba(var(--tL),1);box-shadow:0 1px 0 rgba(var(--tL),.9)}.fnew #fdQ::-webkit-search-cancel-button{display:none}
 .fd-pop{position:absolute;left:10px;right:10px;top:96px;z-index:20;max-height:min(440px,62vh);overflow-y:auto;overscroll-behavior:contain;padding:12px;border-radius:12px;border:1px solid rgba(var(--tL),.45);background:rgb(6,11,30);box-shadow:0 18px 50px rgba(0,0,0,.6),0 0 22px rgba(var(--tL),.18)}.fd-pop[hidden]{display:none}.fd-pop .fd-list{max-height:none;overflow:visible}
 .flog .r .m>div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.flog .r small{display:block}
@@ -2271,13 +2275,13 @@ function fuelTargets(S){const g=S.g,row=(l,v,goal,u,id)=>{const over=goal&&v>goa
     return `<div class="tg-row"><span>${l}</span><b>${n0(v)}<em> / ${tgEdit?`<input id="${id}" inputmode="numeric" autocomplete="off" value="${goal||""}" aria-label="${l} target">`:n0(goal||0)} ${u}</em></b><div class="tg-bar"><i style="width:${(p*100).toFixed(1)}%;background:${c};box-shadow:0 0 8px ${c}"></i></div><small style="${over?"color:#ffb648":""}">${!goal?"no target set":over?n0(v-goal)+" "+u+" over":n0(goal-v)+" "+u+" to go"}</small></div>`};
   return `<div class="panel tgp"><div class="ph"><span>${nDayLbl(nD())}</span></div>
     ${(()=>{const M=[["Carbs",S.carbs,"#f27fb2"],["Protein",S.pro,"#a688f2"],["Fiber",S.fiber,"#b8875f"],["Fat",S.fat,"#f2c14e"]],T=M.reduce((a,x)=>a+(+x[1]||0),0);return `<div class="mbar"><div class="mbar-h"><span>Macronutrients</span><b>${n0(T)} g</b></div><div class="mbar-b" role="img" aria-label="${M.map(x=>x[0]+" "+n0(x[1])+" grams").join(", ")}">${T?M.filter(x=>x[1]>0).map(x=>`<i style="flex:${x[1]};--mc:${x[2]}"></i>`).join(""):""}</div><div class="mbar-l">${M.map(x=>`<span style="--mc:${x[2]}"><i></i>${x[0]}<b>${n0(x[1])} g</b><em>${T?Math.round(x[1]/T*100):0}%</em></span>`).join("")}</div></div>`})()}${nWaterRow()}</div>`}
-function foodLogPanel(S){const rec=fForm&&fForm.kind==="recipe",man=fForm&&fForm.kind==="food",open=fOpen||!!fq||!!fSel||!!fForm,tm=[...S.tm].reverse();
+function foodLogPanel(S){const rec=fForm&&fForm.kind==="recipe",man=fForm&&fForm.kind==="food",open=true,act=!!fq||!!fSel||!!fForm||!!fChain,tm=[...S.tm].reverse();   /* the panel itself shows usuals, fast food and create buttons (no dropdown) */
   return `<div class="panel flogp"><div class="ph"><span>${rec?(fForm.id?"Edit recipe":"New recipe"):man?"New food":"Add food"}</span><i>${fForm?"":nD()===today()?"logs to today":"logs to "+nDayLbl(nD())}</i></div>
     <div class="r fnew" style="--c:var(--magenta)"><span class="dot"></span><div class="m fd-q"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="fdQ" type="search" enterkeyhint="search" autocomplete="off" value="${esc(fq)}" aria-label="${rec?"Search an ingredient":"Search a food to log"}" ${man?"disabled":""}></div>
       <button class="x fd-sc" data-fscan aria-label="Scan a barcode" title="Scan a barcode"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2M7 8v8M10.5 8v8M13.5 8v8M17 8v8"/></svg></button>
-      <button class="x wok" data-fopen aria-label="${open?"Close":"Your foods, or create one"}" title="${open?"Close":"Your foods, or create one"}">${open?`<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`:`<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>`}</button></div>
-    <div class="fd-pop fd" id="fdPop" ${open?"":"hidden"}>${fForm?foodFormHTML():""}${man?"":`<div id="fdOut">${open?foodResults():""}</div>`}${fForm?"":`<div class="fd-btns fd-new"><button class="btn" data-fnew="food">Create a food</button><button class="btn" data-fnew="recipe">Create a recipe</button></div>`}</div>
-    <div class="flog">${nQuick()}</div></div>`}
+      <button class="x wok" data-fopen aria-label="Clear" title="Clear"${act?"":" hidden"}>${open?`<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`:`<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>`}</button></div>
+    <div class="fd-pop fd fd-inline" id="fdPop">${fForm?foodFormHTML():""}${man?"":`<div id="fdOut">${open?foodResults():""}</div>`}${fForm?"":`<div class="fd-btns fd-new"><button class="btn" data-fnew="food">Create a food</button><button class="btn" data-fnew="recipe">Create a recipe</button></div>`}</div>
+    ${""/* quick re-log list removed here: the meals panel below already shows your logs. was: <div class="flog">${nQuick()}</div> */}</div>`}
 function fuelTrend(S){const g=S.g,T=+g.kcal||0,D14=S.days,mx=Math.max(T*1.15,...D14.map(x=>x.kcal),600),UN="#3ddc84",OV="#ffb648";
   if(!D14.some(x=>x.n))return `<div class="panel wtr" style="margin-top:18px"><div class="ph"><span>Calories trend</span><i>Last 14 days</i></div><div class="empty">Your graph starts with the first thing you log</div></div>`;
   const X0=46,X1=588,Y0=14,Y1=160,bw=(X1-X0)/14,py=v=>Y1-v/mx*(Y1-Y0);
@@ -2530,13 +2534,13 @@ document.addEventListener("click",e=>{const c=e.target.closest&&e.target.closest
 document.addEventListener("pointerdown",e=>{if(!e.target.closest||e.target.closest(".cm-menu"))return;document.querySelectorAll(".cm-lift").forEach(n=>{if(!document.querySelector(".cm-menu"))n.classList.remove("cm-lift")})},true);
 
 /* food log: the search row opens a floating list, so the panel itself never changes size */
-function fdPopShow(on){fOpen=on;const p=$("#fdPop");if(!p)return;const open=fOpen||!!fq||!!fSel||!!fForm;p.hidden=!open;if(open&&!fSel&&!(fForm&&fForm.kind==="food"))fdOut()}
+function fdPopShow(on){fOpen=on;const p=$("#fdPop");if(!p)return;p.hidden=false;if(!fSel&&!(fForm&&fForm.kind==="food"))fdOut()}
 document.addEventListener("focusin",e=>{if(e.target.id==="fdQ"&&!fOpen)fdPopShow(true)});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&tab==="fuel"&&(fOpen||fq||fSel)&&!fForm&&!scan){fOpen=false;fq="";fSel=null;fChain=null;render()}});
 document.addEventListener("click",e=>{const t=e.target;if(!t.closest)return;
   if(t.closest("[data-flog],[data-fquick],[data-fsave],[data-fcancel],[data-fus]"))fOpen=false;                                  // these finish the job: the list closes once they have run
   const o=t.closest("[data-fopen]");if(o){e.stopPropagation();if(fOpen||fq||fSel||fForm){fOpen=false;fq="";fSel=null;fChain=null;fForm=null}else fOpen=true;render();return}
-  if(tab==="fuel"&&(fOpen||fq||fSel)&&!fForm&&t.isConnected&&!t.closest(".flogp")&&!t.closest(".scan")&&!t.closest(".askbox")&&!t.closest("#czSheet,#nSheet,#usSheet,.cm-menu")){fOpen=false;fq="";fSel=null;fChain=null;const p=$("#fdPop"),i=$("#fdQ");if(p)p.hidden=true;if(i)i.value=""}
+  if(tab==="fuel"&&(fq||fSel||fChain)&&!fForm&&t.isConnected&&!t.closest(".flogp")&&!t.closest(".scan")&&!t.closest(".askbox")&&!t.closest("#czSheet,#nSheet,#usSheet,.cm-menu")){fOpen=false;fq="";fSel=null;fChain=null;render()}   /* tapping elsewhere clears a search; the panel stays as it is */
   const g=t.closest("[data-tgedit],[data-tgcancel],[data-tgsave]");if(!g)return;
   if(g.dataset.tgedit!==undefined){tgEdit=true;render();return}if(g.dataset.tgcancel!==undefined){tgEdit=false;render();return}
   const nv=id=>{const el=$(id),m=el&&String(el.value).replace(/,/g,"").match(/\d+(\.\d+)?/);return m?Math.round(+m[0]):null},k=nv("#tgK"),pr=nv("#tgP");if(k==null||k<500||k>10000){toast("Enter a calorie target between 500 and 10,000");return}if(pr!=null&&pr>600){toast("That protein target doesn't look right");return}
@@ -3071,7 +3075,7 @@ const fdOut=()=>{const o=$("#fdOut");if(o)o.innerHTML=foodResults()};
 function foodSearchKick(){clearTimeout(fTimer);const q=fq.trim(),tok=++fTok;fOn=[];fErr="";fBusy=q.length>=3;if(!fBusy)return;
   fTimer=setTimeout(async()=>{try{const r=await offSearch(q);if(tok!==fTok)return;fOn=r}catch(e){if(tok!==fTok)return;fErr=navigator.onLine===false?"You're offline. Your own foods and common foods still work.":"Couldn't reach the food database right now. Your own foods and common foods still work."}fBusy=false;if(!fSel)fdOut()},600)}
 function foodPick(f){const [q,u]=foodDef(f);fSel={f,q,u};fdOut();const o=$("#fdOut");o&&o.scrollIntoView&&o.scrollIntoView({block:"nearest",behavior:"smooth"})}
-document.addEventListener("input",e=>{const t=e.target;if(t.id==="fdQ"){fq=t.value;fSel=null;fOpen=true;const pp=$("#fdPop");if(pp)pp.hidden=false;foodSearchKick();fdOut()}
+document.addEventListener("input",e=>{const t=e.target;if(t.id==="fdQ"){fq=t.value;fSel=null;fOpen=true;const pp=$("#fdPop");if(pp)pp.hidden=false;const ck=document.querySelector(".flogp .wok");if(ck)ck.hidden=!(fq||fChain);foodSearchKick();fdOut()}
   else if(t.id==="fdQty"&&fSel){fSel.q=t.value;const m=$("#fdMac");if(m)m.innerHTML=foodMac(foodCalcZ(fSel.f,fSel.q,fSel.u,fSel.cz))}
   else if(fForm&&t.id==="frName")fForm.name=t.value;else if(fForm&&t.id==="frServes"){fForm.serves=t.value}
   else if(fForm&&/^ff(Name|Svl|K|P|C|F)$/.test(t.id))fForm[{ffName:"name",ffSvl:"svl",ffK:"kcal",ffP:"p",ffC:"c",ffF:"f"}[t.id]]=t.value});
@@ -5860,7 +5864,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="346",APPT="2026-11-20T19:12:00Z";   /* APPT: when this update was made */
+const APPV="347",APPT="2026-11-20T19:12:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
