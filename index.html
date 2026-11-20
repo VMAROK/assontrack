@@ -1204,7 +1204,7 @@ button,[role=button],a,input,select,label{touch-action:manipulation}@media (poin
 .nw-ring{width:52px;height:52px}.nw-k{font-family:var(--mono);font-size:12px;color:#cfdaf2;min-height:15px}
 .nw-d.td .nw-t{background:rgba(var(--tL),.3)}.nw-d.td .nw-t small,.nw-d.td .nw-t em{color:#fff;font-weight:800}
 .nw-d.sel{background:linear-gradient(180deg,rgba(var(--tL),.4),rgba(var(--tL),.16));box-shadow:inset 0 0 0 2px rgba(var(--tL),1),0 0 20px rgba(var(--tL),.4);position:relative;z-index:1}
-.nw-l{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:-4px}.nw-l.chg{color:#ffd166;font-weight:700}.nw-d.fut .nw-ring{opacity:.5}
+.nw-l{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--cyan);margin-top:-4px;text-shadow:0 0 8px color-mix(in srgb,var(--cyan) 45%,transparent)}.nw-l.chg{font-weight:800}.nw-l.chg::before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--cyan);margin-right:4px;vertical-align:middle}.nw-k{color:var(--violet)}.nw-d.fut .nw-ring{opacity:.5}
 .nw-note{margin:8px 2px 0}.nwp .bd-leg button[data-nadd]{cursor:pointer}
 .nmp .nm-secs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.nmp .nm-secs.list{grid-template-columns:minmax(0,1fr)}@media (max-width:760px){.nmp .nm-secs{grid-template-columns:minmax(0,1fr)}}
 .nm-sec{min-width:0;border:1px solid color-mix(in srgb,var(--cc) 40%,transparent);border-top:3px solid var(--cc);border-radius:14px;background:linear-gradient(180deg,color-mix(in srgb,var(--cc) 11%,transparent),rgba(var(--tX),.35) 110px);padding:10px;display:grid;gap:8px;align-content:start;transition:box-shadow .2s,background .2s}
@@ -5748,7 +5748,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="311",APPT="2026-11-20T00:45:00-05:00";   /* APPT: when this update was made */
+const APPV="312",APPT="2026-11-20T00:40:00-05:00";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
