@@ -40,6 +40,24 @@
 .flogp .fd-inline #fdOut{flex:1 1 auto;min-height:0;max-height:min(520px,60vh);overflow-y:auto;overscroll-behavior:contain;padding-right:2px}   /* shrinks to fit the panel; never taller than this where the panel can grow */
 
 /* restaurant squares with the company's icon (replaces the bubble chips) */
+.cp-strip{margin:0 2px 12px;padding:12px;border-radius:16px;background:linear-gradient(135deg,rgba(166,40,22,.32),rgba(var(--tX),.4) 70%);border:1px solid rgba(255,120,80,.38);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 0 18px rgba(255,90,50,.12)}
+.cp-sh{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}.cp-sh b{font-size:14px}.cp-sh small{font-size:11.5px;color:var(--muted)}
+.cp-ks{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.cp-k{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 4px;border-radius:13px;font:inherit;font-size:12px;font-weight:650;color:#ffe9e2;cursor:pointer;background:rgba(8,12,30,.45);border:1px solid rgba(255,140,100,.28);--cc:#ff7a52;transition:transform .12s,border-color .2s,box-shadow .2s}
+.cp-k:hover{border-color:#ff8a62;box-shadow:0 0 14px rgba(255,110,70,.3)}.cp-k:active{transform:scale(.95)}.cp-k .fd-ci{width:46px;height:46px;font-size:26px}
+@media (max-width:520px){.cp-ks{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.cp-kt{display:flex;gap:6px;overflow-x:auto;padding:0 2px 10px;scrollbar-width:none}.cp-kt::-webkit-scrollbar{display:none}
+.cp-kt button{flex:none;padding:6px 11px;border-radius:999px;font:inherit;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;background:rgba(var(--tX),.5);border:1px solid rgba(var(--lr),.25)}.cp-kt button.on{color:#ffe9e2;border-color:#ff8a62;background:rgba(255,100,60,.2);box-shadow:0 0 12px rgba(255,100,60,.25)}
+.cp-inc{margin:0 2px 10px;font-size:12px;color:var(--muted)}
+.cp-g{margin:0 0 14px}.cp-g h4{display:flex;align-items:baseline;gap:8px;margin:0 2px 8px;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgb(var(--tL))}.cp-g h4 small{margin-left:auto;font-size:10.5px;letter-spacing:0;text-transform:none;color:var(--muted);font-weight:600}
+.cp-os{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:7px}
+.cp-o{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:9px 11px;border-radius:11px;font:inherit;text-align:left;color:#e6eeff;cursor:pointer;background:rgba(var(--tX),.45);border:1px solid rgba(var(--lr),.25);transition:border-color .15s,background .15s,box-shadow .15s}
+.cp-o span{font-size:12.5px;font-weight:600;line-height:1.2}.cp-o small{font-size:10.5px;color:var(--muted)}
+.cp-o{position:relative}.cp-o.on{border-color:rgb(var(--tL));border-style:solid;background:rgba(var(--tL),.26);box-shadow:0 0 14px rgba(var(--tL),.3)}.cp-o.on::after{content:"✓";position:absolute;top:7px;right:9px;font-size:12px;font-weight:800;color:rgb(var(--tL))}.cp-o.on small{color:rgb(var(--tL))}
+.cp-o.cp-dbl{border-style:dashed}
+.cp-tot{position:sticky;bottom:0;z-index:3;display:flex;align-items:center;gap:10px;margin-top:4px;padding:10px 12px;border-radius:13px;background:rgba(8,14,36,.95);backdrop-filter:blur(12px);border:1px solid rgba(var(--tL),.35);box-shadow:0 -8px 20px rgba(0,0,0,.35)}
+.cp-tot div{display:flex;flex-direction:column;gap:2px;min-width:0}.cp-tot b{font-size:17px}.cp-tot small{font-size:11.5px}.cp-tot i{font-style:normal;font-weight:650}
+.cp-log{margin-left:auto;padding:10px 16px;border-radius:11px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;color:#06101f;background:rgb(var(--tL));border:0;box-shadow:0 0 16px rgba(var(--tL),.4)}
 .fd-cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:9px;padding:2px 2px 10px}
 .fd-cat{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:118px;padding:12px 8px 10px;border-radius:16px;font:inherit;color:#e6eeff;cursor:pointer;text-align:center;
   background:linear-gradient(160deg,color-mix(in srgb,var(--cc) 16%,rgba(var(--tX),.5)),rgba(var(--tX),.42));border:1px solid color-mix(in srgb,var(--cc) 35%,rgba(var(--lr),.25));box-shadow:inset 0 1px 0 rgba(255,255,255,.07);transition:transform .12s,box-shadow .2s,border-color .2s}
@@ -2618,7 +2636,7 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(d.nsave!=null){nRead();if(!nEdit.name)return toast("Give it a name");const i=data.meals.findIndex(x=>x.id===nEdit.id);if(i>=0)data.meals[i]=nEdit;toast("Saved");nEdit=null;nSheet();render();save()}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&fSel&&fSel.czWin){fSel.czWin=false;czSheet();return}if(e.key==="Escape"&&nEdit){nEdit=null;nSheet()}});
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-fsrchx]");if(!b)return;e.preventDefault();e.stopPropagation();fq="";fSel=null;fChain=null;const i=$("#fdQ");if(i){i.value="";i.placeholder=""}const ck=document.querySelector(".flogp .wok");if(ck)ck.hidden=true;const o=$("#fdOut");if(o)o.innerHTML=foodResults()},true);
-document.addEventListener("click",e=>{const c=e.target.closest&&e.target.closest("[data-fchain],[data-fchainx]");if(!c)return;e.preventDefault();e.stopPropagation();fChain=c.dataset.fchainx!=null?null:c.dataset.fchain;fSel=null;fCat=null;const i=$("#fdQ");if(i){i.placeholder=fChain?"Search "+fChain:"";}const o=$("#fdOut");if(o){o.innerHTML=foodResults();o.scrollTop=0}},true);
+document.addEventListener("click",e=>{const c=e.target.closest&&e.target.closest("[data-fchain],[data-fchainx]");if(!c)return;e.preventDefault();e.stopPropagation();fChain=c.dataset.fchainx!=null?null:c.dataset.fchain;fSel=null;fCat=null;fBuild=null;const i=$("#fdQ");if(i){i.placeholder=fChain?"Search "+fChain:"";}const o=$("#fdOut");if(o){o.innerHTML=foodResults();o.scrollTop=0}},true);
 document.addEventListener("pointerdown",e=>{if(!e.target.closest||e.target.closest(".cm-menu"))return;document.querySelectorAll(".cm-lift").forEach(n=>{if(!document.querySelector(".cm-menu"))n.classList.remove("cm-lift")})},true);
 
 /* food log: the search row opens a floating list, so the panel itself never changes size */
@@ -2882,11 +2900,11 @@ Five Guys|Cheeseburger|980|47|40|55|1 burger
 Five Guys|Little Hamburger|540|23|39|26|1 burger
 Five Guys|Fries, regular|950|13|131|41|regular
 Five Guys|Fries, little|530|8|72|23|little
-In-N-Out|Double-Double|670|37|39|41|1 burger
-In-N-Out|Double-Double, Protein Style|520|33|11|39|1 burger
-In-N-Out|Cheeseburger|480|22|39|27|1 burger
-In-N-Out|Hamburger|390|16|39|19|1 burger
-In-N-Out|French Fries|370|6|52|15|1 order
+In-N-Out|Double-Double|610|34|42|34|1 burger
+In-N-Out|Double-Double, Protein Style|460|30|12|32|1 burger
+In-N-Out|Cheeseburger|430|20|40|21|1 burger
+In-N-Out|Hamburger|360|16|38|16|1 burger
+In-N-Out|French Fries|360|6|49|15|1 order
 Jack in the Box|Jumbo Jack|570|26|42|33|1 burger
 Jack in the Box|Tacos, 2|340|12|32|18|2 tacos
 KFC|Original Recipe Chicken Breast|390|39|11|21|1 piece
@@ -3101,7 +3119,78 @@ Wendy's|Crispy Chicken Sandwich|330|15|36|14|1 sandwich
 Wendy's|Spicy Chicken Nuggets, 10 piece|470|23|30|29|10 pieces
 Wendy's|Apple Pecan Salad|470|38|28|24|1 salad
 Wendy's|Chocolate Frosty, medium|470|12|74|12|medium
-Wendy's|Breakfast Baconator|730|36|36|49|1 sandwich`.split("\n").flatMap(l=>{const a=l.split("|"),mk=(nm,k,sv,hot)=>({id:"ff:"+a[0]+":"+nm,brand:a[0],name:nm,kcal:Math.round(+a[2]*k),p:Math.round(+a[3]*k),c:Math.round(+a[4]*k),f:Math.round(+a[5]*k),ps:1,sv:1,svl:sv,src:"ff",key:ffNorm(a[0]+" "+a[0].replace(/[^A-Za-z]/g,"")+" "+(FFALIAS[a[0]]||"")+" "+nm+(hot?" hot":" iced cold"))});
+Wendy's|Breakfast Baconator|730|36|36|49|1 sandwich
+Five Guys|Bacon Burger|920|44|39|50|1 burger
+Five Guys|Bacon Cheeseburger|1060|52|40|62|1 burger
+Five Guys|Little Cheeseburger|610|27|40|32|1 burger
+Five Guys|Little Bacon Cheeseburger|690|32|40|39|1 burger
+Five Guys|Hot Dog|520|18|40|35|1 hot dog
+Five Guys|Cheese Dog|590|22|41|41|1 hot dog
+Five Guys|Grilled Cheese|470|12|41|26|1 sandwich
+Five Guys|Fries, large|1314|18|181|57|large
+Five Guys|Milkshake, vanilla|670|13|83|32|1 shake
+In-N-Out|Hamburger, Protein Style|210|12|9|14|1 burger
+In-N-Out|Cheeseburger, Protein Style|280|16|11|19|1 burger
+In-N-Out|Chocolate Shake|610|16|74|30|15 oz
+In-N-Out|Vanilla Shake|590|16|66|31|15 oz
+In-N-Out|Strawberry Shake|610|15|74|30|15 oz
+In-N-Out|Hot Cocoa|160|2|33|3|8 oz
+Sonic|Jr. Cheeseburger|370|16|34|19|1 burger
+Sonic|SuperSONIC Double Cheeseburger|1070|53|54|70|1 burger
+Sonic|SuperSONIC Bacon Double Cheeseburger|1130|57|54|75|1 burger
+Sonic|All-American Dog|410|13|42|21|1 hot dog
+Sonic|Chili Cheese Coney|470|18|34|29|1 coney
+Sonic|Footlong Quarter Pound Coney|770|31|54|48|1 coney
+Sonic|Crispy Tenders, 5 piece|530|36|37|27|5 pieces
+Sonic|Crispy Chicken Sandwich|520|24|52|24|1 sandwich
+Sonic|Bacon Breakfast Toaster|470|22|42|24|1 sandwich
+Jack in the Box|Sourdough Jack|720|35|46|47|1 burger
+Jack in the Box|Bacon Ultimate Cheeseburger|1020|55|52|65|1 burger
+Jack in the Box|Spicy Deluxe Crispy Chicken Sandwich|720|36|62|39|1 sandwich
+Jack in the Box|Chicken Nuggets, 6 piece|230|12|13|14|6 pieces
+Jack in the Box|Chicken Strips, 4 piece|400|29|27|21|4 strips
+Jack in the Box|Egg Rolls, 3 piece|400|14|43|21|3 rolls
+Jack in the Box|Curly Fries, medium|390|5|46|21|medium
+Jack in the Box|Onion Rings, medium|300|4|37|16|medium
+Jack in the Box|Breakfast Jack|360|17|35|16|1 sandwich
+Jack in the Box|Sausage Croissant|620|22|39|40|1 sandwich
+Jack in the Box|Bacon, Egg & Cheese Croissant|550|24|38|33|1 sandwich
+Jack in the Box|Vanilla Shake|630|12|90|24|1 shake
+Jack in the Box|Oreo Cookie Shake|700|12|104|27|1 shake
+Arby's|Mid Roast Beef|415|27|41|16|1 sandwich
+Arby's|Large Roast Beef|550|40|44|22|1 sandwich
+Arby's|Half Pound Roast Beef|650|47|35|35|1 sandwich
+Arby's|Smokehouse Brisket|650|34|55|32|1 sandwich
+Arby's|Reuben|610|35|47|32|1 sandwich
+Arby's|Roast Beef Gyro|490|27|45|23|1 gyro
+Arby's|Turkey Gyro|470|26|45|22|1 gyro
+Arby's|Classic Crispy Chicken Sandwich|570|27|55|27|1 sandwich
+Arby's|Spicy Deluxe Crispy Chicken Sandwich|600|28|56|29|1 sandwich
+Arby's|Mozzarella Sticks, 4 piece|440|17|46|22|4 sticks
+Arby's|Curly Fries, small|320|5|44|15|small
+Arby's|Crinkle Fries, medium|360|5|50|16|medium
+Arby's|Loaded Curly Fries|650|14|68|35|1 order
+Arby's|Bacon, Egg & Cheese Biscuit|440|20|33|26|1 sandwich
+Arby's|Jamocha Shake, small|430|12|73|11|small
+Domino's|MeatZZa Pizza, large, 1 slice|370|15|34|18|1 slice
+Domino's|ExtravaganZZa Pizza, large, 1 slice|370|16|39|17|1 slice
+Domino's|Buffalo Wings, 4 piece|180|9|14|10|4 wings
+Domino's|BBQ Wings, 4 piece|240|13|18|13|4 wings
+Domino's|Stuffed Cheesy Bread, 1 piece|140|6|16|6|1 piece
+Domino's|Garlic Bread Twists, 2 piece|220|5|27|11|2 pieces
+Domino's|Cinnamon Bread Twists, 2 piece|250|5|31|12|2 pieces
+Domino's|Chicken Alfredo Pasta|620|27|60|28|1 dish
+Domino's|Italian Sausage Marinara Pasta|730|25|96|27|1 dish
+Domino's|Chocolate Lava Crunch Cake|350|4|47|17|1 cake
+Pizza Hut|Hand-Tossed Cheese Pizza, large, 1 slice|280|14|34|10|1 slice
+Pizza Hut|Hand-Tossed Pepperoni Pizza, large, 1 slice|300|13|34|12|1 slice
+Pizza Hut|Supreme Pizza, large, 1 slice|320|14|35|14|1 slice
+Pizza Hut|Meat Lover's Pizza, large, 1 slice|390|17|34|21|1 slice
+Pizza Hut|Naked Bone-In Wing|80|9|0|5|1 wing
+Pizza Hut|Oven-Baked Veggie Pasta|640|27|99|16|1 dish
+Pizza Hut|Oven-Baked Chicken Alfredo|920|37|86|49|1 dish
+Pizza Hut|Cinnamon Stick|80|2|13|3|1 stick
+Pizza Hut|Chocolate Donut Bites, 2|250|3|36|10|2 bites`.split("\n").flatMap(l=>{const a=l.split("|"),mk=(nm,k,sv,hot)=>({id:"ff:"+a[0]+":"+nm,brand:a[0],name:nm,kcal:Math.round(+a[2]*k),p:Math.round(+a[3]*k),c:Math.round(+a[4]*k),f:Math.round(+a[5]*k),ps:1,sv:1,svl:sv,src:"ff",key:ffNorm(a[0]+" "+a[0].replace(/[^A-Za-z]/g,"")+" "+(FFALIAS[a[0]]||"")+" "+nm+(hot?" hot":" iced cold"))});
   if(a[6]==="D"||a[6]==="DI"){const iced=a[6]==="DI";return [["tall",.75],["grande",1],["venti",iced?1.4:1.25]].map(([z,k])=>mk(a[1]+", "+z,k,z,!iced))}return [mk(a[1],1,a[6],/coffee|latte|tea|chocolate|mocha|cappuccino/i.test(a[1])&&!/iced|frapp|cold|frozen|coolatta/i.test(a[1]))]});
 const FFCHAINS=[...new Set(FASTFOODS.map(f=>f.brand))]
 /* menu sections per restaurant, in the order that chain's own ordering app lists them; first rule that matches wins, the last is the catch-all */
@@ -3118,23 +3207,51 @@ const FFCAT={
 "KFC":[["Chicken",/original recipe|extra crispy|breast|thigh|drumstick|wing/],["Tenders & Nuggets",/tender|nugget/],["Sandwiches",/sandwich/],["Bowls & Pot Pies",/bowl|pot pie/],["Sides",/mash|mac|biscuit|coleslaw|fries|corn/],["Desserts & Drinks"]],
 "Panda Express":[["Appetizers",/egg roll|rangoon/],["Sides",/chow mein|rice|greens/],["Entrées"]],
 "Popeyes":[["Chicken",/bonafide|breast|thigh|leg|wing/],["Chicken Sandwiches",/sandwich/],["Tenders",/tender/],["Sides"]],
-"Arby's":[["Sandwiches",/roast|beef|sandwich/],["Sides"]],
-"Domino's":[["Pizza"]],"Pizza Hut":[["Pizza"]],
-"Five Guys":[["Burgers",/burger/],["Fries"]],"In-N-Out":[["Burgers",/burger|double/],["Fries & Drinks"]],
-"Jack in the Box":[["Burgers",/jack|burger/],["Tacos & Sides"]],"Sonic":[["Burgers",/burger/],["Sides"]]};
+"Arby's":[["Breakfast",/biscuit|croissant/],["Shakes",/shake/],["Chicken",/chicken/],["Sides",/fries|sticks/],["Roast Beef",/roast beef/],["Sandwiches"]],
+"Domino's":[["Pizza",/pizza/],["Wings & Chicken",/wing|chicken(?! alfredo)/],["Pasta",/pasta/],["Desserts",/cinnamon|lava|brownie/],["Bread",/bread/],["Pizza"]],"Pizza Hut":[["Pizza",/pizza/],["Wings",/wing/],["Pasta",/pasta|alfredo/],["Desserts"]],
+"Five Guys":[["Dogs",/dog/],["Sandwiches",/grilled cheese|blt|veggie|melt/],["Fries",/fries/],["Shakes",/shake/],["Burgers"]],"In-N-Out":[["Burgers",/burger|double/],["Fries",/fries/],["Shakes",/shake/],["Drinks"]],
+"Jack in the Box":[["Breakfast",/breakfast|croissant/],["Shakes",/shake/],["Chicken",/chicken/],["Tacos & Munchies",/taco|egg roll/],["Sides",/fries|rings/],["Burgers"]],"Sonic":[["Breakfast",/breakfast|toaster/],["Burgers",/burger/],["Hot Dogs",/dog|coney/],["Chicken",/chicken|tender/],["Sides"]]};
 /* display order where it differs from the matching order above */
-const FFSEC={"Starbucks":["Hot Coffee","Cold Coffee","Hot Tea","Cold Tea","Refreshers","Frappuccino® Blended Beverages","Hot Chocolate, Lemonade & More","Hot Breakfast","Oatmeal & Yogurt","Bakery","Treats","Lunch"],"Chick-fil-A":["Breakfast","Entrées","Salads","Sides","Treats","Drinks","Sauces & Dressings"],"Panda Express":["Entrées","Sides","Appetizers"],"Chipotle":["Burritos, Bowls & Quesadillas","Protein or Veggie","Rice","Beans","Top Things Off","Tortilla","Chips & Sides"]};
+const FFSEC={"Starbucks":["Hot Coffee","Cold Coffee","Hot Tea","Cold Tea","Refreshers","Frappuccino® Blended Beverages","Hot Chocolate, Lemonade & More","Hot Breakfast","Oatmeal & Yogurt","Bakery","Treats","Lunch"],"Chick-fil-A":["Breakfast","Entrées","Salads","Sides","Treats","Drinks","Sauces & Dressings"],"Panda Express":["Entrées","Sides","Appetizers"],"Arby's":["Breakfast","Roast Beef","Sandwiches","Chicken","Sides","Shakes"],"Domino's":["Pizza","Wings & Chicken","Bread","Pasta","Desserts"],"Five Guys":["Burgers","Dogs","Sandwiches","Fries","Shakes"],"Jack in the Box":["Breakfast","Burgers","Chicken","Tacos & Munchies","Sides","Shakes"],"Chipotle":["Burritos, Bowls & Quesadillas","Protein or Veggie","Rice","Beans","Top Things Off","Tortilla","Chips & Sides"]};
 const ffSecs=c=>FFSEC[c]||(FFCAT[c]||[["Menu"]]).map(r=>r[0]);
 /* a restaurant opens like its app: category tiles (grid) or every section in one list; the choice is remembered on this device */
 let fCat=null,fMenuView=(()=>{try{return localStorage.getItem("aot-fmv")||"grid"}catch(e){return "grid"}})();
-const FFICON=[[/frappuccino|frozen|coolatta/i,"🥤"],[/cold coffee|iced drinks/i,"🧋"],[/cold tea/i,"🧊"],[/refresher/i,"🍹"],[/hot chocolate/i,"🍫"],[/hot tea/i,"🍵"],[/coffee|mccaf|hot drinks/i,"☕"],[/oatmeal/i,"🥣"],[/breakfast/i,"🍳"],[/bakery/i,"🥐"],[/donut/i,"🍩"],[/bagel/i,"🥯"],[/frosty|sweets & treats/i,"🍦"],[/treats|sweets|dessert/i,"🍪"],[/burger/i,"🍔"],[/nugget|tender|^chicken$|entrées/i,"🍗"],[/fries|^sides$|fries & sides/i,"🍟"],[/salad/i,"🥗"],[/sauce/i,"🥫"],[/burrito/i,"🌯"],[/protein/i,"🥩"],[/rice/i,"🍚"],[/beans/i,"🫘"],[/tortilla|quesadilla|specialties/i,"🫓"],[/top things/i,"🥑"],[/chips/i,"🌽"],[/taco/i,"🌮"],[/nachos/i,"🧀"],[/bowls & pot/i,"🥧"],[/bowl/i,"🥙"],[/pizza/i,"🍕"],[/subs/i,"🥖"],[/snack/i,"🥔"],[/appetizer/i,"🥟"],[/sandwich|lunch/i,"🥪"],[/drink/i,"🥤"],[/side/i,"🍟"]];
+const FFICON=[[/dog/i,"🌭"],[/shake/i,"🥛"],[/wing/i,"🍗"],[/pasta/i,"🍝"],[/bread/i,"🥖"],[/roast beef/i,"🥩"],[/frappuccino|frozen|coolatta/i,"🥤"],[/cold coffee|iced drinks/i,"🧋"],[/cold tea/i,"🧊"],[/refresher/i,"🍹"],[/hot chocolate/i,"🍫"],[/hot tea/i,"🍵"],[/coffee|mccaf|hot drinks/i,"☕"],[/oatmeal/i,"🥣"],[/breakfast/i,"🍳"],[/bakery/i,"🥐"],[/donut/i,"🍩"],[/bagel/i,"🥯"],[/frosty|sweets & treats/i,"🍦"],[/treats|sweets|dessert/i,"🍪"],[/burger/i,"🍔"],[/nugget|tender|^chicken$|entrées/i,"🍗"],[/fries|^sides$|fries & sides/i,"🍟"],[/salad/i,"🥗"],[/sauce/i,"🥫"],[/burrito/i,"🌯"],[/protein/i,"🥩"],[/rice/i,"🍚"],[/beans/i,"🫘"],[/tortilla|quesadilla|specialties/i,"🫓"],[/top things/i,"🥑"],[/chips/i,"🌽"],[/taco/i,"🌮"],[/nachos/i,"🧀"],[/bowls & pot/i,"🥧"],[/bowl/i,"🥙"],[/pizza/i,"🍕"],[/subs/i,"🥖"],[/snack/i,"🥔"],[/appetizer/i,"🥟"],[/sandwich|lunch/i,"🥪"],[/drink/i,"🥤"],[/side/i,"🍟"]];
 const ffIcon=n=>(FFICON.find(r=>r[0].test(n))||[0,"🍽️"])[1];
 const FFVIEWBTN=v=>`<span class="fd-mv" role="group" aria-label="Menu layout"><button type="button" data-fmv="grid" class="${v==="grid"?"on":""}" aria-label="Category tiles" title="Category tiles"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg></button><button type="button" data-fmv="list" class="${v==="list"?"on":""}" aria-label="Full list" title="Full list"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button></span>`;
-function ffMenuView(L){const secs=ffSecs(fChain),cnt=sc=>L.filter(f=>f.cat===sc).length,head=(back,attr,title,sub)=>`<div class="fd-chh"><button type="button" class="fd-back" ${attr} aria-label="${back}">‹</button><b>${esc(title)}</b><small>${sub}</small>${FFVIEWBTN(fMenuView)}</div>`;
+function ffMenuView(L){if(fBuild&&fChain==="Chipotle"&&!fq.trim())return cpView();const secs=ffSecs(fChain),cnt=sc=>L.filter(f=>f.cat===sc).length,head=(back,attr,title,sub)=>`<div class="fd-chh"><button type="button" class="fd-back" ${attr} aria-label="${back}">‹</button><b>${esc(title)}</b><small>${sub}</small>${FFVIEWBTN(fMenuView)}</div>`;
   const cat=fCat&&fCat.c===fChain&&!fq.trim()&&fMenuView==="grid"?fCat.n:null;
   if(cat){const G=L.filter(f=>f.cat===cat);return head("Back to "+fChain+" menu","data-fcatx",cat,`${G.length} item${G.length===1?"":"s"}`)+`<div class="fd-list fd-menu">${G.map(f=>foodRow(f)).join("")}</div>`}
-  if(fMenuView==="grid"&&!fq.trim())return head("Back to restaurants","data-fchainx",fChain,`${secs.filter(cnt).length} categories`)+`<div class="fd-cats">${secs.filter(cnt).map((sc,i)=>`<button type="button" class="fd-cat" data-fcat="${esc(sc)}" style="--cc:${UPAL[i%UPAL.length]}"><span class="fd-ci" aria-hidden="true">${ffIcon(sc)}</span><span class="fd-cn">${esc(sc)}</span><small>${cnt(sc)}</small></button>`).join("")}</div>`;
-  return head("Back to restaurants","data-fchainx",fChain,`${L.length} item${L.length===1?"":"s"}`)+`<div class="fd-list fd-menu">${secs.map(sc=>{const G=L.filter(f=>f.cat===sc);return G.length?`<section class="fd-sec"><h4>${esc(sc)}<small>${G.length}</small></h4>${G.map(f=>foodRow(f)).join("")}</section>`:""}).join("")}</div>`}
+  if(fMenuView==="grid"&&!fq.trim())return head("Back to restaurants","data-fchainx",fChain,`${secs.filter(cnt).length} categories`)+(fChain==="Chipotle"?cpStrip():"")+`<div class="fd-cats">${secs.filter(cnt).map((sc,i)=>`<button type="button" class="fd-cat" data-fcat="${esc(sc)}" style="--cc:${UPAL[i%UPAL.length]}"><span class="fd-ci" aria-hidden="true">${ffIcon(sc)}</span><span class="fd-cn">${esc(sc)}</span><small>${cnt(sc)}</small></button>`).join("")}</div>`;
+  return head("Back to restaurants","data-fchainx",fChain,`${L.length} item${L.length===1?"":"s"}`)+(fChain==="Chipotle"&&!fq.trim()?cpStrip():"")+`<div class="fd-list fd-menu">${secs.map(sc=>{const G=L.filter(f=>f.cat===sc);return G.length?`<section class="fd-sec"><h4>${esc(sc)}<small>${G.length}</small></h4>${G.map(f=>foodRow(f)).join("")}</section>`:""}).join("")}</div>`}
+/* Chipotle: build your own burrito, bowl, quesadilla, salad or tacos; every pick adds its own nutrition (Chipotle's published numbers per portion) */
+let fBuild=null;
+const CPN={"Flour tortilla":[320,8,50,9],"Quesadilla cheese":[220,12,2,16],"Supergreens":[15,1,3,0],"3 crispy corn tortillas":[210,3,30,9],"3 soft flour tortillas":[240,6,39,8],
+ "Chicken":[180,32,0,7],"Steak":[150,21,1,6],"Barbacoa":[170,24,2,7],"Carnitas":[210,23,0,12],"Sofritas":[150,8,9,10],"Veggie":[0,0,0,0],
+ "White rice":[210,4,40,4],"Brown rice":[210,4,36,6],"Black beans":[130,8,22,2],"Pinto beans":[130,8,21,2],
+ "Fajita veggies":[20,1,5,0],"Fresh tomato salsa":[25,0,4,0],"Roasted chili-corn salsa":[80,3,16,2],"Tomatillo-green chili salsa":[15,0,4,0],"Tomatillo-red chili salsa":[30,0,4,1],
+ "Sour cream":[110,2,2,9],"Cheese":[110,6,1,8],"Guacamole":[230,2,8,22],"Queso blanco":[120,5,4,9],"Romaine lettuce":[5,0,1,0],"Chipotle-honey vinaigrette":[220,1,18,16]};
+const CPK={burrito:{n:"Burrito",ic:"🌯",base:["Flour tortilla"],st:["pro","rice","beans","top"]},bowl:{n:"Burrito Bowl",ic:"🥙",base:[],st:["pro","rice","beans","top"]},quesadilla:{n:"Quesadilla",ic:"🫓",base:["Flour tortilla","Quesadilla cheese"],st:["pro","top"]},salad:{n:"Salad",ic:"🥗",base:["Supergreens"],st:["pro","rice","beans","top","dress"]},tacos:{n:"Tacos",ic:"🌮",base:[],st:["shell","pro","rice","beans","top"]}};
+const CPS={shell:{t:"Tortillas",one:1,o:["3 crispy corn tortillas","3 soft flour tortillas"]},pro:{t:"Protein or Veggie",one:1,o:["Chicken","Steak","Barbacoa","Carnitas","Sofritas","Veggie"]},rice:{t:"Rice",one:1,o:["White rice","Brown rice"]},beans:{t:"Beans",one:1,o:["Black beans","Pinto beans"]},top:{t:"Top things off",o:["Fajita veggies","Fresh tomato salsa","Roasted chili-corn salsa","Tomatillo-green chili salsa","Tomatillo-red chili salsa","Sour cream","Cheese","Guacamole","Queso blanco","Romaine lettuce"]},dress:{t:"Dressing",one:1,o:["Chipotle-honey vinaigrette"]}};
+const cpNew=k=>({k,pick:{shell:k==="tacos"?["3 crispy corn tortillas"]:[]},dbl:false});
+function cpParts(b){const K=CPK[b.k],L=[...K.base.map(n=>[n,1])];K.st.forEach(g=>(b.pick[g]||[]).forEach(n=>L.push([n,g==="pro"&&b.dbl&&n!=="Veggie"?2:1])));return L}
+function cpTot(b){return cpParts(b).reduce((a,[n,x])=>{const v=CPN[n]||[0,0,0,0];return [a[0]+v[0]*x,a[1]+v[1]*x,a[2]+v[2]*x,a[3]+v[3]*x]},[0,0,0,0])}
+const CPSHORT={"Fresh tomato salsa":"Mild salsa","Roasted chili-corn salsa":"Corn salsa","Tomatillo-green chili salsa":"Green salsa","Tomatillo-red chili salsa":"Red salsa","Chipotle-honey vinaigrette":"Vinaigrette","Romaine lettuce":"Lettuce","3 crispy corn tortillas":"Crispy corn","3 soft flour tortillas":"Soft flour","Queso blanco":"Queso","Guacamole":"Guac"};
+const cpName=b=>{const K=CPK[b.k],P=(b.pick.pro||[])[0],L=[(P?(b.dbl&&P!=="Veggie"?"Double ":"")+P:"No protein"),...["shell","rice","beans","top","dress"].flatMap(g=>K.st.includes(g)?(b.pick[g]||[]):[]).map(x=>CPSHORT[x]||x)];let t=K.n+" · "+L[0],i=1;while(i<L.length&&(t+", "+L[i]).length<=74)t+=", "+L[i++];return t+(i<L.length?` +${L.length-i}`:"")};
+function cpStrip(){return `<div class="cp-strip"><div class="cp-sh"><b>Build your own</b><small>pick everything, it adds itself up</small></div><div class="cp-ks">${Object.entries(CPK).map(([k,K])=>`<button type="button" class="cp-k" data-cpk="${k}"><span class="fd-ci" aria-hidden="true">${K.ic}</span><span>${K.n}</span></button>`).join("")}</div></div>`}
+function cpView(){const b=fBuild,K=CPK[b.k],[kc,p,c,f]=cpTot(b);
+  const chip=(g,n)=>{const on=(b.pick[g]||[]).includes(n),v=CPN[n];return `<button type="button" class="cp-o${on?" on":""}" data-cpo="${g}|${esc(n)}" aria-pressed="${on}"><span>${esc(n.replace(/^3 /,""))}</span><small>${v[0]} cal</small></button>`};
+  return `<div class="fd-chh"><button type="button" class="fd-back" data-cpx aria-label="Back to Chipotle menu">‹</button><b>Build a ${esc(K.n)}</b><small>Chipotle</small></div>
+  <div class="cp-kt">${Object.entries(CPK).map(([k,X])=>`<button type="button" class="${k===b.k?"on":""}" data-cpk="${k}">${X.ic} ${X.n}</button>`).join("")}</div>
+  <div class="cp-body">${K.base.length?`<p class="cp-inc">Comes with: ${K.base.map(esc).join(" + ")}</p>`:""}${K.st.map(g=>{const S=CPS[g];return `<section class="cp-g"><h4>${S.t}<small>${S.one?"pick one":"pick any"}</small></h4><div class="cp-os">${S.o.map(n=>chip(g,n)).join("")}${g==="pro"?`<button type="button" class="cp-o cp-dbl${b.dbl?" on":""}" data-cpdbl aria-pressed="${b.dbl}"><span>Double protein</span><small>×2</small></button>`:""}</div></section>`}).join("")}</div>
+  <div class="cp-tot"><div><b>${Math.round(kc)} cal</b><small><i style="color:#f27fb2">${Math.round(p)}g P</i> · <i style="color:#a688f2">${Math.round(c)}g C</i> · <i style="color:#f2c14e">${Math.round(f)}g F</i></small></div><button type="button" class="cp-log" data-cplog>Log ${esc(K.n.toLowerCase())}</button></div>`}
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-cpk],[data-cpo],[data-cpdbl],[data-cpx],[data-cplog]");if(!t)return;e.preventDefault();e.stopPropagation();const d=t.dataset,o=$("#fdOut"),y=o?o.scrollTop:0;let top=false;
+  if(d.cpk){fBuild=fBuild?Object.assign(fBuild,{k:d.cpk,pick:Object.assign({},fBuild.pick,{shell:d.cpk==="tacos"&&!(fBuild.pick.shell||[]).length?["3 crispy corn tortillas"]:fBuild.pick.shell})}):cpNew(d.cpk);top=!t.closest(".cp-kt")}
+  else if(d.cpo){const [g,n]=d.cpo.split("|"),S=CPS[g],A=fBuild.pick[g]||[];fBuild.pick[g]=A.includes(n)?(g==="shell"?A:A.filter(x=>x!==n)):(S.one?[n]:[...A,n])}
+  else if(d.cpdbl!=null)fBuild.dbl=!fBuild.dbl;
+  else if(d.cpx!=null){fBuild=null;top=true}
+  else if(d.cplog!=null){const b=fBuild,[kc,p,c,f]=cpTot(b),nm=cpName(b),K=CPK[b.k];const food={id:"ff:Chipotle:"+nm,brand:"Chipotle",name:nm,kcal:Math.round(kc),p:Math.round(p),c:Math.round(c),f:Math.round(f),ps:1,sv:1,svl:"1 "+K.n.toLowerCase(),src:"ff",key:ffNorm("chipotle "+nm)};foodLog(food,1,"sv",fType);fBuild=null;fq="";fOn=[];sfx&&sfx("blip");toast("Chipotle "+K.n.toLowerCase()+" logged");render();save();return}
+  if(o){o.innerHTML=foodResults();o.scrollTop=top?0:y}},true);
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-fcat],[data-fcatx],[data-fmv]");if(!t)return;e.preventDefault();e.stopPropagation();
   if(t.dataset.fmv){fMenuView=t.dataset.fmv;try{localStorage.setItem("aot-fmv",fMenuView)}catch(x){}}
   else if(t.dataset.fcat!=null)fCat={c:fChain,n:t.dataset.fcat};else fCat=null;
@@ -5998,7 +6115,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="355",APPT="2026-11-20T19:12:00Z";   /* APPT: when this update was made */
+const APPV="356",APPT="2026-11-20T19:12:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
