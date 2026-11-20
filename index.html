@@ -1199,11 +1199,12 @@ input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:tex
 button,[role=button],a,input,select,label{touch-action:manipulation}@media (pointer:coarse){input,select,textarea{font-size:max(16px,1em)}}
 #czSheet,#nSheet,#bSheet{touch-action:pan-y}
 .nw-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border:1px solid rgba(var(--lr),.28);border-radius:12px;overflow:hidden}
-.nw-d{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;padding:0 0 10px;font:inherit;color:inherit;cursor:pointer;background:linear-gradient(180deg,rgba(var(--tX),.5),rgba(var(--tX),.28));border:0;border-left:1px solid rgba(var(--lr),.16);transition:background .2s}.nw-d:first-child{border-left:0}.nw-d.fut{opacity:.45;cursor:default}
+.nw-d{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;padding:0 0 10px;font:inherit;color:inherit;cursor:pointer;background:linear-gradient(180deg,rgba(var(--tX),.5),rgba(var(--tX),.28));border:0;border-left:1px solid rgba(var(--lr),.16);transition:background .2s}.nw-d:first-child{border-left:0}.nw-d.fut{opacity:.7}
 .nw-t{display:flex;justify-content:space-between;align-items:baseline;width:100%;padding:8px 9px;background:rgba(4,8,20,.6);border-bottom:1px solid rgba(var(--lr),.14)}.nw-t small{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}.nw-t em{font-style:normal;font-family:var(--mono);font-size:14px;font-weight:600;color:#cfdaf2}
 .nw-ring{width:52px;height:52px}.nw-k{font-family:var(--mono);font-size:12px;color:#cfdaf2;min-height:15px}
 .nw-d.td .nw-t{background:rgba(var(--tL),.3)}.nw-d.td .nw-t small,.nw-d.td .nw-t em{color:#fff;font-weight:800}
 .nw-d.sel{background:linear-gradient(180deg,rgba(var(--tL),.4),rgba(var(--tL),.16));box-shadow:inset 0 0 0 2px rgba(var(--tL),1),0 0 20px rgba(var(--tL),.4);position:relative;z-index:1}
+.nw-l{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:-4px}.nw-l.chg{color:#ffd166;font-weight:700}.nw-d.fut .nw-ring{opacity:.5}
 .nw-note{margin:8px 2px 0}.nwp .bd-leg button[data-nadd]{cursor:pointer}
 .nmp .nm-secs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.nmp .nm-secs.list{grid-template-columns:minmax(0,1fr)}@media (max-width:760px){.nmp .nm-secs{grid-template-columns:minmax(0,1fr)}}
 .nm-sec{min-width:0;border:1px solid color-mix(in srgb,var(--cc) 40%,transparent);border-top:3px solid var(--cc);border-radius:14px;background:linear-gradient(180deg,color-mix(in srgb,var(--cc) 11%,transparent),rgba(var(--tX),.35) 110px);padding:10px;display:grid;gap:8px;align-content:start;transition:box-shadow .2s,background .2s}
@@ -2204,7 +2205,11 @@ function meter(label,v,goal,u,c){const p=goal?Math.min(v/goal,1):0;
   return `<div class="meter" style="--c:${c}"><div class="meter-top"><span>${esc(label)}</span><b>${typeof v==="number"?n0(v):v} / ${n0(goal)} ${u}</b></div><div class="track"><i style="width:${p*100}%"></i></div></div>`}
 
 let fOpen=false,tgEdit=false;
-function fuelStats(d,ds0){const g=d.goals,tm=d.meals.filter(m=>m.d===(ds0||today())),sum=k=>tm.reduce((a,m)=>a+(+m[k]||0),0);
+/* calorie limit history: each change is kept from its day onward, so past days keep the limit they had */
+function kLim(ds,d){d=d||data;const H=(d.goals&&d.goals.kcalHist)||null;if(!H)return +(d.goals&&d.goals.kcal)||0;let best=null;for(const k in H)if(k<=ds&&(best==null||k>best))best=k;return best==null?(+d.goals.kcal||0):+H[best]||0}
+function kLimSet(ds,v){const g=data.goals;if(!g.kcalHist){g.kcalHist={"0000-00-00":+g.kcal||0}}const H=g.kcalHist,nx=x=>{const t=new Date(x+"T12:00");t.setDate(t.getDate()+1);return ymd(t)};
+  if(ds<today()){const n=nx(ds);if(!(n in H))H[n]=kLim(n)}H[ds]=v;const ks=Object.keys(H).sort();for(let i=1;i<ks.length;i++)if(+H[ks[i]]===+H[ks[i-1]])delete H[ks[i]];g.kcal=kLim(today())}
+function fuelStats(d,ds0){const g=Object.assign({},d.goals,{kcal:kLim(ds0||today(),d)}),tm=d.meals.filter(m=>m.d===(ds0||today())),sum=k=>tm.reduce((a,m)=>a+(+m[k]||0),0);
   const days=[...Array(14)].map((_,i)=>{const ds=dayStr(13-i),ms=d.meals.filter(m=>m.d===ds);return {ds,n:ms.length,kcal:ms.reduce((a,m)=>a+(+m.kcal||0),0),pro:ms.reduce((a,m)=>a+(+m.protein||0),0)}});
   const wk=days.slice(7).filter(x=>x.n);return {g,tm,kcal:sum("kcal"),pro:sum("protein"),carbs:sum("carbs"),fat:sum("fat"),days,wk,avg:wk.length?wk.reduce((a,x)=>a+x.kcal,0)/wk.length:null,avgP:wk.length?wk.reduce((a,x)=>a+x.pro,0)/wk.length:null}}
 function fuelTargets(S){const g=S.g,row=(l,v,goal,u,id)=>{const over=goal&&v>goal,p=goal?Math.min(1,v/goal):0,c=over?"#ffb648":"rgba(var(--tL),1)";
@@ -2234,15 +2239,15 @@ function fuelTrend(S){const g=S.g,T=+g.kcal||0,D14=S.days,mx=Math.max(T*1.15,...
     <div class="wtr-leg"><span><i style="background:${UN}"></i>↓ At or under target</span><span><i style="background:${OV}"></i>↑ Over target</span>${T?`<span><i class="dash"></i>Target</span>`:""}</div></div>`}
 /* the calorie limit saves as you type (no reliance on "change", which iPad Safari can skip) */
 let tgtT=null,tgtDirty=false;
-function tgtCommit(show){clearTimeout(tgtT);tgtT=null;const i=document.getElementById("kcalTgt");if(i){const v=+String(i.value).replace(/\D/g,"");data.goals.kcal=v>0?v:0}if(tgtDirty){tgtDirty=false;save();if(show)toast(data.goals.kcal?"Calorie limit saved: "+data.goals.kcal.toLocaleString()+" kcal":"Calorie limit cleared")}}
-document.addEventListener("input",e=>{if(e.target.id!=="kcalTgt")return;const t=e.target,v=t.value.replace(/\D/g,"").slice(0,5),f=v?Number(v).toLocaleString():"";if(t.value!==f){t.value=f;try{t.setSelectionRange(f.length,f.length)}catch(_){}}t.style.width=(Math.max(3,(f||"Set").length)+.3)+"ch";data.goals.kcal=v?+v:0;tgtDirty=true;clearTimeout(tgtT);tgtT=setTimeout(()=>tgtCommit(false),700)});
+function tgtCommit(show){clearTimeout(tgtT);tgtT=null;const i=document.getElementById("kcalTgt"),ds=nD();if(i){const v=+String(i.value).replace(/\D/g,"");kLimSet(ds,v>0?v:0)}if(tgtDirty){tgtDirty=false;save();if(show){const v=kLim(ds);toast(v?(ds<today()?"Limit for "+nDayLbl(ds)+": ":ds===today()?"Limit from today on: ":"Limit from "+nDayLbl(ds)+" on: ")+v.toLocaleString()+" kcal":"Calorie limit cleared")}}}
+document.addEventListener("input",e=>{if(e.target.id!=="kcalTgt")return;const t=e.target,v=t.value.replace(/\D/g,"").slice(0,5),f=v?Number(v).toLocaleString():"";if(t.value!==f){t.value=f;try{t.setSelectionRange(f.length,f.length)}catch(_){}}t.style.width=(Math.max(3,(f||"Set").length)+.3)+"ch";tgtDirty=true;clearTimeout(tgtT);tgtT=setTimeout(()=>tgtCommit(false),700)});
 document.addEventListener("focusout",e=>{if(e.target.id!=="kcalTgt")return;tgtCommit(true);setTimeout(()=>{if(!typing())render()},50)});
 document.addEventListener("keydown",e=>{if(e.target.id==="kcalTgt"&&e.key==="Enter"){e.preventDefault();e.target.blur()}});
 addEventListener("pagehide",()=>{if(tgtDirty)tgtCommit(false)});document.addEventListener("visibilitychange",()=>{if(document.hidden&&tgtDirty)tgtCommit(false)});
 function vFuel(){
   const d=D(),S=fuelStats(d,nD()),g=S.g,T=+g.kcal||0,left=T-S.kcal,day=nD()===today()?"today":nDayLbl(nD()),w=nWater(),W=nWGoal();
   return banner()+`<div class="grid tiles">
-    <div class="panel tile" style="--c:var(--cyan)">${ic("fire")}<small>Daily calorie limit</small><b><input class="tgt-in" id="kcalTgt" inputmode="numeric" value="${T?n0(T):""}" placeholder="Set" aria-label="Daily calorie limit" style="width:${Math.max(3,String(T?n0(T):"Set").length)+.3}ch"></b><em>${T?"tap to change":"tap to set yours"}</em></div>
+    <div class="panel tile" style="--c:var(--cyan)">${ic("fire")}<small>Calorie limit${nD()===today()?"":" · "+nDayLbl(nD())}</small><b><input class="tgt-in" id="kcalTgt" inputmode="numeric" value="${T?n0(T):""}" placeholder="Set" aria-label="Daily calorie limit" style="width:${Math.max(3,String(T?n0(T):"Set").length)+.3}ch"></b><em>${T?"tap to change":"tap to set yours"}</em></div>
     <div class="panel tile" style="--c:var(--${T&&left<0?"amber":"violet"})">${ic("star")}<small>Calories eaten ${day}</small><b>${n0(S.kcal)}</b><em>${T?n0(Math.abs(left))+" kcal "+(left<0?"over":"left"):"no limit set"}</em></div>
     <div class="panel tile" style="--c:var(--magenta)">${ic("bolt")}<small>Protein</small><b>${n0(S.pro)}</b><em>${g.protein?"of "+n0(g.protein)+" g":"g"}</em></div>
     <div class="panel tile" style="--c:var(--cyan)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z"/></svg><small>Water</small><b>${w}</b><em>of ${W} cups</em></div>
@@ -2330,16 +2335,16 @@ document.addEventListener("pointerdown",e=>{const h=e.target.closest&&e.target.c
 document.addEventListener("input",e=>{if(e.target.id==="usNew"&&usAdd){usAdd.nn=e.target.value;const v=!!e.target.value.trim();document.querySelectorAll("#usSheet [data-usag]").forEach(b=>b.setAttribute("aria-pressed",String(!v&&b.dataset.usag===usAdd.g)))}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&(usPick||usEdit||usAdd)){usPick=null;usEdit=null;usAdd=null;usSheet()}if(e.key==="Enter"&&e.target.id==="usNew"){e.preventDefault();const b=document.querySelector("[data-uspicknew]")||document.querySelector("[data-usaddgo]");b&&b.click()}});
 
-function nWeekPanel(d,S){const T=+d.goals.kcal||0,base=new Date(today()+"T12:00");base.setDate(base.getDate()-((base.getDay()+6)%7)+nWk*7);
-  const cells=[...Array(7)].map((_,i)=>{const x=new Date(base);x.setDate(x.getDate()+i);const ds=ymd(x),ms=d.meals.filter(m=>m.d===ds),k=ms.reduce((a,m)=>a+(+m.kcal||0),0),fut=ds>today(),R=17,C=2*Math.PI*R,f=T?Math.min(1,k/T):0,over=T&&k>T,col=over?"#ffb648":"#3ddc84";
-    return `<button type="button" class="nw-d${ds===today()?" td":""}${ds===nD()?" sel":""}${fut?" fut":""}" data-nday="${ds}"${fut?" disabled":""}><span class="nw-t"><small>${DAYS[i]}</small><em>${x.getDate()}</em></span><svg class="nw-ring" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="${R}" fill="none" stroke="rgba(150,180,240,.14)" stroke-width="4.5"/>${ms.length?`<circle cx="22" cy="22" r="${R}" fill="none" stroke="${col}" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="${(C*f).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 22 22)"/>`:""}</svg><span class="nw-k">${ms.length?n0(k):fut?"":"–"}</span></button>`}).join("");
+function nWeekPanel(d,S){const base=new Date(today()+"T12:00");base.setDate(base.getDate()-((base.getDay()+6)%7)+nWk*7);
+  const cells=[...Array(7)].map((_,i)=>{const x=new Date(base);x.setDate(x.getDate()+i);const ds=ymd(x),ms=d.meals.filter(m=>m.d===ds),k=ms.reduce((a,m)=>a+(+m.kcal||0),0),fut=ds>today(),Ld=kLim(ds),chg=(data.goals.kcalHist||{})[ds]!=null&&ds!==(Object.keys(data.goals.kcalHist||{}).sort()[0]),R=17,C=2*Math.PI*R,f=Ld?Math.min(1,k/Ld):0,over=Ld&&k>Ld,col=over?"#ffb648":"#3ddc84";
+    return `<button type="button" class="nw-d${ds===today()?" td":""}${ds===nD()?" sel":""}${fut?" fut":""}" data-nday="${ds}"><span class="nw-t"><small>${DAYS[i]}</small><em>${x.getDate()}</em></span><svg class="nw-ring" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="${R}" fill="none" stroke="rgba(150,180,240,.14)" stroke-width="4.5"/>${ms.length?`<circle cx="22" cy="22" r="${R}" fill="none" stroke="${col}" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="${(C*f).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 22 22)"/>`:""}</svg><span class="nw-k">${ms.length?n0(k):fut?"":"–"}</span><span class="nw-l${chg?" chg":""}" title="${chg?"Limit changed this day":"Calorie limit"}">${Ld?"/ "+n0(Ld):"no limit"}</span></button>`}).join("");
   const lab=base.toLocaleDateString(undefined,{month:"short",day:"numeric"})+" – "+(()=>{const e=new Date(base);e.setDate(e.getDate()+6);return e.toLocaleDateString(undefined,{month:"short",day:"numeric"})})();
   const tm=S.tm,tot=tm.reduce((a,m)=>a+(+m.kcal||0),0);let segs;
   if(nDon==="meal")segs=MEALT.map(t=>[t,tm.filter(m=>(m.type||"Snack")===t).reduce((a,m)=>a+(+m.kcal||0),0),NMC[t]]);
   else{const M=tm.reduce((a,m)=>{const k=nMacK(m);a.p+=k.p;a.c+=k.c;a.f+=k.f;return a},{p:0,c:0,f:0}),o=Math.max(0,tot-M.p-M.c-M.f);segs=[["Protein",M.p,"#ff6fb5"],["Carbs",M.c,"#ffd166"],["Fat",M.f,"#4cc9ff"],["Not split",o,"#5b6b8c"]]}
   const sum=segs.reduce((a,x)=>a+x[1],0),Rr=58,Cc=2*Math.PI*Rr;let off=0;const arcs=segs.filter(x=>x[1]>0).map(([n,v,c])=>{const len=sum?Cc*v/sum:0,el=`<circle cx="80" cy="80" r="${Rr}" fill="none" stroke="${c}" stroke-width="18" stroke-dasharray="${Math.max(0,len-2).toFixed(1)} ${Cc.toFixed(1)}" stroke-dashoffset="${(-off).toFixed(1)}" transform="rotate(-90 80 80)"/>`;off+=len;return el}).join("");
-  return `<div class="panel bm nwp" style="margin-top:18px"><div class="bc"><div class="bc-h"><button type="button" class="bc-nav" data-nwk="-1" aria-label="Previous week">‹</button><b>${lab}</b><button type="button" class="bc-nav" data-nwk="1" aria-label="Next week"${nWk>=0?" disabled":""}>›</button>${nWk||nD()!==today()?`<button type="button" class="bc-today" data-nwk="0">Today</button>`:""}</div><div class="nw-row">${cells}</div>
-    <p class="note nw-note">Tap a day to see or log ${nD()===today()?"another day":"food for "+nDayLbl(nD())}.</p></div><div class="bm-sep"></div>
+  return `<div class="panel bm nwp" style="margin-top:18px"><div class="bc"><div class="bc-h"><button type="button" class="bc-nav" data-nwk="-1" aria-label="Previous week">‹</button><b>${lab}</b><button type="button" class="bc-nav" data-nwk="1" aria-label="Next week"${nWk>=1?" disabled":""}>›</button>${nWk||nD()!==today()?`<button type="button" class="bc-today" data-nwk="0">Today</button>`:""}</div><div class="nw-row">${cells}</div>
+    <p class="note nw-note">Tap a day to see it. The limit in tile 1 is for the day you pick and carries forward; past days keep the limit they had.</p></div><div class="bm-sep"></div>
     <div class="bm-r"><div class="ph"><span>Where calories go</span><div class="seg2" role="group" aria-label="Split by"><button data-ndon="meal" aria-pressed="${nDon==="meal"}">Meal</button><button data-ndon="mac" aria-pressed="${nDon==="mac"}">Macro</button></div></div>
     <div class="bd-wrap"><svg class="bd-donut" viewBox="0 0 160 160" aria-hidden="true"><circle cx="80" cy="80" r="${Rr}" fill="none" stroke="rgba(150,180,240,.12)" stroke-width="18"/>${arcs}<text x="80" y="74" text-anchor="middle" font-size="10.5" fill="#9fb0d0">${nD()===today()?"today":"this day"}</text><text x="80" y="96" text-anchor="middle" font-size="19" font-weight="700" fill="#eef3ff" font-family="var(--mono)">${n0(tot)}</text></svg>
     <div class="bd-leg">${sum?segs.filter(x=>x[1]>0).map(([n,v,c])=>`<button type="button" style="--cc:${c}"${nDon==="meal"?` data-nadd="${n}"`:""}><i></i><span>${n}</span><b>${n0(v)} kcal</b><em>${Math.round(v/sum*100)}%</em></button>`).join(""):`<p class="note" style="margin:0">Log food to see where your calories go.</p>`}</div></div></div></div>`}
@@ -2395,7 +2400,7 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(t.id==="nSheet"){if(e.target.id==="nSheet"){nEdit=null;nSheet()}return}
   if(d.nhold!=null){e.stopPropagation();return}
   if(d.nday){nDay=d.nday===today()?null:d.nday;render();return}
-  if(d.nwk!=null){if(d.nwk==="0"){nWk=0;nDay=null}else nWk=Math.min(0,nWk+(+d.nwk));render();return}
+  if(d.nwk!=null){if(d.nwk==="0"){nWk=0;nDay=null}else nWk=Math.min(1,nWk+(+d.nwk));render();return}
   if(d.ndon){nDon=d.ndon;render();return}
   if(d.nmode){nPro().nMode=d.nmode;render();save();return}
   if(d.nview){nPro().nView=d.nview;render();save();return}
@@ -2427,7 +2432,7 @@ document.addEventListener("click",e=>{const t=e.target;if(!t.closest)return;
   const g=t.closest("[data-tgedit],[data-tgcancel],[data-tgsave]");if(!g)return;
   if(g.dataset.tgedit!==undefined){tgEdit=true;render();return}if(g.dataset.tgcancel!==undefined){tgEdit=false;render();return}
   const nv=id=>{const el=$(id),m=el&&String(el.value).replace(/,/g,"").match(/\d+(\.\d+)?/);return m?Math.round(+m[0]):null},k=nv("#tgK"),pr=nv("#tgP");if(k==null||k<500||k>10000){toast("Enter a calorie target between 500 and 10,000");return}if(pr!=null&&pr>600){toast("That protein target doesn't look right");return}
-  data.goals.kcal=k;if(pr!=null)data.goals.protein=pr;tgEdit=false;render();save();toast("Targets saved")},true);
+  kLimSet(nD(),k);if(pr!=null)data.goals.protein=pr;tgEdit=false;render();save();toast("Targets saved")},true);
 
 /* ---------- nutrition: my foods, recipes, food database, barcode ---------- */
 const BASEFOODS=`Chicken breast, cooked|165|31|0|3.6|120|1 breast
@@ -5743,7 +5748,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="310",APPT="2026-11-20T00:30:00-05:00";   /* APPT: when this update was made */
+const APPV="311",APPT="2026-11-20T00:45:00-05:00";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
