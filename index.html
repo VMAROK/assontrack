@@ -1274,6 +1274,8 @@ button.us-emptyadd{width:100%;font:inherit;cursor:pointer;background:none;color:
 .mg-btn{font:inherit;font-size:13px;padding:6px 12px;border-radius:99px;border:1px solid rgba(150,180,240,.25);background:rgba(10,18,40,.5);color:#cfdaf2;cursor:pointer;touch-action:manipulation}
 .mg-dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px;vertical-align:0}
 #mgSheet input{font-size:16px}
+.mg-b{display:flex;gap:6px;justify-content:center;align-items:baseline}
+.mg-b i{font-style:normal;color:var(--muted);font-size:.6em}
 .mg-tile{margin-top:8px;font-size:12px;padding:4px 12px}
 .mbi b{font-family:var(--mono);color:var(--mc);text-align:right}
 .mbi-t{height:10px;border-radius:99px;background:rgba(150,180,240,.14);overflow:hidden}
@@ -2283,7 +2285,7 @@ function vFuel(){
     <div class="panel tile" style="--c:var(--cyan)">${ic("fire")}<small>Calorie limit${nD()===today()?"":" · "+nDayLbl(nD())}</small><b><input class="tgt-in" id="kcalTgt" inputmode="numeric" value="${T?n0(T):""}" placeholder="Set" aria-label="Daily calorie limit" style="width:${Math.max(3,String(T?n0(T):"Set").length)+.3}ch"></b><em>${T?"tap to change":"tap to set yours"}</em></div>
     <div class="panel tile" style="--c:var(--${T&&left<0?"amber":"violet"})">${ic("star")}<small>Calories eaten ${day}</small><b>${n0(S.kcal)}</b><em>${T?n0(Math.abs(left))+" kcal "+(left<0?"over":"left"):"no limit set"}</em></div>
     <div class="panel tile" style="--c:var(--magenta)">${ic("bolt")}<small>Protein</small><b>${n0(S.pro)}</b><em>${g.protein?"of "+n0(g.protein)+" g":"g"}</em></div>
-    <div class="panel tile" style="--c:var(--cyan)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z"/></svg><small>Water</small><b>${w}</b><em>of ${W} cups</em><button type="button" class="mg-btn mg-tile" data-mgoal>Macro goals</button></div>
+    <div class="panel tile" style="--c:var(--cyan)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4v8l6 4"/></svg><small>Macros</small><b class="mg-b"><span style="color:#f27fb2">${n0(+S.carbs||0)}</span><i>·</i><span style="color:#a688f2">${n0(+S.pro||0)}</span><i>·</i><span style="color:#b8875f">${n0(+S.fiber||0)}</span></b><em>carbs · protein · fiber g</em><button type="button" class="mg-btn mg-tile" data-mgoal>Set goals</button></div>
   </div>
   ${nWeekPanel(d,S)}
   <div class="passtop figtop bodytop fueltop" style="margin-top:18px">${figurePanel()}
@@ -5797,7 +5799,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="333",APPT="2026-11-20T19:12:00Z";   /* APPT: when this update was made */
+const APPV="334",APPT="2026-11-20T19:12:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
