@@ -1279,8 +1279,7 @@ button.us-emptyadd{width:100%;font:inherit;cursor:pointer;background:none;color:
 .mgt-d text{fill:#eef3ff;font:700 12px var(--mono)}
 .mgt-in{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%}
 .mgt-in label{display:flex;flex-direction:column;align-items:center;gap:0;font-size:11px;color:var(--mc)}
-.mgt-in input{all:unset;box-sizing:border-box;width:4.2ch;text-align:center;font:700 22px var(--mono);font-variant-numeric:tabular-nums;color:var(--mc);border-bottom:1px dashed currentColor;cursor:text;-webkit-user-select:text;user-select:text;touch-action:manipulation}
-.mgt-in input:focus{border-bottom-style:solid}
+.mgt-in input{all:unset;box-sizing:border-box;width:4.2ch;text-align:center;font:700 22px var(--mono);font-variant-numeric:tabular-nums;color:var(--mc);cursor:text;-webkit-user-select:text;user-select:text;touch-action:manipulation}
 .mgt-in input::placeholder{color:var(--mc);opacity:1;font:inherit}
 .mgt-in input:focus::placeholder{opacity:.35}
 
@@ -5814,7 +5813,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="336",APPT="2026-11-20T19:12:00Z";   /* APPT: when this update was made */
+const APPV="337",APPT="2026-11-20T19:12:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
