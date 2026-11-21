@@ -5951,8 +5951,12 @@ function passDetail(d){
   </div>`;
 }
 /* the weekly schedule, on its own panel above My passions */
-function passSched(d){const p=d.passions.find(x=>x.id===selP);if(!p||!modesOf(p).includes("schedule"))return "";
-  return `<div class="panel pdetail psched"><div class="ph psched-h"><span>${PTI.schedule||""}Weekly schedule <em>·</em> <b>${esc(p.name)}</b></span></div>${schedView(d,p)}</div>`}
+/* always shown: the picked passion, or your first one when none is picked */
+function passSched(d){const P=d.passions||[],p=P.find(x=>x.id===selP)||sortPass(P)[0];
+  if(!p)return `<div class="panel pdetail psched"><div class="ph psched-h"><span>${PTI.schedule||""}Weekly schedule</span></div><p class="empty" style="padding:18px 4px">Add a passion below to plan your week.</p></div>`;
+  return `<div class="panel pdetail psched" data-schedp="${p.id}"><div class="ph psched-h"><span>${PTI.schedule||""}Weekly schedule <em>·</em> <b>${esc(p.name)}</b></span></div>${schedView(d,p)}</div>`}
+/* using the schedule when no passion is picked picks the one it shows, so its buttons and forms work */
+["click","submit","input","change"].forEach(ev=>document.addEventListener(ev,e=>{const w=e.target.closest&&e.target.closest("[data-schedp]");if(w&&selP!==w.dataset.schedp&&!data.passions.some(x=>x.id===selP))selP=w.dataset.schedp},true));
 let editSlot=null,addingSlot=false,manSlots=false,addDay=null,selSlot=null;
 const DAYSF=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const SDI={rep:`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 013-3h15M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 01-3 3H3"/></svg>`,clock:`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`,hist:`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-3"/></svg>`,
@@ -6768,7 +6772,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="436",APPT="2026-11-21T20:30:00Z";   /* APPT: when this update was made */
+const APPV="436",APPT="2026-11-21T20:34:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
