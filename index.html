@@ -1328,8 +1328,8 @@ button,[role=button],a,input,select,label{touch-action:manipulation}@media (poin
 
 /* the doors */
 .nw-c{position:relative;overflow:hidden}
-.nw-gw{position:absolute;left:0;right:0;top:var(--nwth,37px);bottom:0;overflow:hidden;pointer-events:none;z-index:4}
-.nw-gate{position:absolute;inset:1px 1px 2px;border-radius:1px;transform:translateY(0);transition:transform .55s cubic-bezier(.65,0,.35,1);
+.nw-gw{position:absolute;left:0;right:0;top:calc(var(--nwth,37px) - 1px);bottom:0;overflow:hidden;pointer-events:none;z-index:4}
+.nw-gate{position:absolute;inset:0 1px;border-radius:1px;transform:translateY(0);transition:transform .55s cubic-bezier(.65,0,.35,1);
   background:rgba(120,170,230,.05);-webkit-backdrop-filter:blur(3.5px);backdrop-filter:blur(3.5px);
   border:1px solid rgba(200,225,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 2px 10px rgba(0,0,0,.18)}
 .nw-gate::before{content:"";position:absolute;left:4px;right:4px;top:2px;height:1px;border-radius:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);pointer-events:none}
@@ -6289,7 +6289,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="389",APPT="2026-11-21T03:31:00Z";   /* APPT: when this update was made */
+const APPV="390",APPT="2026-11-21T03:36:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
