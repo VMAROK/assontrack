@@ -1605,6 +1605,13 @@ html .psched .week .wday,html .swin-p .week .wday{border-radius:0!important}
 .pleft .pstats{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
 .pleft .pstats>*{min-width:0}
 .pleft .plrow .hrs{flex:none;text-align:right}.pleft .plrow .hrs b{font-size:17px}.pleft .plrow .hrs small{display:block;font-size:10.5px;white-space:nowrap}
+
+/* passions: grip hidden (kept for keyboard focus), hold a row to drag it */
+.plrow .pl-grip{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
+.plrow .pl-grip:focus-visible{position:static;width:22px;height:28px;opacity:1}
+.plrow{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.plrow.pressing{transition:transform .38s ease-out,background .38s;transform:scale(.985);background:rgba(255,190,120,.06)}
+.plrow.dragging{box-shadow:0 10px 26px rgba(0,0,0,.45);background:rgba(30,20,12,.92)!important;z-index:5}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -5908,21 +5915,31 @@ function setPassOrder(ids){ids.forEach((id,n)=>{const q=data.passions.find(x=>x.
 const sortCommit=(kind,ids)=>kind==="pass"?setPassOrder(ids):setSubOrder(ids);
 const sortRows=g=>{const row=g.closest("[data-row]");return {row,rows:[...row.parentElement.querySelectorAll(`:scope > [data-row][data-group="${row.dataset.group}"]`)]}};
 document.addEventListener("keydown",e=>{const g=e.target.closest&&e.target.closest("[data-sort]");if(!g||!["ArrowUp","ArrowDown"].includes(e.key))return;e.preventDefault();const {row,rows}=sortRows(g),ids=rows.map(r=>r.dataset.id),i=ids.indexOf(row.dataset.id),j=i+(e.key==="ArrowUp"?-1:1);if(j<0||j>=ids.length)return;[ids[i],ids[j]]=[ids[j],ids[i]];sortCommit(g.dataset.sort,ids);const ng=document.querySelector(`[data-sort="${g.dataset.sort}"][data-id="${row.dataset.id}"]`);ng&&ng.focus()});
-document.addEventListener("pointerdown",e=>{const g=e.target.closest&&e.target.closest("[data-sort]");if(!g||e.button>0)return;e.preventDefault();e.stopPropagation();
-  const {row,rows}=sortRows(g),list=row.parentElement,from=rows.indexOf(row);if(rows.length<2){row.classList.add("nomove");setTimeout(()=>row.classList.remove("nomove"),400);return}
+document.addEventListener("pointerdown",e=>{const g=e.target.closest&&e.target.closest("[data-sort]");if(!g||e.button>0)return;e.preventDefault();e.stopPropagation();sortStart(g,e,g)});
+/* passions: no grip shown — press and hold a passion row, then drag it */
+let sortLive=false,sortEat=0;
+document.addEventListener("touchmove",e=>{if(sortLive)e.preventDefault()},{passive:false});
+document.addEventListener("click",e=>{if(Date.now()<sortEat&&e.target.closest&&e.target.closest(".plrow")){e.preventDefault();e.stopImmediatePropagation()}},true);
+document.addEventListener("pointerdown",e=>{if(e.button>0||!e.target.closest)return;const row=e.target.closest(".plrow");if(!row||e.target.closest("[data-sort]"))return;const g=row.querySelector(".pl-grip[data-sort]");if(!g)return;
+  const x0=e.clientX,y0=e.clientY;let t=0;const off=()=>{clearTimeout(t);row.removeEventListener("pointermove",mv);row.removeEventListener("pointerup",off);row.removeEventListener("pointercancel",off);row.classList.remove("pressing")};
+  const mv=ev=>{if(Math.hypot(ev.clientX-x0,ev.clientY-y0)>8)off()};
+  row.addEventListener("pointermove",mv);row.addEventListener("pointerup",off);row.addEventListener("pointercancel",off);row.classList.add("pressing");
+  t=setTimeout(()=>{off();sortLive=true;try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}sortStart(g,e,row)},380)});
+function sortStart(g,e,cap){
+  const {row,rows}=sortRows(g),list=row.parentElement,from=rows.indexOf(row);if(rows.length<2){sortLive=false;row.classList.add("nomove");setTimeout(()=>row.classList.remove("nomove"),400);return}
   const R=rows.map(r=>r.getBoundingClientRect()),h=R[from].height,gap=Math.max(0,from<rows.length-1?R[from+1].top-R[from].bottom:R[from].top-R[from-1].bottom),shift=h+gap;
   const minDy=R[0].top-R[from].top-6,maxDy=R[R.length-1].bottom-R[from].bottom+6,y0=e.clientY;let dy=0,to=from,raf=0;
-  try{g.setPointerCapture(e.pointerId)}catch(_){}
+  try{cap.setPointerCapture(e.pointerId)}catch(_){}
   list.classList.add("sorting");row.classList.add("dragging");document.body.classList.add("grabbing");
   const paint=()=>{raf=0;row.style.transform=`translate3d(0,${dy}px,0) scale(1.02)`;const c=R[from].top+dy+h/2;let t=from;
     for(let i=0;i<rows.length;i++){if(i===from)continue;const mid=R[i].top+R[i].height/2;if(i>from&&c>mid)t=Math.max(t,i);if(i<from&&c<mid)t=Math.min(t,i)}
     to=t;rows.forEach((r,i)=>{if(i===from)return;const o=(i>from&&i<=to)?-shift:(i<from&&i>=to)?shift:0;r.style.transform=o?`translate3d(0,${o}px,0)`:""})};
   const move=ev=>{dy=Math.max(minDy,Math.min(maxDy,ev.clientY-y0));if(!raf)raf=requestAnimationFrame(paint)};
-  const up=()=>{g.removeEventListener("pointermove",move);g.removeEventListener("pointerup",up);g.removeEventListener("pointercancel",up);if(raf){cancelAnimationFrame(raf);paint()}
+  const up=()=>{cap.removeEventListener("pointermove",move);cap.removeEventListener("pointerup",up);cap.removeEventListener("pointercancel",up);if(cap!==g){sortLive=false;sortEat=Date.now()+500}if(raf){cancelAnimationFrame(raf);paint()}
     const final=to>from?R[to].bottom-h-R[from].top:to<from?R[to].top-R[from].top:0;
     row.classList.add("settling");row.style.transform=`translate3d(0,${final}px,0) scale(1)`;document.body.classList.remove("grabbing");
     setTimeout(()=>{const ids=rows.map(r=>r.dataset.id),[m]=ids.splice(from,1);ids.splice(to,0,m);rows.forEach(r=>r.style.transform="");list.classList.remove("sorting");row.classList.remove("dragging","settling");if(to!==from){sortCommit(g.dataset.sort,ids);toast("Order saved")}},240)};
-  g.addEventListener("pointermove",move);g.addEventListener("pointerup",up);g.addEventListener("pointercancel",up)});
+  cap.addEventListener("pointermove",move);cap.addEventListener("pointerup",up);cap.addEventListener("pointercancel",up)}
 let tkFilter="all",addingPrj=false,prjFocus=null,addingSub=null,tkLastOpen=null;const tkOpen=new Set();
 const projOf=(d,p)=>(d.projects||[]).filter(x=>x.pid===p.id).sort((a,b)=>(a.created||0)-(b.created||0));
 const PRJC=["#4cc9ff","#b38cff","#ffb648","#2ee6c5","#ff7eb6","#8fd8ff"];
@@ -6830,7 +6847,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="436",APPT="2026-11-21T22:12:00Z";   /* APPT: when this update was made */
+const APPV="436",APPT="2026-11-21T22:21:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
