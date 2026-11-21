@@ -1527,6 +1527,19 @@ html .panel.ked.ked,html.tpl-spa .panel.ked.ked,html.lk-orange .panel.ked.ked{ba
 .km-blank:hover i,.km-blank:focus-visible i{border-bottom-color:rgba(138,90,28,.7)}
 .km-hpad::before,.km-hpad::after{visibility:hidden}
 .km-gx{margin-left:6px;font-size:14px;line-height:1;color:#a08868;background:none;border:0;cursor:pointer;letter-spacing:0}
+
+/* recipe card */
+.kmod-d>.kdt.krec{width:min(860px,100%)}
+.krec .kdt-h{padding-bottom:12px;border-bottom:1px solid rgba(120,90,40,.25)}.krec .kdt-h b{font-family:Georgia,serif;font-size:26px!important}
+.krec-ed{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;color:#7a6346;background:rgba(255,255,255,.5);border:1px solid #d4c09c;cursor:pointer}
+.krec-b{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:28px;margin-top:16px}@media (max-width:640px){.krec-b{grid-template-columns:1fr}}
+.krec h4{margin:0 0 8px;font-family:Georgia,serif;font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:#8a5a1c}
+.krec h5{margin:12px 0 4px;font-family:Georgia,serif;font-style:italic;font-size:14px;font-weight:600;color:#6b4a1f}
+.krec ul{list-style:none;margin:0;padding:0}.krec ul li{display:grid;grid-template-columns:minmax(70px,auto) 1fr;gap:10px;padding:6px 0;border-bottom:1px dotted rgba(120,90,40,.3);font-size:15px;color:#2b2118}
+.krec-u{font-family:Georgia,serif;font-style:italic;color:#7a6346;white-space:nowrap}
+.krec ol{margin:0;padding:0;list-style:none;counter-reset:st}.krec ol li{counter-increment:st;position:relative;padding:0 0 12px 38px;font-size:15px;line-height:1.55;color:#2b2118}
+.krec ol li::before{content:counter(st);position:absolute;left:0;top:-1px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-family:Georgia,serif;font-size:13px;font-weight:700;color:#f4ecdc;background:#8a5a1c}
+.krec-none{margin:4px 0;font-family:Georgia,serif;font-style:italic;color:#9a8566}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -4681,12 +4694,19 @@ const kCol=d=>{let h=0;for(const ch of String(d.name||""))h=(h*31+ch.charCodeAt(
 const kLogged=id=>data.meals.filter(x=>x.fid===id).length;
 function kCard(d){const T=kTot(d),c=kCol(d),n=kLogged(d.id);
   return `<div class="kc${kOpen===d.id?" open":""}" style="--kc:${c}"><button type="button" class="kc-main" data-kopen="${d.id}" aria-expanded="${kOpen===d.id}"><span class="kc-art">${fPic(d,"kc-ic")}</span><span class="kc-tx"><b>${esc(d.name)}</b><small>${n0(T.ks)} cal · serves ${T.sv}</small></span></button><button type="button" class="kc-log" data-klog="${d.id}" aria-label="Log a serving of ${esc(d.name)}" title="Log a serving">＋</button>${n?`<span class="kc-n" title="Servings logged">${n}×</span>`:""}</div>`}
+/* tapping a dish opens its recipe: ingredients (by group) and numbered steps. Edit is a small pencil up top */
+function kDetail(d){const T=kTot(d),c=kCol(d),G=[...new Set((d.ing||[]).map(x=>x.g||""))],st=String(d.steps||"").split(/\n+/).map(x=>x.trim()).filter(Boolean);
+  return `<div class="kdt krec" style="--kc:${c}"><div class="kdt-h">${fPic(d,"kc-ic")}<div><b>${esc(d.name)}</b><small>Serves ${T.sv} · ${n0(T.ks)} cal a serving${d.group?" · "+esc(d.group):""}</small></div><button type="button" class="krec-ed" data-kedit="${d.id}" aria-label="Edit recipe" title="Edit recipe"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg></button><button type="button" class="x" data-kopen="${d.id}" aria-label="Close">×</button></div>
+    <div class="krec-b"><section><h4>Ingredients</h4>${(d.ing||[]).length?G.map(g=>`${g?`<h5>${esc(g)}</h5>`:""}<ul>${d.ing.filter(x=>(x.g||"")===g).map(x=>`<li><span class="krec-u">${esc(x.u&&x.u!=="NA"?x.u:"")}</span><span>${esc(x.n||"")}</span></li>`).join("")}</ul>`).join(""):`<p class="krec-none">No ingredients yet</p>`}</section>
+    <section><h4>Method</h4>${st.length?`<ol>${st.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:`<p class="krec-none">No steps written yet</p>`}</section></div></div>`}
+/* (was) detail card with Log a serving / Bought / Edit buttons:
 function kDetail(d){const T=kTot(d),c=kCol(d);
   return `<div class="kdt" style="--kc:${c}"><div class="kdt-h">${fPic(d,"kc-ic")}<div><b>${esc(d.name)}</b><small>Serves ${T.sv} · ${n0(T.k)} cal for the whole dish</small></div><button type="button" class="x" data-kopen="${d.id}" aria-label="Close">×</button></div>
     <div class="kdt-k"><span><b>${n0(T.ks)}</b><small>cal a serving</small></span>${T.p||T.c||T.f?nMacTags({protein:T.ps,carbs:T.cs,fat:T.fs}):""}</div>
     <div class="kdt-cols"><div><div class="tp-lab">Ingredients</div><ul class="kdt-ing">${[...new Set((d.ing||[]).map(x=>x.g||""))].map(g=>`${g?`<li class="kdt-g">${esc(g)}</li>`:""}${d.ing.filter(x=>(x.g||"")===g).map(x=>`<li><span>${esc(x.n||"–")}</span><small>${esc(x.u&&x.u!=="NA"?x.u:"")}</small><i>${x.k?n0(x.k)+" cal":""}</i></li>`).join("")}`).join("")||"<li><span>None added</span></li>"}</ul></div>
       ${d.steps?`<div><div class="tp-lab">Steps</div><p class="kdt-st">${esc(d.steps).replace(/\n/g,"<br>")}</p></div>`:""}</div>
     <div class="kd-b"><button type="button" class="btn ghost" data-kbuy="${d.id}">Bought</button><button type="button" class="btn ghost" data-kedit="${d.id}">Edit</button></div></div>`}
+*/
 /* menu: dishes listed under the groups you give them, each line with its icon and calories; tap a line to open it */
 const kGroupsAll=()=>{const P=(data.kgroups=data.kgroups||[]);dishes().forEach(d=>{const g=(d.group||"").trim();if(g&&!P.includes(g))P.push(g)});return P.slice()};let kNG=false;
 function kRow(d){const T=kTot(d),c=kCol(d),n=kLogged(d.id),o=kOpen===d.id;
@@ -6719,7 +6739,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="432",APPT="2026-11-21T19:28:00Z";   /* APPT: when this update was made */
+const APPV="433",APPT="2026-11-21T19:29:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
