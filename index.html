@@ -1640,6 +1640,29 @@ html .panel.pthemep.pthemep{background:rgba(14,10,10,.93)!important;-webkit-back
 .pthemep .ph{display:flex;align-items:center;justify-content:space-between}
 .pthemep-in{overflow-y:auto;overscroll-behavior:contain;min-height:0;margin:0 -6px;padding:0 6px}
 .pthemep .theme-strip{flex-wrap:nowrap;overflow-x:auto}
+
+/* passions: pills to switch whose week the schedule shows */
+.psp{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:2px 0 12px;padding:2px 1px;-webkit-overflow-scrolling:touch}
+.psp::-webkit-scrollbar{display:none}
+.psp-b{flex:none;font:inherit;font-size:12.5px;font-weight:600;padding:5px 13px;border-radius:99px;border:1px solid rgba(var(--lr),.22);background:rgba(4,10,28,.45);color:var(--muted);cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.psp-b:hover{color:var(--fg);border-color:rgba(var(--lr),.4)}
+.psp-b[aria-selected="true"]{color:#1a0e00;background:var(--accent,#ffb648);border-color:transparent;box-shadow:0 0 12px rgba(255,182,72,.35)}
+.psp-b[aria-selected="true"][data-lvl="Priority"]{background:#ff5d6c;color:#1a0306;box-shadow:0 0 12px rgba(255,93,108,.4)}
+.psp-b[aria-selected="true"][data-lvl="Bonus"]{background:#2ee6c5;color:#04101f;box-shadow:0 0 12px rgba(46,230,197,.35)}
+
+/* dashboard: today strip */
+.tds{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0 0 18px}
+.tds-t{display:flex;align-items:center;gap:11px;padding:12px 14px;min-width:0;text-align:left;font:inherit;color:inherit;cursor:pointer;border-radius:14px;border:1px solid rgba(var(--lr),.2);background:rgba(4,10,28,.5);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);transition:border-color .15s,transform .15s}
+.tds-t:hover{border-color:rgba(var(--lr),.42)}.tds-t:active{transform:scale(.98)}
+.tds-i{flex:none;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.06);color:var(--accent,#ffb648)}.tds-t.ok .tds-i{color:#3ddc84}
+.tds-x{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+.tds-x small{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tds-x b{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px}
+.tds-x em{font-style:normal;font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tds-t.ok b{color:#3ddc84}.tds-t.ok .tds-i{background:rgba(61,220,132,.12)}
+.tds-t.now{border-color:rgba(255,182,72,.6);box-shadow:0 0 16px rgba(255,182,72,.22)}.tds-t.now em{color:#ffb648}
+.tds-t.miss em{color:#ff5d6c}.tds-t.part b{color:#ffb648}
+@media (max-width:900px){.tds{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -2696,11 +2719,29 @@ document.addEventListener("submit",e=>{const f=e.target.id;if(f!=="budForm"&&f!=
   if(f==="budForm"){const v=numv($("#budIn").value);data.budget=Object.assign({},data.budget,{monthly:v>0?v:0});toast(v>0?"Budget set":"Budget cleared")}
   else{const v=numv($("#expAmt").value);if(!(v>0)){toast("Enter an amount, like 12.50");return}data.expenses=[...(data.expenses||[]),{id:uid(),d:today(),at:Date.now(),amt:v,note:$("#expNote").value.trim()}];toast("Expense added")}
   render();save()});
+/* Dashboard: one line for today — the meal to log, today's workout, today's passion slot, the next reminder. Each tile opens its tab */
+function todayStrip(d){const t=today(),di=dayIdx(t),now=Date.now();
+  const ck=`<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
+  const tile=(go,icon,lab,val,sub,st)=>`<button type="button" class="tds-t${st?" "+st:""}" data-go="${go}"><span class="tds-i" aria-hidden="true">${icon}</span><span class="tds-x"><small>${lab}</small><b>${val}</b><em>${sub}</em></span></button>`;
+  /* meal */
+  const tm=d.meals.filter(m=>m.d===t),kc=tm.reduce((a,m)=>a+(+m.kcal||0),0),gk=+(d.goals||{}).kcal||0,mt=mealNow(),has=tm.some(m=>(m.type||"")===mt);
+  const meal=tile("fuel",`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v8M4 3v5a3 3 0 0 0 6 0V3M7 11v10M17 3c-2 1.5-3 4-3 7h3v11"/></svg>`,mt,has?`${ck} Logged`:"Not logged yet",gk?(kc<=gk?n0(gk-kc)+" kcal left":n0(kc-gk)+" kcal over"):n0(kc)+" kcal today",has?"ok":"todo");
+  /* workout */
+  const PL=tlPlans(d);let sp=0,sd=0;PL.forEach(p=>p.ex.forEach(e=>{const S=tlSets(e);sp+=S;const w=dsDone(d,p,e,t);sd+=w?Math.min(S,+w.sets||0):0}));
+  const fixed=PL.filter(p=>!anyDay(p)),nm=(fixed[0]||PL[0]||{}).name;
+  const wo=!PL.length?tile("train",`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7v10M3 9.5v5M18 7v10M21 9.5v5M6 12h12"/></svg>`,"Workout","Rest day","nothing planned",""):tile("train",`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7v10M3 9.5v5M18 7v10M21 9.5v5M6 12h12"/></svg>`,"Workout",esc(fixed.length?nm+(fixed.length>1?" +"+(fixed.length-1):""):"Any workout"),sp&&sd>=sp?`${ck} done`:sd?sd+" of "+sp+" sets":sp+" sets to do",sp&&sd>=sp?"ok":sd?"part":"todo");
+  /* passion slot */
+  let best=null;(d.passions||[]).forEach(p=>(p.slots||[]).forEach(sl=>{if(isWk(sl)||sl.day!==di)return;if(sl.once?sl.once!==t:((sl.from&&t<sl.from)||(sl.until&&t>sl.until)))return;const st=slotState(d,p,sl,t);if(st==="none")return;const rank=st==="open"?0:st==="upcoming"?1:st==="missed"?2:3;if(!best||rank<best.rank||(rank===best.rank&&(sl.start||"99")<(best.sl.start||"99")))best={p,sl,st,rank}}));
+  const ps=best?tile("pass",`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg>`,esc(best.p.name),psqLab(best.sl),best.st==="open"?"on now · tap to log":best.st==="upcoming"?"later today":best.st==="missed"?"missed":`${ck} done`,best.st==="open"?"now":best.st==="missed"?"miss":best.st==="upcoming"?"":"ok"):tile("pass",`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg>`,"Passions","Free day","no slot today","");
+  /* reminder */
+  const R=RM().filter(r=>!r.done&&r.d===t).sort((a,b)=>rAt(a)-rAt(b)),nx=R.find(r=>rAt(r)>=now)||R[0];
+  const rm=nx?tile("rem",`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20a2 2 0 0 0 4 0"/></svg>`,nx.tm?fmtTime(nx.tm):"Today",esc(nx.t||"Reminder"),R.length>1?R.length+" today":rAt(nx)<now?"overdue":"next up",rAt(nx)<now?"miss":""):tile("rem",`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20a2 2 0 0 0 4 0"/></svg>`,"Reminders","All clear","nothing left today","ok");
+  return `<div class="tds" role="group" aria-label="Today">${meal}${wo}${ps}${rm}</div>`}
 function vDash(){
   const d=D(),g=d.goals,t=today(),tm=d.meals.filter(m=>m.d===t);
   const kcal=tm.reduce((s,m)=>s+(+m.kcal||0),0),pro=tm.reduce((s,m)=>s+(+m.protein||0),0);
   const P=d.passions,woT=d.workouts.filter(w=>w.d===t).length;
-  return banner()+dashTop(d)+bigCal(d)+`<div class="panel" style="margin-top:18px;--c:var(--magenta)"><div class="ph"><span>Today's targets</span><i>${new Date().toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</i></div>
+  return banner()+todayStrip(d)+dashTop(d)+bigCal(d)+`<div class="panel" style="margin-top:18px;--c:var(--magenta)"><div class="ph"><span>Today's targets</span><i>${new Date().toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</i></div>
     <div class="tgrid">
       ${meter("Calories",kcal,g.kcal,"kcal","var(--cyan)")}
       ${meter("Protein",pro,g.protein,"g","var(--magenta)")}
@@ -6050,7 +6091,11 @@ function passDetail(d){
 function passSched(d){const P=d.passions||[],p=P.find(x=>x.id===selP)||sortPass(P)[0];
   if(!p)return `<div class="panel pdetail psched"><div class="ph psched-h"><span>${PTI.schedule||""}Weekly schedule</span></div><p class="empty" style="padding:18px 4px">Add a passion below to plan your week.</p></div>`;
   /* was the full schedule inline: ${schedView(d,p)} — now seven square days; tap one to open the full week in a window */
-  return `<div class="panel pdetail psched" data-schedp="${p.id}"><div class="ph psched-h"><span>${PTI.schedule||""}Weekly schedule <em>·</em> <b>${esc(p.name)}</b></span><button type="button" class="psq-open" data-swin aria-label="Open the schedule in a window"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7"/></svg>Open</button></div>${schedView(d,p)}</div>`}
+  const SP=sortPass(P),pills=SP.length>1?`<div class="psp" role="tablist" aria-label="Whose week to show">${SP.map(x=>`<button type="button" role="tab" class="psp-b" data-schedpick="${x.id}" aria-selected="${x.id===p.id}" data-lvl="${esc(x.lvl||"")}">${esc(x.name)}</button>`).join("")}</div>`:"";
+  return `<div class="panel pdetail psched" data-schedp="${p.id}"><div class="ph psched-h"><span>${PTI.schedule||""}Weekly schedule${SP.length>1?"":` <em>·</em> <b>${esc(p.name)}</b>`}</span><button type="button" class="psq-open" data-swin aria-label="Open the schedule in a window"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7"/></svg>Open</button></div>${pills}${schedView(d,p)}</div>`}
+/* the passion pills above the schedule pick whose week is shown */
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-schedpick]");if(!b)return;e.stopPropagation();selP=b.dataset.schedpick;themeOpen=false;render();
+  requestAnimationFrame(()=>{const a=document.querySelector('.psp-b[aria-selected="true"]');a&&a.scrollIntoView({inline:"nearest",block:"nearest"})})},true);
 /* square-tile days were tried here and dropped: ${schedSquares(d,p)} */
 let schedWin=false,schedInWin=false;
 /* short time for the square days: "6–7p", "7–8:30p", or "1h" for an any-time slot */
@@ -6883,7 +6928,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="436",APPT="2026-11-21T22:40:00Z";   /* APPT: when this update was made */
+const APPV="436",APPT="2026-11-21T22:44:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
