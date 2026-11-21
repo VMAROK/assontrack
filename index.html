@@ -1521,6 +1521,11 @@ html .panel.ked.ked,html.tpl-spa .panel.ked.ked,html.lk-orange .panel.ked.ked{ba
 .km-add{display:block;margin:6px 4px 0;padding:4px 0;font-family:Georgia,serif;font-style:italic;font-size:13px;color:#8a5a1c;background:none;border:0;cursor:pointer}
 .kpan .bp-add{display:flex;gap:8px}
 .km-ng input{width:100%;box-sizing:border-box;font-family:Georgia,serif;font-size:16px;padding:6px 4px;color:#2b2118;background:transparent;border:0;border-bottom:1.5px solid rgba(120,90,40,.45);outline:none}.km-ngb{display:flex;gap:14px}
+
+.km-blank{display:flex;align-items:flex-end;width:100%;height:58px;padding:0 4px 14px;background:none;border:0;cursor:pointer}
+.km-blank i{flex:1;border-bottom:1.5px dotted rgba(80,60,30,.28)}
+.km-blank:hover i,.km-blank:focus-visible i{border-bottom-color:rgba(138,90,28,.7)}
+.km-gx{margin-left:6px;font-size:14px;line-height:1;color:#a08868;background:none;border:0;cursor:pointer;letter-spacing:0}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -4689,7 +4694,8 @@ function kList(){const q=ffNorm(kFind),W=q.split(" ").filter(Boolean);let D=dish
   D=D.slice().sort(kSort==="az"?(a,b)=>a.name.localeCompare(b.name):kSort==="cal"?(a,b)=>kTot(a).ks-kTot(b).ks:(a,b)=>(b.used||0)-(a.used||0));
   const fil=!!W.length;if(fil&&!D.length)return `<p class="km-empty" style="padding:8px 2px">No dish matches “${esc(kFind)}”.</p>`;
   const G=kGroupsAll().filter(g=>!fil||D.some(d=>(d.group||"").trim()===g)),rest=D.filter(d=>!(d.group||"").trim()),od=kOpen&&D.find(d=>d.id===kOpen);
-  const col=(g,L,lab)=>`<section class="km-sec"><h3 class="km-h"><span>${esc(lab)}</span></h3>${L.map(kRow).join("")||`<p class="km-empty">No dishes yet${g?` · <button type="button" class="km-link" data-kgdel="${esc(g)}">remove group</button>`:""}</p>`}${fil?"":`<button type="button" class="km-add" data-knew="${esc(g)}">＋ Add a dish</button>`}</section>`;
+  /* each column shows at least 12 lines: dishes first, then empty dotted lines (tap one to add a dish to that group) */
+  const col=(g,L,lab)=>`<section class="km-sec"><h3 class="km-h"><span>${esc(lab)}</span>${g&&!L.length&&!fil?`<button type="button" class="km-gx" data-kgdel="${esc(g)}" aria-label="Remove empty group ${esc(g)}" title="Remove group">×</button>`:""}</h3>${L.map(kRow).join("")}${fil?"":[...Array(Math.max(0,12-L.length))].map(()=>`<button type="button" class="km-blank" data-knew="${esc(g)}" aria-label="Add a dish${g?" to "+esc(g):""}"><i></i></button>`).join("")}</section>`;
   return (od?`<div class="kmod kmod-d" role="dialog" aria-modal="true" aria-label="${esc(od.name)}"><button type="button" class="kmod-bg" data-kopen="${od.id}" aria-label="Close"></button>${kDetail(od)}</div>`:"")
    +`<div class="km">${G.map(g=>col(g,D.filter(d=>(d.group||"").trim()===g),g)).join("")}${rest.length||(!G.length&&!kNG)?col("",rest,G.length?"More dishes":"Your dishes"):""}${kNG?`<section class="km-sec km-ng"><h3 class="km-h"><span>New group</span></h3><input id="kNG" maxlength="30" placeholder="e.g. Sunday dinners" aria-label="Group name"><div class="km-ngb"><button type="button" class="km-add" data-kngsave>Add group</button><button type="button" class="km-add" data-kngx>Cancel</button></div></section>`:""}</div>`}
 function kSearchHTML(){if(!kQ.trim())return "";kL=ingFind(kQ);return `<div class="ing-res">${kL.map((f,i)=>`<button type="button" class="fd-r ing-pick" data-kpick="${i}">${fPic(f)}<div class="fd-rm"><b>${esc(f.name)}</b><small>${f.brand?esc(f.brand)+" · ":""}${foodSub(f)}</small></div><span class="ing-plus">＋</span></button>`).join("")||(kBusy?"":`<p class="note ing-st">Nothing found. Type it in yourself below.</p>`)}${kBusy?`<p class="note ing-st">Searching the food database…</p>`:""}</div>`}
@@ -6712,7 +6718,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="428",APPT="2026-11-21T19:18:00Z";   /* APPT: when this update was made */
+const APPV="429",APPT="2026-11-21T19:21:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
