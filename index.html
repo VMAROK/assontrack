@@ -1326,10 +1326,10 @@ button,[role=button],a,input,select,label{touch-action:manipulation}@media (poin
 /* the doors */
 .nw-c{position:relative;overflow:hidden}
 .nw-gw{position:absolute;left:0;right:0;top:var(--nwth,37px);bottom:0;overflow:hidden;pointer-events:none;z-index:4}
-.nw-gate{position:absolute;inset:4px 4px 5px;border-radius:9px;transform:translateY(0);transition:transform .55s cubic-bezier(.65,0,.35,1);
+.nw-gate{position:absolute;inset:1px 1px 2px;border-radius:1px;transform:translateY(0);transition:transform .55s cubic-bezier(.65,0,.35,1);
   background:rgba(120,170,230,.05);-webkit-backdrop-filter:blur(3.5px);backdrop-filter:blur(3.5px);
   border:1px solid rgba(200,225,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 2px 10px rgba(0,0,0,.18)}
-.nw-gate::before{content:"";position:absolute;left:8px;right:8px;top:5px;height:1px;border-radius:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);pointer-events:none}
+.nw-gate::before{content:"";position:absolute;left:4px;right:4px;top:2px;height:1px;border-radius:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);pointer-events:none}
 .nw-row.gopen .nw-gate,.nw-d.sel .nw-gate{transform:translateY(calc(-100% - 12px))}
 .nw-gate.opening{animation:nwOpen .6s cubic-bezier(.65,0,.35,1) both}.nw-gate.closing{animation:nwClose .55s cubic-bezier(.65,0,.35,1) both}
 @keyframes nwOpen{from{transform:translateY(0)}to{transform:translateY(calc(-100% - 12px))}}@keyframes nwClose{from{transform:translateY(calc(-100% - 12px))}to{transform:translateY(0)}}
@@ -2763,7 +2763,7 @@ document.addEventListener("pointerdown",e=>{const h=e.target.closest&&e.target.c
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-nday],[data-nwk],[data-ndon],[data-nmacv],[data-nmode],[data-nview],[data-nadd],[data-nmt],[data-nq],[data-nwat],[data-nwatset],[data-nm],[data-nmedit],[data-nmdup],[data-nmmv],[data-nclose],[data-nemt],[data-nsave],[data-nhold],#nSheet");if(!t)return;const d=t.dataset;
   if(t.id==="nSheet"){if(e.target.id==="nSheet"){nEdit=null;nSheet()}return}
   if(d.nhold!=null){e.stopPropagation();return}
-  if(d.nday){nDay=d.nday===today()?null:d.nday;render();return}
+  if(d.nday){nDay=d.nday===today()||(d.nday<today()&&d.nday===nD())?null:d.nday;render();return}   /* tapping an open past day again closes it and goes back to today */
   if(d.nwk!=null){if(d.nwk==="0"){nWk=0;nDay=null}else nWk=Math.min(1,nWk+(+d.nwk));render();return}
   if(d.ndon){nDon=d.ndon;render();return}
   if(d.nmacv){nPro().nMacV=d.nmacv;nPro().macV=d.nmacv;render();save();return}
@@ -6286,7 +6286,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="387",APPT="2026-11-21T03:18:00Z";   /* APPT: when this update was made */
+const APPV="388",APPT="2026-11-21T03:25:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
