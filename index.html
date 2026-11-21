@@ -1469,6 +1469,21 @@ html .panel.kpan.kpan,html.tpl-spa .panel.kpan.kpan,html.lk-orange .panel.kpan.k
   -webkit-mask:radial-gradient(circle 6px at 0 0,#0000 97%,#000) top/100% 51% no-repeat,radial-gradient(circle 6px at 0 100%,#0000 97%,#000) bottom/100% 51% no-repeat;
   mask:radial-gradient(circle 6px at 0 0,#0000 97%,#000) top/100% 51% no-repeat,radial-gradient(circle 6px at 0 100%,#0000 97%,#000) bottom/100% 51% no-repeat}
 .nw-tix>.nw-d::before{content:"";position:absolute;left:0;top:8px;bottom:8px;border-left:1.5px dashed rgba(var(--lr),.32);pointer-events:none;z-index:5}
+
+/* Kitchen dish editor on paper (a recipe card) */
+html .panel.ked.ked,html.tpl-spa .panel.ked.ked,html.lk-orange .panel.ked.ked{background:#f4ecdc!important;background-image:radial-gradient(120% 80% at 20% 0%,rgba(255,255,255,.55),transparent 60%),radial-gradient(90% 70% at 100% 100%,rgba(160,120,60,.14),transparent 70%),repeating-linear-gradient(0deg,transparent 0 27px,rgba(120,150,200,.18) 27px 28px)!important;background-position:0 0,0 0,0 46px!important;border:1px solid #d9c8a6!important;box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 0 60px rgba(150,110,50,.12)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;color:#2b2118;border-radius:6px!important}
+.ked .ph span{font-family:Georgia,"Times New Roman",serif;font-size:22px;font-weight:600;color:#2b2118}.ked .ph .x{color:#7a6346}
+.ked label,.ked .tp-lab,.ked-h span{color:#7a6346!important;font-family:Georgia,serif;font-style:italic;font-size:13px}
+.ked input,.ked textarea{background:transparent!important;border:0!important;border-bottom:1.5px solid rgba(120,90,40,.35)!important;border-radius:0!important;color:#2b2118!important;font-family:"Bradley Hand","Segoe Print","Comic Sans MS",cursive;font-size:16px!important;padding:6px 4px!important}
+.ked input::placeholder,.ked textarea::placeholder{color:rgba(120,90,40,.45)}
+.ked input:focus,.ked textarea:focus{outline:none;border-bottom-color:#8a5a1c!important;box-shadow:0 2px 0 rgba(138,90,28,.25)}
+.ked textarea{border:1.5px solid rgba(120,90,40,.3)!important;border-radius:6px!important;background:rgba(255,255,255,.35)!important;line-height:1.6}
+.ked .ing-q{background:rgba(255,255,255,.6)!important;border:1px solid #d4c09c!important;border-radius:10px!important;color:#7a6346}.ked .ing-q input{border:0!important;font-family:inherit;font-size:14px!important}
+.ked .ing-res{background:#fbf6ec;border-color:#d4c09c}.ked .ing-pick{color:#2b2118}.ked .ing-pick small,.ked .ing-st{color:#7a6346}.ked .ing-plus{color:#8a5a1c}
+.ked .fd-ic{color:#8a5a1c;background:none;border:0}
+.ked .ing-add{color:#6b4a1f!important;border-color:#c9b08a!important;background:rgba(255,255,255,.45)!important}
+.ked-sum{background:rgba(255,255,255,.55)!important;border-color:#d4c09c!important;color:#7a6346!important;font-family:Georgia,serif}.ked-sum b{color:#2b2118!important}
+.ked .btn{color:#2b2118!important;border-color:#c9b08a!important;background:rgba(255,255,255,.5)!important;box-shadow:none!important}.ked .btn[data-ksave]{background:#2b2118!important;color:#f4ecdc!important;border-color:#2b2118!important}.ked .kdel{color:#b3261e!important}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -6647,7 +6662,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="423",APPT="2026-11-21T16:58:00Z";   /* APPT: when this update was made */
+const APPV="424",APPT="2026-11-21T18:50:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
