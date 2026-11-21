@@ -1477,7 +1477,7 @@ html .panel.kpan.kpan,html.tpl-spa .panel.kpan.kpan,html.lk-orange .panel.kpan.k
 .bc-eye:hover{color:#e6eeff}.bc-eye.on{color:rgb(var(--tL));border-color:rgba(var(--tL),.6);box-shadow:0 0 12px rgba(var(--tL),.3)}
 @media (prefers-reduced-motion:reduce){.nw-gate.slam,.nw-gate.slam .nw-gl{animation:none}}
 .nw-note{margin:8px 2px 0}
-.nw-c .nw-ring{width:60px;height:60px}.nw-ov{filter:drop-shadow(0 0 3px rgba(255,77,106,.8))}.nw-c .nw-ml{margin-top:2px}.nw-key{justify-content:flex-end;margin:8px 2px 0}.nw-kc{background:none!important;border:2px solid #3ddc84;border-radius:50%!important}
+.nw-c .nw-ring{width:60px;height:60px}.nwp .nw-row{touch-action:pan-y;will-change:transform}.nw-ov{filter:drop-shadow(0 0 3px rgba(255,77,106,.8))}.nw-c .nw-ml{margin-top:2px}.nw-key{justify-content:flex-end;margin:8px 2px 0}.nw-kc{background:none!important;border:2px solid #3ddc84;border-radius:50%!important}
 /* today: the site's whitish blue, so it stands apart from a day you've only tapped */
 .nw-d.td{background:linear-gradient(180deg,rgba(200,235,255,.26),rgba(160,215,255,.08))!important;box-shadow:inset 0 0 0 1.5px rgba(214,240,255,.9),0 0 18px rgba(190,230,255,.35)!important;position:relative;z-index:1}
 .nw-d.td .nw-t{background:rgba(214,240,255,.22)!important}.nw-d.td .nw-t small,.nw-d.td .nw-t em{color:#f2faff!important;text-shadow:0 0 8px rgba(200,235,255,.7)}
@@ -2797,6 +2797,16 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(d.nwcm){let [y,m]=nwCalM;m+=+d.nwcm;if(m<0){m=11;y--}if(m>11){m=0;y++}nwCalM=[y,m];const o=document.getElementById("nwCalPop");if(o)o.innerHTML=nwCalHTML();return}
   if(d.nwcd)nwGoDate(d.nwcd)},true);
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.getElementById("nwCalPop"))nwCalClose()});
+/* swipe the week strip left/right to change weeks (arrows stay for mouse and as a hint) */
+let nwSw=null,nwSwNoClick=0;
+document.addEventListener("pointerdown",e=>{const r=e.target.closest&&e.target.closest(".nwp .nw-row");if(!r||tab!=="fuel")return;nwSw={x:e.clientX,y:e.clientY,r,dx:0,on:false}},{passive:true});
+document.addEventListener("pointermove",e=>{if(!nwSw)return;const dx=e.clientX-nwSw.x,dy=e.clientY-nwSw.y;if(!nwSw.on){if(Math.abs(dx)>12&&Math.abs(dx)>Math.abs(dy)*1.3)nwSw.on=true;else if(Math.abs(dy)>14){nwSw=null;return}else return}
+  nwSw.dx=dx;nwSw.r.style.transition="none";nwSw.r.style.transform=`translateX(${dx*.6}px)`;nwSw.r.style.opacity=String(1-Math.min(.5,Math.abs(dx)/500))},{passive:true});
+const nwSwEnd=()=>{if(!nwSw)return;const {r,dx,on}=nwSw;nwSw=null;if(!on)return;nwSwNoClick=Date.now();r.style.transition="";r.style.transform="";r.style.opacity="";
+  if(Math.abs(dx)<60){r.animate([{transform:`translateX(${dx*.6}px)`},{transform:"none"}],{duration:220,easing:"ease-out"});return}
+  const dir=dx<0?1:-1;nWk+=dir;render();const n=document.querySelector(".nwp .nw-row");if(n&&n.animate)n.animate([{transform:`translateX(${dir*40}%)`,opacity:0},{transform:"none",opacity:1}],{duration:300,easing:"cubic-bezier(.2,.8,.2,1)"})};
+document.addEventListener("pointerup",nwSwEnd,{passive:true});document.addEventListener("pointercancel",nwSwEnd,{passive:true});
+document.addEventListener("click",e=>{if(Date.now()-nwSwNoClick<350&&e.target.closest&&e.target.closest(".nw-row")){e.preventDefault();e.stopPropagation()}},true);
 let nwSel=null,nwSlamDone=false,nwGateOpen=(()=>{try{return localStorage.getItem("aot-nwgate")==="1"}catch(e){return false}})();
 const NWEYE=['<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>','<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 5.1A10.6 10.6 0 0112 5c6.4 0 10 7 10 7a17 17 0 01-3.2 4M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.6 9.6 0 005.4-1.6M9.9 9.9a3 3 0 004.2 4.2"/></svg>'];
 const NWDROP=(g,L,delay)=>{g.style.transition="none";g.style.transform="";return g.animate([{transform:`translateY(-${L}%)`,easing:"cubic-bezier(.55,0,1,.45)"},{transform:"translateY(0)",offset:.5,easing:"cubic-bezier(0,.55,.45,1)"},{transform:`translateY(-${Math.min(10,L*.22)}%)`,offset:.68,easing:"cubic-bezier(.55,0,1,.45)"},{transform:"translateY(0)",offset:.82,easing:"cubic-bezier(0,.55,.45,1)"},{transform:`translateY(-${Math.min(3,L*.07)}%)`,offset:.91,easing:"cubic-bezier(.55,0,1,.45)"},{transform:"translateY(0)"}],{duration:Math.round(480+L*7),delay:delay||0})};
@@ -6618,7 +6628,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="419",APPT="2026-11-21T14:07:00Z";   /* APPT: when this update was made */
+const APPV="420",APPT="2026-11-21T16:06:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
