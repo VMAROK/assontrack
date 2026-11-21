@@ -1567,6 +1567,23 @@ html .panel.psched{padding-top:20px!important}.psched-h{margin-bottom:8px}.psche
 /* passions: commitment score + weekly schedule share one panel */
 .cs-combo>.cs{padding:0;margin:0;background:none!important;border:0!important;box-shadow:none!important}
 .cs-split{height:1px;margin:18px -4px 16px;background:linear-gradient(90deg,transparent,rgba(255,200,150,.22),transparent)}
+
+/* passions: square days, full week opens in a window */
+.psched-h{display:flex;align-items:center;justify-content:space-between}.psq-hint{font-size:11.5px;color:var(--muted);font-weight:500}
+.psq{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.psq-d{aspect-ratio:1;display:flex;flex-direction:column;align-items:stretch;gap:6px;padding:9px 8px;border-radius:12px;border:1px solid rgba(255,200,150,.14);background:rgba(255,255,255,.035);color:inherit;font:inherit;text-align:left;cursor:pointer;overflow:hidden;transition:transform .15s,border-color .15s,background .15s}
+.psq-d:hover{border-color:rgba(255,190,120,.4);background:rgba(255,190,120,.06)}.psq-d:active{transform:scale(.97)}
+.psq-d.past{opacity:.6}.psq-d.td{border-color:rgba(190,225,255,.65);background:rgba(190,225,255,.09);box-shadow:0 0 14px rgba(170,215,255,.18)}
+.psq-h{display:flex;justify-content:space-between;align-items:baseline}.psq-h b{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase}.psq-h em{font-style:normal;font-weight:700;font-size:16px}
+.psq-s{display:flex;flex-direction:column;gap:3px;min-height:0}
+.psq-s i{font-style:normal;font-size:10.5px;font-weight:600;padding:3px 5px;border-radius:6px;background:rgba(120,150,255,.14);border-left:2px solid rgba(140,170,255,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.psq-s i.st-done,.psq-s i.st-donelocked{background:rgba(61,220,132,.14);border-left-color:#3ddc84}.psq-s i.st-missed{background:rgba(255,80,100,.14);border-left-color:#ff5a6e}.psq-s i.st-open{background:rgba(255,180,90,.16);border-left-color:#ffb45a}
+.psq-s i.none{background:none;border:0;color:var(--muted);font-weight:400}.psq-s i.more{background:none;border:0;color:var(--muted)}
+@media (max-width:640px){.psq{gap:4px}.psq-d{padding:5px 4px;border-radius:9px}.psq-h{flex-direction:column;align-items:center}.psq-h b{font-size:9.5px}.psq-s i{font-size:0;padding:0;height:4px;border-left-width:0}.psq-s i.none,.psq-s i.more{display:none}}
+.swin{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:grid;place-items:center;padding:24px;animation:swinIn .18s ease-out}
+.swin-p{width:min(900px,100%);max-height:calc(100vh - 48px);overflow:auto;margin:0!important;padding-top:20px!important}
+.swin-x{width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);color:inherit;font-size:20px;line-height:1;cursor:pointer}
+@keyframes swinIn{from{opacity:0}to{opacity:1}}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -5958,7 +5975,22 @@ function passDetail(d){
 /* always shown: the picked passion, or your first one when none is picked */
 function passSched(d){const P=d.passions||[],p=P.find(x=>x.id===selP)||sortPass(P)[0];
   if(!p)return `<div class="panel pdetail psched"><div class="ph psched-h"><span>${PTI.schedule||""}Weekly schedule</span></div><p class="empty" style="padding:18px 4px">Add a passion below to plan your week.</p></div>`;
-  return `<div class="panel pdetail psched" data-schedp="${p.id}"><div class="ph psched-h"><span>${PTI.schedule||""}Weekly schedule <em>·</em> <b>${esc(p.name)}</b></span></div>${schedView(d,p)}</div>`}
+  /* was the full schedule inline: ${schedView(d,p)} — now seven square days; tap one to open the full week in a window */
+  return `<div class="panel pdetail psched" data-schedp="${p.id}"><div class="ph psched-h"><span>${PTI.schedule||""}Weekly schedule <em>·</em> <b>${esc(p.name)}</b></span><small class="psq-hint">Tap a day to open</small></div>${schedSquares(d,p)}</div>`}
+let schedWin=false;
+/* short time for the square days: "6–7p", "7–8:30p", or "1h" for an any-time slot */
+function psqLab(sl){if(sl.dur&&!sl.start)return fmtH(sl.dur);const t=x=>{if(!x)return["",""];let[h,m]=x.split(":").map(Number);const ap=h>=12?"p":"a";h=h%12||12;return[h+(m?":"+String(m).padStart(2,"0"):""),ap]};const a=t(sl.start),b=t(sl.end);if(!b[0])return a[0]+a[1];return a[0]+(a[1]===b[1]?"":a[1])+"–"+b[0]+b[1]}
+function schedSquares(d,p){const mon=monday(0),TD=today();
+  return `<div class="psq" role="list">${DAYS.map((dn,i)=>{const dt=new Date(mon);dt.setDate(dt.getDate()+i);const ds=ymd(dt);
+    const ss=(p.slots||[]).filter(sl=>!isWk(sl)&&sl.day===i&&(sl.once?sl.once===ds:!(sl.until&&ds>sl.until))).sort((a,b)=>(a.start||"99")<(b.start||"99")?-1:1);
+    const ch=ss.slice(0,3).map(sl=>`<i class="st-${slotState(d,p,sl,ds)}">${psqLab(sl)}</i>`).join("")+(ss.length>3?`<i class="more">+${ss.length-3}</i>`:"");
+    return `<button type="button" class="psq-d${ds===TD?" td":""}${ds<TD?" past":""}" data-swin role="listitem" aria-label="${DAYSF[i]} ${dt.getDate()}: ${ss.length?ss.length+" slot"+(ss.length>1?"s":""):"nothing scheduled"}. Open the week"><span class="psq-h"><b>${dn}</b><em>${dt.getDate()}</em></span><span class="psq-s">${ch||'<i class="none">—</i>'}</span></button>`}).join("")}</div>`}
+function schedWinHtml(d){if(!schedWin)return "";const P=d.passions||[],p=P.find(x=>x.id===selP)||sortPass(P)[0];if(!p){schedWin=false;return ""}
+  return `<div class="swin" data-swinbg><div class="panel pdetail swin-p" data-schedp="${p.id}" role="dialog" aria-modal="true" aria-label="Weekly schedule for ${esc(p.name)}"><div class="ph psched-h"><span>${PTI.schedule||""}Weekly schedule <em>·</em> <b>${esc(p.name)}</b></span><button type="button" class="swin-x" data-swinx aria-label="Close">×</button></div>${schedView(d,p)}</div></div>`}
+document.addEventListener("click",e=>{const t=e.target;if(!t.closest)return;
+  if(t.closest("[data-swin]")){schedWin=true;render();return}
+  if(t.closest("[data-swinx]")||(t.matches&&t.matches("[data-swinbg]"))){schedWin=false;render()}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&schedWin){schedWin=false;render()}});
 /* using the schedule when no passion is picked picks the one it shows, so its buttons and forms work */
 ["click","submit","input","change"].forEach(ev=>document.addEventListener(ev,e=>{const w=e.target.closest&&e.target.closest("[data-schedp]");if(w&&selP!==w.dataset.schedp&&!data.passions.some(x=>x.id===selP))selP=w.dataset.schedp},true));
 let editSlot=null,addingSlot=false,manSlots=false,addDay=null,selSlot=null;
@@ -6039,7 +6071,7 @@ const slShort=(a,b)=>`${fmtTime(a).replace(/\s+/,"\u202f")}–${fmtTime(b).repla
 const slRange=(a,b)=>{const A=fmtTime(a),B=fmtTime(b),mA=A.match(/^(.*?)\s*([AP]\.?M\.?)$/i),mB=B.match(/^(.*?)\s*([AP]\.?M\.?)$/i);return mA&&mB&&mA[2]===mB[2]?`<span class="nw">${mA[1]}–</span><wbr><span class="nw">${B}</span>`:`<span class="nw">${A} –</span><wbr> <span class="nw">${B}</span>`};
 function schedView(d,p){
   wkOff=0;
-  const lay=((data.profile||{}).schedView)||"rows";
+  const lay="rows"; /* column view removed — was: ((data.profile||{}).schedView)||"rows" */
   const mon=monday(wkOff),slots=(p.slots||[]).slice().sort((a,b)=>a.day-b.day||((a.start||"99")<(b.start||"99")?-1:1));
   const end=new Date(mon);end.setDate(end.getDate()+6);
   let planned=0,doneM=0,doneN=0,missN=0;
@@ -6058,7 +6090,7 @@ function schedView(d,p){
       return `<button class="wkq st-${st}${on?" sel":""}" data-selslot="${sl.id}:${wk0}" aria-expanded="${!!on}" aria-label="${fmtH(sl.dur)} this ${pw(sl)}, ${fmtH(lg)} logged. Tap for details"><b>${slFreq(sl)} · ${fmtH(sl.dur)}</b><span class="wkq-bar"><i style="width:${Math.min(100,lg/sl.dur*100).toFixed(1)}%"></i></span><small>${lg>=sl.dur?"✓ Done":fmtH(lg)+" logged · "+fmtH(sl.dur-lg)+" to go"}</small></button>`}).join("");return q?`<div class="wkqs">${q}</div>`:""})();   /* progress only: every input lives inside the days */
   const label=wkOff===0?"This week":wkOff===-1?"Last week":wkOff===1?"Next week":`${fmtDate(ymd(mon))} – ${fmtDate(ymd(end))}`;
   return `<div class="wknav"><b>This week</b><small>${fmtDate(ymd(mon))} – ${fmtDate(ymd(end))}</small>
-     <span class="seg2" role="group" aria-label="Layout"><button data-slay="rows" aria-pressed="${lay==="rows"}">Rows</button><button data-slay="cols" aria-pressed="${lay==="cols"}">Columns</button></span>
+     ${/* Rows/Columns toggle removed: <span class="seg2" role="group" aria-label="Layout"><button data-slay="rows">Rows</button><button data-slay="cols">Columns</button></span> */""}
      <span class="wsum">${slots.length?`${doneN} done${missN?` · <b class="miss">${missN} missed</b>`:""} · ${fmtH(doneM)} of ${fmtH(planned)}`:"No time slots yet"}</span></div>
    ${wkRow}<div class="week${lay==="rows"?" rows":""}">${cols.join("")}</div>${addDay!=null&&addDay!=="wk"&&narrow?(()=>{const dt=new Date(mon);dt.setDate(dt.getDate()+addDay);return dayForm(addDay,ymd(dt),true)})():""}${slots.length||addDay!=null?"":`<p class="note" style="text-align:center;margin:10px 0 0">No time slots yet. Tap + under a day to add one.</p>`}
    ${slotDetail(d,p)}
@@ -6122,7 +6154,7 @@ function vPass(){
     ${figurePanel()}
     ${/* was: commitPanel(d,P,wk) + passSched(d) as two panels — now one */""}<div class="stack" style="grid-template-rows:auto 1fr;align-content:stretch"><div class="panel cs-combo">${commitPanel(d,P,wk).replace('<div class="panel cs">','<div class="cs">')}<div class="cs-split"></div>${passSched(d).replace('class="panel pdetail psched"','class="psched"')}</div>${passList(d,P,wk)}</div>
   </div>
-  ${passDetail(d)}
+  ${passDetail(d)}${schedWinHtml(d)}
 `;
 }
 const WALLS=[
@@ -6776,7 +6808,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="436",APPT="2026-11-21T20:42:00Z";   /* APPT: when this update was made */
+const APPV="436",APPT="2026-11-21T20:47:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
