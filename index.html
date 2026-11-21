@@ -1547,6 +1547,13 @@ html .panel.ked.ked,html.tpl-spa .panel.ked.ked,html.lk-orange .panel.ked.ked{ba
 .ked .ked-sec .ked-r .ked-u{font-size:13px!important}.ked .ked-sec .ked-r .ked-n{font-size:15px!important}
 .ked .ked-sec .ked-kw{display:flex;align-items:baseline;gap:2px}.ked .ked-sec .ked-r .ked-k{width:44px;font-size:13px!important;text-align:right}
 .ked .ked-sec .ked-r .fd-ic{align-self:center;padding:0;font-size:14px}
+
+/* ingredients fill across: left, middle, right, then the next line */
+.ked .ked-cols{column-count:auto!important;column-rule:none!important;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 24px;align-items:end}
+@media (max-width:760px){.ked .ked-cols{grid-template-columns:repeat(2,minmax(0,1fr))}}@media (max-width:480px){.ked .ked-cols{grid-template-columns:1fr}}
+.ked .ked-sec{display:contents}
+.ked .ked-gh{grid-column:1/-1;margin:12px 0 2px}.ked .ked-sec:first-child .ked-gh{margin-top:0}
+.ked .ked-more{grid-column:1/-1;justify-self:start;margin:0 0 4px}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -6746,7 +6753,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="434",APPT="2026-11-21T19:33:00Z";   /* APPT: when this update was made */
+const APPV="435",APPT="2026-11-21T19:36:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
