@@ -1375,6 +1375,7 @@ html.tpl-bg #tplbg i:nth-child(1){width:28vw;height:28vw;left:-4vw;top:-6vw;back
 html.tpl-bg #tplbg i:nth-child(2){width:20vw;height:20vw;right:-2vw;top:24vh;background:#ffb25e;opacity:.4;animation-delay:-7s;animation-duration:26s}
 html.tpl-bg #tplbg i:nth-child(3){width:24vw;height:24vw;left:36vw;bottom:-10vw;background:#ff6a1f;opacity:.42;animation-delay:-13s;animation-duration:30s}
 html.tpl-bg #tplbg i:nth-child(4){display:none;width:24vw;height:24vw;left:12vw;bottom:12vh;background:#ffd59a;opacity:.22;animation-delay:-4s;animation-duration:18s}
+html.tpl-bg #tplfx{position:absolute;inset:0;width:100%;height:100%}
 html.tpl-bg #tplbg b{position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 40%,transparent,rgba(5,2,0,.55));opacity:.9}
 @keyframes spaOrb{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(3%,4%) scale(1.08)}66%{transform:translate(-3%,2%) scale(.94)}}
 html.tpl-bg #bgimg,html.tpl-bg #bgimg2,html.tpl-bg #bglive,html.tpl-bg #bgspin,html.tpl-bg .bgshade{visibility:hidden}
@@ -2074,7 +2075,7 @@ body.dbg-off .dbg-n{display:none}body.dbg-off .dbg-box{outline:none}
 </style>
 
 <div id="bgimg" class="on" aria-hidden="true"></div><div id="bgimg2" aria-hidden="true"></div><canvas id="bglive" aria-hidden="true"></canvas><div id="bgspin" aria-hidden="true"></div>
-<div class="bgshade" aria-hidden="true"></div><div id="tplbg" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></div>
+<div class="bgshade" aria-hidden="true"></div><div id="tplbg" aria-hidden="true"><i></i><i></i><i></i><i></i><canvas id="tplfx"></canvas><b></b></div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
   <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   <linearGradient id="gCyan" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4cc9ff" stop-opacity=".3"/><stop offset="1" stop-color="#4cc9ff" stop-opacity="0"/></linearGradient>
@@ -6141,12 +6142,26 @@ function sampleColor(src){if(wallColor.has(src))return Promise.resolve(wallColor
 let toneNow=.5;function setTint(h,s,l=.27){const r=document.documentElement.style,q=toneNow,sf=.4+1.2*q,lf=1.45-.9*q;r.setProperty("--tA",hsl2rgb(h,Math.min(s*sf,.95),l*lf));r.setProperty("--tD",hsl2rgb(h,Math.min(1,s*.75*sf),.075*lf));r.setProperty("--tX",hsl2rgb(h,Math.min(1,s*.8*sf),.045*lf));const tl=hsl2rgb(h,Math.max(.35,Math.min(1,s*1.4)),.66);r.setProperty("--tL",tl);const lines=lookOf().lines!==false;r.setProperty("--lr",lines?tl:"76,170,255");r.setProperty("--lrd",lines?hsl2rgb(h,Math.min(.7,s),.27):"27,42,99");r.setProperty("--tB",hsl2rgb(h,Math.min(.65,s),.59))}
 const passLook=()=>{if(mainOnly())return null;const p=ctxPass(),c=ctxCat(),o=Object.assign({},c&&c.look||{},p&&p.look||{});return Object.keys(o).length?o:null};
 /* templates: a whole-page look (colours, glass, type, backdrop). Your own Boxes settings come back when you turn it off */
+/* Spa backdrop: thin streaks of dark energy drifting through the glow (a slow flow field). Light on the iPad: ~30 fps, stops when hidden or off */
+const spaFx={raf:0,run(){if(this.raf)return;const c=document.getElementById("tplfx");if(!c)return;const x=c.getContext("2d");let W=0,H=0,P=[],last=0,t=0;
+  const fit=()=>{const d=Math.min(2,devicePixelRatio||1);W=c.width=Math.round(innerWidth*d);H=c.height=Math.round(innerHeight*d);x.fillStyle="#000";x.clearRect(0,0,W,H);P=[...Array(130)].map(()=>({x:Math.random()*W,y:Math.random()*H,l:Math.random()*300}))};fit();addEventListener("resize",fit);
+  const field=(px,py)=>{const a=Math.sin(px*.0016+t*.12)*1.6+Math.cos(py*.0021-t*.09)*1.4+Math.sin((px+py)*.0007+t*.05);return a};
+  const step=now=>{this.raf=requestAnimationFrame(step);if(now-last<33)return;last=now;t+=.033;
+    if(!document.documentElement.classList.contains("tpl-bg")||document.hidden){return}
+    x.globalCompositeOperation="destination-out";x.fillStyle="rgba(0,0,0,.03)";x.fillRect(0,0,W,H);x.globalCompositeOperation="source-over";
+    const s=Math.min(2,devicePixelRatio||1);
+    for(const p of P){const a=field(p.x,p.y),nx=p.x+Math.cos(a)*1.6*s,ny=p.y+Math.sin(a)*1.6*s;
+      x.strokeStyle="rgba(0,0,0,.8)";x.lineWidth=1.4*s;x.beginPath();x.moveTo(p.x,p.y);x.lineTo(nx,ny);x.stroke();
+      x.strokeStyle="rgba(255,150,70,.13)";x.lineWidth=.7*s;x.beginPath();x.moveTo(p.x+s,p.y+s);x.lineTo(nx+s,ny+s);x.stroke();
+      p.x=nx;p.y=ny;if(--p.l<0||p.x<-20||p.y<-20||p.x>W+20||p.y>H+20){p.x=Math.random()*W;p.y=Math.random()*H;p.l=150+Math.random()*300}}};
+  this.raf=requestAnimationFrame(step)},
+  stop(){cancelAnimationFrame(this.raf);this.raf=0}};
 const TEMPLATES=[{id:"spa",name:"Spa",sub:"Warm orange ambience, soft glass, slow glow",look:{color:"orange",glass:70,tone:42},bg:true}];
 const tplOf=()=>TEMPLATES.find(t=>t.id===(data.profile||{}).template)||null;
 const tplBgOn=()=>{const t=tplOf();return !!(t&&t.bg&&(data.profile||{}).tplBg!==false)};
 const effLook=()=>{const g=lookOf(),pl=passLook()||{},T=tplOf();if(T)return Object.assign({color:g.color,glass:g.glass,trans:g.trans,tone:g.tone??50},T.look);return {color:pl.color||g.color,glass:pl.glass??g.glass,trans:pl.trans??g.trans,tone:pl.tone??g.tone??50}};
 function applyLook(tmp){tmp=typeof tmp==="number"?{glass:tmp}:(tmp||{});const L=effLook(),g=(tmp.glass??L.glass)/100,t=(tmp.trans??L.trans)/100,r=document.documentElement.style;toneNow=(tmp.tone??L.tone)/100;r.setProperty("--go",(1-t*.88).toFixed(3));r.setProperty("--gb",(4+g*24).toFixed(1)+"px");
-  if(L.color==="auto"){const w=passWall()||wallOf();sampleColor(w.src).then(c=>{if(effLook().color==="auto"&&(passWall()||wallOf()).src===w.src)setTint(c.h,c.s)})}else{const P=LOOKS.find(x=>x.id===L.color)||LOOKS[0];setTint(P.h,P.s,P.l)}document.documentElement.classList.toggle("lk-orange",L.color==="orange");{const T=tplOf(),h=document.documentElement;TEMPLATES.forEach(x=>h.classList.toggle("tpl-"+x.id,!!T&&T.id===x.id));h.classList.toggle("tpl-bg",tplBgOn())}}
+  if(L.color==="auto"){const w=passWall()||wallOf();sampleColor(w.src).then(c=>{if(effLook().color==="auto"&&(passWall()||wallOf()).src===w.src)setTint(c.h,c.s)})}else{const P=LOOKS.find(x=>x.id===L.color)||LOOKS[0];setTint(P.h,P.s,P.l)}document.documentElement.classList.toggle("lk-orange",L.color==="orange");{const T=tplOf(),h=document.documentElement;TEMPLATES.forEach(x=>h.classList.toggle("tpl-"+x.id,!!T&&T.id===x.id));h.classList.toggle("tpl-bg",tplBgOn());if(tplBgOn()&&!(matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches))spaFx.run();else spaFx.stop()}}
 function tplPanel(){const T=tplOf();return `<div class="panel tplp" style="margin-top:18px"><div class="ph"><span>Templates</span><i>${T?esc(T.name)+" is on":"Whole-page looks"}</i></div>
   <p class="note" style="margin:-2px 0 12px">A template restyles the whole app at once: colours, glass, type and its own backdrop. Your wallpaper and Boxes settings stay saved and come back when you switch it off.</p>
   <div class="tpl-row"><button type="button" class="tpl-c tpl-none" data-tpl="" aria-pressed="${!T}"><span class="tpl-pv"><span>Your own setup</span></span><b>None</b><small>Wallpaper and Boxes as you set them</small></button>${TEMPLATES.map(t=>`<button type="button" class="tpl-c" data-tpl="${t.id}" aria-pressed="${!!T&&T.id===t.id}"><span class="tpl-pv tpl-pv-${t.id}"><i></i><i></i><i></i><em></em><em></em></span><b>${esc(t.name)}</b><small>${esc(t.sub)}</small></button>`).join("")}</div>
@@ -6449,7 +6464,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="404",APPT="2026-11-21T05:39:00Z";   /* APPT: when this update was made */
+const APPV="405",APPT="2026-11-21T05:42:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
