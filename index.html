@@ -6143,17 +6143,20 @@ let toneNow=.5;function setTint(h,s,l=.27){const r=document.documentElement.styl
 const passLook=()=>{if(mainOnly())return null;const p=ctxPass(),c=ctxCat(),o=Object.assign({},c&&c.look||{},p&&p.look||{});return Object.keys(o).length?o:null};
 /* templates: a whole-page look (colours, glass, type, backdrop). Your own Boxes settings come back when you turn it off */
 /* Spa backdrop: thin streaks of dark energy drifting through the glow (a slow flow field). Light on the iPad: ~30 fps, stops when hidden or off */
-const spaFx={raf:0,run(){if(this.raf)return;const c=document.getElementById("tplfx");if(!c)return;const x=c.getContext("2d");let W=0,H=0,P=[],last=0,t=0;
-  const fit=()=>{const d=Math.min(2,devicePixelRatio||1);W=c.width=Math.round(innerWidth*d);H=c.height=Math.round(innerHeight*d);x.fillStyle="#000";x.clearRect(0,0,W,H);P=[...Array(130)].map(()=>({x:Math.random()*W,y:Math.random()*H,l:Math.random()*300}))};fit();addEventListener("resize",fit);
-  const field=(px,py)=>{const a=Math.sin(px*.0016+t*.12)*1.6+Math.cos(py*.0021-t*.09)*1.4+Math.sin((px+py)*.0007+t*.05);return a};
+/* (was) free-flowing smoke streaks; now mirrored into a slowly turning kaleidoscope */
+const spaFx={raf:0,run(){if(this.raf)return;const c=document.getElementById("tplfx");if(!c)return;const x=c.getContext("2d");let W=0,H=0,P=[],last=0,t=0;const N=6;
+  const fit=()=>{const d=Math.min(2,devicePixelRatio||1);W=c.width=Math.round(innerWidth*d);H=c.height=Math.round(innerHeight*d);x.clearRect(0,0,W,H);const R=Math.hypot(W,H)/2;P=[...Array(34)].map(()=>({r:Math.random()*R,a:Math.random()*Math.PI/N,l:200+Math.random()*400,h:Math.random()}))};fit();addEventListener("resize",fit);
   const step=now=>{this.raf=requestAnimationFrame(step);if(now-last<33)return;last=now;t+=.033;
-    if(!document.documentElement.classList.contains("tpl-bg")||document.hidden){return}
-    x.globalCompositeOperation="destination-out";x.fillStyle="rgba(0,0,0,.018)";x.fillRect(0,0,W,H);x.globalCompositeOperation="source-over";
-    const s=Math.min(2,devicePixelRatio||1);
-    for(const p of P){const a=field(p.x,p.y),nx=p.x+Math.cos(a)*1.6*s,ny=p.y+Math.sin(a)*1.6*s;
-      x.lineCap="round";x.strokeStyle="rgba(255,190,90,.05)";x.lineWidth=7*s;x.beginPath();x.moveTo(p.x,p.y);x.lineTo(nx,ny);x.stroke();
-      x.strokeStyle="rgba(255,206,120,.55)";x.lineWidth=.8*s;x.beginPath();x.moveTo(p.x,p.y);x.lineTo(nx,ny);x.stroke();
-      p.x=nx;p.y=ny;if(--p.l<0||p.x<-20||p.y<-20||p.x>W+20||p.y>H+20){p.x=Math.random()*W;p.y=Math.random()*H;p.l=150+Math.random()*300}}};
+    if(!document.documentElement.classList.contains("tpl-bg")||document.hidden)return;
+    x.setTransform(1,0,0,1,0,0);x.globalCompositeOperation="destination-out";x.fillStyle="rgba(0,0,0,.012)";x.fillRect(0,0,W,H);x.globalCompositeOperation="source-over";
+    const s=Math.min(2,devicePixelRatio||1),cx=W/2,cy=H/2,R=Math.hypot(W,H)/2,spin=t*.02;x.lineCap="round";
+    for(const p of P){const f=Math.sin(p.r*.004+t*.3)*.9+Math.cos(p.a*9-t*.2)*.7,nr=p.r+Math.cos(f)*1.8*s,na=p.a+Math.sin(f)*.004;
+      const x0=Math.cos(p.a)*p.r,y0=Math.sin(p.a)*p.r,x1=Math.cos(na)*nr,y1=Math.sin(na)*nr,hue=38+Math.sin(p.h*6.28+t*.15)*14;
+      for(let k=0;k<N;k++)for(const m of [1,-1]){const ang=spin+k*2*Math.PI/N,co=Math.cos(ang),si=Math.sin(ang);x.setTransform(co,si*m,-si,co*m,cx,cy);
+        x.strokeStyle=`hsla(${hue},95%,62%,.05)`;x.lineWidth=7*s;x.beginPath();x.moveTo(x0,y0);x.lineTo(x1,y1);x.stroke();
+        x.strokeStyle=`hsla(${hue},100%,74%,.38)`;x.lineWidth=.8*s;x.beginPath();x.moveTo(x0,y0);x.lineTo(x1,y1);x.stroke()}
+      p.r=nr;p.a=na;if(--p.l<0||p.r<0||p.r>R||p.a<-.2||p.a>Math.PI/N+.2){p.r=Math.random()*R;p.a=Math.random()*Math.PI/N;p.l=200+Math.random()*400}}
+    x.setTransform(1,0,0,1,0,0)};
   this.raf=requestAnimationFrame(step)},
   stop(){cancelAnimationFrame(this.raf);this.raf=0}};
 const TEMPLATES=[{id:"spa",name:"Spa",sub:"Warm orange ambience, soft glass, slow glow",look:{color:"orange",glass:4,tone:42},bg:true}];
@@ -6464,7 +6467,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="409",APPT="2026-11-21T05:56:00Z";   /* APPT: when this update was made */
+const APPV="410",APPT="2026-11-21T05:58:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
