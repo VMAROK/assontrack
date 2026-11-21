@@ -1560,6 +1560,9 @@ html .panel.kpan.kpan{-webkit-backdrop-filter:blur(6px) saturate(1.1)!important;
 .kpan #kOut{max-height:calc(100vh - 380px);min-height:340px;overflow-y:auto;overscroll-behavior:contain;margin:0 -8px;padding:0 8px;scrollbar-width:thin;scrollbar-color:rgba(138,90,28,.45) transparent;-webkit-mask:linear-gradient(180deg,#000 calc(100% - 28px),transparent);mask:linear-gradient(180deg,#000 calc(100% - 28px),transparent)}
 .kpan #kOut::-webkit-scrollbar{width:6px}.kpan #kOut::-webkit-scrollbar-thumb{background:rgba(138,90,28,.45);border-radius:9px}
 .panel.kpan{min-height:0}
+
+/* passions: the weekly schedule panel on its own */
+html .panel.psched{padding-top:20px!important}.psched-h{margin-bottom:8px}.psched-h span{display:flex;align-items:center;gap:8px;font-weight:600}.psched-h svg{width:16px;height:16px;opacity:.8}.psched-h em{font-style:normal;opacity:.45}.psched-h b{color:var(--accent,#ffb648)}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -5937,7 +5940,8 @@ function passHead(d,p){const on=modesOf(p).includes("schedule"),st=passStats(d,p
     <div class="pstats"><div><b>${fmtH(st.tot)}</b><small>Total hours</small></div><div><b>${fmtH(st.month)}</b><small>This month</small></div><div><b>${st.n}</b><small>Sessions</small></div><div${st.missed?' data-missopen role="button" tabindex="0" class="ms-open" title="See what counts as missed"':""}><b class="${st.missed?"miss":""}">${st.missed}</b><small>Missed${st.missed?" · see why":""}</small></div></div></div>`}
 function passDetail(d){
   const p=d.passions.find(x=>x.id===selP);if(!p)return "";
-  const tabs=[...modesOf(p),"tasks","projects"];if(!tabs.includes(pTab))pTab=tabs[0];
+  /* const tabs=[...modesOf(p),"tasks","projects"]; — the weekly schedule now has its own panel (passSched) */
+  const tabs=["tasks","projects"];if(!tabs.includes(pTab))pTab=tabs[0];
   const MN={schedule:"Weekly schedule",tasks:"Tasks",projects:"Projects"},on=modesOf(p).includes("schedule"),st=passStats(d,p);
   return `<div class="panel pdetail" style="margin-top:18px">
     <div class="pd-hero">
@@ -5946,6 +5950,9 @@ function passDetail(d){
     <div class="pd-danger">${delOpen?`<form class="delform" id="delForm"><p><b>Delete ${esc(p.name)} for good?</b> This removes all of its logged hours, time slots, tasks and projects. It can't be undone.</p><label><span>Type <code>delete</code> to confirm</span><input id="delIn" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="delete"></label><div class="del-btns"><button class="btn red" id="delGo" disabled>Delete passion</button><button type="button" class="mv" data-delopen>Cancel</button></div></form>`:`<button class="del-trigger" data-delopen title="Delete this passion" aria-label="Delete ${esc(p.name)}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>`}</div>
   </div>`;
 }
+/* the weekly schedule, on its own panel above My passions */
+function passSched(d){const p=d.passions.find(x=>x.id===selP);if(!p||!modesOf(p).includes("schedule"))return "";
+  return `<div class="panel pdetail psched"><div class="ph psched-h"><span>${PTI.schedule||""}Weekly schedule <em>·</em> <b>${esc(p.name)}</b></span></div>${schedView(d,p)}</div>`}
 let editSlot=null,addingSlot=false,manSlots=false,addDay=null,selSlot=null;
 const DAYSF=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const SDI={rep:`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 013-3h15M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 01-3 3H3"/></svg>`,clock:`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`,hist:`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-3"/></svg>`,
@@ -6105,9 +6112,9 @@ function vPass(){
   const fk=(data.profile&&data.profile.figure)||"woman";
   return banner()+`<div class="passtop">
     ${figurePanel()}
-    <div class="stack" style="grid-template-rows:auto auto 1fr;align-content:stretch">${commitPanel(d,P,wk)}${passDetail(d).replace('class="panel pdetail" style="margin-top:18px"','class="panel pdetail pd-top"')}${passList(d,P,wk)}</div>
+    <div class="stack" style="grid-template-rows:auto auto 1fr;align-content:stretch">${commitPanel(d,P,wk)}${passSched(d)}${passList(d,P,wk)}</div>
   </div>
-  ${/* weekly schedule used to sit below everything — now it sits on top of My passions:  passDetail(d) */""}
+  ${passDetail(d)}
 `;
 }
 const WALLS=[
@@ -6761,7 +6768,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="436",APPT="2026-11-21T20:25:00Z";   /* APPT: when this update was made */
+const APPV="436",APPT="2026-11-21T20:30:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
