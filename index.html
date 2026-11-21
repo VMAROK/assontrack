@@ -1563,6 +1563,10 @@ html .panel.kpan.kpan{-webkit-backdrop-filter:blur(6px) saturate(1.1)!important;
 
 /* passions: the weekly schedule panel on its own */
 html .panel.psched{padding-top:20px!important}.psched-h{margin-bottom:8px}.psched-h span{display:flex;align-items:center;gap:8px;font-weight:600}.psched-h svg{width:16px;height:16px;opacity:.8}.psched-h em{font-style:normal;opacity:.45}.psched-h b{color:var(--accent,#ffb648)}
+
+/* passions: commitment score + weekly schedule share one panel */
+.cs-combo>.cs{padding:0;margin:0;background:none!important;border:0!important;box-shadow:none!important}
+.cs-split{height:1px;margin:18px -4px 16px;background:linear-gradient(90deg,transparent,rgba(255,200,150,.22),transparent)}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -6116,7 +6120,7 @@ function vPass(){
   const fk=(data.profile&&data.profile.figure)||"woman";
   return banner()+`<div class="passtop">
     ${figurePanel()}
-    <div class="stack" style="grid-template-rows:auto auto 1fr;align-content:stretch">${commitPanel(d,P,wk)}${passSched(d)}${passList(d,P,wk)}</div>
+    ${/* was: commitPanel(d,P,wk) + passSched(d) as two panels — now one */""}<div class="stack" style="grid-template-rows:auto 1fr;align-content:stretch"><div class="panel cs-combo">${commitPanel(d,P,wk).replace('<div class="panel cs">','<div class="cs">')}<div class="cs-split"></div>${passSched(d).replace('class="panel pdetail psched"','class="psched"')}</div>${passList(d,P,wk)}</div>
   </div>
   ${passDetail(d)}
 `;
@@ -6772,7 +6776,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="436",APPT="2026-11-21T20:40:00Z";   /* APPT: when this update was made */
+const APPV="436",APPT="2026-11-21T20:42:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
