@@ -2948,6 +2948,38 @@ Cola|42|0|10.6|0|355|1 can
 Beer|43|0.5|3.6|0|355|1 can
 Wine, red|85|0.1|2.6|0|147|1 glass
 Coffee, black|1|0.1|0|0|240|1 cup
+Salt|0|0|0|0|1.5|1/4 tsp
+Sea salt|0|0|0|0|1.5|1/4 tsp
+Black pepper, ground|251|10.4|64|3.3|0.6|1/4 tsp
+Garlic powder|331|16.6|72.7|0.7|3.1|1 tsp
+Onion powder|341|10.4|79.1|1|2.4|1 tsp
+Paprika|282|14.1|54|12.9|2.3|1 tsp
+Chili powder|282|13.5|49.7|14.3|2.7|1 tsp
+Cumin, ground|375|17.8|44.2|22.3|2.1|1 tsp
+Cinnamon, ground|247|4|80.6|1.2|2.6|1 tsp
+Oregano, dried|265|9|68.9|4.3|1|1 tsp
+Basil, dried|233|23|47.8|4.1|0.7|1 tsp
+Italian seasoning|265|9|68.9|4.3|1|1 tsp
+Red pepper flakes|318|12|56.6|17.3|0.5|1/4 tsp
+Turmeric, ground|312|9.7|67.1|3.3|3|1 tsp
+Ginger, ground|335|9|71.6|4.2|1.8|1 tsp
+Garlic, raw|149|6.4|33|0.5|3|1 clove
+Ginger, raw|80|1.8|17.8|0.8|6|1 tbsp
+Vegetable oil|884|0|0|100|13.6|1 tbsp
+Soy sauce|53|8.1|4.9|0.6|16|1 tbsp
+Hot sauce|11|0.5|1.8|0.4|5|1 tsp
+Mustard, yellow|60|3.7|5.8|3.3|5|1 tsp
+Vinegar|18|0|0|0|15|1 tbsp
+Lemon juice|22|0.4|6.9|0.2|15|1 tbsp
+All-purpose flour|364|10.3|76.3|1|125|1 cup
+Brown sugar|380|0.1|98.1|0|13|1 tbsp
+Baking soda|0|0|0|0|4.6|1 tsp
+Baking powder|53|0|27.7|0|4.6|1 tsp
+Vanilla extract|288|0.1|12.7|0.1|4.2|1 tsp
+Tomato sauce|24|1.2|5.3|0.3|61|1/4 cup
+Chicken broth|6|0.6|0.4|0.2|240|1 cup
+Heavy cream|340|2.8|2.7|36|15|1 tbsp
+Sour cream|198|2.4|4.6|19.4|30|2 tbsp
 Sports drink|26|0|6.4|0|355|1 bottle`.split("\n").map(l=>{const a=l.split("|");return {id:"b:"+a[0],name:a[0],kcal:+a[1],p:+a[2],c:+a[3],f:+a[4],sv:+a[5],svl:a[6],src:"base"}});
 const MEALT=["Breakfast","Lunch","Dinner","Snack"];
 const mealNow=()=>{const h=new Date().getHours();return h<11?"Breakfast":h<15?"Lunch":h<21?"Dinner":"Snack"};
@@ -6339,7 +6371,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="396",APPT="2026-11-21T04:39:00Z";   /* APPT: when this update was made */
+const APPV="397",APPT="2026-11-21T04:54:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
