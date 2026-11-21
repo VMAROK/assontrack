@@ -1484,6 +1484,10 @@ html .panel.ked.ked,html.tpl-spa .panel.ked.ked,html.lk-orange .panel.ked.ked{ba
 .ked .ing-add{color:#6b4a1f!important;border-color:#c9b08a!important;background:rgba(255,255,255,.45)!important}
 .ked-sum{background:rgba(255,255,255,.55)!important;border-color:#d4c09c!important;color:#7a6346!important;font-family:Georgia,serif}.ked-sum b{color:#2b2118!important}
 .ked .btn{color:#2b2118!important;border-color:#c9b08a!important;background:rgba(255,255,255,.5)!important;box-shadow:none!important}.ked .btn[data-ksave]{background:#2b2118!important;color:#f4ecdc!important;border-color:#2b2118!important}.ked .kdel{color:#b3261e!important}
+
+.kmod{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:24px 16px;overflow-y:auto}
+.kmod-bg{position:fixed;inset:0;border:0;padding:0;background:rgba(3,2,1,.62);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);cursor:default}
+.kmod>.panel.ked{position:relative;width:min(760px,100%);margin:auto;box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 0 60px rgba(150,110,50,.12)!important}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -2819,7 +2823,7 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(d.nwcal!=null){document.getElementById("nwCalPop")?nwCalClose():nwCalOpen(t);return}
   if(d.nwcm){let [y,m]=nwCalM;m+=+d.nwcm;if(m<0){m=11;y--}if(m>11){m=0;y++}nwCalM=[y,m];const o=document.getElementById("nwCalPop");if(o)o.innerHTML=nwCalHTML();return}
   if(d.nwcd)nwGoDate(d.nwcd)},true);
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.getElementById("nwCalPop"))nwCalClose()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.getElementById("nwCalPop"))nwCalClose();else if(e.key==="Escape"&&kEd&&tab==="kitchen"){kEd=null;render()}});
 /* the week strip is a ribbon of day tickets: scroll it freely, it snaps to the nearest day. 5 weeks are drawn; near an end it re-centres */
 const nwLab=(wk0,off)=>{const a=new Date(wk0);a.setDate(a.getDate()+off);const e=new Date(a);e.setDate(e.getDate()+6);const f=x=>x.toLocaleDateString(undefined,{month:"short",day:"numeric"});return f(a)+" – "+f(e)};
 let nwScT=0;
@@ -4672,7 +4676,7 @@ function vKitchen(){const D=dishes();
   return `<div class="grid tiles"><div class="panel tile" style="--c:#ffb468">${ic("fire")}<small>Dishes</small><b>${D.length}</b><em>saved in your kitchen</em></div>
     <div class="panel tile" style="--c:var(--lime)">${ic("star")}<small>Average serving</small><b>${D.length?n0(D.reduce((a,d)=>a+kTot(d).ks,0)/D.length):"–"}</b><em>calories</em></div>
     <div class="panel tile" style="--c:var(--amber)">${ic("bolt")}<small>Servings logged</small><b>${(()=>{const ids=new Set(D.map(d=>d.id)),m=today().slice(0,7);return data.meals.filter(x=>ids.has(x.fid)&&String(x.d).startsWith(m)).length})()}</b><em>from your dishes this month</em></div></div>
-  ${kEd?kEditor():""}
+  ${kEd?`<div class="kmod" role="dialog" aria-modal="true" aria-label="${kEd.id?"Edit dish":"New dish"}"><button type="button" class="kmod-bg" data-kcancel aria-label="Close"></button>${kEditor().replace('style="margin-top:18px"',"")}</div>`:""}
   <div class="panel kpan" style="margin-top:18px"><div class="ph"><span>Your dishes</span><span class="bp-add"><button type="button" data-knew>＋ New dish</button></span></div>
   ${D.length?`<div class="k-bar"><label class="us-q k-find"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="kFind" type="search" autocomplete="off" placeholder="Search dishes or ingredients" value="${esc(kFind)}" aria-label="Search your dishes"></label><span class="seg2" role="group" aria-label="Sort">${[["recent","Recent"],["az","A–Z"],["cal","Calories"]].map(([k,l])=>`<button type="button" data-ksort="${k}" aria-pressed="${kSort===k}">${l}</button>`).join("")}</span></div>`:""}
   <div id="kOut">${kList()}</div></div>`}
@@ -4688,8 +4692,8 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   if(b.dataset.ksort){kSort=b.dataset.ksort;try{localStorage.setItem("aot-ksort",kSort)}catch(x){}document.querySelectorAll("[data-ksort]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.ksort===kSort))}else kOpen=kOpen===b.dataset.kopen?null:b.dataset.kopen;
   const o=$("#kOut");if(o){o.innerHTML=kList();const dt=o.querySelector(".kdt");if(dt&&b.dataset.kopen)dt.scrollIntoView({block:"nearest",behavior:"smooth"})}},true);
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-knew],[data-kedit],[data-kcancel],[data-ksave],[data-kdel],[data-kingadd],[data-kingx],[data-kpick],[data-klog],[data-kbuy]");if(!b)return;e.preventDefault();e.stopPropagation();const d=b.dataset;
-  if(d.knew!=null){kEd={name:"",group:"",serves:"",ing:[{u:"",n:"",k:"",price:""}],steps:""};kQ="";render();$("#view").scrollTop=0;setTimeout(()=>{const n=$("#kName");n&&n.focus()},50);return}
-  if(d.kedit){const f=dishes().find(x=>x.id===d.kedit);if(!f)return;kEd=JSON.parse(JSON.stringify({id:f.id,name:f.name,group:f.group||"",serves:String(f.serves||""),ing:f.ing||[],steps:f.steps||""}));if(!kEd.ing.length)kEd.ing.push({u:"",n:"",k:"",price:""});kQ="";render();$("#view").scrollTop=0;return}
+  if(d.knew!=null){kEd={name:"",group:"",serves:"",ing:[{u:"",n:"",k:"",price:""}],steps:""};kQ="";render();setTimeout(()=>{const n=$("#kName");n&&n.focus()},50);return}
+  if(d.kedit){const f=dishes().find(x=>x.id===d.kedit);if(!f)return;kEd=JSON.parse(JSON.stringify({id:f.id,name:f.name,group:f.group||"",serves:String(f.serves||""),ing:f.ing||[],steps:f.steps||""}));if(!kEd.ing.length)kEd.ing.push({u:"",n:"",k:"",price:""});kQ="";render();return}
   if(d.kcancel!=null){kEd=null;render();return}
   if(d.kingadd!=null){kRead();kEd.ing.push({u:"",n:"",k:"",price:""});kRe();return}
   if(d.kingx!=null){kRead();kEd.ing.splice(+d.kingx,1);if(!kEd.ing.length)kEd.ing.push({u:"",n:"",k:"",price:""});kRe();return}
@@ -6662,7 +6666,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="424",APPT="2026-11-21T18:50:00Z";   /* APPT: when this update was made */
+const APPV="425",APPT="2026-11-21T18:52:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
