@@ -6148,11 +6148,11 @@ const spaFx={raf:0,run(){if(this.raf)return;const c=document.getElementById("tpl
   const field=(px,py)=>{const a=Math.sin(px*.0016+t*.12)*1.6+Math.cos(py*.0021-t*.09)*1.4+Math.sin((px+py)*.0007+t*.05);return a};
   const step=now=>{this.raf=requestAnimationFrame(step);if(now-last<33)return;last=now;t+=.033;
     if(!document.documentElement.classList.contains("tpl-bg")||document.hidden){return}
-    x.globalCompositeOperation="destination-out";x.fillStyle="rgba(0,0,0,.03)";x.fillRect(0,0,W,H);x.globalCompositeOperation="source-over";
+    x.globalCompositeOperation="destination-out";x.fillStyle="rgba(0,0,0,.018)";x.fillRect(0,0,W,H);x.globalCompositeOperation="source-over";
     const s=Math.min(2,devicePixelRatio||1);
     for(const p of P){const a=field(p.x,p.y),nx=p.x+Math.cos(a)*1.6*s,ny=p.y+Math.sin(a)*1.6*s;
-      x.strokeStyle="rgba(0,0,0,.8)";x.lineWidth=1.4*s;x.beginPath();x.moveTo(p.x,p.y);x.lineTo(nx,ny);x.stroke();
-      x.strokeStyle="rgba(255,150,70,.13)";x.lineWidth=.7*s;x.beginPath();x.moveTo(p.x+s,p.y+s);x.lineTo(nx+s,ny+s);x.stroke();
+      x.strokeStyle="rgba(255,140,60,.22)";x.lineWidth=3*s;x.beginPath();x.moveTo(p.x,p.y);x.lineTo(nx,ny);x.stroke();
+      x.strokeStyle="rgba(0,0,0,.95)";x.lineWidth=1.3*s;x.beginPath();x.moveTo(p.x,p.y);x.lineTo(nx,ny);x.stroke();
       p.x=nx;p.y=ny;if(--p.l<0||p.x<-20||p.y<-20||p.x>W+20||p.y>H+20){p.x=Math.random()*W;p.y=Math.random()*H;p.l=150+Math.random()*300}}};
   this.raf=requestAnimationFrame(step)},
   stop(){cancelAnimationFrame(this.raf);this.raf=0}};
@@ -6161,7 +6161,7 @@ const tplOf=()=>TEMPLATES.find(t=>t.id===(data.profile||{}).template)||null;
 const tplBgOn=()=>{const t=tplOf();return !!(t&&t.bg&&(data.profile||{}).tplBg!==false)};
 const effLook=()=>{const g=lookOf(),pl=passLook()||{},T=tplOf();if(T)return Object.assign({color:g.color,glass:g.glass,trans:g.trans,tone:g.tone??50},T.look);return {color:pl.color||g.color,glass:pl.glass??g.glass,trans:pl.trans??g.trans,tone:pl.tone??g.tone??50}};
 function applyLook(tmp){tmp=typeof tmp==="number"?{glass:tmp}:(tmp||{});const L=effLook(),g=(tmp.glass??L.glass)/100,t=(tmp.trans??L.trans)/100,r=document.documentElement.style;toneNow=(tmp.tone??L.tone)/100;r.setProperty("--go",(1-t*.88).toFixed(3));r.setProperty("--gb",(4+g*24).toFixed(1)+"px");
-  if(L.color==="auto"){const w=passWall()||wallOf();sampleColor(w.src).then(c=>{if(effLook().color==="auto"&&(passWall()||wallOf()).src===w.src)setTint(c.h,c.s)})}else{const P=LOOKS.find(x=>x.id===L.color)||LOOKS[0];setTint(P.h,P.s,P.l)}document.documentElement.classList.toggle("lk-orange",L.color==="orange");{const T=tplOf(),h=document.documentElement;TEMPLATES.forEach(x=>h.classList.toggle("tpl-"+x.id,!!T&&T.id===x.id));h.classList.toggle("tpl-bg",tplBgOn());if(tplBgOn()&&!(matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches))spaFx.run();else spaFx.stop()}}
+  if(L.color==="auto"){const w=passWall()||wallOf();sampleColor(w.src).then(c=>{if(effLook().color==="auto"&&(passWall()||wallOf()).src===w.src)setTint(c.h,c.s)})}else{const P=LOOKS.find(x=>x.id===L.color)||LOOKS[0];setTint(P.h,P.s,P.l)}document.documentElement.classList.toggle("lk-orange",L.color==="orange");{const T=tplOf(),h=document.documentElement;TEMPLATES.forEach(x=>h.classList.toggle("tpl-"+x.id,!!T&&T.id===x.id));h.classList.toggle("tpl-bg",tplBgOn());if(tplBgOn())spaFx.run();else spaFx.stop()}}
 function tplPanel(){const T=tplOf();return `<div class="panel tplp" style="margin-top:18px"><div class="ph"><span>Templates</span><i>${T?esc(T.name)+" is on":"Whole-page looks"}</i></div>
   <p class="note" style="margin:-2px 0 12px">A template restyles the whole app at once: colours, glass, type and its own backdrop. Your wallpaper and Boxes settings stay saved and come back when you switch it off.</p>
   <div class="tpl-row"><button type="button" class="tpl-c tpl-none" data-tpl="" aria-pressed="${!T}"><span class="tpl-pv"><span>Your own setup</span></span><b>None</b><small>Wallpaper and Boxes as you set them</small></button>${TEMPLATES.map(t=>`<button type="button" class="tpl-c" data-tpl="${t.id}" aria-pressed="${!!T&&T.id===t.id}"><span class="tpl-pv tpl-pv-${t.id}"><i></i><i></i><i></i><em></em><em></em></span><b>${esc(t.name)}</b><small>${esc(t.sub)}</small></button>`).join("")}</div>
@@ -6464,7 +6464,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="405",APPT="2026-11-21T05:42:00Z";   /* APPT: when this update was made */
+const APPV="406",APPT="2026-11-21T05:46:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
