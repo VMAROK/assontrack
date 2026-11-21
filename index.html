@@ -6143,17 +6143,21 @@ let toneNow=.5;function setTint(h,s,l=.27){const r=document.documentElement.styl
 const passLook=()=>{if(mainOnly())return null;const p=ctxPass(),c=ctxCat(),o=Object.assign({},c&&c.look||{},p&&p.look||{});return Object.keys(o).length?o:null};
 /* templates: a whole-page look (colours, glass, type, backdrop). Your own Boxes settings come back when you turn it off */
 /* Spa backdrop: thin streaks of dark energy drifting through the glow (a slow flow field). Light on the iPad: ~30 fps, stops when hidden or off */
-/* Spa backdrop lines: a calm abstract ribbon of thin gold hairlines, like silk, swaying very slowly behind the panels */
-const spaFx={raf:0,run(){if(this.raf)return;const c=document.getElementById("tplfx");if(!c)return;const x=c.getContext("2d");let W=0,H=0,last=0,t=Math.random()*100;
+/* Spa backdrop: a calm gold kaleidoscope of thin hairlines behind the panels; it turns and breathes slowly, no trails */
+const spaFx={raf:0,run(){if(this.raf)return;const c=document.getElementById("tplfx");if(!c)return;const x=c.getContext("2d");let W=0,H=0,last=0,t=Math.random()*50;const N=8;
   const fit=()=>{const d=Math.min(2,devicePixelRatio||1);W=c.width=Math.round(innerWidth*d);H=c.height=Math.round(innerHeight*d)};fit();addEventListener("resize",fit);
-  const ribbon=(n,y0,amp,ph,sp,col)=>{for(let i=0;i<n;i++){const k=i/(n-1);x.strokeStyle=`rgba(${col},${(.05+.22*Math.sin(k*Math.PI)).toFixed(3)})`;x.beginPath();
-      for(let px=-20;px<=W+20;px+=W/60){const u=px/W,y=H*y0+Math.sin(u*3.1+t*sp+ph+k*.9)*H*amp*(.6+.4*k)+Math.sin(u*7.3-t*sp*.7+k*1.7)*H*.018+k*H*.012;px<0?x.moveTo(px,y):x.lineTo(px,y)}x.stroke()}};
+  const C=[{A:.32,f:.011,sp:.11,ph:0,col:"255,200,120",al:.30},{A:.22,f:.017,sp:-.08,ph:1.3,col:"255,170,90",al:.24},{A:.45,f:.006,sp:.06,ph:2.1,col:"255,215,150",al:.18},{A:.14,f:.026,sp:.13,ph:3.4,col:"255,150,70",al:.22},{A:.6,f:.004,sp:-.05,ph:4.2,col:"255,190,110",al:.14}];
   const step=now=>{this.raf=requestAnimationFrame(step);if(now-last<50)return;last=now;t+=.05;
     if(!document.documentElement.classList.contains("tpl-bg")||document.hidden)return;
-    const s=Math.min(2,devicePixelRatio||1);x.clearRect(0,0,W,H);x.lineWidth=.7*s;
-    ribbon(22,.36,.13,0,.05,"255,196,110");ribbon(16,.7,.1,2.2,.04,"255,160,80")};
+    const s=Math.min(2,devicePixelRatio||1),R=Math.hypot(W,H)*.55,cx=W*.5,cy=H*.48,rot=t*.012,br=1+Math.sin(t*.08)*.04;
+    x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,W,H);x.lineWidth=.7*s;
+    const paths=C.map(q=>{const pts=[];for(let r=6*s;r<=R;r+=R/90){const off=q.A*Math.sin(r*q.f/s+t*q.sp+q.ph)*(r/R);pts.push([Math.cos(off)*r*br,Math.sin(off)*r*br])}return pts});
+    for(let k=0;k<N;k++)for(const m of [1,-1]){const ang=rot+k*2*Math.PI/N,co=Math.cos(ang),si=Math.sin(ang);x.setTransform(co,si,-si*m,co*m,cx,cy);
+      C.forEach((q,i)=>{const P=paths[i];x.strokeStyle=`rgba(${q.col},${q.al})`;x.beginPath();x.moveTo(P[0][0],P[0][1]);for(let j=1;j<P.length;j++)x.lineTo(P[j][0],P[j][1]);x.stroke()})}
+    x.setTransform(1,0,0,1,0,0);const g=x.createRadialGradient(cx,cy,0,cx,cy,R);g.addColorStop(0,"rgba(0,0,0,0)");g.addColorStop(.55,"rgba(0,0,0,0)");g.addColorStop(1,"rgba(0,0,0,.9)");x.globalCompositeOperation="destination-out";x.fillStyle=g;x.fillRect(0,0,W,H);x.globalCompositeOperation="source-over"};
   this.raf=requestAnimationFrame(step)},
   stop(){cancelAnimationFrame(this.raf);this.raf=0}};
+/* earlier: silk ribbons (v411), kaleidoscope trails (v410), black smoke (v405–v408) are in git history */
 /* earlier versions (kaleidoscope streaks, black smoke) are in git history (v405–v410) */
 const TEMPLATES=[{id:"spa",name:"Spa",sub:"Warm orange ambience, soft glass, slow glow",look:{color:"orange",glass:4,tone:42},bg:true}];
 const tplOf=()=>TEMPLATES.find(t=>t.id===(data.profile||{}).template)||null;
@@ -6463,7 +6467,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="411",APPT="2026-11-21T06:01:00Z";   /* APPT: when this update was made */
+const APPV="412",APPT="2026-11-21T06:09:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
