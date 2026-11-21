@@ -1326,11 +1326,13 @@ button,[role=button],a,input,select,label{touch-action:manipulation}@media (poin
 /* the doors */
 .nw-c{position:relative;overflow:hidden}
 .nw-gw{position:absolute;left:0;right:0;top:var(--nwth,37px);bottom:0;overflow:hidden;pointer-events:none;z-index:4}
-.nw-gate{position:absolute;inset:0;transform:translateY(0);transition:transform .5s cubic-bezier(.6,-.25,.35,1);
-  background:linear-gradient(90deg,rgba(255,255,255,.05),transparent 18%,transparent 82%,rgba(255,255,255,.04)),repeating-linear-gradient(180deg,rgba(26,36,58,.97) 0 11px,rgba(16,23,40,.98) 11px 12px),rgb(18,26,44);
-  box-shadow:inset 0 1px 0 rgba(0,0,0,.6),inset 0 -1px 0 rgba(255,255,255,.04)}
-.nw-gl{position:absolute;left:8%;right:8%;bottom:0;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,rgba(var(--tL),.9) 20%,#e9f8ff 50%,rgba(var(--tL),.9) 80%,transparent);box-shadow:0 0 6px rgba(var(--tL),.9),0 0 14px rgba(var(--tL),.5);opacity:.55}
-.nw-gs{position:absolute;left:50%;top:46%;width:22px;height:4px;margin-left:-11px;border-radius:3px;background:rgba(var(--tL),.35);box-shadow:0 8px 0 rgba(var(--tL),.2),0 0 8px rgba(var(--tL),.35)}
+.nw-gate{position:absolute;inset:0;transform:translateY(0);transition:transform .55s cubic-bezier(.65,0,.35,1);
+  background:linear-gradient(155deg,rgba(255,255,255,.16),rgba(255,255,255,.04) 38%,rgba(190,225,255,.07) 62%,rgba(255,255,255,.12)),rgba(14,24,46,.38);
+  -webkit-backdrop-filter:blur(9px) saturate(1.35);backdrop-filter:blur(9px) saturate(1.35);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 1px 0 0 rgba(255,255,255,.08),inset -1px 0 0 rgba(255,255,255,.08),inset 0 -1px 0 rgba(var(--tL),.35)}
+.nw-gate::before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.14) 42%,transparent 52%);pointer-events:none}
+.nw-gl{position:absolute;left:10%;right:10%;bottom:0;height:1.5px;border-radius:2px;background:linear-gradient(90deg,transparent,rgba(var(--tL),.9) 20%,#e9f8ff 50%,rgba(var(--tL),.9) 80%,transparent);box-shadow:0 0 6px rgba(var(--tL),.9),0 0 14px rgba(var(--tL),.5);opacity:.55}
+.nw-gs{display:none}
 .nw-row.gopen .nw-gate,.nw-d.sel .nw-gate{transform:translateY(-101%)}
 .nw-gate.slam{animation:nwSlam .78s both;animation-delay:calc(var(--i)*55ms + .15s)}.nw-gate.slam .nw-gl{animation:nwThud .78s both;animation-delay:calc(var(--i)*55ms + .15s)}
 @keyframes nwSlam{0%{transform:translateY(-101%);animation-timing-function:cubic-bezier(.55,0,1,.45)}50%{transform:translateY(0);animation-timing-function:cubic-bezier(0,.55,.45,1)}66%{transform:translateY(-9%);animation-timing-function:cubic-bezier(.55,0,1,.45)}80%{transform:translateY(0);animation-timing-function:cubic-bezier(0,.55,.45,1)}90%{transform:translateY(-2.5%);animation-timing-function:cubic-bezier(.55,0,1,.45)}100%{transform:translateY(0)}}
@@ -2632,15 +2634,17 @@ const NWEYE=['<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke
 const NWDROP=(g,L,delay)=>{g.style.transition="none";g.style.transform="";return g.animate([{transform:`translateY(-${L}%)`,easing:"cubic-bezier(.55,0,1,.45)"},{transform:"translateY(0)",offset:.5,easing:"cubic-bezier(0,.55,.45,1)"},{transform:`translateY(-${Math.min(10,L*.22)}%)`,offset:.68,easing:"cubic-bezier(.55,0,1,.45)"},{transform:"translateY(0)",offset:.82,easing:"cubic-bezier(0,.55,.45,1)"},{transform:`translateY(-${Math.min(3,L*.07)}%)`,offset:.91,easing:"cubic-bezier(.55,0,1,.45)"},{transform:"translateY(0)"}],{duration:Math.round(480+L*7),delay:delay||0})};
 const NWTHUD=(g,delay,dur)=>{const l=g.querySelector(".nw-gl");l&&l.animate([{opacity:.55},{opacity:.55,offset:.48},{opacity:1,filter:"brightness(1.8)",offset:.52},{opacity:.55}],{duration:dur,delay:delay||0})};
 let nwLift=0,nwLastY=null,nwLastT=0,nwStopT=0;
+/* (was) doors jump on scroll and drop back with a bounce:
 document.addEventListener("scroll",e=>{if(tab!=="fuel"||nwGateOpen)return;const el=e.target===document?document.scrollingElement:e.target;if(!el||!el.querySelector||!el.querySelector(".nw-gate"))return;const y=el.scrollTop,now=performance.now();if(nwLastY==null){nwLastY=y;nwLastT=now;return}
   const v=Math.abs(y-nwLastY)/Math.max(8,now-nwLastT);nwLastY=y;nwLastT=now;nwLift=Math.min(40,nwLift*.72+v*16);
   document.querySelectorAll(".nw-row:not(.gopen) .nw-d:not(.sel) .nw-gate").forEach(g=>{g.getAnimations().forEach(a=>a.cancel());g.style.transition="transform .14s ease-out";g.style.transform=`translateY(-${nwLift.toFixed(1)}%)`});
   clearTimeout(nwStopT);nwStopT=setTimeout(()=>{const L=Math.max(nwLift,4);nwLift=0;nwLastY=null;document.querySelectorAll(".nw-row:not(.gopen) .nw-d:not(.sel) .nw-gate").forEach((g,i)=>{const dl=i*22,a=NWDROP(g,L,dl);NWTHUD(g,dl,a.effect.getTiming().duration)})},150)},true);
+*/
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-nwgate]");if(!b)return;e.preventDefault();e.stopPropagation();nwGateOpen=!nwGateOpen;try{localStorage.setItem("aot-nwgate",nwGateOpen?"1":"0")}catch(x){}
   const row=document.querySelector(".nw-row");b.classList.toggle("on",nwGateOpen);b.setAttribute("aria-pressed",nwGateOpen);b.title=b.ariaLabel=nwGateOpen?"Close past days":"Show past days";b.innerHTML=nwGateOpen?NWEYE[0]:NWEYE[1];
-  if(!row)return;row.classList.toggle("gopen",nwGateOpen);if(!nwGateOpen)row.querySelectorAll(".nw-d:not(.sel) .nw-gate").forEach((g,i)=>{const a=NWDROP(g,101,i*45);NWTHUD(g,i*45,a.effect.getTiming().duration)})},true);
+  if(!row)return;row.classList.toggle("gopen",nwGateOpen);},true);
 function nWeekPanel(d,S){const base=new Date(today()+"T12:00");base.setDate(base.getDate()-((base.getDay()+6)%7)+nWk*7);
-  const nwSlam=!nwSlamDone&&!nwGateOpen;nwSlamDone=true;
+  const nwSlam=false;nwSlamDone=true;
   /* one ring per day: calories inside, macros around it */
   const MC0=["#f27fb2","#a688f2","#b8875f","#f2c14e"];
   const cells=[...Array(7)].map((_,i)=>{const x=new Date(base);x.setDate(x.getDate()+i);const ds=ymd(x),ms=d.meals.filter(m=>m.d===ds),k=ms.reduce((a,m)=>a+(+m.kcal||0),0),fut=ds>today(),Ld=kLim(ds),chg=(data.goals.kcalHist||{})[ds]!=null&&ds!==(Object.keys(data.goals.kcalHist||{}).sort()[0]),R=16,C=2*Math.PI*R,f=Ld?Math.min(1,k/Ld):0,over=Ld&&k>Ld,col=over?"#ffb648":"#3ddc84";
@@ -6281,7 +6285,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="385",APPT="2026-11-21T03:03:00Z";   /* APPT: when this update was made */
+const APPV="386",APPT="2026-11-21T03:13:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
