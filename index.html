@@ -1440,11 +1440,11 @@ html.tpl-spa .tile b{text-shadow:0 0 18px rgba(255,150,60,.45)}
 .km .kdt{margin:4px 0 10px}
 
 /* Kitchen menu on paper, in columns */
-.panel.kpan{background:#f4ecdc!important;background-image:radial-gradient(120% 80% at 20% 0%,rgba(255,255,255,.55),transparent 60%),radial-gradient(90% 70% at 100% 100%,rgba(160,120,60,.14),transparent 70%),repeating-linear-gradient(0deg,rgba(120,90,40,.025) 0 1px,transparent 1px 3px)!important;border:1px solid #d9c8a6!important;box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 0 60px rgba(150,110,50,.12)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;color:#2b2118;border-radius:6px!important}
+html .panel.kpan.kpan,html.tpl-spa .panel.kpan.kpan,html.lk-orange .panel.kpan.kpan{background-color:#f4ecdc!important;background:#f4ecdc!important;background-image:radial-gradient(120% 80% at 20% 0%,rgba(255,255,255,.55),transparent 60%),radial-gradient(90% 70% at 100% 100%,rgba(160,120,60,.14),transparent 70%),repeating-linear-gradient(0deg,rgba(120,90,40,.025) 0 1px,transparent 1px 3px)!important;border:1px solid #d9c8a6!important;box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 0 60px rgba(150,110,50,.12)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;color:#2b2118;border-radius:6px!important}
 .kpan .ph span{font-family:Georgia,"Times New Roman",serif;font-size:22px;font-weight:600;color:#2b2118;letter-spacing:.02em}
 .kpan .bp-add button{color:#6b4a1f!important;border-color:#c9b08a!important;background:rgba(255,255,255,.45)!important}
 .kpan .k-find{background:rgba(255,255,255,.6)!important;border-color:#d4c09c!important;color:#7a6346}.kpan .k-find input{color:#2b2118}.kpan .k-find input::placeholder{color:#9a8566}
-.kpan .seg2{background:rgba(120,90,40,.1)!important;border-color:#d4c09c!important}.kpan .seg2 button{color:#7a6346!important}.kpan .seg2 button[aria-pressed="true"]{background:#2b2118!important;color:#f4ecdc!important;box-shadow:none!important}
+.kpan .seg2{background:rgba(120,90,40,.1)!important;border-color:#d4c09c!important}.kpan .seg2 button{color:#7a6346!important}html body .kpan .seg2 button[aria-pressed="true"]{background:#2b2118!important;color:#f4ecdc!important;box-shadow:none!important}
 .kpan .km{display:block;column-count:3;column-gap:34px;column-rule:1px solid rgba(120,90,40,.18)}
 @media (max-width:1100px){.kpan .km{column-count:2}}@media (max-width:640px){.kpan .km{column-count:1}}
 .kpan .km-sec{margin:0 0 22px}.kpan .km-h{break-after:avoid}.kpan .km-it{break-inside:avoid}
@@ -6618,7 +6618,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="418",APPT="2026-11-21T14:00:00Z";   /* APPT: when this update was made */
+const APPV="419",APPT="2026-11-21T14:07:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
