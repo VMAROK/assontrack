@@ -1487,7 +1487,7 @@ html .panel.ked.ked,html.tpl-spa .panel.ked.ked,html.lk-orange .panel.ked.ked{ba
 
 .kmod{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:24px 16px;overflow-y:auto}
 .kmod-bg{position:fixed;inset:0;border:0;padding:0;background:rgba(3,2,1,.62);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);cursor:default}
-.kmod>.panel.ked{position:relative;width:min(760px,100%);margin:auto;box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 0 60px rgba(150,110,50,.12)!important}
+.kmod>.panel.ked{position:relative;width:min(1040px,100%);margin:auto;box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 0 60px rgba(150,110,50,.12)!important}
 
 .ked-ings{display:grid;grid-template-columns:1fr 1fr;column-gap:26px;align-items:start}
 .ked-ings .ked-h,.ked-ings .ked-r{grid-template-columns:minmax(0,.9fr) minmax(0,1.8fr) minmax(0,.6fr) 26px}
@@ -1540,6 +1540,13 @@ html .panel.ked.ked,html.tpl-spa .panel.ked.ked,html.lk-orange .panel.ked.ked{ba
 .krec ol{margin:0;padding:0;list-style:none;counter-reset:st}.krec ol li{counter-increment:st;position:relative;padding:0 0 12px 38px;font-size:15px;line-height:1.55;color:#2b2118}
 .krec ol li::before{content:counter(st);position:absolute;left:0;top:-1px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-family:Georgia,serif;font-size:13px;font-weight:700;color:#f4ecdc;background:#8a5a1c}
 .krec-none{margin:4px 0;font-family:Georgia,serif;font-style:italic;color:#9a8566}
+
+/* one line per ingredient: amount · ingredient · calories · × */
+.ked .ked-sec .ked-r{grid-template-columns:62px minmax(0,1fr) auto 18px!important;grid-template-areas:none!important;align-items:end;gap:0 6px;margin:0 0 6px;padding-bottom:0;border-bottom:0}
+.ked .ked-sec .ked-r>*{grid-area:auto!important}
+.ked .ked-sec .ked-r .ked-u{font-size:13px!important}.ked .ked-sec .ked-r .ked-n{font-size:15px!important}
+.ked .ked-sec .ked-kw{display:flex;align-items:baseline;gap:2px}.ked .ked-sec .ked-r .ked-k{width:44px;font-size:13px!important;text-align:right}
+.ked .ked-sec .ked-r .fd-ic{align-self:center;padding:0;font-size:14px}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -4722,7 +4729,7 @@ function kList(){const q=ffNorm(kFind),W=q.split(" ").filter(Boolean);let D=dish
 function kSearchHTML(){if(!kQ.trim())return "";kL=ingFind(kQ);return `<div class="ing-res">${kL.map((f,i)=>`<button type="button" class="fd-r ing-pick" data-kpick="${i}">${fPic(f)}<div class="fd-rm"><b>${esc(f.name)}</b><small>${f.brand?esc(f.brand)+" · ":""}${foodSub(f)}</small></div><span class="ing-plus">＋</span></button>`).join("")||(kBusy?"":`<p class="note ing-st">Nothing found. Type it in yourself below.</p>`)}${kBusy?`<p class="note ing-st">Searching the food database…</p>`:""}</div>`}
 /* dish editor: name, steps, then the ingredients like a little menu: 3 columns top to bottom, in your own groups (Sauce, Dough...) */
 const kGs=d=>{const G=d.groups=(d.groups&&d.groups.length?d.groups:[""]);(d.ing||[]).forEach(x=>{x.g=x.g||"";if(!G.includes(x.g))G.push(x.g)});return G};
-function kIngRow(x,i){return `<div class="ked-r"><input class="ked-n" data-king="${i}|n" maxlength="50" placeholder="Ingredient" value="${esc(x.n||"")}" aria-label="Ingredient"><button type="button" class="fd-ic" data-kingx="${i}" aria-label="Remove">×</button><input class="ked-u" data-king="${i}|u" maxlength="20" placeholder="1 cup or NA" value="${esc(x.u||"")}" aria-label="Amount"><span class="ked-kw"><input class="ked-k" data-king="${i}|k" inputmode="decimal" maxlength="6" placeholder="0" value="${esc(x.k||"")}" aria-label="Calories"><small>cal</small></span></div>`}
+function kIngRow(x,i){return `<div class="ked-r"><input class="ked-u" data-king="${i}|u" maxlength="20" placeholder="1 cup" value="${esc(x.u||"")}" aria-label="Amount, or NA"><input class="ked-n" data-king="${i}|n" maxlength="50" placeholder="Ingredient" value="${esc(x.n||"")}" aria-label="Ingredient"><span class="ked-kw"><input class="ked-k" data-king="${i}|k" inputmode="decimal" maxlength="6" placeholder="0" value="${esc(x.k||"")}" aria-label="Calories"><small>cal</small></span><button type="button" class="fd-ic" data-kingx="${i}" aria-label="Remove">×</button></div>`}
 function kEditor(){const d=kEd,T=kTot(d),G=kGs(d);
   return `<div class="panel ked" style="margin-top:18px"><div class="ph"><span>${d.id?"Edit dish":"New dish"}</span><button type="button" class="x" data-kcancel aria-label="Close">×</button></div>
   <div class="ked-g"><label>Dish name<input id="kName" maxlength="60" placeholder="Mom's lasagna" value="${esc(d.name||"")}"></label><label>Group<input id="kGroup" list="kGroupL" maxlength="30" placeholder="e.g. Sunday dinners" value="${esc(d.group||"")}"><datalist id="kGroupL">${kGroupsAll().map(g=>`<option value="${esc(g)}">`).join("")}</datalist></label><label>Serves<input id="kServes" inputmode="numeric" maxlength="3" placeholder="4" value="${esc(d.serves||"")}"></label></div>
@@ -6739,7 +6746,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="433",APPT="2026-11-21T19:29:00Z";   /* APPT: when this update was made */
+const APPV="434",APPT="2026-11-21T19:33:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
