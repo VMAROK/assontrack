@@ -1488,6 +1488,13 @@ html .panel.ked.ked,html.tpl-spa .panel.ked.ked,html.lk-orange .panel.ked.ked{ba
 .kmod{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:24px 16px;overflow-y:auto}
 .kmod-bg{position:fixed;inset:0;border:0;padding:0;background:rgba(3,2,1,.62);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);cursor:default}
 .kmod>.panel.ked{position:relative;width:min(760px,100%);margin:auto;box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 0 60px rgba(150,110,50,.12)!important}
+
+.ked-ings{display:grid;grid-template-columns:1fr 1fr;column-gap:26px;align-items:start}
+.ked-ings .ked-h,.ked-ings .ked-r{grid-template-columns:minmax(0,.9fr) minmax(0,1.8fr) minmax(0,.6fr) 26px}
+@media (max-width:700px){.ked-ings{grid-template-columns:1fr}.ked-h2{display:none!important}}
+.kpan .kdt-ing{column-count:2;column-gap:28px}.kpan .kdt-ing li{break-inside:avoid}.kpan .kdt-ing li:nth-child(2){border-top:0}
+@media (max-width:640px){.kpan .kdt-ing{column-count:1}.kpan .kdt-ing li:nth-child(2){border-top:1px solid rgba(120,90,40,.15)}}
+.panel.kpan{min-height:calc(100vh - 360px)}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -4663,8 +4670,8 @@ function kEditor(){const d=kEd,T=kTot(d);
   <div class="ked-g"><label>Dish name<input id="kName" maxlength="60" placeholder="Mom's lasagna" value="${esc(d.name||"")}"></label><label>Group<input id="kGroup" list="kGroupL" maxlength="30" placeholder="e.g. Sunday dinners" value="${esc(d.group||"")}"><datalist id="kGroupL">${kGroupsAll().map(g=>`<option value="${esc(g)}">`).join("")}</datalist></label><label>Serves<input id="kServes" inputmode="numeric" maxlength="3" placeholder="4" value="${esc(d.serves||"")}"></label></div>
   <div class="tp-lab" style="margin-top:12px">Ingredients</div>
   <label class="us-q ing-q"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="kQ" type="search" autocomplete="off" placeholder="Find an ingredient, e.g. McCormick black pepper" value="${esc(kQ)}"></label><div id="kRes">${kSearchHTML()}</div>
-  <div class="ked-h"><span>Amount</span><span>Ingredient</span><span>Cal</span><span></span></div>
-  ${(d.ing||[]).map((x,i)=>`<div class="ked-r"><input data-king="${i}|u" maxlength="20" placeholder="1 cup or NA" value="${esc(x.u||"")}" aria-label="Amount"><input data-king="${i}|n" maxlength="50" placeholder="Ingredient" value="${esc(x.n||"")}" aria-label="Ingredient"><input data-king="${i}|k" inputmode="decimal" maxlength="6" placeholder="0" value="${esc(x.k||"")}" aria-label="Calories"><button type="button" class="fd-ic" data-kingx="${i}" aria-label="Remove">×</button></div>`).join("")}
+  <div class="ked-ings"><div class="ked-h"><span>Amount</span><span>Ingredient</span><span>Cal</span><span></span></div><div class="ked-h ked-h2"><span>Amount</span><span>Ingredient</span><span>Cal</span><span></span></div>
+  ${(d.ing||[]).map((x,i)=>`<div class="ked-r"><input data-king="${i}|u" maxlength="20" placeholder="1 cup or NA" value="${esc(x.u||"")}" aria-label="Amount"><input data-king="${i}|n" maxlength="50" placeholder="Ingredient" value="${esc(x.n||"")}" aria-label="Ingredient"><input data-king="${i}|k" inputmode="decimal" maxlength="6" placeholder="0" value="${esc(x.k||"")}" aria-label="Calories"><button type="button" class="fd-ic" data-kingx="${i}" aria-label="Remove">×</button></div>`).join("")}</div>
   <button type="button" class="ing-add" data-kingadd>＋ Add ingredient</button>
   <label class="ked-st">Steps or notes<textarea id="kSteps" rows="4" maxlength="4000" placeholder="How you make it">${esc(d.steps||"")}</textarea></label>
   <div class="ked-sum" id="kSum">${kSumHTML(T)}</div>
@@ -6666,7 +6673,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="425",APPT="2026-11-21T18:52:00Z";   /* APPT: when this update was made */
+const APPV="426",APPT="2026-11-21T19:04:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
