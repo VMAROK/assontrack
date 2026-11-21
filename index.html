@@ -4996,7 +4996,7 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   if(h<90||h>250){toast("That height doesn't look right");return}const wn=nums(raw("bmW")),w=wn.length?wn[0]:lw,kg=w==null?0:g.unit==="kg"?w:w*.45359237;if(w==null){toast("Enter your weight");return}if(kg<20||kg>400){toast("That weight doesn't look right for "+g.unit);return}
   bmiDraft={};g.height=Math.round(h*10)/10;if(lw!==w){data.weights.push({id:uid(),d:today(),v:w,at:Date.now()})}
   bmiEdit=false;render();save();toast("BMI saved")},true);
-const figFit=()=>tab==="body"||tab==="train";
+const figFit=()=>tab==="body"||tab==="train"||tab==="fuel";   /* nutrition shows your body too */
 const FITST=[["Start",0],["Lean",.25],["Toned",.5],["Built",.75]];
 function fitLevel(d){const days=new Set(d.workouts.filter(w=>{const a=(Date.now()-new Date(w.d+"T12:00"))/864e5;return a<14&&a>-1}).map(w=>w.d)).size,tr=Math.min(1,days/8),b=bodyInfo(d).pct,m=Math.round((b==null?tr:tr*.8+b*.2)*100)/100;
   let i=0;FITST.forEach((x,k)=>{if(m>=x[1])i=k});const nx=FITST[i+1];let cap="Top shape. Keep training to hold it.";
@@ -6234,7 +6234,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="372",APPT="2026-11-21T01:41:00Z";   /* APPT: when this update was made */
+const APPV="373",APPT="2026-11-21T01:45:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
