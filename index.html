@@ -1663,6 +1663,20 @@ html .panel.pthemep.pthemep{background:rgba(14,10,10,.93)!important;-webkit-back
 .tds-t.now{border-color:rgba(255,182,72,.6);box-shadow:0 0 16px rgba(255,182,72,.22)}.tds-t.now em{color:#ffb648}
 .tds-t.miss em{color:#ff5d6c}.tds-t.part b{color:#ffb648}
 @media (max-width:900px){.tds{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* passions schedule: passion tabs as a dark glass strip down the left */
+.pvt-wrap{display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;align-items:start}
+.pvt-main{min-width:0}
+.pvt{display:flex;flex-direction:column;gap:2px;padding:6px;border-radius:12px;background:rgba(0,4,12,.42);border:1px solid rgba(var(--lr),.16);-webkit-backdrop-filter:blur(16px) saturate(1.2);backdrop-filter:blur(16px) saturate(1.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.05);position:sticky;top:12px;max-height:calc(100vh - 140px);overflow-y:auto;scrollbar-width:none}
+.pvt::-webkit-scrollbar{display:none}
+.pvt-b{display:flex;align-items:center;gap:9px;width:100%;text-align:left;font:inherit;font-size:13.5px;font-weight:600;padding:10px 11px;border-radius:9px;border:0;background:none;color:var(--muted);cursor:pointer;transition:background .15s,color .15s}
+.pvt-b span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pvt-b i{flex:none;width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.25)}
+.pvt-b[data-lvl="Priority"] i{background:#ff5d6c}.pvt-b[data-lvl="Moderate"] i{background:#ffb648}.pvt-b[data-lvl="Bonus"] i{background:#2ee6c5}
+.pvt-b:hover{color:var(--fg);background:rgba(255,255,255,.04)}
+.pvt-b[aria-selected="true"]{color:#fff;background:rgba(255,255,255,.09);box-shadow:inset 3px 0 0 var(--accent,#ffb648)}
+.pvt-b[aria-selected="true"][data-lvl="Priority"]{box-shadow:inset 3px 0 0 #ff5d6c}.pvt-b[aria-selected="true"][data-lvl="Bonus"]{box-shadow:inset 3px 0 0 #2ee6c5}
+@media (max-width:700px){.pvt-wrap{grid-template-columns:minmax(0,1fr)}.pvt{flex-direction:row;overflow-x:auto;position:static;max-height:none}.pvt-b{width:auto;flex:none}}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -6091,8 +6105,9 @@ function passDetail(d){
 function passSched(d){const P=d.passions||[],p=P.find(x=>x.id===selP)||sortPass(P)[0];
   if(!p)return `<div class="panel pdetail psched"><div class="ph psched-h"><span>${PTI.schedule||""}Weekly schedule</span></div><p class="empty" style="padding:18px 4px">Add a passion below to plan your week.</p></div>`;
   /* was the full schedule inline: ${schedView(d,p)} — now seven square days; tap one to open the full week in a window */
-  const SP=sortPass(P),pills=SP.length>1?`<div class="psp" role="tablist" aria-label="Whose week to show">${SP.map(x=>`<button type="button" role="tab" class="psp-b" data-schedpick="${x.id}" aria-selected="${x.id===p.id}" data-lvl="${esc(x.lvl||"")}">${esc(x.name)}</button>`).join("")}</div>`:"";
-  return `<div class="panel pdetail psched" data-schedp="${p.id}"><div class="ph psched-h"><span>${PTI.schedule||""}Weekly schedule${SP.length>1?"":` <em>·</em> <b>${esc(p.name)}</b>`}</span><button type="button" class="psq-open" data-swin aria-label="Open the schedule in a window"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7"/></svg>Open</button></div>${pills}${schedView(d,p)}</div>`}
+  const SP=sortPass(P),pills="";/* was: a row of passion pills over the schedule — now a tab strip down its left side (vtabs) */
+  const vtabs=SP.length>1?`<div class="pvt" role="tablist" aria-orientation="vertical" aria-label="Whose week to show">${SP.map(x=>`<button type="button" role="tab" class="pvt-b" data-schedpick="${x.id}" aria-selected="${x.id===p.id}" data-lvl="${esc(x.lvl||"")}"><i aria-hidden="true"></i><span>${esc(x.name)}</span></button>`).join("")}</div>`:"";
+  return `<div class="panel pdetail psched" data-schedp="${p.id}"><div class="ph psched-h"><span>${PTI.schedule||""}Weekly schedule${SP.length>1?"":` <em>·</em> <b>${esc(p.name)}</b>`}</span><button type="button" class="psq-open" data-swin aria-label="Open the schedule in a window"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7"/></svg>Open</button></div>${pills}${vtabs?`<div class="pvt-wrap">${vtabs}<div class="pvt-main">${schedView(d,p)}</div></div>`:schedView(d,p)}</div>`}
 /* the passion pills above the schedule pick whose week is shown */
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-schedpick]");if(!b)return;e.stopPropagation();selP=b.dataset.schedpick;themeOpen=false;render();
   requestAnimationFrame(()=>{const a=document.querySelector('.psp-b[aria-selected="true"]');a&&a.scrollIntoView({inline:"nearest",block:"nearest"})})},true);
@@ -6928,7 +6943,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="454",APPT="2026-11-21T23:22:00Z";   /* APPT: when this update was made */
+const APPV="455",APPT="2026-11-21T23:40:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
