@@ -1399,7 +1399,7 @@ html.tpl-spa .tile b{text-shadow:0 0 18px rgba(255,150,60,.45)}
 .kd-k{display:flex;flex-direction:column;align-items:flex-end;line-height:1}.kd-k b{font-size:20px}.kd-k small{font-size:10.5px;color:var(--muted)}
 .kd-ing{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kd-b{display:flex;gap:6px;flex-wrap:wrap}.kd-b .btn{padding:7px 11px;font-size:12.5px}
-.ked-g{display:grid;grid-template-columns:1fr 110px;gap:10px}.ked label{display:grid;gap:5px;font-size:12px;color:var(--muted)}
+.ked-g{display:grid;grid-template-columns:1.4fr 1fr 90px;gap:10px}@media (max-width:600px){.ked-g{grid-template-columns:1fr 1fr}.ked-g label:first-child{grid-column:1/-1}}.ked label{display:grid;gap:5px;font-size:12px;color:var(--muted)}
 .ked input,.ked textarea{font:inherit;font-size:14px;padding:9px 10px;border-radius:9px;color:#eef3ff;background:rgba(4,8,22,.7);border:1px solid rgba(var(--lr),.28);width:100%;box-sizing:border-box}.ked textarea{resize:vertical}
 .ked .ing-q input{all:unset;flex:1;min-width:0;font:inherit;font-size:14px;color:#eef3ff}.ked .ing-q{display:flex;margin:4px 0 6px}
 .ked-h,.ked-r{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,2fr) minmax(0,.6fr) 32px;gap:6px;align-items:center;margin-bottom:6px}.ked-h span{font-size:11.5px;color:var(--muted)}
@@ -1425,6 +1425,19 @@ html.tpl-spa .tile b{text-shadow:0 0 18px rgba(255,150,60,.45)}
 .kdt-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:12px}
 .kdt-ing{list-style:none;margin:4px 0 0;padding:0}.kdt-ing li{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:baseline;padding:7px 0;border-top:1px solid rgba(var(--lr),.12);font-size:13.5px}.kdt-ing li:first-child{border-top:0}.kdt-ing small{color:var(--muted)}.kdt-ing i{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--muted)}
 .kdt-st{margin:4px 0 0;font-size:13.5px;line-height:1.55;color:#dfe7fb}
+
+.km{display:grid;gap:22px}
+.km-h{display:flex;align-items:center;gap:14px;margin:0 0 6px;font-size:13px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:rgb(var(--tL))}
+.km-h::before,.km-h::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--tL),.45))}.km-h::after{background:linear-gradient(90deg,rgba(var(--tL),.45),transparent)}
+.km-it{position:relative;border-radius:12px;transition:background .15s}.km-it:hover,.km-it.open{background:color-mix(in srgb,var(--kc) 8%,transparent)}
+.km-row{display:flex;align-items:center;gap:12px;width:100%;padding:10px 52px 10px 8px;font:inherit;color:inherit;text-align:left;background:none;border:0;cursor:pointer}
+.km-row .fpic.km-ic{width:40px;height:40px;font-size:22px;border-radius:12px;flex:none;background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--kc) 40%,transparent),color-mix(in srgb,var(--kc) 12%,rgba(4,8,22,.5)));box-shadow:0 0 0 1px color-mix(in srgb,var(--kc) 35%,transparent)}
+.km-tx{flex:1;min-width:0;display:grid;gap:2px}.km-l{display:flex;align-items:baseline;gap:8px;min-width:0}.km-l b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70%}
+.km-dots{flex:1;min-width:20px;border-bottom:1.5px dotted rgba(var(--lr),.35);transform:translateY(-4px)}.km-l em{font-style:normal;font-family:var(--mono);font-size:14px;font-weight:700;white-space:nowrap}.km-l em small{font-size:10.5px;color:var(--muted);font-weight:500}
+.km-tx>small{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-style:italic}
+.km-it .kc-log{top:50%;right:10px;transform:translateY(-50%);width:28px;height:28px;font-size:16px}
+.km-n{position:absolute;left:2px;top:4px;font-size:9.5px;font-weight:700;padding:1px 5px;border-radius:99px;color:#fff;background:rgba(0,0,0,.55)}
+.km .kdt{margin:4px 0 10px}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -4564,14 +4577,19 @@ function kDetail(d){const T=kTot(d),c=kCol(d);
     <div class="kdt-cols"><div><div class="tp-lab">Ingredients</div><ul class="kdt-ing">${(d.ing||[]).map(x=>`<li><span>${esc(x.n||"–")}</span><small>${esc(x.u&&x.u!=="NA"?x.u:"")}</small><i>${x.k?n0(x.k)+" cal":""}</i></li>`).join("")||"<li><span>None added</span></li>"}</ul></div>
       ${d.steps?`<div><div class="tp-lab">Steps</div><p class="kdt-st">${esc(d.steps).replace(/\n/g,"<br>")}</p></div>`:""}</div>
     <div class="kd-b"><button type="button" class="btn" data-klog="${d.id}">Log a serving</button><button type="button" class="btn ghost" data-kbuy="${d.id}">Bought</button><button type="button" class="btn ghost" data-kedit="${d.id}">Edit</button></div></div>`}
-function kList(){const q=ffNorm(kFind),W=q.split(" ").filter(Boolean);let D=dishes().filter(d=>W.every(w=>ffNorm(d.name+" "+(d.ing||[]).map(x=>x.n).join(" ")).includes(w)));
+/* menu: dishes listed under the groups you give them, each line with its icon and calories; tap a line to open it */
+const kGroupsAll=()=>[...new Set(dishes().map(d=>(d.group||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+function kRow(d){const T=kTot(d),c=kCol(d),n=kLogged(d.id),o=kOpen===d.id;
+  return `<div class="km-it${o?" open":""}" style="--kc:${c}"><button type="button" class="km-row" data-kopen="${d.id}" aria-expanded="${o}">${fPic(d,"km-ic")}<span class="km-tx"><span class="km-l"><b>${esc(d.name)}</b><i class="km-dots" aria-hidden="true"></i><em>${n0(T.ks)}<small> cal</small></em></span><small>${esc((d.ing||[]).map(x=>x.n).filter(Boolean).slice(0,6).join(", "))}${(d.ing||[]).length>6?"…":""}</small></span></button><button type="button" class="kc-log" data-klog="${d.id}" aria-label="Log a serving of ${esc(d.name)}" title="Log a serving">＋</button>${n?`<span class="km-n">${n}×</span>`:""}</div>${o?kDetail(d):""}`}
+function kList(){const q=ffNorm(kFind),W=q.split(" ").filter(Boolean);let D=dishes().filter(d=>W.every(w=>ffNorm(d.name+" "+(d.group||"")+" "+(d.ing||[]).map(x=>x.n).join(" ")).includes(w)));
   D=D.slice().sort(kSort==="az"?(a,b)=>a.name.localeCompare(b.name):kSort==="cal"?(a,b)=>kTot(a).ks-kTot(b).ks:(a,b)=>(b.used||0)-(a.used||0));
-  const od=kOpen&&D.find(d=>d.id===kOpen);
-  return D.length?`<div class="kc-grid">${D.map(kCard).join("")}</div>${od?kDetail(od):""}`:`<p class="note" style="margin:6px 2px 0">${dishes().length?"No dish matches “"+esc(kFind)+"”.":"Save the dishes you cook. Each one shows up when you add food in Nutrition and logs a serving with one tap. Bought takes you to Budget to record what you spent."}</p>`}
+  if(!D.length)return `<p class="note" style="margin:6px 2px 0">${dishes().length?"No dish matches “"+esc(kFind)+"”.":"Save the dishes you cook and sort them into your own groups, like a menu. Each one shows up when you add food in Nutrition and logs a serving with one tap. Bought takes you to Budget to record what you spent."}</p>`;
+  const G=kGroupsAll().filter(g=>D.some(d=>(d.group||"").trim()===g)),rest=D.filter(d=>!(d.group||"").trim());
+  return `<div class="km">${G.map(g=>`<section class="km-sec"><h3 class="km-h"><span>${esc(g)}</span></h3>${D.filter(d=>(d.group||"").trim()===g).map(kRow).join("")}</section>`).join("")}${rest.length?`<section class="km-sec"><h3 class="km-h"><span>${G.length?"More dishes":"Your dishes"}</span></h3>${rest.map(kRow).join("")}</section>`:""}</div>`}
 function kSearchHTML(){if(!kQ.trim())return "";kL=ingFind(kQ);return `<div class="ing-res">${kL.map((f,i)=>`<button type="button" class="fd-r ing-pick" data-kpick="${i}">${fPic(f)}<div class="fd-rm"><b>${esc(f.name)}</b><small>${f.brand?esc(f.brand)+" · ":""}${foodSub(f)}</small></div><span class="ing-plus">＋</span></button>`).join("")||(kBusy?"":`<p class="note ing-st">Nothing found. Type it in yourself below.</p>`)}${kBusy?`<p class="note ing-st">Searching the food database…</p>`:""}</div>`}
 function kEditor(){const d=kEd,T=kTot(d);
   return `<div class="panel ked" style="margin-top:18px"><div class="ph"><span>${d.id?"Edit dish":"New dish"}</span><button type="button" class="x" data-kcancel aria-label="Close">×</button></div>
-  <div class="ked-g"><label>Dish name<input id="kName" maxlength="60" placeholder="Mom's lasagna" value="${esc(d.name||"")}"></label><label>Serves<input id="kServes" inputmode="numeric" maxlength="3" placeholder="4" value="${esc(d.serves||"")}"></label></div>
+  <div class="ked-g"><label>Dish name<input id="kName" maxlength="60" placeholder="Mom's lasagna" value="${esc(d.name||"")}"></label><label>Group<input id="kGroup" list="kGroupL" maxlength="30" placeholder="e.g. Sunday dinners" value="${esc(d.group||"")}"><datalist id="kGroupL">${kGroupsAll().map(g=>`<option value="${esc(g)}">`).join("")}</datalist></label><label>Serves<input id="kServes" inputmode="numeric" maxlength="3" placeholder="4" value="${esc(d.serves||"")}"></label></div>
   <div class="tp-lab" style="margin-top:12px">Ingredients</div>
   <label class="us-q ing-q"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="kQ" type="search" autocomplete="off" placeholder="Find an ingredient, e.g. McCormick black pepper" value="${esc(kQ)}"></label><div id="kRes">${kSearchHTML()}</div>
   <div class="ked-h"><span>Amount</span><span>Ingredient</span><span>Cal</span><span></span></div>
@@ -4591,7 +4609,7 @@ function vKitchen(){const D=dishes();
   <div class="panel kpan" style="margin-top:18px"><div class="ph"><span>Your dishes</span><span class="bp-add"><button type="button" data-knew>＋ New dish</button></span></div>
   ${D.length?`<div class="k-bar"><label class="us-q k-find"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="kFind" type="search" autocomplete="off" placeholder="Search dishes or ingredients" value="${esc(kFind)}" aria-label="Search your dishes"></label><span class="seg2" role="group" aria-label="Sort">${[["recent","Recent"],["az","A–Z"],["cal","Calories"]].map(([k,l])=>`<button type="button" data-ksort="${k}" aria-pressed="${kSort===k}">${l}</button>`).join("")}</span></div>`:""}
   <div id="kOut">${kList()}</div></div>`}
-const kRead=()=>{if(!kEd)return;const v=id=>{const e=document.getElementById(id);return e?e.value:undefined};const n=v("kName"),sv=v("kServes"),st=v("kSteps");if(n!=null)kEd.name=n;if(sv!=null)kEd.serves=sv;if(st!=null)kEd.steps=st};
+const kRead=()=>{if(!kEd)return;const v=id=>{const e=document.getElementById(id);return e?e.value:undefined};const n=v("kName"),sv=v("kServes"),st=v("kSteps"),gr=v("kGroup");if(gr!=null)kEd.group=gr;if(n!=null)kEd.name=n;if(sv!=null)kEd.serves=sv;if(st!=null)kEd.steps=st};
 const kRe=()=>{kRead();const y=$("#view").scrollTop;render();$("#view").scrollTop=y};
 document.addEventListener("input",e=>{const t=e.target;if(!kEd)return;
   if(t.id==="kQ"){kQ=t.value;clearTimeout(kT);const q=kQ.trim(),tok=++kTok;kOn=[];kBusy=q.length>=3;const r=$("#kRes");if(r)r.innerHTML=kSearchHTML();if(!kBusy)return;
@@ -4603,8 +4621,8 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   if(b.dataset.ksort){kSort=b.dataset.ksort;try{localStorage.setItem("aot-ksort",kSort)}catch(x){}document.querySelectorAll("[data-ksort]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.ksort===kSort))}else kOpen=kOpen===b.dataset.kopen?null:b.dataset.kopen;
   const o=$("#kOut");if(o){o.innerHTML=kList();const dt=o.querySelector(".kdt");if(dt&&b.dataset.kopen)dt.scrollIntoView({block:"nearest",behavior:"smooth"})}},true);
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-knew],[data-kedit],[data-kcancel],[data-ksave],[data-kdel],[data-kingadd],[data-kingx],[data-kpick],[data-klog],[data-kbuy]");if(!b)return;e.preventDefault();e.stopPropagation();const d=b.dataset;
-  if(d.knew!=null){kEd={name:"",serves:"",ing:[{u:"",n:"",k:"",price:""}],steps:""};kQ="";render();$("#view").scrollTop=0;setTimeout(()=>{const n=$("#kName");n&&n.focus()},50);return}
-  if(d.kedit){const f=dishes().find(x=>x.id===d.kedit);if(!f)return;kEd=JSON.parse(JSON.stringify({id:f.id,name:f.name,serves:String(f.serves||""),ing:f.ing||[],steps:f.steps||""}));if(!kEd.ing.length)kEd.ing.push({u:"",n:"",k:"",price:""});kQ="";render();$("#view").scrollTop=0;return}
+  if(d.knew!=null){kEd={name:"",group:"",serves:"",ing:[{u:"",n:"",k:"",price:""}],steps:""};kQ="";render();$("#view").scrollTop=0;setTimeout(()=>{const n=$("#kName");n&&n.focus()},50);return}
+  if(d.kedit){const f=dishes().find(x=>x.id===d.kedit);if(!f)return;kEd=JSON.parse(JSON.stringify({id:f.id,name:f.name,group:f.group||"",serves:String(f.serves||""),ing:f.ing||[],steps:f.steps||""}));if(!kEd.ing.length)kEd.ing.push({u:"",n:"",k:"",price:""});kQ="";render();$("#view").scrollTop=0;return}
   if(d.kcancel!=null){kEd=null;render();return}
   if(d.kingadd!=null){kRead();kEd.ing.push({u:"",n:"",k:"",price:""});kRe();return}
   if(d.kingx!=null){kRead();kEd.ing.splice(+d.kingx,1);if(!kEd.ing.length)kEd.ing.push({u:"",n:"",k:"",price:""});kRe();return}
@@ -4612,7 +4630,7 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   if(d.kdel!=null){if(!confirmClear){confirmClear=true;b.textContent="Tap again to delete";setTimeout(()=>{confirmClear=false},2500);return}confirmClear=false;data.foods=(data.foods||[]).filter(x=>x.id!==kEd.id);kEd=null;render();save();toast("Dish deleted");return}
   if(d.ksave!=null){kRead();const nm=(kEd.name||"").trim();if(!nm){toast("Give the dish a name");const n=$("#kName");n&&n.focus();return}
     const ing=kEd.ing.filter(x=>(x.n||"").trim()||kNum(x.k)).map(x=>({u:(x.u||"").trim()||"NA",n:(x.n||"").trim(),k:kNum(x.k),p:kNum(x.p),c:kNum(x.c),f:kNum(x.f),price:kNum(x.price)}));
-    const T=kTot({ing,serves:kEd.serves}),o={kind:"dish",ps:true,name:nm.slice(0,60),svl:"1 serving",serves:T.sv,ing,steps:(kEd.steps||"").slice(0,4000),kcal:Math.round(T.ks),p:fr1(T.ps),c:fr1(T.cs),f:fr1(T.fs),used:Date.now()};
+    const T=kTot({ing,serves:kEd.serves}),o={kind:"dish",ps:true,name:nm.slice(0,60),group:(kEd.group||"").trim().slice(0,30),svl:"1 serving",serves:T.sv,ing,steps:(kEd.steps||"").slice(0,4000),kcal:Math.round(T.ks),p:fr1(T.ps),c:fr1(T.cs),f:fr1(T.fs),used:Date.now()};
     data.foods=data.foods||[];const i=kEd.id?data.foods.findIndex(x=>x.id===kEd.id):-1;if(i>=0)data.foods[i]=Object.assign(data.foods[i],o);else data.foods.push(Object.assign({id:"k:"+uid()},o));kEd=null;render();save();toast(nm+" saved to your kitchen");return}
   if(d.klog){const f=dishes().find(x=>x.id===d.klog);if(!f)return;const keep=nDay;nDay=null;foodLog(f,1,"sv",mealNow());nDay=keep;f.used=Date.now();render();save();toast("A serving of "+f.name+" logged");return}
   if(d.kbuy){const f=dishes().find(x=>x.id===d.kbuy);if(!f)return;kBuy={id:f.id,note:"Kitchen · "+f.name};bAddCat="Food";bTab="spend";go("budget");setTimeout(()=>{const n=$("#bsNote"),a=$("#bsAmt"),fm=$("#bsForm");if(n)n.value=kBuy.note;if(fm)fm.scrollIntoView({block:"center",behavior:"smooth"});if(a)a.focus();toast("Enter what you spent on "+f.name)},120)}},true);
@@ -6577,7 +6595,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="416",APPT="2026-11-21T13:53:00Z";   /* APPT: when this update was made */
+const APPV="417",APPT="2026-11-21T13:56:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
