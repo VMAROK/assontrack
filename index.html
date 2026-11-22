@@ -2895,7 +2895,7 @@ function vDash(){
   const d=D(),g=d.goals,t=today(),tm=d.meals.filter(m=>m.d===t);
   const kcal=tm.reduce((s,m)=>s+(+m.kcal||0),0),pro=tm.reduce((s,m)=>s+(+m.protein||0),0);
   const P=d.passions,woT=d.workouts.filter(w=>w.d===t).length;
-  return banner()+todayStrip(d)+dashTop(d)+bigCal(d)+`<div class="panel" style="margin-top:18px;--c:var(--magenta)"><div class="ph"><span>Today's targets</span><i>${new Date().toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</i></div>
+  return banner()+/* Today strip removed: todayStrip(d)+ */dashTop(d)+bigCal(d)+`<div class="panel" style="margin-top:18px;--c:var(--magenta)"><div class="ph"><span>Today's targets</span><i>${new Date().toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</i></div>
     <div class="tgrid">
       ${meter("Calories",kcal,g.kcal,"kcal","var(--cyan)")}
       ${meter("Protein",pro,g.protein,"g","var(--magenta)")}
@@ -7110,7 +7110,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="470",APPT="2026-11-22T00:36:00Z";   /* APPT: when this update was made */
+const APPV="471",APPT="2026-11-22T01:01:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
