@@ -2156,6 +2156,22 @@ html.phone #view{padding-top:max(12px,env(safe-area-inset-top,0px))!important}
 .att-msg{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin:0 0 8px}
 .tkr-att{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;color:var(--muted)}
 /* open task: media on top, then timer + progress + notes at the bottom */
+/* theater: one big player like YouTube, the rest as a strip under it */
+.att-theater{display:grid;gap:8px;margin-bottom:12px}
+.att-stage{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 18px 40px -14px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.06)}
+.att-stage-in,.att-stage-in>*{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.att-stage-in video,.att-stage-in img{object-fit:contain;background:#000}
+.att-stage-in .attv-miss{display:grid;place-items:center;color:rgba(255,255,255,.6);font-size:13px;margin:0}
+.att-bar{display:flex;align-items:center;gap:10px;padding:0 2px;font-size:12.5px;color:var(--muted)}
+.att-count{font-weight:700;color:var(--fg)}
+.att-kind{padding:2px 8px;border-radius:99px;background:rgba(var(--lr),.12);font-weight:600;font-size:11.5px}
+.att-fs{display:grid;place-items:center;width:34px;height:34px;border-radius:99px;border:0;background:rgba(var(--lr),.1);color:var(--fg);cursor:pointer}
+.att-strip{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 0 4px}.att-strip::-webkit-scrollbar{display:none}
+.att-strip .att-t{flex:0 0 128px;aspect-ratio:16/9;border-radius:9px;opacity:.6;transition:opacity .15s}
+.att-strip .att-t.on{opacity:1;outline:2px solid var(--fg);outline-offset:1px}
+.att-strip .att-t .att-x{top:3px;right:3px;min-width:20px;height:20px;font-size:13px}
+.att-strip .att-yt::after{font-size:8.5px;left:4px;bottom:4px}
+html.phone .att-strip .att-t{flex-basis:110px}
 .tkcard>.att{margin:0;padding-top:4px;border-top:0}
 .tk-bot{display:grid;gap:12px;padding-top:14px;border-top:1px solid rgba(var(--lr),.14)}
 .tk-prog{display:grid;gap:6px}
@@ -6583,6 +6599,19 @@ async function attURL(a){if(attURLs.has(a.id))return attURLs.get(a.id);let blob=
   if(!blob&&a.path&&typeof sbOn==="function"&&sbOn()){try{const {data}=await sb.storage.from("models").download(a.path);if(data){blob=a.type&&data.type!==a.type?new Blob([data],{type:a.type}):data;MDB.put(a.id,blob)}}catch(e){}}
   if(!blob)return null;const u=URL.createObjectURL(blob);attURLs.set(a.id,u);return u}
 let attLinkFor=null,attBusy=null,attView=null;
+/* theater: the big player keeps its element between redraws so a playing video doesn't restart */
+const attSel={},attStageEls=new Map();
+function attStageEl(tid,a){const k=tid+":"+a.id;if(attStageEls.has(k))return attStageEls.get(k);const y=a.kind==="yt"?ytId(a.url):null;
+  const w=document.createElement("div");w.className="att-stage-in";
+  if(a.kind==="yt")w.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${y}?playsinline=1&rel=0&modestbranding=1" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="YouTube video" loading="lazy"></iframe>`;
+  else{const m=document.createElement(a.kind==="vid"?"video":"img");if(a.kind==="vid"){m.controls=true;m.playsInline=true;m.setAttribute("playsinline","");m.preload="metadata"}else m.alt=a.name||"Photo";w.appendChild(m);
+    attURL(a).then(u=>{if(!u){w.innerHTML='<p class="attv-miss">This file isn\'t on this device yet.</p>';return}
+      if(a.kind!=="vid"){m.src=u;return}const so=document.createElement("source");so.src=u+"#t="+((a.t0||0)+0.1).toFixed(1);so.type=a.type||"video/mp4";m.appendChild(so);
+      if(a.t1!=null){m.addEventListener("loadedmetadata",()=>{try{m.currentTime=a.t0||0}catch(_){}},{once:true});m.addEventListener("timeupdate",()=>{if(m.currentTime>=a.t1){m.pause();m.currentTime=a.t0||0}})}
+      m.load()})}
+  attStageEls.set(k,w);return w}
+function attStages(){document.querySelectorAll("[data-attstage]").forEach(st=>{const [tid,aid]=st.dataset.attstage.split(":"),t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);if(!a)return;
+  const el=attStageEl(tid,a);if(el.parentNode!==st){st.innerHTML="";st.appendChild(el)}})}
 const findTaskAny=id=>{for(const p of data.passions||[]){const t=(p.tasks||[]).find(x=>x.id===id);if(t)return t}return null};
 const ATT_PLAY='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="rgba(0,0,0,.55)"/><path d="M10 8l6 4-6 4z" fill="#fff"/></svg>';
 function attThumb(a){const y=a.kind==="yt"?ytId(a.url):null;
@@ -6592,12 +6621,16 @@ function attHtml(t){const A=t.att||[];
   const tile=a=>{const inner=attThumb(a);
     return `<div class="att-t"><button type="button" class="att-open" data-attview="${t.id}:${a.id}" aria-label="Open ${a.kind==="img"?"photo":a.kind==="vid"?"video":"YouTube video"}">${inner}</button><button type="button" class="att-x" data-attdel="${t.id}:${a.id}" aria-label="Remove">×</button></div>`};
   return `<div class="att"><div class="att-h">${CLIP}<span>Media</span>${A.length?`<small>${A.length}</small>`:""}</div>
-    ${A.length?`<div class="att-grid">${A.map(tile).join("")}</div>`:""}
+    ${A.length?(()=>{const cur=A.find(a=>a.id===attSel[t.id])||A[0],i=A.indexOf(cur);
+      return `<div class="att-theater"><div class="att-stage" data-attstage="${t.id}:${cur.id}"><div class="att-stage-load"></div></div>
+      <div class="att-bar"><span class="att-count">${i+1} of ${A.length}</span><span class="att-kind">${cur.kind==="yt"?"YouTube":cur.kind==="vid"?"Video":"Photo"}</span><span style="flex:1"></span><button type="button" class="att-fs" data-attview="${t.id}:${cur.id}" aria-label="Full screen" title="Full screen"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>
+      ${true?`<div class="att-strip">${A.map(a=>`<div class="att-t${a.id===cur.id?" on":""}"><button type="button" class="att-open" data-attsel="${t.id}:${a.id}" aria-pressed="${a.id===cur.id}" aria-label="Show this ${a.kind==="img"?"photo":"video"}">${attThumb(a)}</button><button type="button" class="att-x" data-attdel="${t.id}:${a.id}" aria-label="Remove">×</button></div>`).join("")}</div>`:""}</div>`})():""}
+    <!-- old small grid: ${""}<div class="att-grid">tiles</div> -->
     ${attBusy===t.id?`<p class="att-msg"><span class="mini-spin"></span>Adding…</p>`:""}
     ${attLinkFor===t.id?`<form class="att-link" data-attlinkform="${t.id}"><input id="attUrl" type="url" inputmode="url" placeholder="Paste a YouTube link" autocomplete="off" required><button class="btn">Add</button><button type="button" class="att-cx" data-attlink="${t.id}" aria-label="Cancel">×</button></form>`:""}
     <div class="att-add"><button type="button" class="att-b" data-attpick="${t.id}" data-attacc="image/*">+ Photo</button><button type="button" class="att-b" data-attpick="${t.id}" data-attacc="video/*">+ Video <small style="opacity:.7;font-weight:500">(up to 1 min)</small></button><button type="button" class="att-b" data-attlink="${t.id}">+ YouTube link</button></div>
     ${cmpPool(t.id).length>=2&&A.length?`<button type="button" class="att-cmp" data-cmpopen="${t.id}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="2"/><rect x="13" y="4" width="8" height="16" rx="2"/></svg><span><b>Compare side by side</b><small>Put two videos or photos next to each other</small></span></button>`:""}</div>`}
-function attHydrate(){document.querySelectorAll("[data-attsrc]").forEach(el=>{if(el.src)return;const id=el.dataset.attsrc;const t=[...document.querySelectorAll("[data-attview]")].length;
+function attHydrate(){attStages();document.querySelectorAll("[data-attsrc]").forEach(el=>{if(el.src)return;const id=el.dataset.attsrc;const t=[...document.querySelectorAll("[data-attview]")].length;
   for(const p of data.passions||[])for(const tk of p.tasks||[]){const a=(tk.att||[]).find(x=>x.id===id);if(a){attURL(a).then(u=>{if(u){el.src=u+(a.kind==="vid"?"#t="+((a.t0||0)+0.1).toFixed(1):"")}else el.closest(".att-t")&&el.closest(".att-t").classList.add("missing")});return}}});
   if(attView){const [tid,aid]=attView.split(":"),t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);let v=document.getElementById("attViewer");
     if(!a){attView=null;v&&v.remove();return}
@@ -6666,12 +6699,13 @@ function attPicker(){if(attPickEl)return attPickEl;const i=document.createElemen
 document.addEventListener("submit",e=>{const f=e.target;if(!f.dataset||!f.dataset.attlinkform)return;e.preventDefault();e.stopImmediatePropagation();
   const u=(f.querySelector("#attUrl").value||"").trim(),y=ytId(u);if(!y){toast("That doesn't look like a YouTube link");return}
   const t=findTaskAny(f.dataset.attlinkform);if(!t)return;(t.att=t.att||[]).push({id:uid(),kind:"yt",url:"https://youtu.be/"+y,at:Date.now()});attLinkFor=null;save();render()},true);
-document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-attlink],[data-attdel],[data-attview],[data-attclose],[data-attpick]");
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-attlink],[data-attdel],[data-attview],[data-attclose],[data-attpick],[data-attsel]");
   if(!b){if(attView&&e.target.id==="attViewer"){attView=null;attHydrate()}return}
   e.preventDefault();e.stopPropagation();
   if(b.dataset.attlink){attLinkFor=attLinkFor===b.dataset.attlink?null:b.dataset.attlink;render();if(attLinkFor)setTimeout(()=>{const i=document.getElementById("attUrl");i&&i.focus()},30);return}
   if(b.dataset.attpick){attPickFor=b.dataset.attpick;attPickAt=Date.now();const i=attPicker();i.accept=b.dataset.attacc||"image/*,video/*";i.multiple=i.accept==="image/*";i.click();return}
-  if(b.dataset.attview){attView=b.dataset.attview;attHydrate();return}
+  if(b.dataset.attsel){const [tid,aid]=b.dataset.attsel.split(":");if(attSel[tid]!==aid){document.querySelectorAll(`[data-attstage^="${tid}:"] video`).forEach(v=>v.pause());attSel[tid]=aid;render()}return}
+  if(b.dataset.attview){document.querySelectorAll(".att-stage video").forEach(v=>v.pause());attView=b.dataset.attview;attHydrate();return}
   if(b.dataset.attclose!==undefined){attView=null;attHydrate();return}
   if(b.dataset.attdel){const [tid,aid]=b.dataset.attdel.split(":"),t=findTaskAny(tid);if(!t)return;
     if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="Remove?";b.classList.add("armed");setTimeout(()=>{if(b.isConnected){b.dataset.armed="";b.textContent="×";b.classList.remove("armed")}},2500);return}
@@ -7776,7 +7810,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="514",APPT="2026-11-22T23:01:55Z";   /* APPT: when this update was made */
+const APPV="515",APPT="2026-11-22T23:04:57Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
