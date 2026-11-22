@@ -2877,8 +2877,9 @@ body.dbg-off .dbg-n{display:none}body.dbg-off .dbg-box{outline:none}
 .tknewp .tkn-h{display:flex;align-items:center;justify-content:space-between;margin:0}
 .tknewp .tkn-h .x{width:30px;height:30px;border-radius:50%;border:1px solid rgba(var(--lr),.25);background:none;color:var(--muted);font-size:18px;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
 .passtop{position:relative}
-.tkbr{position:absolute;z-index:4;pointer-events:none;box-sizing:border-box}
-.tknewp.bridged{border-top-right-radius:0!important;border-bottom-right-radius:0!important;border-right-color:transparent!important}
+.tkmerge{position:absolute;z-index:0;pointer-events:none}.tkmerge svg{position:absolute;inset:0;display:block}
+.tknewp.merged,.pdetail.merged{background:none!important;border-color:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.tknewp.merged::before,.tknewp.merged::after,.pdetail.merged::before,.pdetail.merged::after{display:none!important}
 
 .tknew-b{font:inherit;font-size:13px;font-weight:700;color:var(--cyan);background:rgba(var(--tL),.1);border:1px solid rgba(var(--tL),.4);border-radius:99px;padding:6px 12px;cursor:pointer}
 .tknew-b.on{background:rgba(var(--tL),.25);color:#fff}
@@ -7639,7 +7640,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="507",APPT="2026-11-22T22:13:00Z";   /* APPT: when this update was made */
+const APPV="508",APPT="2026-11-22T22:24:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -7743,26 +7744,28 @@ function fit(){const sh=$(".shell"),W=1180,de=document.documentElement,vw=de.cli
   else sh.style.cssText=""}
 addEventListener("resize",fit);fit();
 
-/* the New task panel sits under My passions and joins Tasks & Projects with a bridge across the gap */
-function tkBridge(){const n=document.querySelector(".tknewp"),pd=document.querySelector(".pg-next>.pdetail");
-  const unmask=()=>{if(!pd)return;pd.style.minHeight="";pd.style.webkitMaskImage=pd.style.maskImage=pd.style.webkitMaskSize=pd.style.maskSize=pd.style.webkitMaskPosition=pd.style.maskPosition=pd.style.webkitMaskRepeat=pd.style.maskRepeat=""};
-  const host=document.querySelector(".passtop");let br=host&&host.querySelector(":scope>.tkbr");const nobr=()=>{if(br)br.remove()};
-  if(!n){unmask();nobr();return}
-  if(!pd||!host||getComputedStyle(n).display==="none"){n.classList.remove("bridged");unmask();nobr();return}
-  const nr=n.getBoundingClientRect(),pr=pd.getBoundingClientRect(),k=nr.width/n.offsetWidth||1,gap=(pr.left-nr.right)/k;
-  if(gap<0||gap>80||pr.top>nr.top){n.classList.remove("bridged");unmask();nobr();return}
+/* the New task panel sits under My passions and is merged with Tasks & Projects into ONE glass shape:
+   both panels go see-through and a single piece of glass (with one outline) is drawn behind the pair */
+function tkBridge(){const n=document.querySelector(".tknewp"),pd=document.querySelector(".pg-next>.pdetail"),host=document.querySelector(".passtop");
+  let g=host&&host.querySelector(":scope>.tkmerge");
+  const off=()=>{if(g)g.remove();if(n)n.classList.remove("merged");if(pd){pd.classList.remove("merged");pd.style.minHeight=""}};
+  if(!n||!pd||!host){off();return}
+  const nr=n.getBoundingClientRect(),pr=pd.getBoundingClientRect(),hr=host.getBoundingClientRect(),k=nr.width/n.offsetWidth||1,gap=(pr.left-nr.right)/k;
+  if(gap<0||gap>80||pr.top>nr.top){off();return}
   pd.style.minHeight=Math.ceil((nr.bottom-pr.top)/k+18)+"px";
-  /* open pdetail's left edge where the bridge lands, so the two panels read as one shape */
-  const a=(nr.top-pr.top)/k-1,b2=(nr.bottom-pr.top)/k+1,m=`linear-gradient(#000,#000),linear-gradient(to bottom,#000 0,#000 ${a}px,transparent ${a}px,transparent ${b2}px,#000 ${b2}px)`;
-  pd.style.webkitMaskImage=pd.style.maskImage=m;pd.style.webkitMaskSize=pd.style.maskSize="calc(100% - 1px) 100%,1px 100%";
-  pd.style.webkitMaskPosition=pd.style.maskPosition="right top,left top";pd.style.webkitMaskRepeat=pd.style.maskRepeat="no-repeat";
-  const cs=getComputedStyle(n),hr=host.getBoundingClientRect();
-  if(!br){br=document.createElement("i");br.className="tkbr";br.setAttribute("aria-hidden","true");host.appendChild(br)}
-  /* the bridge: same glass as the New task panel, from its right edge across the gap onto panel 10's (opened) left edge */
-  Object.assign(br.style,{left:(nr.right-hr.left)/k+"px",top:(nr.top-hr.top)/k+"px",width:gap+1+"px",height:n.offsetHeight+"px",
-    borderTop:"1px solid "+cs.borderTopColor,borderBottom:"1px solid "+cs.borderTopColor,backgroundImage:cs.backgroundImage,backgroundColor:cs.backgroundColor,
-    backgroundSize:"100% 100%",backdropFilter:cs.backdropFilter,webkitBackdropFilter:cs.webkitBackdropFilter||cs.backdropFilter});
-  n.classList.add("bridged")}
+  const cs=getComputedStyle(pd.classList.contains("merged")?n:pd),glass=g&&g.dataset.bg?g.dataset:null;
+  const bg=glass?glass.bg:cs.backgroundImage,bc=glass?glass.bc:cs.borderTopColor,bf=glass?glass.bf:(cs.backdropFilter||cs.webkitBackdropFilter||"none"),R=parseFloat(glass?glass.r:cs.borderTopLeftRadius)||0;
+  if(!g){g=document.createElement("div");g.className="tkmerge";g.setAttribute("aria-hidden","true");host.insertBefore(g,host.firstChild)}
+  g.dataset.bg=bg;g.dataset.bc=bc;g.dataset.bf=bf;g.dataset.r=R;
+  n.classList.add("merged");pd.classList.add("merged");
+  const pr2=pd.getBoundingClientRect(),P={l:(pr2.left-hr.left)/k,t:(pr2.top-hr.top)/k,r:(pr2.right-hr.left)/k,b:(pr2.bottom-hr.top)/k},N={l:(nr.left-hr.left)/k,t:(nr.top-hr.top)/k,b:(nr.bottom-hr.top)/k};
+  const X=N.l,Y=P.t,W=P.r-X,H=Math.max(P.b,N.b)-Y,x=v=>+(v-X).toFixed(2),y=v=>+(v-Y).toFixed(2);
+  const r=Math.min(R,(N.b-N.t)/2),c=Math.min(R,10);   /* r: outer corners, c: the two inside corners where the panels meet */
+  const d=`M${x(P.l)+r},${y(P.t)} H${x(P.r)-r} A${r},${r} 0 0 1 ${x(P.r)},${y(P.t)+r} V${y(P.b)-r} A${r},${r} 0 0 1 ${x(P.r)-r},${y(P.b)} H${x(P.l)+r} A${r},${r} 0 0 1 ${x(P.l)},${y(P.b)-r}`+
+    ` V${y(N.b)+c} A${c},${c} 0 0 0 ${x(P.l)-c},${y(N.b)} H${x(N.l)+r} A${r},${r} 0 0 1 ${x(N.l)},${y(N.b)-r} V${y(N.t)+r} A${r},${r} 0 0 1 ${x(N.l)+r},${y(N.t)}`+
+    ` H${x(P.l)-c} A${c},${c} 0 0 0 ${x(P.l)},${y(N.t)-c} V${y(P.t)+r} A${r},${r} 0 0 1 ${x(P.l)+r},${y(P.t)} Z`;
+  Object.assign(g.style,{left:X+"px",top:Y+"px",width:W+"px",height:H+"px",backgroundImage:bg,clipPath:`path('${d}')`,webkitClipPath:`path('${d}')`,backdropFilter:bf,webkitBackdropFilter:bf});
+  g.innerHTML=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><path d="${d}" fill="none" stroke="${bc}" stroke-width="2"/></svg>`}
 {const _r=render;render=function(){const out=_r.apply(this,arguments);try{tkBridge()}catch(e){}return out}}
 addEventListener("resize",()=>{try{tkBridge()}catch(e){}});
 
