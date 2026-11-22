@@ -2167,6 +2167,7 @@ html.phone #view{padding-top:max(12px,env(safe-area-inset-top,0px))!important}
 .attv-in{width:min(960px,100%);max-height:100%;display:grid;place-items:center}
 .attv-in img,.attv-in video{max-width:100%;max-height:calc(100vh - 80px);border-radius:10px}
 .attv-in iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:10px;background:#000}
+.attv-miss{color:#fff;opacity:.8;font-size:15px}
 .attv-x{position:absolute;top:max(14px,env(safe-area-inset-top,0px));right:14px;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.5);color:#fff;font-size:24px;line-height:1;cursor:pointer;z-index:2}
 /* phone Dashboard: This week and the month calendar sit straight on the page — no panel box around them */
 html.phone #view .panel.wahead,html.phone #view .panel:has(>.calhead){background:none!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;padding:6px 0!important;border-radius:0!important}
@@ -2181,6 +2182,12 @@ html.phone #view .panel .panel{padding:10px!important}
 /* phone, Dashboard: the month calendar sits straight on the page, no panel around it */
 html.phone #view .panel:has(>.calhead){background:none!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;padding:8px 2px!important}
 html.phone #view .panel:has(>.calhead)::before,html.phone #view .panel:has(>.calhead)::after{display:none!important}
+/* phone: an open New task panel and the Tasks panel are one piece — no gap, no line between them */
+html.phone #view .pleft:has(>.tknewp)>.tknewp{border-bottom:0!important;border-bottom-left-radius:0!important;border-bottom-right-radius:0!important;margin-bottom:0!important;padding-bottom:18px!important;box-shadow:none!important}
+html.phone #view .pgrid:has(.tknewp)>.pg-next{margin-top:-7px!important}
+html.phone #view .pgrid:has(.tknewp)>.pg-next>.pdetail{border-top:0!important;border-top-left-radius:0!important;border-top-right-radius:0!important;margin-top:0!important}
+html.phone #view .pgrid:has(.tknewp)>.pg-next>.pdetail::before{display:none!important}
+html.phone .tkbr{display:none!important}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -6494,12 +6501,14 @@ let addTimeFor=null;
 const CLIP='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5l-8.6 8.6a5.5 5.5 0 0 1-7.8-7.8l9.2-9.2a3.7 3.7 0 0 1 5.2 5.2l-9.2 9.2a1.8 1.8 0 0 1-2.6-2.6l8.5-8.5"/></svg>';
 const ytId=u=>{const m=String(u||"").match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/|v\/))([\w-]{11})/);return m?m[1]:null};
 const MDB={db:null,open(){return this.db||(this.db=new Promise((ok,no)=>{try{const r=indexedDB.open("aot-media",1);r.onupgradeneeded=()=>r.result.createObjectStore("f");r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)}catch(e){no(e)}}))},
-  async put(k,v){try{const db=await this.open();await new Promise((ok,no)=>{const x=db.transaction("f","readwrite");x.objectStore("f").put(v,k);x.oncomplete=ok;x.onerror=()=>no(x.error)})}catch(e){}},
-  async get(k){try{const db=await this.open();return await new Promise(ok=>{const r=db.transaction("f").objectStore("f").get(k);r.onsuccess=()=>ok(r.result||null);r.onerror=()=>ok(null)})}catch(e){return null}},
+  /* stored as raw bytes + type: iPhone Safari can't play a video Blob that was read back from IndexedDB */
+  async put(k,v){try{const rec=v instanceof Blob?{t:v.type||"",b:await v.arrayBuffer()}:v;const db=await this.open();await new Promise((ok,no)=>{const x=db.transaction("f","readwrite");x.objectStore("f").put(rec,k);x.oncomplete=ok;x.onerror=()=>no(x.error)})}catch(e){}},
+  async get(k){try{const db=await this.open();const r=await new Promise(ok=>{const q=db.transaction("f").objectStore("f").get(k);q.onsuccess=()=>ok(q.result||null);q.onerror=()=>ok(null)});
+    if(!r)return null;if(r.b)return new Blob([r.b],{type:r.t||""});if(r instanceof Blob){const b=new Blob([await r.arrayBuffer()],{type:r.type||""});this.put(k,b);return b}return null}catch(e){return null}},
   async del(k){try{const db=await this.open();db.transaction("f","readwrite").objectStore("f").delete(k)}catch(e){}}};
 const attURLs=new Map();
 async function attURL(a){if(attURLs.has(a.id))return attURLs.get(a.id);let blob=await MDB.get(a.id);
-  if(!blob&&a.path&&typeof sbOn==="function"&&sbOn()){try{const {data}=await sb.storage.from("models").download(a.path);if(data){blob=data;MDB.put(a.id,blob)}}catch(e){}}
+  if(!blob&&a.path&&typeof sbOn==="function"&&sbOn()){try{const {data}=await sb.storage.from("models").download(a.path);if(data){blob=a.type&&data.type!==a.type?new Blob([data],{type:a.type}):data;MDB.put(a.id,blob)}}catch(e){}}
   if(!blob)return null;const u=URL.createObjectURL(blob);attURLs.set(a.id,u);return u}
 let attLinkFor=null,attBusy=null,attView=null;
 const findTaskAny=id=>{for(const p of data.passions||[]){const t=(p.tasks||[]).find(x=>x.id===id);if(t)return t}return null};
@@ -6520,8 +6529,14 @@ function attHydrate(){document.querySelectorAll("[data-attsrc]").forEach(el=>{if
     if(!v){v=document.createElement("div");v.id="attViewer";v.className="attv";v.setAttribute("role","dialog");v.setAttribute("aria-modal","true");document.body.appendChild(v)}
     if(v.dataset.k===attView)return;v.dataset.k=attView;
     const y=a.kind==="yt"?ytId(a.url):null;
-    v.innerHTML=`<button type="button" class="attv-x" data-attclose aria-label="Close">×</button><div class="attv-in">${a.kind==="yt"?`<iframe src="https://www.youtube-nocookie.com/embed/${y}?autoplay=1&playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="YouTube video"></iframe>`:a.kind==="vid"?`<video controls playsinline autoplay data-attfull></video>`:`<img data-attfull alt="${esc(a.name||"Photo")}">`}</div>`;
-    if(a.kind!=="yt")attURL(a).then(u=>{const m=v.querySelector("[data-attfull]");if(!m||!u)return;if(a.kind==="vid"&&a.t1!=null){m.src=u+"#t="+a.t0.toFixed(1)+","+a.t1.toFixed(1);m.addEventListener("loadedmetadata",()=>{m.currentTime=a.t0},{once:true});m.addEventListener("timeupdate",()=>{if(m.currentTime>=a.t1){m.pause();m.currentTime=a.t0}})}else m.src=u})}
+    v.innerHTML=`<button type="button" class="attv-x" data-attclose aria-label="Close">×</button><div class="attv-in">${a.kind==="yt"?`<iframe src="https://www.youtube-nocookie.com/embed/${y}?autoplay=1&playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="YouTube video"></iframe>`:a.kind==="vid"?`<video controls playsinline preload="auto" data-attfull></video>`:`<img data-attfull alt="${esc(a.name||"Photo")}">`}</div>`;
+    if(a.kind!=="yt")attURL(a).then(u=>{const m=v.querySelector("[data-attfull]");if(!m)return;
+      if(!u){m.replaceWith(Object.assign(document.createElement("p"),{className:"attv-miss",textContent:"This file isn't on this device yet."}));return}
+      if(a.kind!=="vid"){m.src=u;return}
+      /* iPhone needs the video's type spelled out to play it from the phone's storage */
+      const so=document.createElement("source");so.src=u;so.type=a.type||"video/mp4";m.appendChild(so);
+      if(a.t1!=null){m.addEventListener("loadedmetadata",()=>{try{m.currentTime=a.t0||0}catch(_){}},{once:true});m.addEventListener("timeupdate",()=>{if(m.currentTime>=a.t1){m.pause();m.currentTime=a.t0||0}})}
+      m.load();const pl=m.play();pl&&pl.catch(()=>{})})}
   else{const v=document.getElementById("attViewer");v&&v.remove()}}
 /* shrink photos before saving so they don't fill the phone */
 function attShrink(f){return new Promise(ok=>{if(!/^image\/(jpe?g|png|webp|heic|heif)/i.test(f.type)){ok(f);return}const u=URL.createObjectURL(f),im=new Image();
@@ -6555,7 +6570,8 @@ const attWait=(p,ms)=>Promise.race([p,new Promise(ok=>setTimeout(ok,ms))]);
 async function attAddFiles(tid,files){const t=findTaskAny(tid);if(!t)return;attBusy=tid;render();
   try{for(const f of files){const vid=/^video\//.test(f.type)||/\.(mov|mp4|m4v|webm)$/i.test(f.name||"");if(!vid&&!/^image\//.test(f.type))continue;
     let cut=null;if(vid){const d=await attDur(f);if(!d||d>ATT_VMAX+0.5){cut=await attTrimAsk(f,d);if(!cut)continue;if(cut==="all")cut=null}}
-    const blob=vid?f:await attShrink(f),id=uid(),a={id,kind:vid?"vid":"img",name:f.name||"",at:Date.now(),size:blob.size};if(cut){a.t0=cut[0];a.t1=cut[1]}
+    const vt=f.type||(/\.mov$/i.test(f.name||"")?"video/quicktime":"video/mp4");
+    const blob=vid?(f.type?f:new Blob([f],{type:vt})):await attShrink(f),id=uid(),a={id,kind:vid?"vid":"img",name:f.name||"",type:vid?vt:"image/jpeg",at:Date.now(),size:blob.size};if(cut){a.t0=cut[0];a.t1=cut[1]}
     await attWait(MDB.put(id,blob),15000);
     (t.att=t.att||[]).push(a);
     /* upload in the background so the screen never waits on it */
@@ -7623,7 +7639,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="506",APPT="2026-11-22T22:08:00Z";   /* APPT: when this update was made */
+const APPV="507",APPT="2026-11-22T22:13:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
