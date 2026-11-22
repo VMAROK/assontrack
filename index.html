@@ -2156,6 +2156,14 @@ html.phone #view{padding-top:max(12px,env(safe-area-inset-top,0px))!important}
 .att-msg{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin:0 0 8px}
 .tkr-att{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;color:var(--muted)}
 .attv{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.88);display:grid;place-items:center;padding:16px;animation:swinIn .18s ease-out}
+.atrim-box{width:min(560px,100%);display:grid;gap:12px;background:rgba(14,22,42,.96);border:1px solid rgba(var(--lr),.25);border-radius:14px;padding:16px}
+.atrim-h{display:grid;gap:3px}.atrim-h b{font-size:17px}.atrim-h small{color:var(--muted);font-size:13px}
+.atrim-box video{width:100%;max-height:52vh;border-radius:10px;background:#000}
+.atrim-bar{position:relative;height:44px;border-radius:8px;background:rgba(255,255,255,.08)}
+.atrim-bar i{position:absolute;top:0;bottom:0;border:3px solid #ffd23f;border-radius:8px;background:rgba(255,210,63,.18);pointer-events:none}
+.atrim-bar input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:grab}
+.atrim-t{display:flex;justify-content:space-between;font:600 13px var(--mono);color:var(--muted)}.atrim-t span:first-child{color:#ffd23f}
+.atrim-b{display:flex;justify-content:flex-end;gap:10px}
 .attv-in{width:min(960px,100%);max-height:100%;display:grid;place-items:center}
 .attv-in img,.attv-in video{max-width:100%;max-height:calc(100vh - 80px);border-radius:10px}
 .attv-in iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:10px;background:#000}
@@ -6472,14 +6480,14 @@ function attHtml(t){const A=t.att||[];
     ${attLinkFor===t.id?`<form class="att-link" data-attlinkform="${t.id}"><input id="attUrl" type="url" inputmode="url" placeholder="Paste a YouTube link" autocomplete="off" required><button class="btn">Add</button><button type="button" class="att-cx" data-attlink="${t.id}" aria-label="Cancel">×</button></form>`:""}
     <div class="att-add"><button type="button" class="att-b" data-attpick="${t.id}" data-attacc="image/*">+ Photo</button><button type="button" class="att-b" data-attpick="${t.id}" data-attacc="video/*">+ Video <small style="opacity:.7;font-weight:500">(up to 1 min)</small></button><button type="button" class="att-b" data-attlink="${t.id}">+ YouTube link</button></div></div>`}
 function attHydrate(){document.querySelectorAll("[data-attsrc]").forEach(el=>{if(el.src)return;const id=el.dataset.attsrc;const t=[...document.querySelectorAll("[data-attview]")].length;
-  for(const p of data.passions||[])for(const tk of p.tasks||[]){const a=(tk.att||[]).find(x=>x.id===id);if(a){attURL(a).then(u=>{if(u){el.src=u+(a.kind==="vid"?"#t=0.1":"")}else el.closest(".att-t")&&el.closest(".att-t").classList.add("missing")});return}}});
+  for(const p of data.passions||[])for(const tk of p.tasks||[]){const a=(tk.att||[]).find(x=>x.id===id);if(a){attURL(a).then(u=>{if(u){el.src=u+(a.kind==="vid"?"#t="+((a.t0||0)+0.1).toFixed(1):"")}else el.closest(".att-t")&&el.closest(".att-t").classList.add("missing")});return}}});
   if(attView){const [tid,aid]=attView.split(":"),t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);let v=document.getElementById("attViewer");
     if(!a){attView=null;v&&v.remove();return}
     if(!v){v=document.createElement("div");v.id="attViewer";v.className="attv";v.setAttribute("role","dialog");v.setAttribute("aria-modal","true");document.body.appendChild(v)}
     if(v.dataset.k===attView)return;v.dataset.k=attView;
     const y=a.kind==="yt"?ytId(a.url):null;
     v.innerHTML=`<button type="button" class="attv-x" data-attclose aria-label="Close">×</button><div class="attv-in">${a.kind==="yt"?`<iframe src="https://www.youtube-nocookie.com/embed/${y}?autoplay=1&playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="YouTube video"></iframe>`:a.kind==="vid"?`<video controls playsinline autoplay data-attfull></video>`:`<img data-attfull alt="${esc(a.name||"Photo")}">`}</div>`;
-    if(a.kind!=="yt")attURL(a).then(u=>{const m=v.querySelector("[data-attfull]");if(m&&u)m.src=u})}
+    if(a.kind!=="yt")attURL(a).then(u=>{const m=v.querySelector("[data-attfull]");if(!m||!u)return;if(a.kind==="vid"&&a.t1!=null){m.src=u+"#t="+a.t0.toFixed(1)+","+a.t1.toFixed(1);m.addEventListener("loadedmetadata",()=>{m.currentTime=a.t0},{once:true});m.addEventListener("timeupdate",()=>{if(m.currentTime>=a.t1){m.pause();m.currentTime=a.t0}})}else m.src=u})}
   else{const v=document.getElementById("attViewer");v&&v.remove()}}
 /* shrink photos before saving so they don't fill the phone */
 function attShrink(f){return new Promise(ok=>{if(!/^image\/(jpe?g|png|webp|heic|heif)/i.test(f.type)){ok(f);return}const u=URL.createObjectURL(f),im=new Image();
@@ -6489,12 +6497,26 @@ function attShrink(f){return new Promise(ok=>{if(!/^image\/(jpe?g|png|webp|heic|
 const ATT_VMAX=60;
 function attDur(f){return new Promise(ok=>{const u=URL.createObjectURL(f),v=document.createElement("video");let done=false;const fin=d=>{if(done)return;done=true;URL.revokeObjectURL(u);v.removeAttribute("src");ok(d)};
   v.preload="metadata";v.muted=true;v.onloadedmetadata=()=>fin(isFinite(v.duration)?v.duration:0);v.onerror=()=>fin(0);setTimeout(()=>fin(0),8000);v.src=u})}
+/* trim window: a video longer than 1 minute opens this — slide the 1-minute window to the part you want */
+const attMS=x=>Math.floor(x/60)+":"+String(Math.floor(x%60)).padStart(2,"0");
+function attTrimAsk(f,dur){return new Promise(done=>{const u=URL.createObjectURL(f),L=ATT_VMAX,max=Math.max(0,dur-L);let st=0;
+  const w=document.createElement("div");w.className="attv atrim";w.setAttribute("role","dialog");w.setAttribute("aria-modal","true");
+  w.innerHTML=`<div class="atrim-box"><div class="atrim-h"><b>Trim video</b><small>Videos can be up to 1 minute. Slide the box to the part you want.</small></div>
+    <video playsinline muted autoplay src="${u}"></video>
+    <div class="atrim-bar"><i style="width:${L/dur*100}%"></i><input type="range" min="0" max="${max}" step="0.1" value="0" aria-label="Start of the clip"></div>
+    <div class="atrim-t"><span></span><span>${attMS(dur)} total</span></div>
+    <div class="atrim-b"><button type="button" class="att-b" data-x>Cancel</button><button type="button" class="btn" data-ok>Use this minute</button></div></div>`;
+  document.body.appendChild(w);const v=w.querySelector("video"),r=w.querySelector("input"),box=w.querySelector(".atrim-bar i"),lab=w.querySelector(".atrim-t span");
+  const upd=()=>{box.style.left=(max?st/dur*100:0)+"%";lab.textContent=attMS(st)+" – "+attMS(st+L)};upd();
+  r.addEventListener("input",()=>{st=+r.value;upd();try{v.currentTime=st;v.play()}catch(e){}});
+  v.addEventListener("timeupdate",()=>{if(v.currentTime>=st+L||v.currentTime<st-0.5)v.currentTime=st});
+  const end=val=>{v.pause();v.removeAttribute("src");URL.revokeObjectURL(u);w.remove();done(val)};
+  w.querySelector("[data-x]").onclick=()=>end(null);w.querySelector("[data-ok]").onclick=()=>end([st,Math.min(dur,st+L)])})}
 const attWait=(p,ms)=>Promise.race([p,new Promise(ok=>setTimeout(ok,ms))]);
 async function attAddFiles(tid,files){const t=findTaskAny(tid);if(!t)return;attBusy=tid;render();
   try{for(const f of files){const vid=/^video\//.test(f.type)||/\.(mov|mp4|m4v|webm)$/i.test(f.name||"");if(!vid&&!/^image\//.test(f.type))continue;
-    if(vid){const d=await attDur(f);if(d>ATT_VMAX+0.5){toast(`That video is ${Math.floor(d/60)}:${String(Math.round(d%60)).padStart(2,"0")} long. Videos can be up to 1 minute. Trim it first.`,5000);continue}
-      if(f.size>120e6){toast("That video is too big. Videos can be up to 1 minute.",5000);continue}}
-    const blob=vid?f:await attShrink(f),id=uid(),a={id,kind:vid?"vid":"img",name:f.name||"",at:Date.now(),size:blob.size};
+    let cut=null;if(vid){const d=await attDur(f);if(d>ATT_VMAX+0.5){cut=await attTrimAsk(f,d);if(!cut)continue}}
+    const blob=vid?f:await attShrink(f),id=uid(),a={id,kind:vid?"vid":"img",name:f.name||"",at:Date.now(),size:blob.size};if(cut){a.t0=cut[0];a.t1=cut[1]}
     await attWait(MDB.put(id,blob),15000);
     (t.att=t.att||[]).push(a);
     /* upload in the background so the screen never waits on it */
@@ -7557,7 +7579,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="502",APPT="2026-11-22T21:50:00Z";   /* APPT: when this update was made */
+const APPV="503",APPT="2026-11-22T21:55:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
