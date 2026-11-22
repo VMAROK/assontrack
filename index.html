@@ -2188,6 +2188,30 @@ html.phone #view .pgrid:has(.tknewp)>.pg-next{margin-top:-7px!important}
 html.phone #view .pgrid:has(.tknewp)>.pg-next>.pdetail{border-top:0!important;border-top-left-radius:0!important;border-top-right-radius:0!important;margin-top:0!important}
 html.phone #view .pgrid:has(.tknewp)>.pg-next>.pdetail::before{display:none!important}
 html.phone .tkbr{display:none!important}
+
+/* ===== phone, panel 10 (Tasks & Projects) ===== */
+.ptp-name{display:none}
+html.phone #view .ptp-name{display:flex;align-items:center;gap:8px;padding:2px 2px 10px}
+html.phone #view .ptp-name b{font-size:20px;font-weight:700}
+html.phone #view .ptp-name .plvl{font-size:11px!important}
+/* Tasks / Projects switch: small and quiet */
+html.phone #view .ptp .ptabs{padding:3px!important;gap:3px!important;border-radius:10px!important;background:rgba(0,0,0,.25)!important;box-shadow:none!important;margin:0 0 4px!important}
+html.phone #view .ptp .ptabs .tab{min-height:0!important;height:32px!important;padding:0 10px!important;font-size:13px!important;border-radius:8px!important;box-shadow:none!important;text-shadow:none!important;background:none!important;color:var(--muted)!important;border:0!important}
+html.phone #view .ptp .ptabs .tab svg{width:14px!important;height:14px!important}
+html.phone #view .ptp .ptabs .tab[aria-selected="true"]{background:rgba(255,255,255,.1)!important;color:var(--fg)!important}
+html.phone #view .ptp .ptabs .tab[aria-selected="true"] :is(.tcount,i,em,b){background:rgba(255,255,255,.15)!important;color:var(--fg)!important;box-shadow:none!important}
+html.phone #view .ptp .pd-hero{padding:0!important;margin:0!important;background:none!important;border:0!important}
+/* tasks: plain list rows — name on top, status · time underneath, Start on the right */
+html.phone #view .ptp .tkrow{display:flex!important;align-items:center!important;gap:8px;padding:10px 2px!important;border:0!important;border-bottom:1px solid rgba(var(--lr),.12)!important;border-radius:0!important;background:none!important;box-shadow:none!important;min-height:0!important}
+html.phone #view .ptp .tkrow::before{display:none!important}
+html.phone #view .ptp .tkrow .tkrow-main{display:grid!important;grid-template-columns:auto auto minmax(0,1fr);align-items:center;column-gap:8px;row-gap:3px;padding:0!important;background:none!important;border:0!important;min-height:0!important;text-align:left;flex:1;min-width:0}
+html.phone #view .ptp .tkrow .tkr-title{grid-column:1/-1;font-size:15px!important;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.phone #view .ptp .tkrow .tk-pill{grid-column:1;font-size:11px!important;padding:1px 7px!important;border-radius:5px!important}
+html.phone #view .ptp .tkrow .tkr-time{grid-column:2;font-size:12px!important;color:var(--muted);font-weight:500;font-family:var(--mono)}
+html.phone #view .ptp .tkrow .tkr-due,html.phone #view .ptp .tkrow .tkr-att{grid-column:auto;font-size:11.5px!important}
+html.phone #view .ptp .tkrow .tkr-sp,html.phone #view .ptp .tkrow .tk-chev{display:none!important}
+html.phone #view .ptp .tkrow .tkr-act{flex:none;align-self:center;height:32px;min-height:0!important;padding:0 14px!important;border-radius:99px!important;font-size:13px!important;font-weight:600;border:1px solid rgba(var(--lr),.3)!important;background:none!important;box-shadow:none!important}
+html.phone #view .ptp .tkrow.st-running .tkr-time{color:#ffb648}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -6960,9 +6984,12 @@ function figurePanel(){return `<div class="panel holopanel"><div class="ph"><spa
 /* Tasks & Projects next to My passions: the picked passion, or the first one when none is picked (using it picks that one) */
 /* editing categories happens here, in the panel beside My passions (it used to take over My passions itself) */
 function passCatPanel(d){const ALL=sortPass(d.passions||[]);return `<div class="panel pcatp">${catTabs(ALL)}${catManager(ALL)}</div>`}
-function passTP(d){const P=d.passions||[];if(!P.length)return "";const cur=P.find(x=>x.id===selP);if(cur)return passDetail(d).replace('class="panel pdetail" style="margin-top:18px"','class="panel pdetail ptp"');
+function passTP(d){const P=d.passions||[];if(!P.length)return "";const cur=P.find(x=>x.id===selP);
+  /* the passion's name on top of the panel (shown on phones) */
+  const nm=p=>`<div class="ptp-name"><b>${esc(p.name)}</b>${p.lvl?`<span class="plvl" data-lvl="${esc(p.lvl)}">${esc(p.lvl)}</span>`:""}</div>`;
+  if(cur)return passDetail(d).replace('class="panel pdetail" style="margin-top:18px">','class="panel pdetail ptp">'+nm(cur));
   const f=sortPass(P)[0],keep=selP;selP=f.id;let h="";try{h=passDetail(d)}finally{selP=keep}
-  return h.replace('class="panel pdetail" style="margin-top:18px"',`class="panel pdetail ptp" data-schedp="${f.id}"`)}
+  return h.replace('class="panel pdetail" style="margin-top:18px">',`class="panel pdetail ptp" data-schedp="${f.id}">`+nm(f))}
 function vPass(){
   const d=D(),S=scoreAll(d),st=streak(d),wk=weekKey(today()),P=d.passions;
   const pn=id=>(P.find(p=>p.id===id)||{name:"Removed"}).name;
@@ -7640,7 +7667,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="508",APPT="2026-11-22T22:24:00Z";   /* APPT: when this update was made */
+const APPV="509",APPT="2026-11-22T22:22:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
