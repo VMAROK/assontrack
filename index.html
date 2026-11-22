@@ -2190,8 +2190,8 @@ html.phone #view .pgrid:has(.tknewp)>.pg-next>.pdetail::before{display:none!impo
 html.phone .tkbr{display:none!important}
 
 /* ===== panel 10 (Tasks & Projects): passion name on top, quiet switch, tasks as list rows — every screen size ===== */
-#view .ptp-name{display:flex;align-items:center;gap:8px;padding:2px 2px 10px}
-#view .ptp-name b{font-size:20px;font-weight:700}
+#view .ptp-name{display:flex;align-items:center;gap:10px;padding:12px 4px 14px;margin:0}
+#view .ptp-name b{font-size:22px;font-weight:700;letter-spacing:.01em;line-height:1.2}
 #view .ptp-name .plvl{font-size:11px!important}
 /* Tasks / Projects switch: small and quiet */
 #view .ptp .ptabs{padding:3px!important;gap:3px!important;border-radius:10px!important;background:rgba(0,0,0,.25)!important;box-shadow:none!important;margin:0 0 4px!important}
@@ -7666,7 +7666,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="510",APPT="2026-11-22T22:31:00Z";   /* APPT: when this update was made */
+const APPV="511",APPT="2026-11-22T22:34:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
