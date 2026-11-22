@@ -1856,7 +1856,12 @@ html:not(.tpl-spa) .tkq-add{color:#04101f;background:linear-gradient(180deg,#7fd
 
 /* phone: same page as the iPad, tabs along the bottom — 4 at a time like a real app's tab bar; swipe the bar for the rest.
    The page is drawn 1180px wide and shrunk to the phone, so 1pt on the phone ≈ 3px here (tab bar 49pt, icons 25pt, labels 10pt) */
-html.phone,html.phone body{height:100%}
+html.phone,html.phone body{height:100%;overflow:hidden!important;overscroll-behavior:none}
+/* the app itself never scrolls on the phone — only the page area inside it does, so the tab bar stays put */
+html.phone body{position:fixed;inset:0;width:100%}
+html.phone .shell{position:fixed!important;inset:0!important;width:auto!important;height:auto!important}
+html.phone #view{overflow-y:auto!important;overflow-x:hidden;overscroll-behavior:contain;min-height:0}
+html.phone .topbar{padding-top:max(24px,calc(env(safe-area-inset-top,0px) * 3))!important}
 html.phone .shell{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto minmax(0,1fr) auto!important;height:100%}
 html.phone .topbar{grid-column:1!important;grid-row:1!important}
 html.phone #view{grid-column:1!important;grid-row:2!important;-webkit-overflow-scrolling:touch}
@@ -7164,7 +7169,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="474",APPT="2026-11-22T01:16:00Z";   /* APPT: when this update was made */
+const APPV="475",APPT="2026-11-22T01:19:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
