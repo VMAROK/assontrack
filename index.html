@@ -6619,7 +6619,8 @@ function attStageEl(tid,a){const k=tid+":"+a.id;if(attStageEls.has(k))return att
   document.addEventListener("touchend",e=>{if(sx==null||!st)return;const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;sx=null;if(Math.abs(dx)<45||Math.abs(dx)<Math.abs(dy)*1.3)return;
     const tid=st.dataset.atttid,tk=findTaskAny(tid);if(!tk)return;const A=tk.att||[];if(A.length<2)return;const cur=A.findIndex(a=>a.id===(attSel[tid]||A[0].id));const nx=A[(Math.max(0,cur)+(dx<0?1:-1)+A.length)%A.length];
     st.querySelectorAll("video").forEach(v=>v.pause());attSel[tid]=nx.id;render()},{passive:true})})();
-function attStages(){document.querySelectorAll("[data-attstage]").forEach(st=>{const [tid,aid]=st.dataset.attstage.split(":"),t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);if(!a)return;
+function attStages(){document.querySelectorAll(".att-strip").forEach(sp=>{const on=sp.querySelector(".att-t.on");if(!on)return;const l=on.offsetLeft-sp.offsetLeft,r=l+on.offsetWidth;if(l<sp.scrollLeft||r>sp.scrollLeft+sp.clientWidth)sp.scrollLeft=Math.max(0,l-(sp.clientWidth-on.offsetWidth)/2)});
+  document.querySelectorAll("[data-attstage]").forEach(st=>{const [tid,aid]=st.dataset.attstage.split(":"),t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);if(!a)return;
   const el=attStageEl(tid,a);if(el.parentNode!==st){st.innerHTML="";st.appendChild(el)}})}
 const findTaskAny=id=>{for(const p of data.passions||[]){const t=(p.tasks||[]).find(x=>x.id===id);if(t)return t}return null};
 const ATT_PLAY='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="rgba(0,0,0,.55)"/><path d="M10 8l6 4-6 4z" fill="#fff"/></svg>';
@@ -7821,7 +7822,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="516",APPT="2026-11-22T23:11:35Z";   /* APPT: when this update was made */
+const APPV="517",APPT="2026-11-22T23:15:39Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
