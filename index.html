@@ -1874,6 +1874,9 @@ html.phone .navgrp .navsub{display:flex!important;pointer-events:auto!important}
 html.phone .navcar,html.phone .navbtn.navsub::after,html.phone .navbtn.navsub::before{display:none!important}
 html.phone .navbtn,html.phone .navbtn.navsub{flex:0 0 25%!important;width:25%!important;max-width:none!important;height:147px;box-sizing:border-box;scroll-snap-align:start;flex-direction:column!important;gap:8px!important;font-size:30px!important;font-weight:500!important;padding:18px 0 0!important;margin:0!important;justify-content:flex-start;align-items:center;text-align:center;border-radius:0!important;border:0!important;background:none!important;box-shadow:none!important;min-width:0}
 html.phone .navbtn svg{width:75px!important;height:75px!important;flex:none}
+/* the reminders count sits on the corner of its icon, like an app badge (it was falling under the tab) */
+html.phone .navbtn{position:relative}
+html.phone .navbtn .nbadge{position:absolute!important;top:8px;left:calc(50% + 18px);right:auto!important;margin:0!important;min-width:54px;height:54px;padding:0 15px;font-size:30px;border-radius:99px;box-shadow:0 0 0 6px rgba(10,10,14,.9),0 0 18px rgba(255,209,102,.6)}
 html.phone .navbtn[aria-selected="true"]{color:var(--accent,#ffb648)!important}
 html.phone .navbtn[aria-selected="true"]::before{display:none!important}
 html.phone .toast{bottom:calc(200px + env(safe-area-inset-bottom,0px))}
@@ -7170,7 +7173,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="477",APPT="2026-11-22T01:29:00Z";   /* APPT: when this update was made */
+const APPV="478",APPT="2026-11-22T03:43:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
