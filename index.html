@@ -2159,13 +2159,16 @@ html.phone #view{padding-top:max(12px,env(safe-area-inset-top,0px))!important}
 /* theater: one big player like YouTube, the rest as a strip under it */
 .att-theater{display:grid;gap:8px;margin-bottom:12px}
 .att-stage{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 18px 40px -14px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.06)}
-.att-stage-in,.att-stage-in>*{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.att-slot>.att-stage-in,.att-stage-in>*{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
 .att-stage-in video,.att-stage-in img{object-fit:contain;background:#000}
 .att-stage-in .attv-miss{display:grid;place-items:center;color:rgba(255,255,255,.6);font-size:13px;margin:0}
-.att-bar{display:flex;align-items:center;gap:10px;padding:0 2px;font-size:12.5px;color:var(--muted)}
-.att-count{font-weight:700;color:var(--fg)}
-.att-kind{padding:2px 8px;border-radius:99px;background:rgba(var(--lr),.12);font-weight:600;font-size:11.5px}
-.att-fs{display:grid;place-items:center;width:34px;height:34px;border-radius:99px;border:0;background:rgba(var(--lr),.1);color:var(--fg);cursor:pointer}
+/* corner lines like the portfolio: hairline-thin, the one showing glows */
+.att-dots{position:absolute;z-index:3;top:21px;right:58px;display:flex;align-items:center;gap:3px;max-width:calc(100% - 80px);pointer-events:none}
+.att-dots i{flex:0 1 12px;min-width:3px;height:1.5px;border-radius:1px;background:rgba(255,255,255,.22);transition:background .5s,box-shadow .5s}
+.att-dots i.on{background:#fff;box-shadow:0 0 4px rgba(255,255,255,.95),0 0 10px rgba(160,200,255,.7),0 0 18px rgba(120,170,255,.45)}
+html.tpl-spa .att-dots i.on{background:#ffb15c;box-shadow:0 0 4px rgba(255,160,70,.95),0 0 10px rgba(217,137,58,.75),0 0 18px rgba(217,137,58,.45)}
+.att-fs{position:absolute;z-index:4;top:8px;right:8px;width:34px;height:34px;display:grid;place-items:center;border-radius:6px;cursor:pointer;color:#f2ede6;background:rgba(8,6,6,.55);border:1px solid rgba(255,255,255,.16);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.att-slot{position:absolute;inset:0}
 .att-strip{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 0 4px}.att-strip::-webkit-scrollbar{display:none}
 .att-strip .att-t{flex:0 0 128px;aspect-ratio:16/9;border-radius:9px;opacity:.6;transition:opacity .15s}
 .att-strip .att-t.on{opacity:1;outline:2px solid var(--fg);outline-offset:1px}
@@ -6610,6 +6613,12 @@ function attStageEl(tid,a){const k=tid+":"+a.id;if(attStageEls.has(k))return att
       if(a.t1!=null){m.addEventListener("loadedmetadata",()=>{try{m.currentTime=a.t0||0}catch(_){}},{once:true});m.addEventListener("timeupdate",()=>{if(m.currentTime>=a.t1){m.pause();m.currentTime=a.t0||0}})}
       m.load()})}
   attStageEls.set(k,w);return w}
+/* swipe the big player left/right to go to the next/previous item (like the portfolio covers) */
+(()=>{let sx=null,sy=0,st=null;
+  document.addEventListener("touchstart",e=>{const g=e.target.closest&&e.target.closest(".att-stage");if(!g||e.touches.length>1){sx=null;return}const r=g.getBoundingClientRect(),y=e.touches[0].clientY;if(y>r.bottom-56){sx=null;return}sx=e.touches[0].clientX;sy=y;st=g},{passive:true});
+  document.addEventListener("touchend",e=>{if(sx==null||!st)return;const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;sx=null;if(Math.abs(dx)<45||Math.abs(dx)<Math.abs(dy)*1.3)return;
+    const tid=st.dataset.atttid,tk=findTaskAny(tid);if(!tk)return;const A=tk.att||[];if(A.length<2)return;const cur=A.findIndex(a=>a.id===(attSel[tid]||A[0].id));const nx=A[(Math.max(0,cur)+(dx<0?1:-1)+A.length)%A.length];
+    st.querySelectorAll("video").forEach(v=>v.pause());attSel[tid]=nx.id;render()},{passive:true})})();
 function attStages(){document.querySelectorAll("[data-attstage]").forEach(st=>{const [tid,aid]=st.dataset.attstage.split(":"),t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);if(!a)return;
   const el=attStageEl(tid,a);if(el.parentNode!==st){st.innerHTML="";st.appendChild(el)}})}
 const findTaskAny=id=>{for(const p of data.passions||[]){const t=(p.tasks||[]).find(x=>x.id===id);if(t)return t}return null};
@@ -6622,8 +6631,10 @@ function attHtml(t){const A=t.att||[];
     return `<div class="att-t"><button type="button" class="att-open" data-attview="${t.id}:${a.id}" aria-label="Open ${a.kind==="img"?"photo":a.kind==="vid"?"video":"YouTube video"}">${inner}</button><button type="button" class="att-x" data-attdel="${t.id}:${a.id}" aria-label="Remove">×</button></div>`};
   return `<div class="att"><div class="att-h">${CLIP}<span>Media</span>${A.length?`<small>${A.length}</small>`:""}</div>
     ${A.length?(()=>{const cur=A.find(a=>a.id===attSel[t.id])||A[0],i=A.indexOf(cur);
-      return `<div class="att-theater"><div class="att-stage" data-attstage="${t.id}:${cur.id}"><div class="att-stage-load"></div></div>
-      <div class="att-bar"><span class="att-count">${i+1} of ${A.length}</span><span class="att-kind">${cur.kind==="yt"?"YouTube":cur.kind==="vid"?"Video":"Photo"}</span><span style="flex:1"></span><button type="button" class="att-fs" data-attview="${t.id}:${cur.id}" aria-label="Full screen" title="Full screen"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>
+      return `<div class="att-theater"><div class="att-stage" data-atttid="${t.id}"><div class="att-slot" data-attstage="${t.id}:${cur.id}"></div>
+        ${A.length>1?`<span class="att-dots" aria-hidden="true">${A.map(a=>`<i${a.id===cur.id?' class="on"':""}></i>`).join("")}</span>`:""}
+        <button type="button" class="att-fs" data-attview="${t.id}:${cur.id}" aria-label="Full screen" title="Full screen"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>
+      <!-- old caption bar ("2 of 3", type, full screen), replaced by the corner lines like the portfolio -->
       ${true?`<div class="att-strip">${A.map(a=>`<div class="att-t${a.id===cur.id?" on":""}"><button type="button" class="att-open" data-attsel="${t.id}:${a.id}" aria-pressed="${a.id===cur.id}" aria-label="Show this ${a.kind==="img"?"photo":"video"}">${attThumb(a)}</button><button type="button" class="att-x" data-attdel="${t.id}:${a.id}" aria-label="Remove">×</button></div>`).join("")}</div>`:""}</div>`})():""}
     <!-- old small grid: ${""}<div class="att-grid">tiles</div> -->
     ${attBusy===t.id?`<p class="att-msg"><span class="mini-spin"></span>Adding…</p>`:""}
@@ -7810,7 +7821,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="515",APPT="2026-11-22T23:04:57Z";   /* APPT: when this update was made */
+const APPV="516",APPT="2026-11-22T23:11:35Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
