@@ -6470,7 +6470,7 @@ function attHtml(t){const A=t.att||[];
     ${A.length?`<div class="att-grid">${A.map(tile).join("")}</div>`:""}
     ${attBusy===t.id?`<p class="att-msg"><span class="mini-spin"></span>Adding…</p>`:""}
     ${attLinkFor===t.id?`<form class="att-link" data-attlinkform="${t.id}"><input id="attUrl" type="url" inputmode="url" placeholder="Paste a YouTube link" autocomplete="off" required><button class="btn">Add</button><button type="button" class="att-cx" data-attlink="${t.id}" aria-label="Cancel">×</button></form>`:""}
-    <div class="att-add"><label class="att-b"><input type="file" accept="image/*,video/*" multiple data-attfile="${t.id}" hidden>+ Photo or video <small style="opacity:.7;font-weight:500">(video up to 1 min)</small></label><button type="button" class="att-b" data-attlink="${t.id}">+ YouTube link</button></div></div>`}
+    <div class="att-add"><button type="button" class="att-b" data-attpick="${t.id}" data-attacc="image/*">+ Photo</button><button type="button" class="att-b" data-attpick="${t.id}" data-attacc="video/*">+ Video <small style="opacity:.7;font-weight:500">(up to 1 min)</small></button><button type="button" class="att-b" data-attlink="${t.id}">+ YouTube link</button></div></div>`}
 function attHydrate(){document.querySelectorAll("[data-attsrc]").forEach(el=>{if(el.src)return;const id=el.dataset.attsrc;const t=[...document.querySelectorAll("[data-attview]")].length;
   for(const p of data.passions||[])for(const tk of p.tasks||[]){const a=(tk.att||[]).find(x=>x.id===id);if(a){attURL(a).then(u=>{if(u){el.src=u+(a.kind==="vid"?"#t=0.1":"")}else el.closest(".att-t")&&el.closest(".att-t").classList.add("missing")});return}}});
   if(attView){const [tid,aid]=attView.split(":"),t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);let v=document.getElementById("attViewer");
@@ -6501,14 +6501,21 @@ async function attAddFiles(tid,files){const t=findTaskAny(tid);if(!t)return;attB
     if(typeof sbOn==="function"&&sbOn()){const ext=vid?((f.name||"").split(".").pop()||"mp4").toLowerCase():"jpg",pth=sbUser.id+"/att/"+id+"."+ext;
       sb.storage.from("models").upload(pth,blob,{upsert:true,contentType:blob.type||"application/octet-stream"}).then(({error})=>{if(!error){a.path=pth;save()}}).catch(()=>{})}}}
   finally{attBusy=null;save();render()}}
-document.addEventListener("change",e=>{const i=e.target;if(!i.dataset||!i.dataset.attfile)return;const fs=[...(i.files||[])];i.value="";if(fs.length)attAddFiles(i.dataset.attfile,fs)});
+/* one file picker that lives outside the redrawn screen — the screen redraws while the phone's photo picker is open,
+   which threw away the old picker, so tapping the check mark did nothing */
+let attPickFor=null,attPickEl=null;
+function attPicker(){if(attPickEl)return attPickEl;const i=document.createElement("input");i.type="file";
+  i.style.cssText="position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0";
+  i.addEventListener("change",()=>{const fs=[...(i.files||[])],tid=attPickFor;i.value="";if(fs.length&&tid)attAddFiles(tid,fs)});
+  document.body.appendChild(i);return attPickEl=i}
 document.addEventListener("submit",e=>{const f=e.target;if(!f.dataset||!f.dataset.attlinkform)return;e.preventDefault();e.stopImmediatePropagation();
   const u=(f.querySelector("#attUrl").value||"").trim(),y=ytId(u);if(!y){toast("That doesn't look like a YouTube link");return}
   const t=findTaskAny(f.dataset.attlinkform);if(!t)return;(t.att=t.att||[]).push({id:uid(),kind:"yt",url:"https://youtu.be/"+y,at:Date.now()});attLinkFor=null;save();render()},true);
-document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-attlink],[data-attdel],[data-attview],[data-attclose]");
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-attlink],[data-attdel],[data-attview],[data-attclose],[data-attpick]");
   if(!b){if(attView&&e.target.id==="attViewer"){attView=null;attHydrate()}return}
   e.preventDefault();e.stopPropagation();
   if(b.dataset.attlink){attLinkFor=attLinkFor===b.dataset.attlink?null:b.dataset.attlink;render();if(attLinkFor)setTimeout(()=>{const i=document.getElementById("attUrl");i&&i.focus()},30);return}
+  if(b.dataset.attpick){attPickFor=b.dataset.attpick;const i=attPicker();i.accept=b.dataset.attacc||"image/*,video/*";i.multiple=i.accept==="image/*";i.click();return}
   if(b.dataset.attview){attView=b.dataset.attview;attHydrate();return}
   if(b.dataset.attclose!==undefined){attView=null;attHydrate();return}
   if(b.dataset.attdel){const [tid,aid]=b.dataset.attdel.split(":"),t=findTaskAny(tid);if(!t)return;
@@ -7550,7 +7557,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="501",APPT="2026-11-22T21:45:00Z";   /* APPT: when this update was made */
+const APPV="502",APPT="2026-11-22T21:50:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
