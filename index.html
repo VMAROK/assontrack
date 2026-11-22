@@ -1734,6 +1734,10 @@ html.tpl-spa .pleft .ptabs-in{border-radius:19px 19px 0 0}
 .pg-right>.cs-combo{flex:1 1 auto}
 .pgrid>.pleft{align-self:start}
 .pg-next:empty{display:none}
+
+/* Tasks & Projects beside My passions */
+.pgrid>.pg-next{align-self:start}
+.pg-next>.ptp{margin:0!important}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -6341,6 +6345,10 @@ function commitPanel(d,P,wk){
     <div class="cs-stats"><div><b style="color:#3ddc84">${done}</b><small>On time</small></div><div${missed?' data-missopen role="button" tabindex="0" class="ms-open" title="See what counts as missed"':""}><b class="${missed?"miss":""}">${missed}</b><small>Missed${missed?" · see why":""}</small></div><div><b>${fmtH(wkM)}</b><small>This week</small></div><div><b>${stk}<span>d</span></b><small>Streak</small></div></div></div>`;
 }
 function figurePanel(){return `<div class="panel holopanel"><div class="ph"><span>${figFit()?"Your body":"Your figure"}</span><button class="addp gear avgear${avEdit?" on":""}" data-avedit aria-expanded="${avEdit}" aria-label="Customize" title="Customize"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button></div>${holoView()}<div class="avfoot">${avEdit?avEditor()+`<div class="av-actions"><button class="btn ghost" data-avcancel>Cancel</button><button class="btn" data-avsave>Save</button></div>`:""}</div></div>`}
+/* Tasks & Projects next to My passions: the picked passion, or the first one when none is picked (using it picks that one) */
+function passTP(d){const P=d.passions||[];if(!P.length)return "";const cur=P.find(x=>x.id===selP);if(cur)return passDetail(d).replace('class="panel pdetail" style="margin-top:18px"','class="panel pdetail ptp"');
+  const f=sortPass(P)[0],keep=selP;selP=f.id;let h="";try{h=passDetail(d)}finally{selP=keep}
+  return h.replace('class="panel pdetail" style="margin-top:18px"',`class="panel pdetail ptp" data-schedp="${f.id}"`)}
 function vPass(){
   const d=D(),S=scoreAll(d),st=streak(d),wk=weekKey(today()),P=d.passions;
   const pn=id=>(P.find(p=>p.id===id)||{name:"Removed"}).name;
@@ -6351,9 +6359,9 @@ function vPass(){
     <div class="pg-cell pg-fig">${figurePanel()}</div>
     <div class="pg-cell pg-right">${passThemePanel(d)}<div class="panel cs-combo">${commitPanel(d,P,wk).replace('<div class="panel cs">','<div class="cs">')}<div class="cs-split"></div>${passSched(d).replace('class="panel pdetail psched"','class="psched"')}</div></div>
     <div class="stack pleft">${passList(d,P,wk)}</div>
-    <div class="pg-cell pg-next"></div>
+    <div class="pg-cell pg-next">${passTP(d)}</div>
   </div>
-  ${passDetail(d)}${schedWinHtml(d)}
+  ${/* Tasks & Projects used to sit here, full width under everything: passDetail(d) */""}${schedWinHtml(d)}
 `;
 }
 const WALLS=[
@@ -7007,7 +7015,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="464",APPT="2026-11-22T00:06:00Z";   /* APPT: when this update was made */
+const APPV="465",APPT="2026-11-22T00:10:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
