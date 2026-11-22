@@ -1,5 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script>/* phones: lay the page out exactly like the iPad/desktop (1180px wide, scaled to fit) — only the tabs move to the bottom */
+(function(){try{var w=Math.min(screen.width,screen.height);if(w<700){document.querySelector('meta[name=viewport]').setAttribute('content','width=1180,viewport-fit=cover');document.documentElement.classList.add('phone')}}catch(e){}})();</script>
 <title>AssOnTrack</title>
 <meta name="description" content="Progress, diet and passion tracker">
 <meta name="theme-color" content="#060b17">
@@ -1818,9 +1820,10 @@ html:not(.tpl-spa) .tkq-add{color:#04101f;background:linear-gradient(180deg,#7fd
 .pg-next>.pcatp{margin:0}
 .pcatp .ph{display:flex;align-items:center;justify-content:space-between}
 
-/* ===== PHONE ONLY (under 700px wide) — the iPad never sees these ===== */
+/* phone-only dashboard tweaks — dropped: the phone now shows the same layout as the iPad
+/* ===== PHONE ONLY (under 700px wide) — the iPad never sees these ===== * /
 @media (max-width:700px){
-  /* dashboard score tiles: 4 across, nothing cut off, whole tile opens the breakdown */
+  /* dashboard score tiles: 4 across, nothing cut off, whole tile opens the breakdown * /
   .dstack .dtiles{height:auto!important;grid-template-columns:repeat(4,minmax(0,1fr))!important}
   .dstack .dtile{position:relative;height:auto!important;padding:12px 2px 10px!important;gap:4px!important;border-top:0!important;border-left:1px solid rgba(var(--lr),.16)!important}
   .dstack .dtile:first-child{border-left:0!important}
@@ -1828,7 +1831,7 @@ html:not(.tpl-spa) .tkq-add{color:#04101f;background:linear-gradient(180deg,#7fd
   .dstack .dtile b{font-size:12px}
   .dstack .dtile small{font-size:10px;line-height:1.2}
   .dstack .dtile .dview{position:absolute;inset:0;opacity:0;font-size:0;border:0;background:none;padding:0;margin:0}
-  /* this week: 7 small columns instead of 7 tall rows */
+  /* this week: 7 small columns instead of 7 tall rows * /
   .wahead .wa-grid{grid-template-columns:repeat(7,minmax(0,1fr))!important;min-height:0!important}
   .wahead .wa-day{display:flex!important;flex-direction:column;gap:4px;padding:7px 3px 8px!important;border-top:0!important;border-left:1px solid rgba(var(--lr),.14)!important;min-height:86px!important}
   .wahead .wa-day:first-child{border-left:0!important}
@@ -1839,16 +1842,30 @@ html:not(.tpl-spa) .tkq-add{color:#04101f;background:linear-gradient(180deg,#7fd
   .wahead .wa-it small{display:block;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .wahead .wa-it span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .wahead .wa-none{font-size:0;text-align:center;color:var(--muted)}.wahead .wa-none::after{content:"–";font-size:12px;opacity:.5}
-  /* dashboard figure: figure on the left, its words on the right — no tall empty box */
+  /* dashboard figure: figure on the left, its words on the right — no tall empty box * /
   .dashtop .holopanel{display:grid!important;grid-template-columns:118px minmax(0,1fr);grid-template-areas:"holo ph" "holo st" "holo cap" "holo foot";grid-template-rows:auto auto auto 1fr;column-gap:14px;row-gap:6px;align-items:start}
   .dashtop .holopanel>.ph{grid-area:ph;margin:0!important}
   .dashtop .holopanel>.holo{grid-area:holo;width:118px!important;max-width:118px!important;margin:0!important;align-self:center}
   .dashtop .holopanel>.hstage{grid-area:st;justify-self:start;margin:0!important}
   .dashtop .holopanel>.hcap{grid-area:cap;text-align:left!important;margin:0!important;font-size:12px}
   .dashtop .holopanel>.avfoot{grid-area:foot}
-  /* header: the update stamp smaller */
+  /* header: the update stamp smaller * /
   #updTop{font-size:11px!important;padding:4px 7px!important}
 }
+*/
+
+/* phone: same page as the iPad, tabs along the bottom */
+html.phone,html.phone body{height:100%}
+html.phone .shell{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto minmax(0,1fr) auto!important;height:100%}
+html.phone .topbar{grid-column:1!important;grid-row:1!important}
+html.phone #view{grid-column:1!important;grid-row:2!important;-webkit-overflow-scrolling:touch}
+html.phone aside{grid-column:1!important;grid-row:3!important;flex-direction:row!important;justify-content:space-around;gap:0!important;padding:8px 10px max(10px,env(safe-area-inset-bottom,0px))!important;border-right:0!important;border-top:1px solid rgba(var(--lr),.3);overflow:visible!important}
+html.phone aside .logo,html.phone aside .side-foot{display:none!important}
+html.phone .navbtn{flex:1;flex-direction:column!important;gap:5px!important;font-size:15px!important;padding:10px 4px!important;justify-content:center;align-items:center;text-align:center;border-radius:12px;min-width:0}
+html.phone .navbtn svg{width:30px!important;height:30px!important}
+html.phone .navsub::before,html.phone .navsub>.nav-dash{display:none!important}
+html.phone .navbtn[aria-selected="true"]::before{left:28%!important;right:28%!important;top:-9px!important;bottom:auto!important;width:auto!important;height:3px!important}
+html.phone .toast{bottom:calc(120px + env(safe-area-inset-bottom,0px))}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -7142,7 +7159,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="472",APPT="2026-11-22T01:06:00Z";   /* APPT: when this update was made */
+const APPV="473",APPT="2026-11-22T01:11:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
