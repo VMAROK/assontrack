@@ -2863,6 +2863,40 @@ body.dbg-off .dbg-n{display:none}body.dbg-off .dbg-box{outline:none}
 .pw-btns{display:flex;gap:10px;align-items:center}.pw-btns .btn{flex:1}
 .imp input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0!important}
 .snaps{display:grid;gap:8px}.snap{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:9px 11px;border:1px solid rgba(var(--lr),.2);border-radius:10px}.snap span{display:grid;font-size:13px}.snap small{color:var(--muted);font-size:12px}.snap .mv.armed{color:#ffb648;border-color:rgba(255,182,72,.5)}
+
+/* ===== Passions: New task panel under My passions, bridged into Tasks & Projects ===== */
+.tknewp{position:relative;overflow:visible;z-index:4}
+.tknewp form.addform{display:grid;gap:12px;margin:0;padding:0;background:none!important;border:0!important;box-shadow:none!important}
+.tknewp .tkn-h{display:flex;align-items:center;justify-content:space-between;margin:0}
+.tknewp .tkn-h .x{width:30px;height:30px;border-radius:50%;border:1px solid rgba(var(--lr),.25);background:none;color:var(--muted);font-size:18px;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
+.passtop{position:relative}
+.tkbr{position:absolute;z-index:4;pointer-events:none;box-sizing:border-box}
+.tknewp.bridged{border-top-right-radius:0!important;border-bottom-right-radius:0!important;border-right-color:transparent!important}
+
+.tknew-b{font:inherit;font-size:13px;font-weight:700;color:var(--cyan);background:rgba(var(--tL),.1);border:1px solid rgba(var(--tL),.4);border-radius:99px;padding:6px 12px;cursor:pointer}
+.tknew-b.on{background:rgba(var(--tL),.25);color:#fff}
+.pdetail .tkwrap{grid-template-columns:minmax(0,1fr)!important}
+
+/* ===== Tasks list in panel 10: one clean list, no boxes inside the panel ===== */
+.pdetail .tk-sec{background:none!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;margin:0!important;padding:14px 0 10px!important;border-bottom:1px solid rgba(var(--lr),.16)!important}
+.pdetail .tk-sec .ph>span:first-child,.pdetail .ph.tk-sec>span:first-child{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.pdetail .ph.tk-sec.solo{margin-top:22px!important;padding:14px 0 10px!important}
+.pdetail .tklist{display:block!important}
+.pdetail .tklist>.tkrow,.pdetail .tkg-b>.tkrow,.pdetail .tksub>.tkrow{border:0!important;border-bottom:1px solid rgba(var(--lr),.12)!important;border-radius:0!important;background:none!important;box-shadow:none!important;margin:0!important;position:relative}
+.pdetail .tkrow::before,.pdetail .tkcard::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:3px;background:var(--sc,#4c6bb0)}
+.pdetail .tkrow.st-running,.pdetail .tkcard.st-running{--sc:#3ddc84}.pdetail .tkrow.st-paused,.pdetail .tkcard.st-paused{--sc:#ffb547}
+.pdetail .tkrow.st-overdue,.pdetail .tkcard.st-overdue{--sc:var(--red)}.pdetail .tkrow.st-planned,.pdetail .tkcard.st-planned{--sc:#8a7bff}
+.pdetail .tkrow>.tkrow-main{padding-left:14px!important}
+.pdetail .tkrow .tkr-act{background:none!important;border-left:0!important;padding:0 6px 0 14px!important}.pdetail .tkrow .tkr-act:hover{text-decoration:underline}
+.pdetail .tklist>.tkcard,.pdetail .tkg-b>.tkcard,.pdetail .tksub>.tkcard{position:relative;border:0!important;border-bottom:1px solid rgba(var(--lr),.12)!important;border-radius:0!important;box-shadow:none!important;margin:0!important;padding:4px 0 18px 14px!important;gap:14px;background:linear-gradient(90deg,rgba(var(--tL),.07),transparent 70%)!important;overflow:visible}
+.pdetail .tkcard::before{top:14px;bottom:18px}
+.pdetail .tkcard>.tk-top{margin:0!important;padding:12px 0 0!important;background:none!important;border:0!important}
+.pdetail .tkcard .tk-mid{padding:0}
+.pdetail .tkcard .att{border-top:0;margin:0;padding:0}
+.pdetail .tkcard .track{margin:0}
+.pdetail .tkg-h{padding:14px 0 6px!important;margin:0!important;background:none!important;border:0!important}
+.pdetail .tkgroup{border:0!important;background:none!important;box-shadow:none!important;padding:0!important;margin:0!important}
+.pdetail .tkgroup .tkg-b{padding:0!important;border:0!important;background:none!important;margin:0!important}
 </style>
 
 <div id="bgimg" class="on" aria-hidden="true"></div><div id="bgimg2" aria-hidden="true"></div><canvas id="bglive" aria-hidden="true"></canvas><div id="bgspin" aria-hidden="true"></div>
@@ -6553,6 +6587,14 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
     const a=(t.att||[]).find(x=>x.id===aid);t.att=(t.att||[]).filter(x=>x.id!==aid);if(a){MDB.del(a.id);if(a.path&&typeof sbOn==="function"&&sbOn())try{sb.storage.from("models").remove([a.path])}catch(_){}if(attURLs.has(a.id)){URL.revokeObjectURL(attURLs.get(a.id));attURLs.delete(a.id)}}
     save();render()}},true);
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&attView){attView=null;attHydrate()}});
+function tkFormHtml(d,p){const PR=prjOrdered(d,p);return `<form class="f addform" id="tkForm"><div class="ph tkn-h"><span>New task</span><button type="button" class="x" data-tknew aria-label="Close">×</button></div>
+     <label>Task<input id="tkT" required placeholder="Describe the task" autocomplete="off"></label>
+     ${PR.length?`<label>Project (optional)<select id="tkP"><option value="">No project</option>${PR.map(x=>`<option value="${x.id}" ${(prjFocus||tkFilter)===x.id?"selected":""}>${esc(prjLabel(x))}</option>`).join("")}</select></label>`:`<p class="note" style="margin:0">Tip: create a project in the Projects tab to group tasks.</p>`}
+     <div class="f2"><label>Start date (optional)<input id="tkS" type="date" min="${today()}"></label><label>Hours to put in (optional)<input id="tkH" type="number" step="0.5" min="0" inputmode="decimal" placeholder="e.g. 5"></label></div>
+     <div class="f2"><label>Due date (optional)<input id="tkD" type="date" min="${today()}"></label><label>Due time (optional)<input id="tkTm" type="time"></label></div>
+     <label class="lockbox"><input id="tkAck" type="checkbox"><span><b>No turning back.</b> Once a deadline is set it can't be changed or removed, and the task can't be deleted. Missing it counts against your progress.</span></label>
+     <button class="btn">Add task</button>
+     <small class="note" style="margin:0">Hit Start when you begin, Pause when you stop, and Mark done when it's finished. Every timed session adds to your hours.</small></form>`}
 function taskView(d,p){
   const PR=prjOrdered(d,p),TOPS=topsOf(d,p);if(tkFilter!=="all"&&tkFilter!=="none"&&!PR.some(x=>x.id===tkFilter))tkFilter="all";const fx=prjById(tkFilter),fIds=fx?treeIds(fx):[];const inF=t=>tkFilter==="all"||(tkFilter==="none"?!t.proj||!PR.some(x=>x.id===t.proj):fIds.includes(t.proj));
   const T=(p.tasks||[]).filter(inF),act=T.filter(t=>!t.doneAt).sort((a,b)=>(a.due||9e15)-(b.due||9e15)||a.created-b.created),fin=T.filter(t=>t.doneAt).sort((a,b)=>b.doneAt-a.doneAt);
@@ -6569,7 +6611,7 @@ function taskView(d,p){
       <div class="tk-btns">${st==="planned"?"":run?`<button class="btn" data-tkpause="${t.id}">Pause</button><button class="tk-cancel" data-tkcancel="${t.id}" title="Discard this timer session">Cancel timer</button>`:`<button class="btn" data-tkstart="${t.id}">${(t.runs||[]).length?"Resume":"Start"}</button>`}<span class="tk-end">${(t.runs||[]).length?`<button class="tk-ic tk-reset" data-tkreset="${t.id}" aria-label="Reset timer" title="Reset timer to 0"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button>`:""}${!t.due?`<button class="tk-ic tk-del" data-tkdel="${t.id}" aria-label="Delete task" title="Delete task"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>`:`<span class="tk-ic tk-lock" title="Tasks with a deadline can't be deleted">${LOCK}</span>`}<button class="tk-ic tk-done" data-tkdone="${t.id}" aria-label="Mark done" title="Mark done"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></span></div></div>`};
   const frow=t=>{const st=taskState(t);return `<div class="r" style="--c:${st==="late"?"var(--red)":"#3ddc84"}"><span class="dot"></span><div class="m"><div>${esc(t.title)}</div><small>${t.proj&&PR.find(x=>x.id===t.proj)?esc(PR.find(x=>x.id===t.proj).title)+" · ":""}Done ${fmtDate(ymd(new Date(t.doneAt)))}${t.planH?` · ${t.planH}h planned`:""} · ${!t.due?"no deadline":st==="late"?`<span class="miss">after the deadline</span>`:"before the deadline"}</small></div><div class="v">${fmtClock(taskMs(t))}</div><button class="tk-undo" data-tkundo="${t.id}" title="Move back to In progress"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg><span>Undo</span></button><button class="x" data-tkdel="${t.id}" aria-label="Delete">×</button></div>`};
   const tm=taskStats(p);
-  return `<div class="tk-sec tk-top-band"><div class="ph"><span>In progress</span><span style="display:flex;align-items:center;gap:12px">${act.length?`<button class="tkall" data-tkall>${act.every(t=>tkOpen.has(t.id))?"Collapse all":"Expand all"}</button>`:""}<i>${act.length}</i></span></div>
+  return `<div class="tk-sec tk-top-band"><div class="ph"><span>In progress</span><span style="display:flex;align-items:center;gap:12px"><button class="tknew-b${tkNew?" on":""}" data-tknew="${p.id}" aria-expanded="${tkNew}">+ New task</button>${act.length?`<button class="tkall" data-tkall>${act.every(t=>tkOpen.has(t.id))?"Collapse all":"Expand all"}</button>`:""}<i>${act.length}</i></span></div>
      ${PR.length?(()=>{const cnt=ids=>(p.tasks||[]).filter(t=>!t.doneAt&&ids(t)).length;const openTop=fx?topOf(fx):null;const pop=openTop&&tkLastOpen!==openTop.id?" pop":"";tkLastOpen=openTop?openTop.id:null;
        return `<div class="tkfilter">${[["all","All"],...TOPS.map(x=>[x.id,x.title]),["none","No project"]].map(([k,l])=>{const x=prjById(k),K=x?kidsOf(x):[],ids=x?treeIds(x):[];
          const n=cnt(t=>k==="all"||(k==="none"?!t.proj||!PR.some(q=>q.id===t.proj):ids.includes(t.proj)));const open=x&&openTop===x&&K.length,branch=open&&tkFilter!==k;
@@ -6585,14 +6627,7 @@ function taskView(d,p){
        return act.map(card).join("")})()}</div>
      <div class="ph tk-sec solo" style="margin-top:20px"><span>Completed</span><i>${tm.done} on time${tm.missed?` · ${tm.missed} missed`:""}</i></div>
      <div class="rows">${fin.length?fin.map(frow).join(""):`<div class="empty" style="padding:16px">Nothing completed yet</div>`}</div></div>
-   <form class="f addform" id="tkForm"><div class="ph" style="margin-bottom:0"><span>New task</span></div>
-     <label>Task<input id="tkT" required placeholder="Describe the task" autocomplete="off"></label>
-     ${PR.length?`<label>Project (optional)<select id="tkP"><option value="">No project</option>${PR.map(x=>`<option value="${x.id}" ${(prjFocus||tkFilter)===x.id?"selected":""}>${esc(prjLabel(x))}</option>`).join("")}</select></label>`:`<p class="note" style="margin:0">Tip: create a project in the Projects tab to group tasks.</p>`}
-     <div class="f2"><label>Start date (optional)<input id="tkS" type="date" min="${today()}"></label><label>Hours to put in (optional)<input id="tkH" type="number" step="0.5" min="0" inputmode="decimal" placeholder="e.g. 5"></label></div>
-     <div class="f2"><label>Due date (optional)<input id="tkD" type="date" min="${today()}"></label><label>Due time (optional)<input id="tkTm" type="time"></label></div>
-     <label class="lockbox"><input id="tkAck" type="checkbox"><span><b>No turning back.</b> Once a deadline is set it can't be changed or removed, and the task can't be deleted. Missing it counts against your progress.</span></label>
-     <button class="btn">Add task</button>
-     <small class="note" style="margin:0">Hit Start when you begin, Pause when you stop, and Mark done when it's finished. Every timed session adds to your hours.</small></form></div>`;
+</div>`;
 }
 
 /* ---------- projects inside a passion ---------- */
@@ -6652,7 +6687,7 @@ let tkMore=false,tkDoneOpen=false;
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-tkmore],[data-tkdoneopen]");if(!t)return;e.preventDefault();
   if(t.dataset.tkmore!==undefined){tkMore=!tkMore;const m=t.closest("form").querySelector(".tkq-more");if(m)m.hidden=!tkMore;t.classList.toggle("on",tkMore);t.setAttribute("aria-expanded",tkMore);return}
   tkDoneOpen=!tkDoneOpen;render()});
-let tkFilter="all",addingPrj=false,prjFocus=null,addingSub=null,tkLastOpen=null;const tkOpen=new Set();
+let tkNew=false,tkFilter="all",addingPrj=false,prjFocus=null,addingSub=null,tkLastOpen=null;const tkOpen=new Set();
 const projOf=(d,p)=>(d.projects||[]).filter(x=>x.pid===p.id).sort((a,b)=>(a.created||0)-(b.created||0));
 const PRJC=["#4cc9ff","#b38cff","#ffb648","#2ee6c5","#ff7eb6","#8fd8ff"];
 const prjById=id=>(data.projects||[]).find(q=>q.id===id);
@@ -6920,7 +6955,7 @@ function vPass(){
   return banner()+`<div class="passtop pgrid">
     <div class="pg-cell pg-fig">${figurePanel()}</div>
     <div class="pg-cell pg-right">${passThemePanel(d)}<div class="panel cs-combo">${commitPanel(d,P,wk).replace('<div class="panel cs">','<div class="cs">')}<div class="cs-split"></div>${passSched(d).replace('class="panel pdetail psched"','class="psched"')}</div></div>
-    <div class="stack pleft">${passList(d,P,wk)}</div>
+    <div class="stack pleft">${passList(d,P,wk)}${(()=>{const cp=P.find(x=>x.id===selP);return tkNew&&!catMgr&&pTab==="tasks"&&cp?`<div class="panel tknewp">${tkFormHtml(d,cp)}</div>`:""})()}</div>
     <div class="pg-cell pg-next">${catMgr?passCatPanel(d):passTP(d)}</div>
   </div>
   ${/* Tasks & Projects used to sit here, full width under everything: passDetail(d) */""}${schedWinHtml(d)}
@@ -7476,6 +7511,7 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
   else if(b.dataset.ptab){pTab=b.dataset.ptab;render()}
   else if(b.dataset.wk!==undefined){const k=+b.dataset.wk;wkOff=k?wkOff+k:0;render()}
   else if(b.dataset.tkopen){const id=b.dataset.tkopen;tkOpen.has(id)?tkOpen.delete(id):tkOpen.add(id);render()}
+  else if(b.dataset.tknew!==undefined){if(b.dataset.tknew)selP=b.dataset.tknew;tkNew=!tkNew;render();if(tkNew)setTimeout(()=>{const i=$("#tkT");if(i){i.focus({preventScroll:true})}},60)}
   else if(b.dataset.tkall!==undefined){const p=data.passions.find(x=>x.id===selP);const ids=(p&&p.tasks||[]).filter(t=>!t.doneAt).map(t=>t.id);const all=ids.length&&ids.every(i=>tkOpen.has(i));ids.forEach(i=>all?tkOpen.delete(i):tkOpen.add(i));render()}
   else if(b.dataset.addprj!==undefined){addingPrj=!addingPrj;render();if(addingPrj){const i=$("#pjT");i&&i.focus()}}
   else if(b.dataset.rn){renaming=b.dataset.rn;const [k,id]=renaming.split(":");if(k==="task")tkOpen.add(id);render();const i=$("#rnIn");if(i){i.focus();i.select()}}
@@ -7524,7 +7560,7 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
   else if(b.dataset.addsub){addingSub=addingSub===b.dataset.addsub?null:b.dataset.addsub;render();if(addingSub){const i=$("#sbT");i&&i.focus()}}
   else if(b.dataset.tkf){tkFilter=b.dataset.tkf;render()}
   else if(b.dataset.prjgo){tkFilter=b.dataset.prjgo;pTab="tasks";render()}
-  else if(b.dataset.prjadd){tkFilter=b.dataset.prjadd;prjFocus=b.dataset.prjadd;pTab="tasks";render();const f=$("#tkForm");if(f){f.scrollIntoView({behavior:"smooth",block:"center"});setTimeout(()=>{const i=$("#tkT");i&&i.focus({preventScroll:true})},350)}}
+  else if(b.dataset.prjadd){tkFilter=b.dataset.prjadd;prjFocus=b.dataset.prjadd;pTab="tasks";tkNew=true;render();const f=$("#tkForm");if(f){f.scrollIntoView({behavior:"smooth",block:"center"});setTimeout(()=>{const i=$("#tkT");i&&i.focus({preventScroll:true})},350)}}
   else if(b.dataset.delprj){if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="Delete?";b.classList.add("armed");return}const id=b.dataset.delprj,x=prjById(id);if(!x)return;const par=x.parent&&prjById(x.parent)?x.parent:null;
     data.passions.forEach(q=>(q.tasks||[]).forEach(t=>{if(t.proj===id)t.proj=par}));(data.projects||[]).forEach(k=>{if(k.parent===id)k.parent=null});data.projects=(data.projects||[]).filter(q=>q.id!==id);if(tkFilter===id)tkFilter=par||"all";render();save();toast(par?"Sub-project deleted · its tasks moved up to "+prjById(par).title:kidsOf(x).length?"Project deleted · sub-projects and tasks were kept":"Project deleted · its tasks were kept")}
   else if(b.dataset.selslot){const [id,ds]=b.dataset.selslot.split(":");const same=selSlot&&selSlot.id===id&&selSlot.ds===ds;selSlot=same?null:{id,ds};editSlot=null;render();if(!same){const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"nearest"})}}
@@ -7587,7 +7623,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="505",APPT="2026-11-22T21:58:00Z";   /* APPT: when this update was made */
+const APPV="506",APPT="2026-11-22T22:08:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -7637,7 +7673,7 @@ document.addEventListener("submit",e=>{
   else if(f==="tkForm"){const p=data.passions.find(x=>x.id===selP);if(!p)return;const dd=$("#tkD").value,tt=$("#tkTm").value;let due=null;
     if(dd){if(!$("#tkAck").checked){toast("Tick the box to lock in a deadline");return}due=+new Date(dd+"T"+(tt||"23:59"));if(due<=Date.now()){toast("Pick a deadline in the future");return}}
     else if(tt){toast("Add a date for the deadline, or clear the time");return}
-    p.tasks=p.tasks||[];const so=$("#tkS").value||"";if(so&&so<today()){toast("Start date can't be in the past");return}if(so&&due&&+new Date(so+"T00:00")>due){toast("Start date must be before the deadline");return}const pj=$("#tkP")?$("#tkP").value:"";p.tasks.push({id:uid(),proj:pj||null,title:$("#tkT").value.trim(),planH:num("#tkH")||0,startOn:so>today()?so:"",created:Date.now(),due,runs:[],doneAt:null});pTab="tasks";prjFocus=null;toast(due?"Task added · deadline locked":"Task added")}
+    p.tasks=p.tasks||[];const so=$("#tkS").value||"";if(so&&so<today()){toast("Start date can't be in the past");return}if(so&&due&&+new Date(so+"T00:00")>due){toast("Start date must be before the deadline");return}const pj=$("#tkP")?$("#tkP").value:"";p.tasks.push({id:uid(),proj:pj||null,title:$("#tkT").value.trim(),planH:num("#tkH")||0,startOn:so>today()?so:"",created:Date.now(),due,runs:[],doneAt:null});pTab="tasks";prjFocus=null;tkNew=false;toast(due?"Task added · deadline locked":"Task added")}
   else if(f==="slotEditForm"){const p=data.passions.find(x=>x.id===selP);const old=p&&(p.slots||[]).find(x=>x.id===editSlot);if(!old)return;
     if(isWk(old)){const dur=parseHM($("#seH").value);if(!dur||dur>(isMo(old)?44640:10080)){toast("Enter the time as HH:MM, like 08:00");return}old.dur=dur;const u=($("#seU")||{}).value;if(u)old.until=u;else delete old.until;editSlot=null;toast((isMo(old)?"Monthly":"Weekly")+" amount updated");render();save();return}
     const st=$("#seS").value,en=$("#seE").value,fr=$("#seF").value||today(),once=$("#seR").value==="once",isDur=$("#seK").value==="dur",dur=isDur?parseHM($("#seH").value):null;
@@ -7690,6 +7726,29 @@ function fit(){const sh=$(".shell"),W=1180,de=document.documentElement,vw=de.cli
     de.style.setProperty('--pz',1/k);sh.style.cssText=`position:fixed;left:0;top:0;width:${W}px;height:${h/k}px;transform:scale(${k});transform-origin:0 0`}
   else sh.style.cssText=""}
 addEventListener("resize",fit);fit();
+
+/* the New task panel sits under My passions and joins Tasks & Projects with a bridge across the gap */
+function tkBridge(){const n=document.querySelector(".tknewp"),pd=document.querySelector(".pg-next>.pdetail");
+  const unmask=()=>{if(!pd)return;pd.style.minHeight="";pd.style.webkitMaskImage=pd.style.maskImage=pd.style.webkitMaskSize=pd.style.maskSize=pd.style.webkitMaskPosition=pd.style.maskPosition=pd.style.webkitMaskRepeat=pd.style.maskRepeat=""};
+  const host=document.querySelector(".passtop");let br=host&&host.querySelector(":scope>.tkbr");const nobr=()=>{if(br)br.remove()};
+  if(!n){unmask();nobr();return}
+  if(!pd||!host||getComputedStyle(n).display==="none"){n.classList.remove("bridged");unmask();nobr();return}
+  const nr=n.getBoundingClientRect(),pr=pd.getBoundingClientRect(),k=nr.width/n.offsetWidth||1,gap=(pr.left-nr.right)/k;
+  if(gap<0||gap>80||pr.top>nr.top){n.classList.remove("bridged");unmask();nobr();return}
+  pd.style.minHeight=Math.ceil((nr.bottom-pr.top)/k+18)+"px";
+  /* open pdetail's left edge where the bridge lands, so the two panels read as one shape */
+  const a=(nr.top-pr.top)/k-1,b2=(nr.bottom-pr.top)/k+1,m=`linear-gradient(#000,#000),linear-gradient(to bottom,#000 0,#000 ${a}px,transparent ${a}px,transparent ${b2}px,#000 ${b2}px)`;
+  pd.style.webkitMaskImage=pd.style.maskImage=m;pd.style.webkitMaskSize=pd.style.maskSize="calc(100% - 1px) 100%,1px 100%";
+  pd.style.webkitMaskPosition=pd.style.maskPosition="right top,left top";pd.style.webkitMaskRepeat=pd.style.maskRepeat="no-repeat";
+  const cs=getComputedStyle(n),hr=host.getBoundingClientRect();
+  if(!br){br=document.createElement("i");br.className="tkbr";br.setAttribute("aria-hidden","true");host.appendChild(br)}
+  /* the bridge: same glass as the New task panel, from its right edge across the gap onto panel 10's (opened) left edge */
+  Object.assign(br.style,{left:(nr.right-hr.left)/k+"px",top:(nr.top-hr.top)/k+"px",width:gap+1+"px",height:n.offsetHeight+"px",
+    borderTop:"1px solid "+cs.borderTopColor,borderBottom:"1px solid "+cs.borderTopColor,backgroundImage:cs.backgroundImage,backgroundColor:cs.backgroundColor,
+    backgroundSize:"100% 100%",backdropFilter:cs.backdropFilter,webkitBackdropFilter:cs.webkitBackdropFilter||cs.backdropFilter});
+  n.classList.add("bridged")}
+{const _r=render;render=function(){const out=_r.apply(this,arguments);try{tkBridge()}catch(e){}return out}}
+addEventListener("resize",()=>{try{tkBridge()}catch(e){}});
 
 render();
 
