@@ -2155,6 +2155,42 @@ html.phone #view{padding-top:max(12px,env(safe-area-inset-top,0px))!important}
 .att-cx{border:0;background:none;color:var(--muted);font-size:20px;cursor:pointer}
 .att-msg{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin:0 0 8px}
 .tkr-att{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;color:var(--muted)}
+/* open task: media on top, then timer + progress + notes at the bottom */
+.tkcard>.att{margin:0;padding-top:4px;border-top:0}
+.tk-bot{display:grid;gap:12px;padding-top:14px;border-top:1px solid rgba(var(--lr),.14)}
+.tk-prog{display:grid;gap:6px}
+.tk-prog-h{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:600;color:var(--muted)}
+.tk-prog-h b{color:var(--fg);font:700 13px var(--mono)}
+.tk-prog-bar{height:8px!important;margin:0!important}
+.tk-goal{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--muted);margin:0}
+.tk-goal input{width:58px;padding:4px 8px;font-size:13px;text-align:center}
+.tk-notes{display:grid;gap:6px;margin:0;font-size:12.5px;font-weight:600;color:var(--muted)}
+.tk-notes textarea{width:100%;box-sizing:border-box;min-height:74px;resize:vertical;font:inherit;font-size:14px;font-weight:400;line-height:1.45;color:var(--fg);padding:10px 12px;border-radius:10px;border:1px solid rgba(var(--lr),.2);background:rgba(0,0,0,.22)}
+.att-cmp{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;width:100%;margin-top:12px;padding:11px 14px;border-radius:12px;cursor:pointer;color:var(--fg);background:rgba(var(--lr),.08);border:1px solid rgba(var(--lr),.22)}
+.att-cmp:hover{background:rgba(var(--lr),.14)}
+.att-cmp span{display:grid;gap:2px}.att-cmp b{font-size:14px}.att-cmp small{font-size:12px;color:var(--muted)}
+/* compare window */
+#attCmp.acmp{padding:10px;place-items:stretch;z-index:1100;background:#05070c;padding-top:max(10px,env(safe-area-inset-top))}
+.acmp-box{display:grid;grid-template-rows:auto 1fr auto;gap:10px;width:min(1100px,100%);height:100%;margin:0 auto;min-height:0}
+.acmp-h{display:flex;align-items:baseline;gap:10px;padding:4px 44px 0 4px;position:relative}
+.acmp-h b{font-size:18px;color:#fff}.acmp-h small{font-size:12.5px;color:rgba(255,255,255,.6)}
+.acmp-x{position:absolute!important;top:-4px!important;right:0!important}
+.acmp-panes{display:grid;grid-template-columns:1fr 1fr;gap:8px;min-height:0}
+.acmp-p{display:grid;grid-template-rows:1fr auto auto;gap:6px;min-height:0;min-width:0}
+.acmp-m{position:relative;min-height:0;border-radius:12px;overflow:hidden;background:#000;display:grid;place-items:center}
+.acmp-m video,.acmp-m img{width:100%;height:100%;object-fit:contain;display:block;transition:transform .25s}
+.acmp-m iframe{width:100%;height:100%;border:0}
+.acmp-p.mir .acmp-m video,.acmp-p.mir .acmp-m img{transform:scaleX(-1)}
+.acmp-mir{position:absolute;top:6px;left:6px;font:600 11.5px inherit;font-family:inherit;padding:5px 9px;border-radius:99px;border:0;background:rgba(0,0,0,.6);color:#fff;cursor:pointer}
+.acmp-mir[aria-pressed="true"]{background:#ffd23f;color:#111}
+.acmp-lab{font-size:12px;color:rgba(255,255,255,.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.acmp-lab span{color:#fff;font-weight:600}
+.acmp-pick{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.acmp-pick::-webkit-scrollbar{display:none}
+.acmp-th{all:unset;flex:0 0 44px;height:44px;border-radius:8px;overflow:hidden;position:relative;cursor:pointer;background:#111;border:2px solid transparent;box-sizing:border-box}
+.acmp-th.on{border-color:#ffd23f}
+.acmp-th img,.acmp-th video{width:100%;height:100%;object-fit:cover;display:block}
+.acmp-th .att-play svg{width:16px;height:16px}.acmp-th .att-yt::after{display:none}
+.acmp-ctl{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding-bottom:env(safe-area-inset-bottom)}
+.acmp-ctl .att-b{color:#fff;border-color:rgba(255,255,255,.3)}
 .attv{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.88);display:grid;place-items:center;padding:16px;animation:swinIn .18s ease-out}
 .atrim-box{width:min(560px,100%);display:grid;gap:12px;background:rgba(14,22,42,.96);border:1px solid rgba(var(--lr),.25);border-radius:14px;padding:16px}
 .atrim-h{display:grid;gap:3px}.atrim-h b{font-size:17px}.atrim-h small{color:var(--muted);font-size:13px}
@@ -2218,7 +2254,7 @@ html.phone .tkbr{display:none!important}
 #view .ptp .tkgroup>.tkg-h,#view .ptp .tksub>.tkg-h,#view .ptp .ph.tk-sec.solo:not(:has(~ .rows)):not(:last-of-type){display:none!important}
 #view .ptp :is(.tkgroup,.tksub,.tkg-b){border:0!important;background:none!important;box-shadow:none!important;padding:0!important;margin:0!important}
 #view .ptp :is(.tkgroup,.tksub,.tkg-b)::before,#view .ptp :is(.tkgroup,.tksub,.tkg-b)::after{display:none!important}
-#view .ptp .tklist>:not(.tkrow):not(.tkgroup):not(.tksub):not(.tkg-b){display:none!important}
+#view .ptp .tklist>:not(.tkrow):not(.tkcard):not(.empty):not(.tkgroup):not(.tksub):not(.tkg-b){display:none!important}
 #view .ptp .tkrow .tkrow-main{display:flex!important;flex-wrap:wrap;align-items:center;gap:4px 10px!important}
 #view .ptp .tkrow .tkr-title{flex:1 0 100%}
 #view .ptp .tkrow .tkr-prj{display:inline;font-size:12px;color:var(--muted);order:5}
@@ -6548,16 +6584,19 @@ async function attURL(a){if(attURLs.has(a.id))return attURLs.get(a.id);let blob=
   if(!blob)return null;const u=URL.createObjectURL(blob);attURLs.set(a.id,u);return u}
 let attLinkFor=null,attBusy=null,attView=null;
 const findTaskAny=id=>{for(const p of data.passions||[]){const t=(p.tasks||[]).find(x=>x.id===id);if(t)return t}return null};
+const ATT_PLAY='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="rgba(0,0,0,.55)"/><path d="M10 8l6 4-6 4z" fill="#fff"/></svg>';
+function attThumb(a){const y=a.kind==="yt"?ytId(a.url):null;
+  return a.kind==="img"?`<img data-attsrc="${a.id}" alt="${esc(a.name||"Photo")}">`:a.kind==="vid"?`<video data-attsrc="${a.id}" muted playsinline preload="metadata"></video><i class="att-play">${ATT_PLAY}</i>`:`<img src="https://i.ytimg.com/vi/${y}/hqdefault.jpg" alt="YouTube video" loading="lazy"><i class="att-play att-yt">${ATT_PLAY}</i>`}
 function attHtml(t){const A=t.att||[];
   const PLAY='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="rgba(0,0,0,.55)"/><path d="M10 8l6 4-6 4z" fill="#fff"/></svg>';
-  const tile=a=>{const y=a.kind==="yt"?ytId(a.url):null;
-    const inner=a.kind==="img"?`<img data-attsrc="${a.id}" alt="${esc(a.name||"Photo")}">`:a.kind==="vid"?`<video data-attsrc="${a.id}" muted playsinline preload="metadata"></video><i class="att-play">${PLAY}</i>`:`<img src="https://i.ytimg.com/vi/${y}/hqdefault.jpg" alt="YouTube video" loading="lazy"><i class="att-play att-yt">${PLAY}</i>`;
+  const tile=a=>{const inner=attThumb(a);
     return `<div class="att-t"><button type="button" class="att-open" data-attview="${t.id}:${a.id}" aria-label="Open ${a.kind==="img"?"photo":a.kind==="vid"?"video":"YouTube video"}">${inner}</button><button type="button" class="att-x" data-attdel="${t.id}:${a.id}" aria-label="Remove">×</button></div>`};
-  return `<div class="att"><div class="att-h">${CLIP}<span>Attachments</span>${A.length?`<small>${A.length}</small>`:""}</div>
+  return `<div class="att"><div class="att-h">${CLIP}<span>Media</span>${A.length?`<small>${A.length}</small>`:""}</div>
     ${A.length?`<div class="att-grid">${A.map(tile).join("")}</div>`:""}
     ${attBusy===t.id?`<p class="att-msg"><span class="mini-spin"></span>Adding…</p>`:""}
     ${attLinkFor===t.id?`<form class="att-link" data-attlinkform="${t.id}"><input id="attUrl" type="url" inputmode="url" placeholder="Paste a YouTube link" autocomplete="off" required><button class="btn">Add</button><button type="button" class="att-cx" data-attlink="${t.id}" aria-label="Cancel">×</button></form>`:""}
-    <div class="att-add"><button type="button" class="att-b" data-attpick="${t.id}" data-attacc="image/*">+ Photo</button><button type="button" class="att-b" data-attpick="${t.id}" data-attacc="video/*">+ Video <small style="opacity:.7;font-weight:500">(up to 1 min)</small></button><button type="button" class="att-b" data-attlink="${t.id}">+ YouTube link</button></div></div>`}
+    <div class="att-add"><button type="button" class="att-b" data-attpick="${t.id}" data-attacc="image/*">+ Photo</button><button type="button" class="att-b" data-attpick="${t.id}" data-attacc="video/*">+ Video <small style="opacity:.7;font-weight:500">(up to 1 min)</small></button><button type="button" class="att-b" data-attlink="${t.id}">+ YouTube link</button></div>
+    ${cmpPool(t.id).length>=2&&A.length?`<button type="button" class="att-cmp" data-cmpopen="${t.id}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="2"/><rect x="13" y="4" width="8" height="16" rx="2"/></svg><span><b>Compare side by side</b><small>Put two videos or photos next to each other</small></span></button>`:""}</div>`}
 function attHydrate(){document.querySelectorAll("[data-attsrc]").forEach(el=>{if(el.src)return;const id=el.dataset.attsrc;const t=[...document.querySelectorAll("[data-attview]")].length;
   for(const p of data.passions||[])for(const tk of p.tasks||[]){const a=(tk.att||[]).find(x=>x.id===id);if(a){attURL(a).then(u=>{if(u){el.src=u+(a.kind==="vid"?"#t="+((a.t0||0)+0.1).toFixed(1):"")}else el.closest(".att-t")&&el.closest(".att-t").classList.add("missing")});return}}});
   if(attView){const [tid,aid]=attView.split(":"),t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);let v=document.getElementById("attViewer");
@@ -6639,6 +6678,59 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
     const a=(t.att||[]).find(x=>x.id===aid);t.att=(t.att||[]).filter(x=>x.id!==aid);if(a){MDB.del(a.id);if(a.path&&typeof sbOn==="function"&&sbOn())try{sb.storage.from("models").remove([a.path])}catch(_){}if(attURLs.has(a.id)){URL.revokeObjectURL(attURLs.get(a.id));attURLs.delete(a.id)}}
     save();render()}},true);
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&attView){attView=null;attHydrate()}});
+
+/* compare: two media side by side (e.g. your dance next to the original) */
+let attCmp=null;
+const passOfTask=id=>(data.passions||[]).find(p=>(p.tasks||[]).some(t=>t.id===id));
+function cmpPool(tid){const t=findTaskAny(tid),p=passOfTask(tid);if(!t)return [];const out=(t.att||[]).map(a=>({a,t}));
+  ((p&&p.tasks)||[]).forEach(x=>{if(x.id!==tid)(x.att||[]).forEach(a=>out.push({a,t:x}))});return out}
+function cmpOpen(tid){const P=cmpPool(tid);if(P.length<2)return;const own=P.filter(x=>x.t.id===tid);
+  attCmp={tid,L:own[0].a.id,R:(own[1]||P.find(x=>x.a.id!==own[0].a.id)).a.id,mL:false,mR:false,sp:1};cmpRender()}
+function cmpVids(){return [...document.querySelectorAll("#attCmp video[data-cmpv]")]}
+function cmpRender(){let w=document.getElementById("attCmp");
+  if(!attCmp){if(w)w.remove();return}
+  const P=cmpPool(attCmp.tid);const get=id=>P.find(x=>x.a.id===id);if(!get(attCmp.L)||!get(attCmp.R)){attCmp=null;w&&w.remove();return}
+  const key=attCmp.L+"|"+attCmp.R;
+  if(!w){w=document.createElement("div");w.id="attCmp";w.className="attv acmp";w.setAttribute("role","dialog");w.setAttribute("aria-modal","true");w.setAttribute("aria-label","Compare side by side");document.body.appendChild(w)}
+  if(w.dataset.k===key){cmpStyle();return}w.dataset.k=key;
+  const pane=side=>{const it=get(attCmp[side]),a=it.a,y=a.kind==="yt"?ytId(a.url):null;
+    const m=a.kind==="yt"?`<iframe src="https://www.youtube-nocookie.com/embed/${y}?playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="YouTube video"></iframe>`:a.kind==="vid"?`<video data-cmpv="${side}" playsinline controls preload="auto" ${side==="R"?"muted":""}></video>`:`<img data-cmpi="${side}" alt="${esc(a.name||"Photo")}">`;
+    return `<div class="acmp-p" data-side="${side}"><div class="acmp-m">${m}<button type="button" class="acmp-mir" data-cmpmir="${side}" aria-pressed="false" title="Mirror (flip left to right)">⇋ Mirror</button></div>
+      <div class="acmp-lab">${side==="L"?"Left":"Right"} · <span>${esc(it.t.title)}</span></div>
+      <div class="acmp-pick" role="group" aria-label="Choose the ${side==="L"?"left":"right"} media">${P.map(x=>`<button type="button" class="acmp-th${x.a.id===attCmp[side]?" on":""}" data-cmppick="${side}:${x.a.id}" aria-pressed="${x.a.id===attCmp[side]}" title="${esc(x.t.title)}">${attThumb(x.a)}</button>`).join("")}</div></div>`};
+  w.innerHTML=`<div class="acmp-box"><div class="acmp-h"><b>Compare</b><small>Tap a thumbnail to swap what's on each side</small><button type="button" class="attv-x acmp-x" data-cmpclose aria-label="Close">×</button></div>
+    <div class="acmp-panes">${pane("L")}${pane("R")}</div>
+    <div class="acmp-ctl"><button type="button" class="att-b" data-cmpgo="restart">⟲ Restart both</button><button type="button" class="btn" data-cmpgo="play">▶ Play both</button><button type="button" class="att-b" data-cmpgo="pause">❚❚ Pause</button><button type="button" class="att-b" data-cmpgo="speed">Speed ${attCmp.sp}×</button></div></div>`;
+  ["L","R"].forEach(side=>{const a=get(attCmp[side]).a;if(a.kind==="yt")return;
+    attURL(a).then(u=>{const el=w.querySelector(a.kind==="vid"?`[data-cmpv="${side}"]`:`[data-cmpi="${side}"]`);if(!el)return;
+      if(!u){el.replaceWith(Object.assign(document.createElement("p"),{className:"attv-miss",textContent:"This file isn't on this device yet."}));return}
+      if(a.kind!=="vid"){el.src=u;return}
+      const so=document.createElement("source");so.src=u;so.type=a.type||"video/mp4";el.appendChild(so);el.playbackRate=attCmp.sp;
+      el.addEventListener("loadedmetadata",()=>{try{el.currentTime=a.t0||0}catch(_){}el.playbackRate=attCmp?attCmp.sp:1},{once:true});
+      if(a.t1!=null)el.addEventListener("timeupdate",()=>{if(el.currentTime>=a.t1)el.currentTime=a.t0||0});
+      el.load()})});
+  cmpStyle()}
+function cmpStyle(){const w=document.getElementById("attCmp");if(!w||!attCmp)return;
+  ["L","R"].forEach(s=>{const on=attCmp["m"+s];const p=w.querySelector(`.acmp-p[data-side="${s}"]`);if(!p)return;p.classList.toggle("mir",on);const b=p.querySelector("[data-cmpmir]");b&&b.setAttribute("aria-pressed",on)})}
+const cmpStart=side=>{const a=attCmp&&cmpPool(attCmp.tid).find(x=>x.a.id===attCmp[side]);return a?a.a.t0||0:0};
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-cmpopen],[data-cmpclose],[data-cmppick],[data-cmpmir],[data-cmpgo]");
+  if(!b){if(attCmp&&e.target.id==="attCmp"){attCmp=null;cmpRender()}return}
+  e.preventDefault();e.stopPropagation();
+  if(b.dataset.cmpopen){cmpOpen(b.dataset.cmpopen);attHydrate();return}
+  if(b.dataset.cmpclose!==undefined){attCmp=null;cmpRender();return}
+  if(!attCmp)return;
+  if(b.dataset.cmppick){const [s,id]=b.dataset.cmppick.split(":");attCmp[s]=id;cmpRender();attHydrate();return}
+  if(b.dataset.cmpmir){const k="m"+b.dataset.cmpmir;attCmp[k]=!attCmp[k];cmpStyle();return}
+  const V=cmpVids(),g=b.dataset.cmpgo;
+  if(g==="play")V.forEach(v=>{const p=v.play();p&&p.catch(()=>{})});
+  if(g==="pause")V.forEach(v=>v.pause());
+  if(g==="restart")V.forEach(v=>{try{v.currentTime=cmpStart(v.dataset.cmpv)}catch(_){}const p=v.play();p&&p.catch(()=>{})});
+  if(g==="speed"){attCmp.sp=attCmp.sp===1?.75:attCmp.sp===.75?.5:1;V.forEach(v=>v.playbackRate=attCmp.sp);b.textContent="Speed "+attCmp.sp+"×"}},true);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&attCmp){attCmp=null;cmpRender()}});
+/* task notes + hours goal: saved as you type, without redrawing the screen */
+let noteT=null;
+document.addEventListener("input",e=>{const n=e.target.closest&&e.target.closest("[data-tknote]");if(!n)return;const t=findTaskAny(n.dataset.tknote);if(!t)return;t.note=n.value;clearTimeout(noteT);noteT=setTimeout(save,600)});
+document.addEventListener("change",e=>{const g=e.target.closest&&e.target.closest("[data-tkgoal]");if(!g)return;const t=findTaskAny(g.dataset.tkgoal),h=parseFloat(g.value);if(!t||!(h>0))return;t.planH=Math.round(h*2)/2;save();render()});
 function tkFormHtml(d,p){const PR=prjOrdered(d,p);return `<form class="f addform" id="tkForm"><div class="ph tkn-h"><span>New task</span><button type="button" class="x" data-tknew aria-label="Close">×</button></div>
      <label>Task<input id="tkT" required placeholder="Describe the task" autocomplete="off"></label>
      ${PR.length?`<label>Project (optional)<select id="tkP"><option value="">No project</option>${PR.map(x=>`<option value="${x.id}" ${(prjFocus||tkFilter)===x.id?"selected":""}>${esc(prjLabel(x))}</option>`).join("")}</select></label>`:`<p class="note" style="margin:0">Tip: create a project in the Projects tab to group tasks.</p>`}
@@ -6656,10 +6748,16 @@ function taskView(d,p){
       return `<div class="tkrow st-${st}"><button class="tkrow-main" data-tkopen="${t.id}" aria-expanded="false" aria-label="${esc(t.title)}, ${PILL[st]}. Tap to expand"><b class="tkr-title">${esc(t.title)}</b><span class="tk-pill">${PILL[st]}</span>${(()=>{const pj=t.proj&&PR.find(x=>x.id===t.proj);if(!pj)return "";const par=pj.parent&&PR.find(x=>x.id===pj.parent);return `<span class="tkr-prj">${par?esc(par.title)+" › ":""}${esc(pj.title)}</span>`})()}${(t.att||[]).length?`<span class="tkr-att" title="${t.att.length} attached">${CLIP}${t.att.length}</span>`:""}<span class="tkr-sp"></span><span class="tkr-time"${run?` data-timer="${p.id}:${t.id}"`:""}>${fmtClock(ms)}</span>${t.due?`<span class="tkr-due${left<0?" late":left<864e5?" soon":""}">${LOCK} ${fmtDate(ymd(new Date(t.due)))}</span>`:""}<svg class="tk-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>${st==="planned"?"":run?`<button class="tkr-act tkr-cancel" data-tkcancel="${t.id}" aria-label="Cancel timer" title="Cancel timer (nothing is logged)">×</button><button class="tkr-act" data-tkpause="${t.id}">Pause</button>`:`<button class="tkr-act" data-tkstart="${t.id}">${(t.runs||[]).length?"Resume":"Start"}</button>`}</div>`}
     const due=t.due?(()=>{const left=t.due-Date.now();return `<span class="tk-due${left<0?" late":left<864e5?" soon":""}">${LOCK} Due ${fmtDate(ymd(new Date(t.due)))}, ${clock(t.due)} · ${left<0?"missed "+fmtLeft(-left)+" ago":"in "+fmtLeft(left)}</span>`})():`<span class="tk-due none">No deadline</span>`;
     return `<div class="tkcard st-${st}"><div class="tk-top"><div class="tk-name">${isRn("task",t.id)?rnForm("task",t.id,t.title,PR.length?`<select id="rnP" class="rn-proj" aria-label="Project or sub-project" title="Project or sub-project">${["",...PR.map(x=>x.id)].map(id=>`<option value="${id}" ${(t.proj||"")===id?"selected":""}>${id?esc(prjLabel(PR.find(x=>x.id===id))):"No project"}</option>`).join("")}</select>`:""):`<b>${esc(t.title)}</b><span class="tk-pill">${PILL[st]}</span>`}</div>${isRn("task",t.id)?"":penBtn("task",t.id,t.title)}<button class="tk-fold" data-tkopen="${t.id}" aria-expanded="true" aria-label="Collapse task"><svg class="tk-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></div>
-      <div class="tk-mid"><div class="tk-time"><b ${run?`data-timer="${p.id}:${t.id}"`:""}>${fmtClock(ms)}</b>${t.planH?`<small>of ${t.planH}h planned</small>`:""}</div>${due}</div>${t.planH?`<div class="track" style="--c:${ms>=t.planH*36e5?"#3ddc84":"var(--cyan)"}"><i style="width:${Math.min(ms/(t.planH*36e5),1)*100}%"></i></div>`:""}
+      ${attHtml(t)}
+      <!-- old order (timer above media), kept for reference:
+      tk-mid / track / tk-plan / tkadd / attHtml / tk-btns -->
+      <div class="tk-bot">
+      <div class="tk-mid"><div class="tk-time"><b ${run?`data-timer="${p.id}:${t.id}"`:""}>${fmtClock(ms)}</b>${t.planH?`<small>of ${t.planH}h planned</small>`:""}</div>${due}</div>
+      ${(()=>{const pc=t.planH?Math.min(ms/(t.planH*36e5),1):0;return `<div class="tk-prog"><div class="tk-prog-h"><span>Progress</span>${t.planH?`<b>${Math.round(pc*100)}%</b>`:`<label class="tk-goal">Goal <input type="number" min="0.5" step="0.5" inputmode="decimal" placeholder="—" data-tkgoal="${t.id}" aria-label="Hours goal"> h</label>`}</div><div class="track tk-prog-bar" style="--c:${pc>=1?"#3ddc84":"var(--cyan)"}"><i style="width:${pc*100}%"></i></div></div>`})()}
       ${st==="planned"?`<div class="tk-plan">Starts ${fmtDate(t.startOn)}. The timer unlocks that day.</div>`:""}
       ${addTimeFor===t.id?`<form class="tkadd" id="tkAddForm" data-tid="${t.id}"><label>Date<input id="taD" type="date" value="${today()}" max="${today()}" required></label><label>Hours<input id="taH" type="number" min="0" inputmode="numeric" value="1"></label><label>Minutes<input id="taM" type="number" min="0" max="59" inputmode="numeric" value="0"></label><button class="btn">Add</button></form>`:""}
-      ${attHtml(t)}
+      <label class="tk-notes"><span>Notes</span><textarea data-tknote="${t.id}" rows="3" placeholder="What to work on, what felt off, counts, cues…">${esc(t.note||"")}</textarea></label>
+      </div>
       <div class="tk-btns">${st==="planned"?"":run?`<button class="btn" data-tkpause="${t.id}">Pause</button><button class="tk-cancel" data-tkcancel="${t.id}" title="Discard this timer session">Cancel timer</button>`:`<button class="btn" data-tkstart="${t.id}">${(t.runs||[]).length?"Resume":"Start"}</button>`}<span class="tk-end">${(t.runs||[]).length?`<button class="tk-ic tk-reset" data-tkreset="${t.id}" aria-label="Reset timer" title="Reset timer to 0"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button>`:""}${!t.due?`<button class="tk-ic tk-del" data-tkdel="${t.id}" aria-label="Delete task" title="Delete task"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>`:`<span class="tk-ic tk-lock" title="Tasks with a deadline can't be deleted">${LOCK}</span>`}<button class="tk-ic tk-done" data-tkdone="${t.id}" aria-label="Mark done" title="Mark done"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></span></div></div>`};
   const frow=t=>{const st=taskState(t);return `<div class="r" style="--c:${st==="late"?"var(--red)":"#3ddc84"}"><span class="dot"></span><div class="m"><div>${esc(t.title)}</div><small>${t.proj&&PR.find(x=>x.id===t.proj)?esc(PR.find(x=>x.id===t.proj).title)+" · ":""}Done ${fmtDate(ymd(new Date(t.doneAt)))}${t.planH?` · ${t.planH}h planned`:""} · ${!t.due?"no deadline":st==="late"?`<span class="miss">after the deadline</span>`:"before the deadline"}</small></div><div class="v">${fmtClock(taskMs(t))}</div><button class="tk-undo" data-tkundo="${t.id}" title="Move back to In progress"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg><span>Undo</span></button><button class="x" data-tkdel="${t.id}" aria-label="Delete">×</button></div>`};
   const tm=taskStats(p);
@@ -7678,7 +7776,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="513",APPT="2026-11-22T22:38:00Z";   /* APPT: when this update was made */
+const APPV="514",APPT="2026-11-22T23:01:55Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
