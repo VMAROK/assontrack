@@ -6470,7 +6470,7 @@ function attHtml(t){const A=t.att||[];
     ${A.length?`<div class="att-grid">${A.map(tile).join("")}</div>`:""}
     ${attBusy===t.id?`<p class="att-msg"><span class="mini-spin"></span>Adding…</p>`:""}
     ${attLinkFor===t.id?`<form class="att-link" data-attlinkform="${t.id}"><input id="attUrl" type="url" inputmode="url" placeholder="Paste a YouTube link" autocomplete="off" required><button class="btn">Add</button><button type="button" class="att-cx" data-attlink="${t.id}" aria-label="Cancel">×</button></form>`:""}
-    <div class="att-add"><label class="att-b"><input type="file" accept="image/*,video/*" multiple data-attfile="${t.id}" hidden>+ Photo or video</label><button type="button" class="att-b" data-attlink="${t.id}">+ YouTube link</button></div></div>`}
+    <div class="att-add"><label class="att-b"><input type="file" accept="image/*,video/*" multiple data-attfile="${t.id}" hidden>+ Photo or video <small style="opacity:.7;font-weight:500">(video up to 1 min)</small></label><button type="button" class="att-b" data-attlink="${t.id}">+ YouTube link</button></div></div>`}
 function attHydrate(){document.querySelectorAll("[data-attsrc]").forEach(el=>{if(el.src)return;const id=el.dataset.attsrc;const t=[...document.querySelectorAll("[data-attview]")].length;
   for(const p of data.passions||[])for(const tk of p.tasks||[]){const a=(tk.att||[]).find(x=>x.id===id);if(a){attURL(a).then(u=>{if(u){el.src=u+(a.kind==="vid"?"#t=0.1":"")}else el.closest(".att-t")&&el.closest(".att-t").classList.add("missing")});return}}});
   if(attView){const [tid,aid]=attView.split(":"),t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);let v=document.getElementById("attViewer");
@@ -6485,14 +6485,22 @@ function attHydrate(){document.querySelectorAll("[data-attsrc]").forEach(el=>{if
 function attShrink(f){return new Promise(ok=>{if(!/^image\/(jpe?g|png|webp|heic|heif)/i.test(f.type)){ok(f);return}const u=URL.createObjectURL(f),im=new Image();
   im.onload=()=>{const M=1600,k=Math.min(1,M/Math.max(im.width,im.height));if(k>=1&&f.size<1.5e6){URL.revokeObjectURL(u);ok(f);return}const c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(b=>ok(b||f),"image/jpeg",.86)};
   im.onerror=()=>{URL.revokeObjectURL(u);ok(f)};im.src=u})}
+/* videos: 1 minute max — longer clips are too big for the phone to hold and upload */
+const ATT_VMAX=60;
+function attDur(f){return new Promise(ok=>{const u=URL.createObjectURL(f),v=document.createElement("video");let done=false;const fin=d=>{if(done)return;done=true;URL.revokeObjectURL(u);v.removeAttribute("src");ok(d)};
+  v.preload="metadata";v.muted=true;v.onloadedmetadata=()=>fin(isFinite(v.duration)?v.duration:0);v.onerror=()=>fin(0);setTimeout(()=>fin(0),8000);v.src=u})}
+const attWait=(p,ms)=>Promise.race([p,new Promise(ok=>setTimeout(ok,ms))]);
 async function attAddFiles(tid,files){const t=findTaskAny(tid);if(!t)return;attBusy=tid;render();
-  for(const f of files){const vid=/^video\//.test(f.type);if(!vid&&!/^image\//.test(f.type))continue;
-    if(vid&&f.size>200e6){toast("That video is over 200 MB — try a shorter clip");continue}
+  try{for(const f of files){const vid=/^video\//.test(f.type)||/\.(mov|mp4|m4v|webm)$/i.test(f.name||"");if(!vid&&!/^image\//.test(f.type))continue;
+    if(vid){const d=await attDur(f);if(d>ATT_VMAX+0.5){toast(`That video is ${Math.floor(d/60)}:${String(Math.round(d%60)).padStart(2,"0")} long. Videos can be up to 1 minute. Trim it first.`,5000);continue}
+      if(f.size>120e6){toast("That video is too big. Videos can be up to 1 minute.",5000);continue}}
     const blob=vid?f:await attShrink(f),id=uid(),a={id,kind:vid?"vid":"img",name:f.name||"",at:Date.now(),size:blob.size};
-    await MDB.put(id,blob);
-    if(typeof sbOn==="function"&&sbOn()){try{const ext=vid?(f.name.split(".").pop()||"mp4").toLowerCase():"jpg",pth=sbUser.id+"/att/"+id+"."+ext;const {error}=await sb.storage.from("models").upload(pth,blob,{upsert:true,contentType:blob.type||"application/octet-stream"});if(!error)a.path=pth}catch(e){}}
-    (t.att=t.att||[]).push(a)}
-  attBusy=null;save();render()}
+    await attWait(MDB.put(id,blob),15000);
+    (t.att=t.att||[]).push(a);
+    /* upload in the background so the screen never waits on it */
+    if(typeof sbOn==="function"&&sbOn()){const ext=vid?((f.name||"").split(".").pop()||"mp4").toLowerCase():"jpg",pth=sbUser.id+"/att/"+id+"."+ext;
+      sb.storage.from("models").upload(pth,blob,{upsert:true,contentType:blob.type||"application/octet-stream"}).then(({error})=>{if(!error){a.path=pth;save()}}).catch(()=>{})}}}
+  finally{attBusy=null;save();render()}}
 document.addEventListener("change",e=>{const i=e.target;if(!i.dataset||!i.dataset.attfile)return;const fs=[...(i.files||[])];i.value="";if(fs.length)attAddFiles(i.dataset.attfile,fs)});
 document.addEventListener("submit",e=>{const f=e.target;if(!f.dataset||!f.dataset.attlinkform)return;e.preventDefault();e.stopImmediatePropagation();
   const u=(f.querySelector("#attUrl").value||"").trim(),y=ytId(u);if(!y){toast("That doesn't look like a YouTube link");return}
@@ -7542,7 +7550,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="500",APPT="2026-11-22T21:40:00Z";   /* APPT: when this update was made */
+const APPV="501",APPT="2026-11-22T21:45:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
