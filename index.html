@@ -2,6 +2,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <script>/* phones: lay the page out exactly like the iPad/desktop (1180px wide, scaled to fit) — only the tabs move to the bottom */
 (function(){try{var w=Math.min(screen.width,screen.height);if(w<700){document.querySelector('meta[name=viewport]').setAttribute('content','width=1180,viewport-fit=cover');document.documentElement.classList.add('phone')}}catch(e){}})();</script>
+<script>/* phones: make the app exactly as tall as the screen */
+(function(){var de=document.documentElement;if(!de.classList.contains('phone'))return;
+  function sz(){try{var k=de.clientWidth/(innerWidth<screen.width*1.5?screen.width:innerWidth)||1,sa=navigator.standalone===true||matchMedia('(display-mode:standalone)').matches,full=Math.round((de.clientWidth/screen.width)*(innerWidth>innerHeight&&screen.height>screen.width?screen.width:screen.height)),h=Math.max(innerHeight,window.visualViewport?Math.round(visualViewport.height):0);de.style.setProperty('--apph',(sa?Math.max(full,h):h)+'px')}catch(e){}}
+  sz();addEventListener('resize',sz);addEventListener('orientationchange',function(){setTimeout(sz,300)});if(window.visualViewport)visualViewport.addEventListener('resize',sz);addEventListener('load',sz)})();</script>
 <title>AssOnTrack</title>
 <meta name="description" content="Progress, diet and passion tracker">
 <meta name="theme-color" content="#060b17">
@@ -1859,7 +1863,9 @@ html:not(.tpl-spa) .tkq-add{color:#04101f;background:linear-gradient(180deg,#7fd
 html.phone,html.phone body{height:100%;overflow:hidden!important;overscroll-behavior:none}
 /* the app itself never scrolls on the phone — only the page area inside it does, so the tab bar stays put */
 html.phone body{position:fixed;inset:0;width:100%}
-html.phone .shell{position:fixed!important;inset:0!important;width:auto!important;height:auto!important}
+html.phone .shell{position:fixed!important;inset:0 0 auto 0!important;width:auto!important;height:var(--apph,100%)!important}
+/* the phone screen's real height (iPhone can report a shorter page in this zoomed-out mode, which left a black band under the tabs) */
+html.phone #bgimg,html.phone #bgimg2,html.phone #bglive,html.phone .bgshade,html.phone #tplbg{bottom:auto!important;height:var(--apph,100%)!important}
 html.phone #view{overflow-y:auto!important;overflow-x:hidden;overscroll-behavior:contain;min-height:0}
 html.phone .topbar{padding-top:max(24px,calc(env(safe-area-inset-top,0px) * 3))!important}
 html.phone .shell{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto minmax(0,1fr) auto!important;height:100%}
@@ -7169,7 +7175,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="475",APPT="2026-11-22T01:19:00Z";   /* APPT: when this update was made */
+const APPV="476",APPT="2026-11-22T01:24:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
