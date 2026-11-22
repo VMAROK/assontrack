@@ -1854,18 +1854,23 @@ html:not(.tpl-spa) .tkq-add{color:#04101f;background:linear-gradient(180deg,#7fd
 }
 */
 
-/* phone: same page as the iPad, tabs along the bottom */
+/* phone: same page as the iPad, tabs along the bottom — 4 at a time like a real app's tab bar; swipe the bar for the rest.
+   The page is drawn 1180px wide and shrunk to the phone, so 1pt on the phone ≈ 3px here (tab bar 49pt, icons 25pt, labels 10pt) */
 html.phone,html.phone body{height:100%}
 html.phone .shell{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto minmax(0,1fr) auto!important;height:100%}
 html.phone .topbar{grid-column:1!important;grid-row:1!important}
 html.phone #view{grid-column:1!important;grid-row:2!important;-webkit-overflow-scrolling:touch}
-html.phone aside{grid-column:1!important;grid-row:3!important;flex-direction:row!important;justify-content:space-around;gap:0!important;padding:8px 10px max(10px,env(safe-area-inset-bottom,0px))!important;border-right:0!important;border-top:1px solid rgba(var(--lr),.3);overflow:visible!important}
+html.phone aside{grid-column:1!important;grid-row:3!important;display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;justify-content:flex-start!important;gap:0!important;padding:0 0 max(36px,calc(env(safe-area-inset-bottom,0px) * 3))!important;border-right:0!important;border-top:1px solid rgba(var(--lr),.3);overflow-x:auto!important;overflow-y:hidden!important;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-backdrop-filter:blur(30px) saturate(1.4)!important;backdrop-filter:blur(30px) saturate(1.4)!important}
+html.phone aside::-webkit-scrollbar{display:none}
 html.phone aside .logo,html.phone aside .side-foot{display:none!important}
-html.phone .navbtn{flex:1;flex-direction:column!important;gap:5px!important;font-size:15px!important;padding:10px 4px!important;justify-content:center;align-items:center;text-align:center;border-radius:12px;min-width:0}
-html.phone .navbtn svg{width:30px!important;height:30px!important}
-html.phone .navsub::before,html.phone .navsub>.nav-dash{display:none!important}
-html.phone .navbtn[aria-selected="true"]::before{left:28%!important;right:28%!important;top:-9px!important;bottom:auto!important;width:auto!important;height:3px!important}
-html.phone .toast{bottom:calc(120px + env(safe-area-inset-bottom,0px))}
+html.phone .navgrp,html.phone .navgrp-in,html.phone aside .navgrp-wrap{display:contents!important}
+html.phone .navgrp .navsub{display:flex!important;pointer-events:auto!important}
+html.phone .navcar,html.phone .navbtn.navsub::after,html.phone .navbtn.navsub::before{display:none!important}
+html.phone .navbtn,html.phone .navbtn.navsub{flex:0 0 25%!important;width:25%!important;max-width:none!important;height:147px;box-sizing:border-box;scroll-snap-align:start;flex-direction:column!important;gap:8px!important;font-size:30px!important;font-weight:500!important;padding:18px 0 0!important;margin:0!important;justify-content:flex-start;align-items:center;text-align:center;border-radius:0!important;border:0!important;background:none!important;box-shadow:none!important;min-width:0}
+html.phone .navbtn svg{width:75px!important;height:75px!important;flex:none}
+html.phone .navbtn[aria-selected="true"]{color:var(--accent,#ffb648)!important}
+html.phone .navbtn[aria-selected="true"]::before{display:none!important}
+html.phone .toast{bottom:calc(200px + env(safe-area-inset-bottom,0px))}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -7159,7 +7164,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="473",APPT="2026-11-22T01:11:00Z";   /* APPT: when this update was made */
+const APPV="474",APPT="2026-11-22T01:16:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
