@@ -2188,6 +2188,8 @@ html.phone .att-strip .att-t{flex-basis:110px}
 .tk-save:hover{background:#3b7cff}.tk-save.ok{background:#1f9d5a}
 .tk-bot{gap:10px!important}
 .tkcard .tk-btns:has(.tk-save){flex-wrap:nowrap!important;gap:8px!important}.tkcard .tk-btns:has(.tk-save) .tk-end{margin-left:auto;flex-shrink:0}
+.att-rep{position:absolute;z-index:4;top:8px;left:8px;height:34px;display:inline-flex;align-items:center;gap:6px;padding:0 10px;border-radius:0;cursor:pointer;font:600 12.5px inherit;font-family:inherit;color:#f2ede6;background:rgba(8,6,6,.55);border:1px solid rgba(255,255,255,.16);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.att-rep.on{background:rgba(47,111,236,.75);border-color:rgba(150,190,255,.6)}
 /* add + compare: one slim icon row */
 .att-tools{display:flex;align-items:center;gap:3px;margin-top:3px}
 .att-ic{position:relative;display:grid;place-items:center;width:40px;height:34px;padding:0;border:0;border-radius:0;cursor:pointer;color:var(--fg);background:rgba(var(--lr),.1);transition:background .15s}
@@ -6668,6 +6670,7 @@ function attHtml(t){const A=t.att||[];
     ${A.length?(()=>{const cur=A.find(a=>a.id===attSel[t.id])||A[0],i=A.indexOf(cur);
       return `<div class="att-theater"><div class="att-stage" data-atttid="${t.id}"><div class="att-slot" data-attstage="${t.id}:${cur.id}"></div>
         ${A.length>1?`<span class="att-dots" aria-hidden="true">${A.map(a=>`<i${a.id===cur.id?' class="on"':""}></i>`).join("")}</span>`:""}
+        <button type="button" class="att-rep${attRepl&&attRepl.aid===cur.id?" on":""}" data-attrep="${t.id}:${cur.id}" aria-label="Replace this ${cur.kind==="yt"?"link":cur.kind==="vid"?"video":"photo"}" title="Replace"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h13l-3-3M20 17H7l3 3"/></svg><span>Replace</span></button>
         <button type="button" class="att-fs" data-attview="${t.id}:${cur.id}" aria-label="Full screen" title="Full screen"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>
       <!-- old caption bar ("2 of 3", type, full screen), replaced by the corner lines like the portfolio -->
       ${true?`<div class="att-strip">${A.map(a=>`<div class="att-t${a.id===cur.id?" on":""}"><button type="button" class="att-open" data-attsel="${t.id}:${a.id}" aria-pressed="${a.id===cur.id}" aria-label="Show this ${a.kind==="img"?"photo":"video"}">${attThumb(a)}</button><button type="button" class="att-x" data-attdel="${t.id}:${a.id}" aria-label="Remove">×</button></div>`).join("")}</div>`:""}</div>`})():""}
@@ -6676,7 +6679,7 @@ function attHtml(t){const A=t.att||[];
     <!-- YouTube link box moved into the icon row, next to the YouTube icon -->
     <!-- old add pills + "Compare side by side" card, replaced by the icon row below:
     <div class="att-add">+ Photo / + Video (up to 1 min) / + YouTube link</div><button class="att-cmp">Compare side by side</button> -->
-    <div class="att-tools"><!-- separate video button merged into the photo button (both opened the same library) --><button type="button" class="att-ic" data-attpick="${t.id}" data-attacc="image/*,video/*" aria-label="Add photo or video" title="Add photo or video (videos up to 1 min)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg><b>+</b></button><button type="button" class="att-ic att-ic-yt${attLinkFor===t.id?" on":""}" data-attlink="${t.id}" aria-label="Add YouTube link" title="Add YouTube link"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><rect x="2" y="5.5" width="20" height="13" rx="3.5" fill="currentColor" opacity=".9"/><path d="M10 9l5 3-5 3z" fill="var(--yt-tri,#111)"/></svg><b>+</b></button>${attLinkFor===t.id?`<form class="att-link att-link-in" data-attlinkform="${t.id}"><input id="attUrl" type="url" inputmode="url" placeholder="Paste YouTube link" autocomplete="off" required><button class="att-go" aria-label="Add link">Add</button></form>`:""}
+    <div class="att-tools"><!-- separate video button merged into the photo button (both opened the same library) --><button type="button" class="att-ic" data-attpick="${t.id}" data-attacc="image/*,video/*" aria-label="Add photo or video" title="Add photo or video (videos up to 1 min)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg><b>+</b></button><button type="button" class="att-ic att-ic-yt${attLinkFor===t.id?" on":""}" data-attlink="${t.id}" aria-label="Add YouTube link" title="Add YouTube link"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><rect x="2" y="5.5" width="20" height="13" rx="3.5" fill="currentColor" opacity=".9"/><path d="M10 9l5 3-5 3z" fill="var(--yt-tri,#111)"/></svg><b>+</b></button>${attLinkFor===t.id?`<form class="att-link att-link-in" data-attlinkform="${t.id}"><input id="attUrl" type="url" inputmode="url" placeholder="${attRepl&&attRepl.tid===t.id?"Paste new link to replace":"Paste YouTube link"}" autocomplete="off" required><button class="att-go" aria-label="Add link">${attRepl&&attRepl.tid===t.id?"Replace":"Add"}</button></form>`:""}
       ${true?`<span class="att-tsep"></span><button type="button" class="att-ic att-ic-cmp${cmpPool(t.id).length<2?" dim":""}" data-cmpopen="${t.id}" aria-label="Compare two side by side" title="Compare side by side"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="8" height="16"/><rect x="13" y="4" width="8" height="16"/></svg></button>`:""}</div></div>`}
 function attHydrate(){attStages();document.querySelectorAll("[data-attsrc]").forEach(el=>{if(el.src)return;const id=el.dataset.attsrc;const t=[...document.querySelectorAll("[data-attview]")].length;
   for(const p of data.passions||[])for(const tk of p.tasks||[]){const a=(tk.att||[]).find(x=>x.id===id);if(a){attURL(a).then(u=>{if(u){el.src=u+(a.kind==="vid"?"#t="+((a.t0||0)+0.1).toFixed(1):"")}else el.closest(".att-t")&&el.closest(".att-t").classList.add("missing")});return}}});
@@ -6722,6 +6725,11 @@ function attTrimAsk(f,dur){return new Promise(done=>{const u=URL.createObjectURL
   v.addEventListener("timeupdate",()=>{if(v.currentTime>=st+L||v.currentTime<st-0.5)v.currentTime=st});
   const end=val=>{v.pause();v.removeAttribute("src");URL.revokeObjectURL(u);w.remove();done(val)};
   w.querySelector("[data-x]").onclick=()=>end(null);w.querySelector("[data-ok]").onclick=()=>end(dur?[st,Math.min(dur,st+L)]:"all")})}
+/* replace: the new item takes the old one's place */
+let attRepl=null;
+function attDrop(a){if(!a)return;MDB.del(a.id);if(a.path&&typeof sbOn==="function"&&sbOn())try{sb.storage.from("models").remove([a.path])}catch(_){}if(attURLs.has(a.id)){URL.revokeObjectURL(attURLs.get(a.id));attURLs.delete(a.id)}[...attStageEls.keys()].forEach(k=>{if(k.endsWith(":"+a.id))attStageEls.delete(k)})}
+function attPut(t,a){const r=attRepl&&attRepl.tid===t.id?attRepl.aid:null;t.att=t.att||[];const i=r?t.att.findIndex(x=>x.id===r):-1;
+  if(i>=0){const old=t.att[i];t.att[i]=a;attDrop(old);attRepl=null}else t.att.push(a);attSel[t.id]=a.id}
 const attWait=(p,ms)=>Promise.race([p,new Promise(ok=>setTimeout(ok,ms))]);
 async function attAddFiles(tid,files){const t=findTaskAny(tid);if(!t)return;attBusy=tid;render();
   try{for(const f of files){const vid=/^video\//.test(f.type)||/\.(mov|mp4|m4v|webm)$/i.test(f.name||"");if(!vid&&!/^image\//.test(f.type))continue;
@@ -6729,11 +6737,11 @@ async function attAddFiles(tid,files){const t=findTaskAny(tid);if(!t)return;attB
     const vt=f.type||(/\.mov$/i.test(f.name||"")?"video/quicktime":"video/mp4");
     const blob=vid?(f.type?f:new Blob([f],{type:vt})):await attShrink(f),id=uid(),a={id,kind:vid?"vid":"img",name:f.name||"",type:vid?vt:"image/jpeg",at:Date.now(),size:blob.size};if(cut){a.t0=cut[0];a.t1=cut[1]}
     await attWait(MDB.put(id,blob),15000);
-    (t.att=t.att||[]).push(a);
+    attPut(t,a);
     /* upload in the background so the screen never waits on it */
     if(typeof sbOn==="function"&&sbOn()){const ext=vid?((f.name||"").split(".").pop()||"mp4").toLowerCase():"jpg",pth=sbUser.id+"/att/"+id+"."+ext;
       sb.storage.from("models").upload(pth,blob,{upsert:true,contentType:blob.type||"application/octet-stream"}).then(({error})=>{if(!error){a.path=pth;save()}}).catch(()=>{})}}}
-  finally{attBusy=null;save();render()}}
+  finally{attBusy=null;attRepl=null;save();render()}}
 /* one file picker that lives outside the redrawn screen — the screen redraws while the phone's photo picker is open,
    which threw away the old picker, so tapping the check mark did nothing */
 let attPickFor=null,attPickEl=null,attPickAt=0;
@@ -6742,16 +6750,19 @@ let attPickFor=null,attPickEl=null,attPickAt=0;
 window.attHold=()=>(attPickAt&&Date.now()-attPickAt<600000)||!!attBusy||!!document.querySelector(".atrim");
 function attPicker(){if(attPickEl)return attPickEl;const i=document.createElement("input");i.type="file";
   i.style.cssText="position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0";
-  i.addEventListener("cancel",()=>{attPickAt=0});i.addEventListener("change",()=>{attPickAt=0;const fs=[...(i.files||[])],tid=attPickFor;i.value="";if(fs.length&&tid)attAddFiles(tid,fs)});
+  i.addEventListener("cancel",()=>{attPickAt=0;attRepl=null});i.addEventListener("change",()=>{attPickAt=0;const fs=[...(i.files||[])],tid=attPickFor;i.value="";if(fs.length&&tid)attAddFiles(tid,fs)});
   document.body.appendChild(i);return attPickEl=i}
 document.addEventListener("submit",e=>{const f=e.target;if(!f.dataset||!f.dataset.attlinkform)return;e.preventDefault();e.stopImmediatePropagation();
   const u=(f.querySelector("#attUrl").value||"").trim(),y=ytId(u);if(!y){toast("That doesn't look like a YouTube link");return}
-  const t=findTaskAny(f.dataset.attlinkform);if(!t)return;(t.att=t.att||[]).push({id:uid(),kind:"yt",url:"https://youtu.be/"+y,at:Date.now()});attLinkFor=null;save();render()},true);
-document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-attlink],[data-attdel],[data-attview],[data-attclose],[data-attpick],[data-attsel]");
+  const t=findTaskAny(f.dataset.attlinkform);if(!t)return;attPut(t,{id:uid(),kind:"yt",url:"https://youtu.be/"+y,at:Date.now()});attLinkFor=null;save();render()},true);
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-attlink],[data-attdel],[data-attview],[data-attclose],[data-attpick],[data-attsel],[data-attrep]");
   if(!b){if(attView&&e.target.id==="attViewer"){attView=null;attHydrate()}return}
   e.preventDefault();e.stopPropagation();
-  if(b.dataset.attlink){attLinkFor=attLinkFor===b.dataset.attlink?null:b.dataset.attlink;render();if(attLinkFor)setTimeout(()=>{const i=document.getElementById("attUrl");i&&i.focus()},30);return}
-  if(b.dataset.attpick){attPickFor=b.dataset.attpick;attPickAt=Date.now();const i=attPicker();i.accept=b.dataset.attacc||"image/*,video/*";i.multiple=/image/.test(i.accept);i.click();return}
+  if(b.dataset.attlink){attRepl=null;attLinkFor=attLinkFor===b.dataset.attlink?null:b.dataset.attlink;render();if(attLinkFor)setTimeout(()=>{const i=document.getElementById("attUrl");i&&i.focus()},30);return}
+  if(b.dataset.attpick){attRepl=null;attPickFor=b.dataset.attpick;attPickAt=Date.now();const i=attPicker();i.accept=b.dataset.attacc||"image/*,video/*";i.multiple=/image/.test(i.accept);i.click();return}
+  if(b.dataset.attrep){const [tid,aid]=b.dataset.attrep.split(":"),t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);if(!a)return;attRepl={tid,aid};
+    if(a.kind==="yt"){attLinkFor=tid;render();setTimeout(()=>{const i=document.getElementById("attUrl");i&&i.focus()},30);return}
+    attPickFor=tid;attPickAt=Date.now();const i=attPicker();i.accept="image/*,video/*";i.multiple=false;i.click();return}
   if(b.dataset.attsel){const [tid,aid]=b.dataset.attsel.split(":");if(attSel[tid]!==aid){document.querySelectorAll(`[data-attstage^="${tid}:"] video`).forEach(v=>v.pause());attSel[tid]=aid;render()}return}
   if(b.dataset.attview){document.querySelectorAll(".att-stage video").forEach(v=>v.pause());attView=b.dataset.attview;attHydrate();return}
   if(b.dataset.attclose!==undefined){attView=null;attHydrate();return}
@@ -7861,7 +7872,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="522",APPT="2026-11-22T23:42:07Z";   /* APPT: when this update was made */
+const APPV="523",APPT="2026-11-22T23:55:37Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
