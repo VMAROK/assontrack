@@ -2158,6 +2158,19 @@ html.phone #view{padding-top:max(12px,env(safe-area-inset-top,0px))!important}
 .attv-in img,.attv-in video{max-width:100%;max-height:calc(100vh - 80px);border-radius:10px}
 .attv-in iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:10px;background:#000}
 .attv-x{position:absolute;top:max(14px,env(safe-area-inset-top,0px));right:14px;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.5);color:#fff;font-size:24px;line-height:1;cursor:pointer;z-index:2}
+/* phone Dashboard: This week and the month calendar sit straight on the page — no panel box around them */
+html.phone #view .panel.wahead,html.phone #view .panel:has(>.calhead){background:none!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;padding:6px 0!important;border-radius:0!important}
+html.phone #view .panel.wahead::before,html.phone #view .panel.wahead::after,html.phone #view .panel:has(>.calhead)::before,html.phone #view .panel:has(>.calhead)::after{display:none!important}
+
+/* phone: tighter spacing — less room around the panels and a bit less inside them */
+html.phone #view{padding:6px 6px 18px!important}
+html.phone #view .panel{padding:11px!important;border-radius:14px!important}
+html.phone #view :is(.grid,.stack,.passtop,.pgrid,.dashtop,.trtop,.bodytop){gap:6px!important}
+html.phone #view>*+*{margin-top:6px!important}
+html.phone #view .panel .panel{padding:10px!important}
+/* phone, Dashboard: the month calendar sits straight on the page, no panel around it */
+html.phone #view .panel:has(>.calhead){background:none!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;padding:8px 2px!important}
+html.phone #view .panel:has(>.calhead)::before,html.phone #view .panel:has(>.calhead)::after{display:none!important}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -7527,7 +7540,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="498",APPT="2026-11-22T21:23:00Z";   /* APPT: when this update was made */
+const APPV="499",APPT="2026-11-22T21:25:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
