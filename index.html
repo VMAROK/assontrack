@@ -1759,6 +1759,62 @@ html.tpl-spa .ptabs .tab[aria-selected="true"] .tcount{background:#1f0c00;color:
 html.tpl-spa .ptabs .tab:hover{background:rgba(255,170,90,.1)}
 html.tpl-spa .pd-hero::after{background:linear-gradient(90deg,transparent,rgba(255,170,70,.75),transparent)!important;box-shadow:0 0 10px rgba(255,160,60,.5)!important}
 html.tpl-spa .pd-hero{box-shadow:0 1px 0 rgba(255,170,90,.1),0 10px 24px -12px rgba(0,0,0,.6)!important}
+
+/* tasks, neater: one list, quick add on top, flat rows, project headers with a thin bar, completed folded */
+.tk2wrap{display:block!important}
+.tk2wrap>div{min-width:0}
+.tkq{margin:4px 0 14px;border:1px solid rgba(var(--lr),.22);border-radius:12px;background:rgba(2,4,10,.55);overflow:hidden}
+.tkq-row{display:flex;align-items:center;gap:8px;padding:6px 6px 6px 12px}
+.tkq-plus{font-size:20px;line-height:1;color:var(--accent,#ffb648);font-weight:600}
+.tkq-row input{flex:1;min-width:0;background:none!important;border:0!important;box-shadow:none!important;font:inherit;font-size:15px;color:var(--fg);padding:8px 2px!important;outline:none}
+.tkq-mb{flex:none;font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);background:none;border:1px solid rgba(var(--lr),.2);border-radius:8px;padding:7px 10px;cursor:pointer}
+.tkq-mb.on{color:var(--fg);border-color:rgba(var(--lr),.45)}
+.tkq-add{flex:none;font:inherit;font-size:13px;font-weight:700;padding:8px 14px;border-radius:8px;border:0;cursor:pointer;color:#1f0c00;background:linear-gradient(180deg,#ffd27a,#ff9f3a)}
+html:not(.tpl-spa) .tkq-add{color:#04101f;background:linear-gradient(180deg,#7fdcff,#3fb8f2)}
+.tkq-more{display:grid;gap:10px;padding:10px 12px 14px;border-top:1px solid rgba(var(--lr),.14)}
+.tkq-more[hidden]{display:none}
+.tklist{display:flex;flex-direction:column;gap:0}
+.tkgroup{border:0!important;background:none!important;box-shadow:none!important;padding:0!important;margin:0 0 10px!important}
+.tkgroup .tkg-h{display:flex;align-items:center;gap:8px;padding:8px 2px 6px!important;border:0!important;background:none!important}
+.tkgroup .tkg-h small{color:var(--muted)}
+.tkg-bar{flex:1;max-width:160px;height:3px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;margin-left:auto}
+.tkg-bar>i{display:block;height:100%;background:var(--pc,#ffb648);border-radius:3px}
+.tkg-b{border:0!important;padding:0!important;margin:0!important;background:none!important}
+.tksub{border:0!important;padding:0!important;margin:0!important;background:none!important}
+.tksub .tkg-h.sm{padding:6px 2px 4px 18px!important;font-size:12.5px;color:var(--muted);border:0!important}
+.tksub::before,.tkg-b::before{display:none!important}
+.tkrow.tk2{align-items:center;gap:0;border:0!important;border-bottom:1px solid rgba(var(--lr),.1)!important;border-radius:0!important;background:none!important;box-shadow:none!important;overflow:visible;padding:2px 0}
+.tkrow.tk2:last-child{border-bottom:0!important}
+.tkrow.tk2 .tkrow-main{padding:9px 8px;gap:8px;border-radius:8px}
+.tk2-x{display:flex;flex-direction:column;min-width:0;gap:2px}
+.tk2 .tkr-title{font-size:14.5px;font-weight:600;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.3}
+.tk2-meta{font-size:11.5px;color:var(--muted)}.tk2-meta .late{color:#ff5d6c}.tk2-meta .soon{color:#ffb648}
+.tk2-ck{flex:none;position:relative;width:22px;height:22px;margin:0 2px 0 6px;border-radius:50%;border:2px solid rgba(255,255,255,.28);background:none;cursor:pointer;padding:0}
+.tk2-ck:hover{border-color:#3ddc84}
+.tk2-ck.armed{border-color:#3ddc84;background:rgba(61,220,132,.25)}
+.tk2-ck.armed span{position:absolute;left:28px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:#3ddc84;white-space:nowrap;background:rgba(2,6,10,.9);padding:2px 6px;border-radius:6px;z-index:3}
+.tk2.st-running .tk2-ck{border-color:#ffb648;background:conic-gradient(#ffb648 0 50%,transparent 0);box-shadow:0 0 10px rgba(255,182,72,.5)}
+.tk2.st-paused .tk2-ck{border-color:rgba(255,182,72,.6)}
+.tk2.st-overdue .tk2-ck{border-color:rgba(255,93,108,.7)}
+.tk2.st-planned .tk2-ck{border-style:dashed}
+.tk2-ic{flex:none;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(var(--lr),.22);background:rgba(255,255,255,.04);color:var(--fg);cursor:pointer;margin-right:4px;font-size:17px;line-height:1;padding:0}
+.tk2-play{color:var(--accent,#ffb648);border-color:rgba(255,182,72,.35)}
+.tk2-play:hover{background:rgba(255,182,72,.12)}
+.tk2-cx{width:28px;height:28px;font-size:16px;color:var(--muted)}
+.tk2-run{flex:none;font-family:var(--mono);font-size:13px;font-weight:700;color:#ffb648;margin-right:8px;text-shadow:0 0 8px rgba(255,182,72,.45)}
+.tkrow.tk2.st-running{background:linear-gradient(90deg,rgba(255,170,60,.1),transparent 70%)!important}
+.tk2-done{display:flex;align-items:center;gap:10px;width:100%;margin:10px 0 0;padding:11px 12px;border-radius:10px;border:1px solid rgba(var(--lr),.16);background:rgba(2,4,10,.4);color:var(--fg);font:inherit;cursor:pointer;text-align:left}
+.tk2-done small{color:var(--muted);margin-left:auto}
+.tk2-done .tk-chev{transition:transform .2s}.tk2-done[aria-expanded="true"] .tk-chev{transform:rotate(180deg)}
+.tk2-dck{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:rgba(61,220,132,.18);color:#3ddc84;font-size:12px;font-weight:800}
+.tk2-donelist{margin-top:6px}
+.ptp .tkfilter,.ptp .tkf-branch{display:none!important}
+
+/* My passions gear: top-left corner, sticking out */
+.pleft .pmine>.ph .gear{right:auto!important;left:-15px!important;top:-15px!important}
+.pleft .pmine:not(.has-tabs)>.ph .gear{top:-15px!important}
+.pg-next>.pcatp{margin:0}
+.pcatp .ph{display:flex;align-items:center;justify-content:space-between}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -5898,16 +5954,16 @@ function passList(d,P,wk){P=sortPass(P);const ALL=P;const C=cats();if(C.length&&
   const withGoal=rows.filter(r=>r.pct!=null),overall=withGoal.length?withGoal.reduce((a,r)=>a+Math.min(r.pct,1),0)/withGoal.length:null;
   /* category tabs sit on top of the panel like folder tabs (while editing categories they stay inside the panel) */
   /* category tabs are the top strip inside the box; the "My passions" title is gone and the gear sticks out of the right side */
-  const fold="",inTabs=!catMgr&&cats().length;/* was: folder tabs above the panel (pfold) */
-  return `<div class="panel pmine${inTabs?" has-tabs":""}" style="--c:var(--lime)">${inTabs?`<div class="ptabs-in">${catTabs(ALL)}</div>`:""}<div class="ph"><span class="pmine-t">My passions</span><span style="display:flex;align-items:center;gap:12px"><button class="addp gear${catMgr?" on":""}" data-catmgr aria-label="Category settings" aria-expanded="${catMgr}" title="Categories"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></span></div>${catMgr||!cats().length?catTabs(ALL):""}${(()=>{if(catMgr){headShown="";return ""}const sp=selP&&D().passions.find(x=>x.id===selP);if(sp)return passHead(D(),sp);if(passCat!=="all"&&(passCat==="none"||cats().some(c=>c.id===passCat)))return catHead(D(),passCat);headShown="";return ""})()}${/* category tabs were here, under the passion box — now at the top of the panel */""}${catManager(ALL)}
+  const fold="",inTabs=cats().length&&!catMgr;/* was: folder tabs above the panel (pfold) */
+  return `<div class="panel pmine${inTabs?" has-tabs":""}" style="--c:var(--lime)">${inTabs?`<div class="ptabs-in">${catTabs(ALL)}</div>`:""}<div class="ph"><span class="pmine-t">My passions</span><span style="display:flex;align-items:center;gap:12px"><button class="addp gear${catMgr?" on":""}" data-catmgr aria-label="Category settings" aria-expanded="${catMgr}" title="Categories"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></span></div>${!catMgr&&!cats().length?catTabs(ALL):""}${/* category editing opens in the panel beside this one (passCatPanel) */""}${(()=>{if(false){headShown="";return ""}const sp=selP&&D().passions.find(x=>x.id===selP);if(sp)return passHead(D(),sp);if(passCat!=="all"&&(passCat==="none"||cats().some(c=>c.id===passCat)))return catHead(D(),passCat);headShown="";return ""})()}${/* category tabs were here, under the passion box — now at the top of the panel */""}
 
-   ${catMgr?"":rows.length?`<div class="plist">${rows.map(r=>{const pc=r.pct==null?null:Math.round(Math.min(r.pct,1)*100);
+   ${false?"":rows.length?`<div class="plist">${rows.map(r=>{const pc=r.pct==null?null:Math.round(Math.min(r.pct,1)*100);
      return `<div class="plrow${selP===r.p.id?" on":""}" data-row data-group="${esc(r.p.lvl||"none")}" data-id="${r.p.id}" data-selp="${r.p.id}" role="button" tabindex="0" aria-expanded="${selP===r.p.id}"><button class="pjs-grip pl-grip" data-sort="pass" data-id="${r.p.id}" aria-label="Reorder ${esc(r.p.name)} within ${esc(r.p.lvl||"its group")}. Drag, or use the arrow keys" title="Drag to reorder within ${esc(r.p.lvl||"this group")}"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 8h14M5 12h14M5 16h14"/></svg></button>${!r.last?emptyPie():r.pct==null?`<svg class="pie" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="none" stroke="var(--dim)" stroke-width="2" stroke-dasharray="4 4"/></svg>`:pie(r.pct)}
        <div class="m"><div>${esc(r.p.name)}${r.p.lvl?`<span class="plvl" data-lvl="${esc(r.p.lvl)}">${esc(r.p.lvl)}</span>`:""}</div><small>${!r.sched&&r.gm?`Goal ${r.p.goal}h`:""}${r.last?((!r.sched&&r.gm)?" · last logged ":"Last logged ")+fmtDate(r.last.d):((!r.sched&&r.gm)?" · ":"")+"Not yet logged"}</small></div>
        <div class="hrs"><b>${fmtH(r.tot)}</b><small style="color:${pc==null?"var(--muted)":pc>=100?"#3ddc84":pc>=50?"var(--amber)":"#ff5d6c"}">${pc==null?"total":pc+(r.sched?"% on track":"% of goal")}</small></div>
        </div>`}).join("")}</div>`
    :`<div class="empty">${cats().length&&passCat!=="all"&&ALL.length?(passCat==="none"?"Every passion has a category":`Nothing in ${esc(catName(passCat))} yet<br>Add one below, or move a passion here from its header`):"No passions yet"}</div>`}
-   ${catMgr?"":addingP?`<div class="addwrap"><div class="addhead"><b>New passion</b><button class="x" data-addp aria-label="Close">×</button></div><form class="f addform" id="pForm"><label>Passion<input id="pName" required placeholder="Dancing" autocomplete="off"></label>
+   ${false?"":addingP?`<div class="addwrap"><div class="addhead"><b>New passion</b><button class="x" data-addp aria-label="Close">×</button></div><form class="f addform" id="pForm"><label>Passion<input id="pName" required placeholder="Dancing" autocomplete="off"></label>
     <label>Label<select id="pLvl"><option>Priority</option><option selected>Moderate</option><option>Bonus</option></select></label>${cats().length?`<label>Category<select id="pCat"><option value="">No category</option>${cats().map(c=>`<option value="${c.id}" ${passCat===c.id?"selected":""}>${esc(c.name)}</option>`).join("")}</select></label>`:""}
     <button class="btn">Add passion</button></form></div>`:`<button class="addrow" data-addp><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add a passion</button>`}</div>${fold?"</div>":""}`;
 }
@@ -6035,7 +6091,13 @@ function taskView(d,p){
   const PILL={new:"Not started",running:"In progress",paused:"Paused",overdue:"Deadline missed",planned:"Planned"};
   const card=t=>{const st=taskState(t),ms=taskMs(t),run=st==="running";
     if(!tkOpen.has(t.id)&&addTimeFor!==t.id){const left=t.due?t.due-Date.now():null;
+      /* neater row: done circle · full name with a small line under it · ▶ (timer only shows while running). was the boxed row with a status pill, 00:00:00 and a Start button */
+      const meta=[st==="planned"&&t.startOn?"Starts "+fmtDate(t.startOn):"",st==="overdue"?`<span class="late">Deadline missed</span>`:"",st==="paused"?"Paused":"",!run&&ms>0?fmtH(Math.round(ms/6e4))+" logged":"",t.planH?"of "+t.planH+"h":"",t.due&&st!=="overdue"?`<span class="${left<864e5?"soon":""}">${LOCK} ${fmtDate(ymd(new Date(t.due)))}</span>`:""].filter(Boolean).join(" · ");
+      const PLAY='<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>',PAUSE='<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg>';
+      return `<div class="tkrow tk2 st-${st}"><button class="tk2-ck" data-tkdone="${t.id}" aria-label="Mark ${esc(t.title)} done" title="Tap twice to mark done"></button><button class="tkrow-main" data-tkopen="${t.id}" aria-expanded="false" aria-label="${esc(t.title)}, ${PILL[st]}. Tap for details"><span class="tk2-x"><b class="tkr-title">${esc(t.title)}</b>${meta?`<small class="tk2-meta">${meta}</small>`:""}</span></button>${st==="planned"?"":run?`<span class="tk2-run" data-timer="${p.id}:${t.id}">${fmtClock(ms)}</span><button class="tk2-ic" data-tkpause="${t.id}" aria-label="Pause" title="Pause">${PAUSE}</button><button class="tk2-ic tk2-cx" data-tkcancel="${t.id}" aria-label="Cancel timer" title="Cancel timer (nothing is logged)">×</button>`:`<button class="tk2-ic tk2-play" data-tkstart="${t.id}" aria-label="${(t.runs||[]).length?"Resume":"Start"} ${esc(t.title)}" title="${(t.runs||[]).length?"Resume":"Start"}">${PLAY}</button>`}</div>`}
+      /* was:
       return `<div class="tkrow st-${st}"><button class="tkrow-main" data-tkopen="${t.id}" aria-expanded="false" aria-label="${esc(t.title)}, ${PILL[st]}. Tap to expand"><b class="tkr-title">${esc(t.title)}</b><span class="tk-pill">${PILL[st]}</span><span class="tkr-sp"></span><span class="tkr-time"${run?` data-timer="${p.id}:${t.id}"`:""}>${fmtClock(ms)}</span>${t.due?`<span class="tkr-due${left<0?" late":left<864e5?" soon":""}">${LOCK} ${fmtDate(ymd(new Date(t.due)))}</span>`:""}<svg class="tk-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>${st==="planned"?"":run?`<button class="tkr-act tkr-cancel" data-tkcancel="${t.id}" aria-label="Cancel timer" title="Cancel timer (nothing is logged)">×</button><button class="tkr-act" data-tkpause="${t.id}">Pause</button>`:`<button class="tkr-act" data-tkstart="${t.id}">${(t.runs||[]).length?"Resume":"Start"}</button>`}</div>`}
+      */
     const due=t.due?(()=>{const left=t.due-Date.now();return `<span class="tk-due${left<0?" late":left<864e5?" soon":""}">${LOCK} Due ${fmtDate(ymd(new Date(t.due)))}, ${clock(t.due)} · ${left<0?"missed "+fmtLeft(-left)+" ago":"in "+fmtLeft(left)}</span>`})():`<span class="tk-due none">No deadline</span>`;
     return `<div class="tkcard st-${st}"><div class="tk-top"><div class="tk-name">${isRn("task",t.id)?rnForm("task",t.id,t.title,PR.length?`<select id="rnP" class="rn-proj" aria-label="Project or sub-project" title="Project or sub-project">${["",...PR.map(x=>x.id)].map(id=>`<option value="${id}" ${(t.proj||"")===id?"selected":""}>${id?esc(prjLabel(PR.find(x=>x.id===id))):"No project"}</option>`).join("")}</select>`:""):`<b>${esc(t.title)}</b><span class="tk-pill">${PILL[st]}</span>`}</div>${isRn("task",t.id)?"":penBtn("task",t.id,t.title)}<button class="tk-fold" data-tkopen="${t.id}" aria-expanded="true" aria-label="Collapse task"><svg class="tk-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></div>
       <div class="tk-mid"><div class="tk-time"><b ${run?`data-timer="${p.id}:${t.id}"`:""}>${fmtClock(ms)}</b>${t.planH?`<small>of ${t.planH}h planned</small>`:""}</div>${due}</div>${t.planH?`<div class="track" style="--c:${ms>=t.planH*36e5?"#3ddc84":"var(--cyan)"}"><i style="width:${Math.min(ms/(t.planH*36e5),1)*100}%"></i></div>`:""}
@@ -6050,24 +6112,24 @@ function taskView(d,p){
          const n=cnt(t=>k==="all"||(k==="none"?!t.proj||!PR.some(q=>q.id===t.proj):ids.includes(t.proj)));const open=x&&openTop===x&&K.length,branch=open&&tkFilter!==k;
          const btn=`<button class="fchip${open?" open":""}${branch?" branch":""}" data-tkf="${k}" aria-pressed="${tkFilter===k}" ${x?`style="--pc:${prjColor(d,x)}"`:""} ${K.length?`aria-expanded="${!!open}"`:""}>${x?`<span class="pj-dot"></span>`:""}${esc(l)}<i>${n}</i>${K.length?`<svg class="tkf-chev" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`:""}</button>`;
          return btn}).join("")}</div>${openTop&&kidsOf(openTop).length?`<div class="tkf-branch${pop}" style="--pc:${prjColor(d,openTop)}"><span class="tkf-wire" aria-hidden="true"></span><div class="tkfilter tkf-subbar" role="group" aria-label="${esc(openTop.title)} sub-projects">${kidsOf(openTop).map(c=>`<button class="fchip sub" data-tkf="${c.id}" aria-pressed="${tkFilter===c.id}">${esc(c.title)}<i>${cnt(t=>t.proj===c.id)}</i></button>`).join("")}</div></div>`:""}`})():""}
-     </div><div class="tkwrap"><div>
-     
-     <div class="tklist">${!act.length?`<div class="empty" style="padding:22px 10px">${(p.tasks||[]).length&&tkFilter!=="all"?"No open tasks here":"No tasks yet"}</div>`:(()=>{
-       const sub=(x,ts)=>{const own=ts.filter(t=>t.proj===x.id),K=kidsOf(x);return own.map(card).join("")+K.map(k=>{const kt=ts.filter(t=>t.proj===k.id);return kt.length?`<div class="tksub"><div class="tkg-h sm">↳ <b>${esc(k.title)}</b><small>${prjStats(p,k).done} of ${prjStats(p,k).total} done</small></div>${kt.map(card).join("")}</div>`:""}).join("")};
-       const grp=(x,ts)=>`<div class="tkgroup" style="--pc:${prjColor(d,x)}"><div class="tkg-h"><span class="pj-dot"></span><b>${esc(x.title)}</b><small>${prjStats(p,x).done} of ${prjStats(p,x).total} done</small></div><div class="tkg-b">${sub(x,ts)}</div></div>`;
-       if(tkFilter==="all"&&PR.length){const loose=act.filter(t=>!t.proj||!PR.some(x=>x.id===t.proj));return TOPS.map(x=>{const ids=treeIds(x),ts=act.filter(t=>ids.includes(t.proj));return ts.length?grp(x,ts):""}).join("")+(loose.length?`<div class="tkgroup"><div class="tkg-h"><b class="muted">No project</b></div><div class="tkg-b">${loose.map(card).join("")}</div></div>`:"")}
-       if(fx&&!fx.parent&&kidsOf(fx).length)return sub(fx,act);
-       return act.map(card).join("")})()}</div>
-     <div class="ph tk-sec solo" style="margin-top:20px"><span>Completed</span><i>${tm.done} on time${tm.missed?` · ${tm.missed} missed`:""}</i></div>
-     <div class="rows">${fin.length?fin.map(frow).join(""):`<div class="empty" style="padding:16px">Nothing completed yet</div>`}</div></div>
-   <form class="f addform" id="tkForm"><div class="ph" style="margin-bottom:0"><span>New task</span></div>
-     <label>Task<input id="tkT" required placeholder="Describe the task" autocomplete="off"></label>
+     </div><div class="tkwrap tk2wrap"><div>
+     <form class="tkq" id="tkForm"><div class="tkq-row"><span class="tkq-plus" aria-hidden="true">+</span><input id="tkT" required placeholder="Add a task" autocomplete="off" aria-label="New task"><button type="button" class="tkq-mb${tkMore?" on":""}" data-tkmore aria-expanded="${tkMore}">⋯ More</button><button class="tkq-add">Add</button></div>
+     <div class="tkq-more"${tkMore?"":" hidden"}>
      ${PR.length?`<label>Project (optional)<select id="tkP"><option value="">No project</option>${PR.map(x=>`<option value="${x.id}" ${(prjFocus||tkFilter)===x.id?"selected":""}>${esc(prjLabel(x))}</option>`).join("")}</select></label>`:`<p class="note" style="margin:0">Tip: create a project in the Projects tab to group tasks.</p>`}
      <div class="f2"><label>Start date (optional)<input id="tkS" type="date" min="${today()}"></label><label>Hours to put in (optional)<input id="tkH" type="number" step="0.5" min="0" inputmode="decimal" placeholder="e.g. 5"></label></div>
      <div class="f2"><label>Due date (optional)<input id="tkD" type="date" min="${today()}"></label><label>Due time (optional)<input id="tkTm" type="time"></label></div>
      <label class="lockbox"><input id="tkAck" type="checkbox"><span><b>No turning back.</b> Once a deadline is set it can't be changed or removed, and the task can't be deleted. Missing it counts against your progress.</span></label>
-     <button class="btn">Add task</button>
-     <small class="note" style="margin:0">Hit Start when you begin, Pause when you stop, and Mark done when it's finished. Every timed session adds to your hours.</small></form></div>`;
+     <small class="note" style="margin:0">Tap ▶ when you begin and ⏸ when you stop. Tap the circle twice when it's finished. Every timed session adds to your hours.</small></div></form>
+     
+     <div class="tklist">${!act.length?`<div class="empty" style="padding:22px 10px">${(p.tasks||[]).length&&tkFilter!=="all"?"No open tasks here":"No tasks yet"}</div>`:(()=>{
+       const sub=(x,ts)=>{const own=ts.filter(t=>t.proj===x.id),K=kidsOf(x);return own.map(card).join("")+K.map(k=>{const kt=ts.filter(t=>t.proj===k.id);return kt.length?`<div class="tksub"><div class="tkg-h sm">↳ <b>${esc(k.title)}</b><small>${prjStats(p,k).done} of ${prjStats(p,k).total} done</small></div>${kt.map(card).join("")}</div>`:""}).join("")};
+       const grp=(x,ts)=>`<div class="tkgroup" style="--pc:${prjColor(d,x)}"><div class="tkg-h"><span class="pj-dot"></span><b>${esc(x.title)}</b><small>${prjStats(p,x).done} of ${prjStats(p,x).total}</small><i class="tkg-bar" aria-hidden="true"><i style="width:${prjStats(p,x).total?Math.round(prjStats(p,x).done/prjStats(p,x).total*100):0}%"></i></i></div><div class="tkg-b">${sub(x,ts)}</div></div>`;
+       if(tkFilter==="all"&&PR.length){const loose=act.filter(t=>!t.proj||!PR.some(x=>x.id===t.proj));return TOPS.map(x=>{const ids=treeIds(x),ts=act.filter(t=>ids.includes(t.proj));return ts.length?grp(x,ts):""}).join("")+(loose.length?`<div class="tkgroup"><div class="tkg-h"><b class="muted">No project</b></div><div class="tkg-b">${loose.map(card).join("")}</div></div>`:"")}
+       if(fx&&!fx.parent&&kidsOf(fx).length)return sub(fx,act);
+       return act.map(card).join("")})()}</div>
+     ${fin.length?`<button type="button" class="tk2-done" data-tkdoneopen aria-expanded="${tkDoneOpen}"><span class="tk2-dck">✓</span><b>${fin.length} completed</b><small>${tm.done} on time${tm.missed?` · ${tm.missed} missed`:""}</small><svg class="tk-chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>${tkDoneOpen?`<div class="rows tk2-donelist">${fin.map(frow).join("")}</div>`:""}`:""}
+     ${/* was: a "Completed" heading with every finished task listed under it */""}</div>
+   </div>`;
 }
 
 /* ---------- projects inside a passion ---------- */
@@ -6113,6 +6175,20 @@ function sortStart(g,e,cap){
     row.classList.add("settling");row.style.transform=`translate3d(0,${final}px,0) scale(1)`;document.body.classList.remove("grabbing");
     setTimeout(()=>{const ids=rows.map(r=>r.dataset.id),[m]=ids.splice(from,1);ids.splice(to,0,m);rows.forEach(r=>r.style.transform="");list.classList.remove("sorting");row.classList.remove("dragging","settling");if(to!==from){sortCommit(g.dataset.sort,ids);toast("Order saved")}},240)};
   cap.addEventListener("pointermove",move);cap.addEventListener("pointerup",up);cap.addEventListener("pointercancel",up)}
+/* was: the New task form, always open beside the list:
+   <form class="f addform" id="tkForm"><div class="ph" style="margin-bottom:0"><span>New task</span></div>
+     <label>Task<input id="tkT" required placeholder="Describe the task" autocomplete="off"></label>
+     $ {PR.length?`<label>Project (optional)<select id="tkP"><option value="">No project</option>$ {PR.map(x=>`<option value="$ {x.id}" $ {(prjFocus||tkFilter)===x.id?"selected":""}>$ {esc(prjLabel(x))}</option>`).join("")}</select></label>`:`<p class="note" style="margin:0">Tip: create a project in the Projects tab to group tasks.</p>`}
+     <div class="f2"><label>Start date (optional)<input id="tkS" type="date" min="$ {today()}"></label><label>Hours to put in (optional)<input id="tkH" type="number" step="0.5" min="0" inputmode="decimal" placeholder="e.g. 5"></label></div>
+     <div class="f2"><label>Due date (optional)<input id="tkD" type="date" min="$ {today()}"></label><label>Due time (optional)<input id="tkTm" type="time"></label></div>
+     <label class="lockbox"><input id="tkAck" type="checkbox"><span><b>No turning back.</b> Once a deadline is set it can't be changed or removed, and the task can't be deleted. Missing it counts against your progress.</span></label>
+     <button class="btn">Add task</button>
+     <small class="note" style="margin:0">Hit Start when you begin, Pause when you stop, and Mark done when it's finished. Every timed session adds to your hours.</small></form>
+*/
+let tkMore=false,tkDoneOpen=false;
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-tkmore],[data-tkdoneopen]");if(!t)return;e.preventDefault();
+  if(t.dataset.tkmore!==undefined){tkMore=!tkMore;const m=t.closest("form").querySelector(".tkq-more");if(m)m.hidden=!tkMore;t.classList.toggle("on",tkMore);t.setAttribute("aria-expanded",tkMore);return}
+  tkDoneOpen=!tkDoneOpen;render()});
 let tkFilter="all",addingPrj=false,prjFocus=null,addingSub=null,tkLastOpen=null;const tkOpen=new Set();
 const projOf=(d,p)=>(d.projects||[]).filter(x=>x.pid===p.id).sort((a,b)=>(a.created||0)-(b.created||0));
 const PRJC=["#4cc9ff","#b38cff","#ffb648","#2ee6c5","#ff7eb6","#8fd8ff"];
@@ -6367,6 +6443,8 @@ function commitPanel(d,P,wk){
 }
 function figurePanel(){return `<div class="panel holopanel"><div class="ph"><span>${figFit()?"Your body":"Your figure"}</span><button class="addp gear avgear${avEdit?" on":""}" data-avedit aria-expanded="${avEdit}" aria-label="Customize" title="Customize"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button></div>${holoView()}<div class="avfoot">${avEdit?avEditor()+`<div class="av-actions"><button class="btn ghost" data-avcancel>Cancel</button><button class="btn" data-avsave>Save</button></div>`:""}</div></div>`}
 /* Tasks & Projects next to My passions: the picked passion, or the first one when none is picked (using it picks that one) */
+/* editing categories happens here, in the panel beside My passions (it used to take over My passions itself) */
+function passCatPanel(d){const ALL=sortPass(d.passions||[]);return `<div class="panel pcatp">${catTabs(ALL)}${catManager(ALL)}</div>`}
 function passTP(d){const P=d.passions||[];if(!P.length)return "";const cur=P.find(x=>x.id===selP);if(cur)return passDetail(d).replace('class="panel pdetail" style="margin-top:18px"','class="panel pdetail ptp"');
   const f=sortPass(P)[0],keep=selP;selP=f.id;let h="";try{h=passDetail(d)}finally{selP=keep}
   return h.replace('class="panel pdetail" style="margin-top:18px"',`class="panel pdetail ptp" data-schedp="${f.id}"`)}
@@ -6380,7 +6458,7 @@ function vPass(){
     <div class="pg-cell pg-fig">${figurePanel()}</div>
     <div class="pg-cell pg-right">${passThemePanel(d)}<div class="panel cs-combo">${commitPanel(d,P,wk).replace('<div class="panel cs">','<div class="cs">')}<div class="cs-split"></div>${passSched(d).replace('class="panel pdetail psched"','class="psched"')}</div></div>
     <div class="stack pleft">${passList(d,P,wk)}</div>
-    <div class="pg-cell pg-next">${passTP(d)}</div>
+    <div class="pg-cell pg-next">${catMgr?passCatPanel(d):passTP(d)}</div>
   </div>
   ${/* Tasks & Projects used to sit here, full width under everything: passDetail(d) */""}${schedWinHtml(d)}
 `;
@@ -7036,7 +7114,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="468",APPT="2026-11-22T00:19:00Z";   /* APPT: when this update was made */
+const APPV="469",APPT="2026-11-22T00:33:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
