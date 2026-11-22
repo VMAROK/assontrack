@@ -2133,6 +2133,31 @@ html.phone #view .mbi{grid-template-columns:64px minmax(0,1fr) auto!important;co
 /* phones: no top bar — the page starts right under the status bar */
 html.phone .topbar{display:none!important}
 html.phone #view{padding-top:max(12px,env(safe-area-inset-top,0px))!important}
+
+/* task attachments */
+.att{margin:12px 0 4px;padding-top:12px;border-top:1px solid rgba(var(--lr),.14)}
+.att-h{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px}.att-h small{margin-left:2px;opacity:.8}
+.att-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;margin-bottom:10px}
+.att-t{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:rgba(0,0,0,.35);border:1px solid rgba(var(--lr),.18)}
+.att-open{all:unset;display:block;width:100%;height:100%;cursor:pointer}
+.att-open img,.att-open video{width:100%;height:100%;object-fit:cover;display:block}
+.att-play{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.att-yt::after{content:"YouTube";position:absolute;left:6px;bottom:6px;font-size:9.5px;font-weight:700;font-style:normal;padding:2px 5px;border-radius:4px;background:#ff0033;color:#fff}
+.att-x{position:absolute;top:4px;right:4px;min-width:24px;height:24px;padding:0 6px;border-radius:99px;border:0;background:rgba(0,0,0,.65);color:#fff;font-size:15px;line-height:1;cursor:pointer}
+.att-x.armed{font-size:11px;background:#ff4d5e}
+.att-t.missing::after{content:"Not on this device";position:absolute;inset:0;display:grid;place-items:center;font-size:10.5px;color:var(--muted);text-align:center;padding:6px}
+.att-add{display:flex;flex-wrap:wrap;gap:8px}
+.att-b{display:inline-flex;align-items:center;gap:4px;font:inherit;font-size:13px;font-weight:600;padding:8px 12px;border-radius:99px;border:1px dashed rgba(var(--lr),.35);background:none;color:var(--fg);cursor:pointer}
+.att-b:hover{border-style:solid}
+.att-link{display:flex;gap:8px;margin:0 0 10px;align-items:center}.att-link input{flex:1;min-width:0}
+.att-cx{border:0;background:none;color:var(--muted);font-size:20px;cursor:pointer}
+.att-msg{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin:0 0 8px}
+.tkr-att{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;color:var(--muted)}
+.attv{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.88);display:grid;place-items:center;padding:16px;animation:swinIn .18s ease-out}
+.attv-in{width:min(960px,100%);max-height:100%;display:grid;place-items:center}
+.attv-in img,.attv-in video{max-width:100%;max-height:calc(100vh - 80px);border-radius:10px}
+.attv-in iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:10px;background:#000}
+.attv-x{position:absolute;top:max(14px,env(safe-area-inset-top,0px));right:14px;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.5);color:#fff;font-size:24px;line-height:1;cursor:pointer;z-index:2}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -6408,18 +6433,79 @@ const LOCK=`<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="
 function stopRun(p,t){const r=(t.runs||[]).find(x=>!x.e);if(!r)return 0;r.e=Date.now();const mins=Math.round((r.e-r.s)/6e4);
   if(mins>=1)data.sessions.push({id:uid(),pid:p.id,d:ymd(new Date(r.s)),time:hmOf(r.s),mins,note:"Task: "+t.title,taskId:t.id});return mins}
 let addTimeFor=null;
+/* ===== task attachments: photos, videos and YouTube links ===== */
+const CLIP='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5l-8.6 8.6a5.5 5.5 0 0 1-7.8-7.8l9.2-9.2a3.7 3.7 0 0 1 5.2 5.2l-9.2 9.2a1.8 1.8 0 0 1-2.6-2.6l8.5-8.5"/></svg>';
+const ytId=u=>{const m=String(u||"").match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/|v\/))([\w-]{11})/);return m?m[1]:null};
+const MDB={db:null,open(){return this.db||(this.db=new Promise((ok,no)=>{try{const r=indexedDB.open("aot-media",1);r.onupgradeneeded=()=>r.result.createObjectStore("f");r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)}catch(e){no(e)}}))},
+  async put(k,v){try{const db=await this.open();await new Promise((ok,no)=>{const x=db.transaction("f","readwrite");x.objectStore("f").put(v,k);x.oncomplete=ok;x.onerror=()=>no(x.error)})}catch(e){}},
+  async get(k){try{const db=await this.open();return await new Promise(ok=>{const r=db.transaction("f").objectStore("f").get(k);r.onsuccess=()=>ok(r.result||null);r.onerror=()=>ok(null)})}catch(e){return null}},
+  async del(k){try{const db=await this.open();db.transaction("f","readwrite").objectStore("f").delete(k)}catch(e){}}};
+const attURLs=new Map();
+async function attURL(a){if(attURLs.has(a.id))return attURLs.get(a.id);let blob=await MDB.get(a.id);
+  if(!blob&&a.path&&typeof sbOn==="function"&&sbOn()){try{const {data}=await sb.storage.from("models").download(a.path);if(data){blob=data;MDB.put(a.id,blob)}}catch(e){}}
+  if(!blob)return null;const u=URL.createObjectURL(blob);attURLs.set(a.id,u);return u}
+let attLinkFor=null,attBusy=null,attView=null;
+const findTaskAny=id=>{for(const p of data.passions||[]){const t=(p.tasks||[]).find(x=>x.id===id);if(t)return t}return null};
+function attHtml(t){const A=t.att||[];
+  const PLAY='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="rgba(0,0,0,.55)"/><path d="M10 8l6 4-6 4z" fill="#fff"/></svg>';
+  const tile=a=>{const y=a.kind==="yt"?ytId(a.url):null;
+    const inner=a.kind==="img"?`<img data-attsrc="${a.id}" alt="${esc(a.name||"Photo")}">`:a.kind==="vid"?`<video data-attsrc="${a.id}" muted playsinline preload="metadata"></video><i class="att-play">${PLAY}</i>`:`<img src="https://i.ytimg.com/vi/${y}/hqdefault.jpg" alt="YouTube video" loading="lazy"><i class="att-play att-yt">${PLAY}</i>`;
+    return `<div class="att-t"><button type="button" class="att-open" data-attview="${t.id}:${a.id}" aria-label="Open ${a.kind==="img"?"photo":a.kind==="vid"?"video":"YouTube video"}">${inner}</button><button type="button" class="att-x" data-attdel="${t.id}:${a.id}" aria-label="Remove">×</button></div>`};
+  return `<div class="att"><div class="att-h">${CLIP}<span>Attachments</span>${A.length?`<small>${A.length}</small>`:""}</div>
+    ${A.length?`<div class="att-grid">${A.map(tile).join("")}</div>`:""}
+    ${attBusy===t.id?`<p class="att-msg"><span class="mini-spin"></span>Adding…</p>`:""}
+    ${attLinkFor===t.id?`<form class="att-link" data-attlinkform="${t.id}"><input id="attUrl" type="url" inputmode="url" placeholder="Paste a YouTube link" autocomplete="off" required><button class="btn">Add</button><button type="button" class="att-cx" data-attlink="${t.id}" aria-label="Cancel">×</button></form>`:""}
+    <div class="att-add"><label class="att-b"><input type="file" accept="image/*,video/*" multiple data-attfile="${t.id}" hidden>+ Photo or video</label><button type="button" class="att-b" data-attlink="${t.id}">+ YouTube link</button></div></div>`}
+function attHydrate(){document.querySelectorAll("[data-attsrc]").forEach(el=>{if(el.src)return;const id=el.dataset.attsrc;const t=[...document.querySelectorAll("[data-attview]")].length;
+  for(const p of data.passions||[])for(const tk of p.tasks||[]){const a=(tk.att||[]).find(x=>x.id===id);if(a){attURL(a).then(u=>{if(u){el.src=u+(a.kind==="vid"?"#t=0.1":"")}else el.closest(".att-t")&&el.closest(".att-t").classList.add("missing")});return}}});
+  if(attView){const [tid,aid]=attView.split(":"),t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);let v=document.getElementById("attViewer");
+    if(!a){attView=null;v&&v.remove();return}
+    if(!v){v=document.createElement("div");v.id="attViewer";v.className="attv";v.setAttribute("role","dialog");v.setAttribute("aria-modal","true");document.body.appendChild(v)}
+    if(v.dataset.k===attView)return;v.dataset.k=attView;
+    const y=a.kind==="yt"?ytId(a.url):null;
+    v.innerHTML=`<button type="button" class="attv-x" data-attclose aria-label="Close">×</button><div class="attv-in">${a.kind==="yt"?`<iframe src="https://www.youtube-nocookie.com/embed/${y}?autoplay=1&playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="YouTube video"></iframe>`:a.kind==="vid"?`<video controls playsinline autoplay data-attfull></video>`:`<img data-attfull alt="${esc(a.name||"Photo")}">`}</div>`;
+    if(a.kind!=="yt")attURL(a).then(u=>{const m=v.querySelector("[data-attfull]");if(m&&u)m.src=u})}
+  else{const v=document.getElementById("attViewer");v&&v.remove()}}
+/* shrink photos before saving so they don't fill the phone */
+function attShrink(f){return new Promise(ok=>{if(!/^image\/(jpe?g|png|webp|heic|heif)/i.test(f.type)){ok(f);return}const u=URL.createObjectURL(f),im=new Image();
+  im.onload=()=>{const M=1600,k=Math.min(1,M/Math.max(im.width,im.height));if(k>=1&&f.size<1.5e6){URL.revokeObjectURL(u);ok(f);return}const c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(b=>ok(b||f),"image/jpeg",.86)};
+  im.onerror=()=>{URL.revokeObjectURL(u);ok(f)};im.src=u})}
+async function attAddFiles(tid,files){const t=findTaskAny(tid);if(!t)return;attBusy=tid;render();
+  for(const f of files){const vid=/^video\//.test(f.type);if(!vid&&!/^image\//.test(f.type))continue;
+    if(vid&&f.size>200e6){toast("That video is over 200 MB — try a shorter clip");continue}
+    const blob=vid?f:await attShrink(f),id=uid(),a={id,kind:vid?"vid":"img",name:f.name||"",at:Date.now(),size:blob.size};
+    await MDB.put(id,blob);
+    if(typeof sbOn==="function"&&sbOn()){try{const ext=vid?(f.name.split(".").pop()||"mp4").toLowerCase():"jpg",pth=sbUser.id+"/att/"+id+"."+ext;const {error}=await sb.storage.from("models").upload(pth,blob,{upsert:true,contentType:blob.type||"application/octet-stream"});if(!error)a.path=pth}catch(e){}}
+    (t.att=t.att||[]).push(a)}
+  attBusy=null;save();render()}
+document.addEventListener("change",e=>{const i=e.target;if(!i.dataset||!i.dataset.attfile)return;const fs=[...(i.files||[])];i.value="";if(fs.length)attAddFiles(i.dataset.attfile,fs)});
+document.addEventListener("submit",e=>{const f=e.target;if(!f.dataset||!f.dataset.attlinkform)return;e.preventDefault();e.stopImmediatePropagation();
+  const u=(f.querySelector("#attUrl").value||"").trim(),y=ytId(u);if(!y){toast("That doesn't look like a YouTube link");return}
+  const t=findTaskAny(f.dataset.attlinkform);if(!t)return;(t.att=t.att||[]).push({id:uid(),kind:"yt",url:"https://youtu.be/"+y,at:Date.now()});attLinkFor=null;save();render()},true);
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-attlink],[data-attdel],[data-attview],[data-attclose]");
+  if(!b){if(attView&&e.target.id==="attViewer"){attView=null;attHydrate()}return}
+  e.preventDefault();e.stopPropagation();
+  if(b.dataset.attlink){attLinkFor=attLinkFor===b.dataset.attlink?null:b.dataset.attlink;render();if(attLinkFor)setTimeout(()=>{const i=document.getElementById("attUrl");i&&i.focus()},30);return}
+  if(b.dataset.attview){attView=b.dataset.attview;attHydrate();return}
+  if(b.dataset.attclose!==undefined){attView=null;attHydrate();return}
+  if(b.dataset.attdel){const [tid,aid]=b.dataset.attdel.split(":"),t=findTaskAny(tid);if(!t)return;
+    if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="Remove?";b.classList.add("armed");setTimeout(()=>{if(b.isConnected){b.dataset.armed="";b.textContent="×";b.classList.remove("armed")}},2500);return}
+    const a=(t.att||[]).find(x=>x.id===aid);t.att=(t.att||[]).filter(x=>x.id!==aid);if(a){MDB.del(a.id);if(a.path&&typeof sbOn==="function"&&sbOn())try{sb.storage.from("models").remove([a.path])}catch(_){}if(attURLs.has(a.id)){URL.revokeObjectURL(attURLs.get(a.id));attURLs.delete(a.id)}}
+    save();render()}},true);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&attView){attView=null;attHydrate()}});
 function taskView(d,p){
   const PR=prjOrdered(d,p),TOPS=topsOf(d,p);if(tkFilter!=="all"&&tkFilter!=="none"&&!PR.some(x=>x.id===tkFilter))tkFilter="all";const fx=prjById(tkFilter),fIds=fx?treeIds(fx):[];const inF=t=>tkFilter==="all"||(tkFilter==="none"?!t.proj||!PR.some(x=>x.id===t.proj):fIds.includes(t.proj));
   const T=(p.tasks||[]).filter(inF),act=T.filter(t=>!t.doneAt).sort((a,b)=>(a.due||9e15)-(b.due||9e15)||a.created-b.created),fin=T.filter(t=>t.doneAt).sort((a,b)=>b.doneAt-a.doneAt);
   const PILL={new:"Not started",running:"In progress",paused:"Paused",overdue:"Deadline missed",planned:"Planned"};
   const card=t=>{const st=taskState(t),ms=taskMs(t),run=st==="running";
     if(!tkOpen.has(t.id)&&addTimeFor!==t.id){const left=t.due?t.due-Date.now():null;
-      return `<div class="tkrow st-${st}"><button class="tkrow-main" data-tkopen="${t.id}" aria-expanded="false" aria-label="${esc(t.title)}, ${PILL[st]}. Tap to expand"><b class="tkr-title">${esc(t.title)}</b><span class="tk-pill">${PILL[st]}</span><span class="tkr-sp"></span><span class="tkr-time"${run?` data-timer="${p.id}:${t.id}"`:""}>${fmtClock(ms)}</span>${t.due?`<span class="tkr-due${left<0?" late":left<864e5?" soon":""}">${LOCK} ${fmtDate(ymd(new Date(t.due)))}</span>`:""}<svg class="tk-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>${st==="planned"?"":run?`<button class="tkr-act tkr-cancel" data-tkcancel="${t.id}" aria-label="Cancel timer" title="Cancel timer (nothing is logged)">×</button><button class="tkr-act" data-tkpause="${t.id}">Pause</button>`:`<button class="tkr-act" data-tkstart="${t.id}">${(t.runs||[]).length?"Resume":"Start"}</button>`}</div>`}
+      return `<div class="tkrow st-${st}"><button class="tkrow-main" data-tkopen="${t.id}" aria-expanded="false" aria-label="${esc(t.title)}, ${PILL[st]}. Tap to expand"><b class="tkr-title">${esc(t.title)}</b><span class="tk-pill">${PILL[st]}</span>${(t.att||[]).length?`<span class="tkr-att" title="${t.att.length} attached">${CLIP}${t.att.length}</span>`:""}<span class="tkr-sp"></span><span class="tkr-time"${run?` data-timer="${p.id}:${t.id}"`:""}>${fmtClock(ms)}</span>${t.due?`<span class="tkr-due${left<0?" late":left<864e5?" soon":""}">${LOCK} ${fmtDate(ymd(new Date(t.due)))}</span>`:""}<svg class="tk-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>${st==="planned"?"":run?`<button class="tkr-act tkr-cancel" data-tkcancel="${t.id}" aria-label="Cancel timer" title="Cancel timer (nothing is logged)">×</button><button class="tkr-act" data-tkpause="${t.id}">Pause</button>`:`<button class="tkr-act" data-tkstart="${t.id}">${(t.runs||[]).length?"Resume":"Start"}</button>`}</div>`}
     const due=t.due?(()=>{const left=t.due-Date.now();return `<span class="tk-due${left<0?" late":left<864e5?" soon":""}">${LOCK} Due ${fmtDate(ymd(new Date(t.due)))}, ${clock(t.due)} · ${left<0?"missed "+fmtLeft(-left)+" ago":"in "+fmtLeft(left)}</span>`})():`<span class="tk-due none">No deadline</span>`;
     return `<div class="tkcard st-${st}"><div class="tk-top"><div class="tk-name">${isRn("task",t.id)?rnForm("task",t.id,t.title,PR.length?`<select id="rnP" class="rn-proj" aria-label="Project or sub-project" title="Project or sub-project">${["",...PR.map(x=>x.id)].map(id=>`<option value="${id}" ${(t.proj||"")===id?"selected":""}>${id?esc(prjLabel(PR.find(x=>x.id===id))):"No project"}</option>`).join("")}</select>`:""):`<b>${esc(t.title)}</b><span class="tk-pill">${PILL[st]}</span>`}</div>${isRn("task",t.id)?"":penBtn("task",t.id,t.title)}<button class="tk-fold" data-tkopen="${t.id}" aria-expanded="true" aria-label="Collapse task"><svg class="tk-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></div>
       <div class="tk-mid"><div class="tk-time"><b ${run?`data-timer="${p.id}:${t.id}"`:""}>${fmtClock(ms)}</b>${t.planH?`<small>of ${t.planH}h planned</small>`:""}</div>${due}</div>${t.planH?`<div class="track" style="--c:${ms>=t.planH*36e5?"#3ddc84":"var(--cyan)"}"><i style="width:${Math.min(ms/(t.planH*36e5),1)*100}%"></i></div>`:""}
       ${st==="planned"?`<div class="tk-plan">Starts ${fmtDate(t.startOn)}. The timer unlocks that day.</div>`:""}
       ${addTimeFor===t.id?`<form class="tkadd" id="tkAddForm" data-tid="${t.id}"><label>Date<input id="taD" type="date" value="${today()}" max="${today()}" required></label><label>Hours<input id="taH" type="number" min="0" inputmode="numeric" value="1"></label><label>Minutes<input id="taM" type="number" min="0" max="59" inputmode="numeric" value="0"></label><button class="btn">Add</button></form>`:""}
+      ${attHtml(t)}
       <div class="tk-btns">${st==="planned"?"":run?`<button class="btn" data-tkpause="${t.id}">Pause</button><button class="tk-cancel" data-tkcancel="${t.id}" title="Discard this timer session">Cancel timer</button>`:`<button class="btn" data-tkstart="${t.id}">${(t.runs||[]).length?"Resume":"Start"}</button>`}<span class="tk-end">${(t.runs||[]).length?`<button class="tk-ic tk-reset" data-tkreset="${t.id}" aria-label="Reset timer" title="Reset timer to 0"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button>`:""}${!t.due?`<button class="tk-ic tk-del" data-tkdel="${t.id}" aria-label="Delete task" title="Delete task"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>`:`<span class="tk-ic tk-lock" title="Tasks with a deadline can't be deleted">${LOCK}</span>`}<button class="tk-ic tk-done" data-tkdone="${t.id}" aria-label="Mark done" title="Mark done"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></span></div></div>`};
   const frow=t=>{const st=taskState(t);return `<div class="r" style="--c:${st==="late"?"var(--red)":"#3ddc84"}"><span class="dot"></span><div class="m"><div>${esc(t.title)}</div><small>${t.proj&&PR.find(x=>x.id===t.proj)?esc(PR.find(x=>x.id===t.proj).title)+" · ":""}Done ${fmtDate(ymd(new Date(t.doneAt)))}${t.planH?` · ${t.planH}h planned`:""} · ${!t.due?"no deadline":st==="late"?`<span class="miss">after the deadline</span>`:"before the deadline"}</small></div><div class="v">${fmtClock(taskMs(t))}</div><button class="tk-undo" data-tkundo="${t.id}" title="Move back to In progress"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg><span>Undo</span></button><button class="x" data-tkdel="${t.id}" aria-label="Delete">×</button></div>`};
   const tm=taskStats(p);
@@ -7271,7 +7357,7 @@ function render(){try{nwSync()}catch(_){}
   v.scrollTop=y;keep.forEach(([q,i,x,t])=>{const el=v.querySelectorAll(q)[i];if(el){const sb=el.style.scrollBehavior;el.style.scrollBehavior="auto";el.scrollLeft=x;el.scrollTop=t;el.style.scrollBehavior=sb}});
   $("#ttl").innerHTML=`${TITLES[tab][0]}<small>${TITLES[tab][1]}</small>`;
   document.querySelectorAll(".navbtn").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab));navGrpSet();try{rBadge()}catch(_){}
-  placeBranch();try{nwStripInit()}catch(_){}applyWall();applyWallBlur();applyLook();preloadWalls();holoMount();eqCards();dbgLabels();
+  placeBranch();try{nwStripInit()}catch(_){}applyWall();applyWallBlur();applyLook();preloadWalls();holoMount();eqCards();dbgLabels();attHydrate();
 }
 /* every workout card in the All workouts panel is as tall as the tallest one */
 function eqCards(){const cs=[...document.querySelectorAll("#view .wk-catc .tp-card")];if(!cs.length)return;cs.forEach(c=>c.style.minHeight="");const cmp=!!document.querySelector("#view .wk-cats.compact");document.querySelectorAll("#view .wk-catc .sh-row,#view .wk-cats").forEach(r=>{let dots=r.nextElementSibling&&r.nextElementSibling.classList.contains("sc-dots")?r.nextElementSibling:null;
@@ -7441,7 +7527,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="497",APPT="2026-11-22T21:17:00Z";   /* APPT: when this update was made */
+const APPV="498",APPT="2026-11-22T21:23:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
