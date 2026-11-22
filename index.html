@@ -6525,10 +6525,13 @@ async function attAddFiles(tid,files){const t=findTaskAny(tid);if(!t)return;attB
   finally{attBusy=null;save();render()}}
 /* one file picker that lives outside the redrawn screen — the screen redraws while the phone's photo picker is open,
    which threw away the old picker, so tapping the check mark did nothing */
-let attPickFor=null,attPickEl=null;
+let attPickFor=null,attPickEl=null,attPickAt=0;
+/* while the photo/video picker is open (or a video is being added or trimmed), never reload the page for an update —
+   a reload kills the picker, so tapping its check mark did nothing */
+window.attHold=()=>(attPickAt&&Date.now()-attPickAt<600000)||!!attBusy||!!document.querySelector(".atrim");
 function attPicker(){if(attPickEl)return attPickEl;const i=document.createElement("input");i.type="file";
   i.style.cssText="position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0";
-  i.addEventListener("change",()=>{const fs=[...(i.files||[])],tid=attPickFor;i.value="";if(fs.length&&tid)attAddFiles(tid,fs)});
+  i.addEventListener("cancel",()=>{attPickAt=0});i.addEventListener("change",()=>{attPickAt=0;const fs=[...(i.files||[])],tid=attPickFor;i.value="";if(fs.length&&tid)attAddFiles(tid,fs)});
   document.body.appendChild(i);return attPickEl=i}
 document.addEventListener("submit",e=>{const f=e.target;if(!f.dataset||!f.dataset.attlinkform)return;e.preventDefault();e.stopImmediatePropagation();
   const u=(f.querySelector("#attUrl").value||"").trim(),y=ytId(u);if(!y){toast("That doesn't look like a YouTube link");return}
@@ -6537,7 +6540,7 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   if(!b){if(attView&&e.target.id==="attViewer"){attView=null;attHydrate()}return}
   e.preventDefault();e.stopPropagation();
   if(b.dataset.attlink){attLinkFor=attLinkFor===b.dataset.attlink?null:b.dataset.attlink;render();if(attLinkFor)setTimeout(()=>{const i=document.getElementById("attUrl");i&&i.focus()},30);return}
-  if(b.dataset.attpick){attPickFor=b.dataset.attpick;const i=attPicker();i.accept=b.dataset.attacc||"image/*,video/*";i.multiple=i.accept==="image/*";i.click();return}
+  if(b.dataset.attpick){attPickFor=b.dataset.attpick;attPickAt=Date.now();const i=attPicker();i.accept=b.dataset.attacc||"image/*,video/*";i.multiple=i.accept==="image/*";i.click();return}
   if(b.dataset.attview){attView=b.dataset.attview;attHydrate();return}
   if(b.dataset.attclose!==undefined){attView=null;attHydrate();return}
   if(b.dataset.attdel){const [tid,aid]=b.dataset.attdel.split(":"),t=findTaskAny(tid);if(!t)return;
@@ -7579,7 +7582,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="503",APPT="2026-11-22T21:55:00Z";   /* APPT: when this update was made */
+const APPV="504",APPT="2026-11-22T21:48:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -7588,7 +7591,7 @@ const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"s
       let st={v:0,n:0,t:0};try{st=JSON.parse(sessionStorage.getItem("aot-upd2")||"{}");}catch(e){}if(st.v!==v)st={v,n:0,t:0};
       if(st.n>=4){updBtn(v);return}                                                       // tried a few times and the server still sends the old page: offer a button
       if(st.n&&Date.now()-st.t<20000){setTimeout(check,20000);return}                     // give the server a moment between tries
-      const go=async()=>{const el=document.activeElement;if(typeof typing==="function"&&typing()&&el&&String(el.value||"").trim()){setTimeout(go,2000);return}   // never yank the page away mid-typing
+      const go=async()=>{const el=document.activeElement;if(window.attHold&&attHold()){setTimeout(go,3000);return}if(typeof typing==="function"&&typing()&&el&&String(el.value||"").trim()){setTimeout(go,2000);return}   // never yank the page away mid-typing
         try{st.n++;st.t=Date.now();sessionStorage.setItem("aot-upd2",JSON.stringify(st))}catch(e){}
         try{await Promise.race([(async()=>{const reg=await navigator.serviceWorker.getRegistration();reg&&await reg.update()})(),new Promise(r=>setTimeout(r,1800))])}catch(e){}location.replace(location.pathname+"?u="+Date.now())};go()}catch(e){}finally{busy=false}}
   function updBtn(v){if(document.getElementById("updBtn"))return;const b=document.createElement("button");b.id="updBtn";b.textContent="Update to the newest version";b.style.cssText="position:fixed;z-index:9999;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);font:600 14px/1 inherit;padding:12px 18px;border-radius:8px;border:1px solid rgba(76,201,255,.9);background:#0e2a4a;color:#e8f6ff;box-shadow:0 8px 24px rgba(0,0,0,.45);cursor:pointer";
@@ -7685,7 +7688,7 @@ addEventListener("resize",fit);fit();
 
 render();
 
-if("serviceWorker" in navigator&&location.protocol==="https:"){addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>{r.update();document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")r.update()})}).catch(()=>{}));let reloaded=false;const hadCtl=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!hadCtl||reloaded)return;const go=()=>{if(reloaded)return;if(typing()){setTimeout(go,1500);return}reloaded=true;location.reload()};go()})}
+if("serviceWorker" in navigator&&location.protocol==="https:"){addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>{r.update();document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")r.update()})}).catch(()=>{}));let reloaded=false;const hadCtl=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!hadCtl||reloaded)return;const go=()=>{if(reloaded)return;if(typing()||(window.attHold&&attHold())){setTimeout(go,1500);return}reloaded=true;location.reload()};go()})}
 </script>
 
 </body></html>
