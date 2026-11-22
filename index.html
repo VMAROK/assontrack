@@ -2157,8 +2157,8 @@ html.phone #view{padding-top:max(12px,env(safe-area-inset-top,0px))!important}
 .tkr-att{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;color:var(--muted)}
 /* open task: media on top, then timer + progress + notes at the bottom */
 /* theater: one big player like YouTube, the rest as a strip under it */
-.att-theater{display:grid;gap:8px;margin-bottom:12px}
-.att-stage{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 18px 40px -14px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.06)}
+.att-theater{display:grid;gap:3px;margin-bottom:12px}
+.att-stage{position:relative;aspect-ratio:16/9;border-radius:0;overflow:hidden;background:#000;box-shadow:0 18px 40px -14px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.06)}
 .att-slot>.att-stage-in,.att-stage-in>*{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
 .att-stage-in video,.att-stage-in img{object-fit:contain;background:#000}
 .att-stage-in .attv-miss{display:grid;place-items:center;color:rgba(255,255,255,.6);font-size:13px;margin:0}
@@ -2167,14 +2167,19 @@ html.phone #view{padding-top:max(12px,env(safe-area-inset-top,0px))!important}
 .att-dots i{flex:0 1 12px;min-width:3px;height:1.5px;border-radius:1px;background:rgba(255,255,255,.22);transition:background .5s,box-shadow .5s}
 .att-dots i.on{background:#fff;box-shadow:0 0 4px rgba(255,255,255,.95),0 0 10px rgba(160,200,255,.7),0 0 18px rgba(120,170,255,.45)}
 html.tpl-spa .att-dots i.on{background:#ffb15c;box-shadow:0 0 4px rgba(255,160,70,.95),0 0 10px rgba(217,137,58,.75),0 0 18px rgba(217,137,58,.45)}
-.att-fs{position:absolute;z-index:4;top:8px;right:8px;width:34px;height:34px;display:grid;place-items:center;border-radius:6px;cursor:pointer;color:#f2ede6;background:rgba(8,6,6,.55);border:1px solid rgba(255,255,255,.16);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.att-fs{position:absolute;z-index:4;top:8px;right:8px;width:34px;height:34px;display:grid;place-items:center;border-radius:0;cursor:pointer;color:#f2ede6;background:rgba(8,6,6,.55);border:1px solid rgba(255,255,255,.16);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .att-slot{position:absolute;inset:0}
-.att-strip{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 0 4px}.att-strip::-webkit-scrollbar{display:none}
-.att-strip .att-t{flex:0 0 128px;aspect-ratio:16/9;border-radius:9px;opacity:.6;transition:opacity .15s}
-.att-strip .att-t.on{opacity:1;outline:2px solid var(--fg);outline-offset:1px}
+.att-strip{display:flex;gap:3px;overflow-x:auto;scrollbar-width:none;padding:0;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}.att-strip::-webkit-scrollbar{display:none}
+.att-strip .att-t{flex:0 0 128px;aspect-ratio:16/9;border-radius:0;border:0;opacity:.55;transition:opacity .15s;scroll-snap-align:start}
+.att-strip .att-t.on{opacity:1;outline:2px solid var(--fg);outline-offset:-2px}
 .att-strip .att-t .att-x{top:3px;right:3px;min-width:20px;height:20px;font-size:13px}
 .att-strip .att-yt::after{font-size:8.5px;left:4px;bottom:4px}
 html.phone .att-strip .att-t{flex-basis:110px}
+/* sharp corners, media packed tight */
+.att-theater{gap:3px!important}
+.att-stage,.att-strip .att-t,.att-fs{border-radius:0!important}
+.att-strip{gap:3px!important;padding:0!important}
+.att-strip .att-t.on{outline-offset:-2px!important}
 .tkcard>.att{margin:0;padding-top:4px;border-top:0}
 .tk-bot{display:grid;gap:12px;padding-top:14px;border-top:1px solid rgba(var(--lr),.14)}
 .tk-prog{display:grid;gap:6px}
@@ -7822,7 +7827,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="517",APPT="2026-11-22T23:15:39Z";   /* APPT: when this update was made */
+const APPV="518",APPT="2026-11-22T23:19:15Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
