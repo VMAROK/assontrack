@@ -6495,27 +6495,32 @@ function attShrink(f){return new Promise(ok=>{if(!/^image\/(jpe?g|png|webp|heic|
   im.onerror=()=>{URL.revokeObjectURL(u);ok(f)};im.src=u})}
 /* videos: 1 minute max — longer clips are too big for the phone to hold and upload */
 const ATT_VMAX=60;
-function attDur(f){return new Promise(ok=>{const u=URL.createObjectURL(f),v=document.createElement("video");let done=false;const fin=d=>{if(done)return;done=true;URL.revokeObjectURL(u);v.removeAttribute("src");ok(d)};
-  v.preload="metadata";v.muted=true;v.onloadedmetadata=()=>fin(isFinite(v.duration)?v.duration:0);v.onerror=()=>fin(0);setTimeout(()=>fin(0),8000);v.src=u})}
+function attDur(f){return new Promise(ok=>{const u=URL.createObjectURL(f),v=document.createElement("video");let done=false;const fin=d=>{if(done)return;done=true;v.removeAttribute("src");v.remove();URL.revokeObjectURL(u);ok(d)};
+  v.preload="metadata";v.muted=true;v.playsInline=true;v.setAttribute("playsinline","");v.style.cssText="position:fixed;left:-9999px;top:0;width:2px;height:2px;opacity:0;pointer-events:none";
+  const rd=()=>{if(isFinite(v.duration)&&v.duration>0)fin(v.duration)};v.addEventListener("loadedmetadata",rd);v.addEventListener("durationchange",rd);v.onerror=()=>fin(0);setTimeout(()=>fin(0),6000);
+  document.body.appendChild(v);v.src=u;try{v.load()}catch(e){}})}
 /* trim window: a video longer than 1 minute opens this — slide the 1-minute window to the part you want */
 const attMS=x=>Math.floor(x/60)+":"+String(Math.floor(x%60)).padStart(2,"0");
-function attTrimAsk(f,dur){return new Promise(done=>{const u=URL.createObjectURL(f),L=ATT_VMAX,max=Math.max(0,dur-L);let st=0;
+function attTrimAsk(f,dur){return new Promise(done=>{const u=URL.createObjectURL(f),L=ATT_VMAX;let max=Math.max(0,dur-L),st=0;
   const w=document.createElement("div");w.className="attv atrim";w.setAttribute("role","dialog");w.setAttribute("aria-modal","true");
   w.innerHTML=`<div class="atrim-box"><div class="atrim-h"><b>Trim video</b><small>Videos can be up to 1 minute. Slide the box to the part you want.</small></div>
     <video playsinline muted autoplay src="${u}"></video>
-    <div class="atrim-bar"><i style="width:${L/dur*100}%"></i><input type="range" min="0" max="${max}" step="0.1" value="0" aria-label="Start of the clip"></div>
-    <div class="atrim-t"><span></span><span>${attMS(dur)} total</span></div>
+    <div class="atrim-bar"><i style="width:${dur?L/dur*100:100}%"></i><input type="range" min="0" max="${max}" step="0.1" value="0" aria-label="Start of the clip"></div>
+    <div class="atrim-t"><span></span><span class="atrim-tot">${dur?attMS(dur)+" total":"Loading…"}</span></div>
     <div class="atrim-b"><button type="button" class="att-b" data-x>Cancel</button><button type="button" class="btn" data-ok>Use this minute</button></div></div>`;
   document.body.appendChild(w);const v=w.querySelector("video"),r=w.querySelector("input"),box=w.querySelector(".atrim-bar i"),lab=w.querySelector(".atrim-t span");
-  const upd=()=>{box.style.left=(max?st/dur*100:0)+"%";lab.textContent=attMS(st)+" – "+attMS(st+L)};upd();
+  const upd=()=>{box.style.left=(max?st/dur*100:0)+"%";lab.textContent=dur?attMS(st)+" – "+attMS(Math.min(dur,st+L)):""};upd();
+  const meta=()=>{if(dur||!isFinite(v.duration)||!(v.duration>0))return;dur=v.duration;if(dur<=L+0.5){end("all");return}
+    max=dur-L;r.max=max;box.style.width=L/dur*100+"%";w.querySelector(".atrim-tot").textContent=attMS(dur)+" total";upd()};
+  v.addEventListener("loadedmetadata",meta);v.addEventListener("durationchange",meta);
   r.addEventListener("input",()=>{st=+r.value;upd();try{v.currentTime=st;v.play()}catch(e){}});
   v.addEventListener("timeupdate",()=>{if(v.currentTime>=st+L||v.currentTime<st-0.5)v.currentTime=st});
   const end=val=>{v.pause();v.removeAttribute("src");URL.revokeObjectURL(u);w.remove();done(val)};
-  w.querySelector("[data-x]").onclick=()=>end(null);w.querySelector("[data-ok]").onclick=()=>end([st,Math.min(dur,st+L)])})}
+  w.querySelector("[data-x]").onclick=()=>end(null);w.querySelector("[data-ok]").onclick=()=>end(dur?[st,Math.min(dur,st+L)]:"all")})}
 const attWait=(p,ms)=>Promise.race([p,new Promise(ok=>setTimeout(ok,ms))]);
 async function attAddFiles(tid,files){const t=findTaskAny(tid);if(!t)return;attBusy=tid;render();
   try{for(const f of files){const vid=/^video\//.test(f.type)||/\.(mov|mp4|m4v|webm)$/i.test(f.name||"");if(!vid&&!/^image\//.test(f.type))continue;
-    let cut=null;if(vid){const d=await attDur(f);if(d>ATT_VMAX+0.5){cut=await attTrimAsk(f,d);if(!cut)continue}}
+    let cut=null;if(vid){const d=await attDur(f);if(!d||d>ATT_VMAX+0.5){cut=await attTrimAsk(f,d);if(!cut)continue;if(cut==="all")cut=null}}
     const blob=vid?f:await attShrink(f),id=uid(),a={id,kind:vid?"vid":"img",name:f.name||"",at:Date.now(),size:blob.size};if(cut){a.t0=cut[0];a.t1=cut[1]}
     await attWait(MDB.put(id,blob),15000);
     (t.att=t.att||[]).push(a);
@@ -7582,7 +7587,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="504",APPT="2026-11-22T21:48:00Z";   /* APPT: when this update was made */
+const APPV="505",APPT="2026-11-22T21:58:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
