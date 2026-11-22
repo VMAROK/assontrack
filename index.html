@@ -1721,6 +1721,11 @@ html.tpl-spa .pleft .ptabs-in{border-radius:19px 19px 0 0}
 
 /* My passions: the selected passion / category box at the top is removed (hidden, not deleted) */
 .pleft .pmine .pd-inline{display:none!important}
+
+/* passions schedule, columns view: square day boxes, not tall */
+.psched .week:not(.rows){min-height:0!important;height:auto!important;align-items:start!important;grid-auto-rows:auto!important}
+.psched .week:not(.rows) .wday{aspect-ratio:1/1;min-height:0!important;height:auto!important;flex:none!important}
+.psched .week:not(.rows) .wday .dayadd{margin-top:auto}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -6153,9 +6158,9 @@ function passSched(d){const P=d.passions||[],p=P.find(x=>x.id===selP)||sortPass(
   if(!p)return `<div class="panel pdetail psched"><div class="ph psched-h"><span>${PTI.schedule||""}Weekly schedule</span></div><p class="empty" style="padding:18px 4px">Add a passion below to plan your week.</p></div>`;
   /* was the full schedule inline: ${schedView(d,p)} — now seven square days; tap one to open the full week in a window */
   const SP=sortPass(P),pills="";/* was: a row of passion pills over the schedule — now a tab strip down its left side (vtabs) */
-  const vtabs=SP.length>1?`<div class="pvt" role="tablist" aria-orientation="vertical" aria-label="Whose week to show">${SP.map(x=>`<button type="button" role="tab" class="pvt-b" data-schedpick="${x.id}" aria-selected="${x.id===p.id}" data-lvl="${esc(x.lvl||"")}"><i aria-hidden="true"></i><span>${esc(x.name)}</span></button>`).join("")}</div>`:"";
+  const vtabs=false&&SP.length>1?`<div class="pvt" role="tablist" aria-orientation="vertical" aria-label="Whose week to show">${SP.map(x=>`<button type="button" role="tab" class="pvt-b" data-schedpick="${x.id}" aria-selected="${x.id===p.id}" data-lvl="${esc(x.lvl||"")}"><i aria-hidden="true"></i><span>${esc(x.name)}</span></button>`).join("")}</div>`:"";
   return `<div class="panel pdetail psched" data-schedp="${p.id}"><div class="ph psched-h"><span>${PTI.schedule||""}Weekly schedule${SP.length>1?"":` <em>·</em> <b>${esc(p.name)}</b>`}</span><button type="button" class="psq-open" data-swin aria-label="Open the schedule in a window"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7"/></svg>Open</button></div>${pills}${vtabs?`<div class="pvt-wrap">${vtabs}<div class="pvt-main">${schedView(d,p)}</div></div>`:schedView(d,p)}</div>`}
-/* the passion pills above the schedule pick whose week is shown */
+/* the passion pills / tab strip above the schedule pick whose week is shown (strip removed: vtabs is off) */
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-schedpick]");if(!b)return;e.stopPropagation();selP=b.dataset.schedpick;themeOpen=false;render();
   requestAnimationFrame(()=>{const a=document.querySelector('.psp-b[aria-selected="true"]');a&&a.scrollIntoView({inline:"nearest",block:"nearest"})})},true);
 /* square-tile days were tried here and dropped: ${schedSquares(d,p)} */
@@ -6253,7 +6258,7 @@ const slShort=(a,b)=>`${fmtTime(a).replace(/\s+/,"\u202f")}–${fmtTime(b).repla
 const slRange=(a,b)=>{const A=fmtTime(a),B=fmtTime(b),mA=A.match(/^(.*?)\s*([AP]\.?M\.?)$/i),mB=B.match(/^(.*?)\s*([AP]\.?M\.?)$/i);return mA&&mB&&mA[2]===mB[2]?`<span class="nw">${mA[1]}–</span><wbr><span class="nw">${B}</span>`:`<span class="nw">${A} –</span><wbr> <span class="nw">${B}</span>`};
 function schedView(d,p){
   wkOff=0;
-  const lay=((data.profile||{}).schedView)||"rows"; /* Rows/Columns on the panel and in the window */
+  const lay=((data.profile||{}).schedView)||"cols"; /* Rows/Columns on the panel and in the window; columns by default */
   const mon=monday(wkOff),slots=(p.slots||[]).slice().sort((a,b)=>a.day-b.day||((a.start||"99")<(b.start||"99")?-1:1));
   const end=new Date(mon);end.setDate(end.getDate()+6);
   let planned=0,doneM=0,doneN=0,missN=0;
@@ -6990,7 +6995,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="462",APPT="2026-11-21T23:56:00Z";   /* APPT: when this update was made */
+const APPV="463",APPT="2026-11-22T00:03:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
