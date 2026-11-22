@@ -1888,13 +1888,19 @@ html.phone #bgimg,html.phone #bgimg2,html.phone #bglive,html.phone .bgshade{bott
 /* phone, Nutrition: the 4 top tiles as 2 rows of 2 (1·2 / 3·4) */
 html.phone #view>.grid.tiles:has(.mgt){grid-template-columns:repeat(2,minmax(0,1fr))!important}
 html.phone #view>.grid.tiles:has(.mgt)>.tile{aspect-ratio:1/1}
-/* phone: the page is the iPad layout shrunk ~3x, so blow the tile contents back up to normal phone-app size */
-html.phone #view>.grid.tiles:has(.mgt)>.tile{gap:0;padding:12px}
-html.phone #view>.grid.tiles:has(.mgt)>.tile>*{zoom:2.5}
-html.phone #view>.grid.tiles:has(.mgt)>.tile>.wt-m{zoom:2.2;top:10px;right:10px}
-html.phone #view>.grid.tiles:has(.mgt)>.mgt>*{zoom:2.3}
-html.phone #view>.grid.tiles:has(.mgt)>.mgt>.mgt-in{zoom:2.1;width:calc(100%/2.1);grid-template-columns:repeat(2,1fr);row-gap:2px}
-html.phone #view>.grid.tiles:has(.mgt)>.mgt .mgt-in label{padding-bottom:4px}
+/* phone, Nutrition: real mobile layout — undo the 3x shrink for this tab and stack everything in one column */
+html.phone #view:has(>.grid.tiles .mgt){zoom:var(--pz,1)}
+html.phone #view:has(>.grid.tiles .mgt) :is(.grid:not(.tiles),.bm.nwp,.passtop){grid-template-columns:minmax(0,1fr)!important;grid-template-areas:none!important}
+html.phone #view:has(>.grid.tiles .mgt) :is(.bm.nwp,.passtop)>*{grid-column:1!important;grid-row:auto!important}
+html.phone #view:has(>.grid.tiles .mgt) :is(.nm-secs,.wtr-sum){grid-template-columns:repeat(2,minmax(0,1fr))!important}
+html.phone #view:has(>.grid.tiles .mgt) .mgt-in{grid-template-columns:repeat(2,1fr);row-gap:4px}
+html.phone #view:has(>.grid.tiles .mgt) .fd-tiles{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px}
+html.phone #view:has(>.grid.tiles .mgt) .flogp{flex:none!important;height:auto!important;min-height:0}
+html.phone #view:has(>.grid.tiles .mgt) .nw-t{flex-direction:column;align-items:center;gap:1px;padding:5px 0}
+html.phone #view:has(>.grid.tiles .mgt) .nw-t small{font-size:9px;letter-spacing:.02em}
+html.phone #view:has(>.grid.tiles .mgt) .nw-t em{font-size:12px}
+html.phone #view:has(>.grid.tiles .mgt) .nw-d{font-size:9px;gap:3px;padding-left:0;padding-right:0}
+html.phone #view:has(>.grid.tiles .mgt) .nw-d :is(.nw-k,.nw-l,.nw-ml){font-size:9px!important;letter-spacing:0;white-space:nowrap}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -7188,7 +7194,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="482",APPT="2026-11-22T04:08:00Z";   /* APPT: when this update was made */
+const APPV="483",APPT="2026-11-22T04:20:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -7286,7 +7292,7 @@ function fit(){const sh=$(".shell"),W=1180,de=document.documentElement,vw=de.cli
   if(vw<W){const k=vw/W,sa=navigator.standalone===true||matchMedia("(display-mode: standalone)").matches,
     /* installed iPhone app: the page reports a height short by the status bar, which left a black bar at the bottom — use the full screen */
     full=sa&&de.classList.contains("phone")?(innerWidth>innerHeight?Math.min(screen.width,screen.height):Math.max(screen.width,screen.height)):0,
-    h=Math.max(de.clientHeight||0,innerHeight||0,full);sh.style.cssText=`position:fixed;left:0;top:0;width:${W}px;height:${h/k}px;transform:scale(${k});transform-origin:0 0`}
+    h=Math.max(de.clientHeight||0,innerHeight||0,full);de.style.setProperty('--pz',1/k);sh.style.cssText=`position:fixed;left:0;top:0;width:${W}px;height:${h/k}px;transform:scale(${k});transform-origin:0 0`}
   else sh.style.cssText=""}
 addEventListener("resize",fit);fit();
 
