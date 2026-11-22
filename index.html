@@ -2175,6 +2175,15 @@ html.tpl-spa .att-dots i.on{background:#ffb15c;box-shadow:0 0 4px rgba(255,160,7
 .att-strip .att-t .att-x{top:3px;right:3px;min-width:20px;height:20px;font-size:13px}
 .att-strip .att-yt::after{font-size:8.5px;left:4px;bottom:4px}
 html.phone .att-strip .att-t{flex-basis:110px}
+/* add + compare: one slim icon row */
+.att-tools{display:flex;align-items:center;gap:3px;margin-top:3px}
+.att-ic{position:relative;display:grid;place-items:center;width:40px;height:34px;padding:0;border:0;border-radius:0;cursor:pointer;color:var(--fg);background:rgba(var(--lr),.1);transition:background .15s}
+.att-ic:hover,.att-ic.on{background:rgba(var(--lr),.22)}
+.att-ic b{position:absolute;right:4px;top:2px;font-size:11px;line-height:1;font-weight:800;opacity:.85}
+.att-ic-yt{color:#ff3b30}.att-ic-yt b{color:var(--fg)}
+.att-ic-cmp{width:auto;padding:0 11px;margin-left:auto}.att-ic-cmp b{display:none}
+.att-tsep{flex:1}
+.att .att-link{margin:3px 0 0}
 /* sharp corners, media packed tight */
 .att-theater{gap:3px!important}
 .att-stage,.att-strip .att-t,.att-fs{border-radius:0!important}
@@ -6612,9 +6621,11 @@ const attSel={},attStageEls=new Map();
 function attStageEl(tid,a){const k=tid+":"+a.id;if(attStageEls.has(k))return attStageEls.get(k);const y=a.kind==="yt"?ytId(a.url):null;
   const w=document.createElement("div");w.className="att-stage-in";
   if(a.kind==="yt")w.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${y}?playsinline=1&rel=0&modestbranding=1" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="YouTube video" loading="lazy"></iframe>`;
-  else{const m=document.createElement(a.kind==="vid"?"video":"img");if(a.kind==="vid"){m.controls=true;m.playsInline=true;m.setAttribute("playsinline","");m.preload="metadata"}else m.alt=a.name||"Photo";w.appendChild(m);
+  else{const m=document.createElement(a.kind==="vid"?"video":"img");if(a.kind==="vid"){m.controls=true;m.playsInline=true;m.setAttribute("playsinline","");m.setAttribute("webkit-playsinline","");m.preload="auto"}else m.alt=a.name||"Photo";w.appendChild(m);
     attURL(a).then(u=>{if(!u){w.innerHTML='<p class="attv-miss">This file isn\'t on this device yet.</p>';return}
-      if(a.kind!=="vid"){m.src=u;return}const so=document.createElement("source");so.src=u+"#t="+((a.t0||0)+0.1).toFixed(1);so.type=a.type||"video/mp4";m.appendChild(so);
+      if(a.kind!=="vid"){m.src=u;return}/* same as the full-screen player (which plays on iPhone): plain file address, no "#t=" on it — iPhone won't play a saved video addressed that way */
+      const so=document.createElement("source");so.src=u;so.type=a.type||"video/mp4";m.appendChild(so);
+      m.addEventListener("loadedmetadata",()=>{try{m.currentTime=a.t0||0.01}catch(_){}},{once:true});
       if(a.t1!=null){m.addEventListener("loadedmetadata",()=>{try{m.currentTime=a.t0||0}catch(_){}},{once:true});m.addEventListener("timeupdate",()=>{if(m.currentTime>=a.t1){m.pause();m.currentTime=a.t0||0}})}
       m.load()})}
   attStageEls.set(k,w);return w}
@@ -6645,8 +6656,10 @@ function attHtml(t){const A=t.att||[];
     <!-- old small grid: ${""}<div class="att-grid">tiles</div> -->
     ${attBusy===t.id?`<p class="att-msg"><span class="mini-spin"></span>Adding…</p>`:""}
     ${attLinkFor===t.id?`<form class="att-link" data-attlinkform="${t.id}"><input id="attUrl" type="url" inputmode="url" placeholder="Paste a YouTube link" autocomplete="off" required><button class="btn">Add</button><button type="button" class="att-cx" data-attlink="${t.id}" aria-label="Cancel">×</button></form>`:""}
-    <div class="att-add"><button type="button" class="att-b" data-attpick="${t.id}" data-attacc="image/*">+ Photo</button><button type="button" class="att-b" data-attpick="${t.id}" data-attacc="video/*">+ Video <small style="opacity:.7;font-weight:500">(up to 1 min)</small></button><button type="button" class="att-b" data-attlink="${t.id}">+ YouTube link</button></div>
-    ${cmpPool(t.id).length>=2&&A.length?`<button type="button" class="att-cmp" data-cmpopen="${t.id}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="2"/><rect x="13" y="4" width="8" height="16" rx="2"/></svg><span><b>Compare side by side</b><small>Put two videos or photos next to each other</small></span></button>`:""}</div>`}
+    <!-- old add pills + "Compare side by side" card, replaced by the icon row below:
+    <div class="att-add">+ Photo / + Video (up to 1 min) / + YouTube link</div><button class="att-cmp">Compare side by side</button> -->
+    <div class="att-tools"><button type="button" class="att-ic" data-attpick="${t.id}" data-attacc="image/*" aria-label="Add photo" title="Add photo"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg><b>+</b></button><button type="button" class="att-ic" data-attpick="${t.id}" data-attacc="video/*" aria-label="Add video, up to 1 minute" title="Add video (up to 1 min)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="1"/><path d="M16 10l5-3v10l-5-3z"/></svg><b>+</b></button><button type="button" class="att-ic att-ic-yt${attLinkFor===t.id?" on":""}" data-attlink="${t.id}" aria-label="Add YouTube link" title="Add YouTube link"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><rect x="2" y="5.5" width="20" height="13" rx="3.5" fill="currentColor" opacity=".9"/><path d="M10 9l5 3-5 3z" fill="var(--yt-tri,#111)"/></svg><b>+</b></button>
+      ${cmpPool(t.id).length>=2&&A.length?`<span class="att-tsep"></span><button type="button" class="att-ic att-ic-cmp" data-cmpopen="${t.id}" aria-label="Compare two side by side" title="Compare side by side"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="8" height="16"/><rect x="13" y="4" width="8" height="16"/></svg></button>`:""}</div></div>`}
 function attHydrate(){attStages();document.querySelectorAll("[data-attsrc]").forEach(el=>{if(el.src)return;const id=el.dataset.attsrc;const t=[...document.querySelectorAll("[data-attview]")].length;
   for(const p of data.passions||[])for(const tk of p.tasks||[]){const a=(tk.att||[]).find(x=>x.id===id);if(a){attURL(a).then(u=>{if(u){el.src=u+(a.kind==="vid"?"#t="+((a.t0||0)+0.1).toFixed(1):"")}else el.closest(".att-t")&&el.closest(".att-t").classList.add("missing")});return}}});
   if(attView){const [tid,aid]=attView.split(":"),t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);let v=document.getElementById("attViewer");
@@ -7827,7 +7840,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="518",APPT="2026-11-22T23:19:15Z";   /* APPT: when this update was made */
+const APPV="519",APPT="2026-11-22T23:28:58Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
