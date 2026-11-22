@@ -2184,6 +2184,11 @@ html.phone .att-strip .att-t{flex-basis:110px}
 .att-ic-cmp{width:auto;padding:0 11px;margin-left:auto}.att-ic-cmp b{display:none}
 .att-tsep{flex:1}
 .att .att-link{margin:3px 0 0}
+.att-link-in{display:flex;flex:1;min-width:0;gap:0;margin:0!important;height:34px}
+.att-link-in input{flex:1;min-width:0;height:34px;box-sizing:border-box;border-radius:0;padding:0 10px;font-size:14px;border:1px solid rgba(var(--lr),.22);background:rgba(0,0,0,.25);color:var(--fg)}
+.att-link-in .att-go{height:34px!important;margin:0!important;min-height:0!important;line-height:34px;border:0;border-radius:0!important;padding:0 12px!important;font:600 13px inherit;font-family:inherit;cursor:pointer;color:var(--fg);background:rgba(var(--lr),.22)}
+.att-tools:has(.att-link-in) .att-tsep{display:none}
+.att-tools:has(.att-link-in) .att-ic-cmp{margin-left:0}
 /* sharp corners, media packed tight */
 .att-theater{gap:3px!important}
 .att-stage,.att-strip .att-t,.att-fs{border-radius:0!important}
@@ -6655,10 +6660,10 @@ function attHtml(t){const A=t.att||[];
       ${true?`<div class="att-strip">${A.map(a=>`<div class="att-t${a.id===cur.id?" on":""}"><button type="button" class="att-open" data-attsel="${t.id}:${a.id}" aria-pressed="${a.id===cur.id}" aria-label="Show this ${a.kind==="img"?"photo":"video"}">${attThumb(a)}</button><button type="button" class="att-x" data-attdel="${t.id}:${a.id}" aria-label="Remove">×</button></div>`).join("")}</div>`:""}</div>`})():""}
     <!-- old small grid: ${""}<div class="att-grid">tiles</div> -->
     ${attBusy===t.id?`<p class="att-msg"><span class="mini-spin"></span>Adding…</p>`:""}
-    ${attLinkFor===t.id?`<form class="att-link" data-attlinkform="${t.id}"><input id="attUrl" type="url" inputmode="url" placeholder="Paste a YouTube link" autocomplete="off" required><button class="btn">Add</button><button type="button" class="att-cx" data-attlink="${t.id}" aria-label="Cancel">×</button></form>`:""}
+    <!-- YouTube link box moved into the icon row, next to the YouTube icon -->
     <!-- old add pills + "Compare side by side" card, replaced by the icon row below:
     <div class="att-add">+ Photo / + Video (up to 1 min) / + YouTube link</div><button class="att-cmp">Compare side by side</button> -->
-    <div class="att-tools"><button type="button" class="att-ic" data-attpick="${t.id}" data-attacc="image/*" aria-label="Add photo" title="Add photo"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg><b>+</b></button><button type="button" class="att-ic" data-attpick="${t.id}" data-attacc="video/*" aria-label="Add video, up to 1 minute" title="Add video (up to 1 min)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="1"/><path d="M16 10l5-3v10l-5-3z"/></svg><b>+</b></button><button type="button" class="att-ic att-ic-yt${attLinkFor===t.id?" on":""}" data-attlink="${t.id}" aria-label="Add YouTube link" title="Add YouTube link"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><rect x="2" y="5.5" width="20" height="13" rx="3.5" fill="currentColor" opacity=".9"/><path d="M10 9l5 3-5 3z" fill="var(--yt-tri,#111)"/></svg><b>+</b></button>
+    <div class="att-tools"><!-- separate video button merged into the photo button (both opened the same library) --><button type="button" class="att-ic" data-attpick="${t.id}" data-attacc="image/*,video/*" aria-label="Add photo or video" title="Add photo or video (videos up to 1 min)"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg><b>+</b></button><button type="button" class="att-ic att-ic-yt${attLinkFor===t.id?" on":""}" data-attlink="${t.id}" aria-label="Add YouTube link" title="Add YouTube link"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><rect x="2" y="5.5" width="20" height="13" rx="3.5" fill="currentColor" opacity=".9"/><path d="M10 9l5 3-5 3z" fill="var(--yt-tri,#111)"/></svg><b>+</b></button>${attLinkFor===t.id?`<form class="att-link att-link-in" data-attlinkform="${t.id}"><input id="attUrl" type="url" inputmode="url" placeholder="Paste YouTube link" autocomplete="off" required><button class="att-go" aria-label="Add link">Add</button></form>`:""}
       ${cmpPool(t.id).length>=2&&A.length?`<span class="att-tsep"></span><button type="button" class="att-ic att-ic-cmp" data-cmpopen="${t.id}" aria-label="Compare two side by side" title="Compare side by side"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="8" height="16"/><rect x="13" y="4" width="8" height="16"/></svg></button>`:""}</div></div>`}
 function attHydrate(){attStages();document.querySelectorAll("[data-attsrc]").forEach(el=>{if(el.src)return;const id=el.dataset.attsrc;const t=[...document.querySelectorAll("[data-attview]")].length;
   for(const p of data.passions||[])for(const tk of p.tasks||[]){const a=(tk.att||[]).find(x=>x.id===id);if(a){attURL(a).then(u=>{if(u){el.src=u+(a.kind==="vid"?"#t="+((a.t0||0)+0.1).toFixed(1):"")}else el.closest(".att-t")&&el.closest(".att-t").classList.add("missing")});return}}});
@@ -6733,7 +6738,7 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   if(!b){if(attView&&e.target.id==="attViewer"){attView=null;attHydrate()}return}
   e.preventDefault();e.stopPropagation();
   if(b.dataset.attlink){attLinkFor=attLinkFor===b.dataset.attlink?null:b.dataset.attlink;render();if(attLinkFor)setTimeout(()=>{const i=document.getElementById("attUrl");i&&i.focus()},30);return}
-  if(b.dataset.attpick){attPickFor=b.dataset.attpick;attPickAt=Date.now();const i=attPicker();i.accept=b.dataset.attacc||"image/*,video/*";i.multiple=i.accept==="image/*";i.click();return}
+  if(b.dataset.attpick){attPickFor=b.dataset.attpick;attPickAt=Date.now();const i=attPicker();i.accept=b.dataset.attacc||"image/*,video/*";i.multiple=/image/.test(i.accept);i.click();return}
   if(b.dataset.attsel){const [tid,aid]=b.dataset.attsel.split(":");if(attSel[tid]!==aid){document.querySelectorAll(`[data-attstage^="${tid}:"] video`).forEach(v=>v.pause());attSel[tid]=aid;render()}return}
   if(b.dataset.attview){document.querySelectorAll(".att-stage video").forEach(v=>v.pause());attView=b.dataset.attview;attHydrate();return}
   if(b.dataset.attclose!==undefined){attView=null;attHydrate();return}
@@ -7840,7 +7845,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="519",APPT="2026-11-22T23:28:58Z";   /* APPT: when this update was made */
+const APPV="520",APPT="2026-11-22T23:32:54Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
