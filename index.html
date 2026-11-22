@@ -2044,6 +2044,24 @@ html.phone #view .calhead h2{font-size:24px!important;line-height:1.1}
 html.phone #view .mcal .chips{gap:2px!important}
 html.phone #view .mcal .chips em{font-size:0!important;height:5px;padding:0!important;border-left:0!important;border-radius:3px;background:var(--c)!important}
 html.phone #view .mcal .chips small{font-size:9px!important;padding:0!important}
+/* phone, the schedule (panel and window): readable slots, short empty days */
+html.phone :is(.psched,.swin-p) .week:not(.rows) .slot-main{font-size:10px!important;line-height:1.2;padding:3px 3px!important;white-space:normal!important}
+html.phone :is(.psched,.swin-p) .week:not(.rows) .slot-main *{font-size:inherit!important;white-space:normal!important}
+html.phone .swin-p .wnone{font-size:0!important}html.phone .swin-p .wnone::after{content:"–";font-size:12px;opacity:.5}
+html.phone .swin-p .wdh{flex-direction:column!important;align-items:center!important;gap:0!important;font-size:11px}
+html.phone .swin{padding:10px!important}
+html.phone .swin-p .week:not(.rows) .wday{min-height:110px!important}
+/* phone, workout designer: one column, muscles under the form */
+html.phone #view .tp-form{grid-template-columns:minmax(0,1fr)!important;gap:14px!important}
+html.phone #view .tp-dys{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:4px!important}
+html.phone #view .tp-dys>*{min-width:0!important;padding-left:0!important;padding-right:0!important;text-align:center}
+html.phone #view .tp-r .musvg,html.phone #view .tp-fig{max-width:260px;margin:0 auto}
+html.phone #view .tp-er{grid-template-columns:22px minmax(0,1fr) 16px minmax(0,1fr) 30px!important;row-gap:6px!important;column-gap:4px!important}
+html.phone #view .tp-er>:nth-child(1){grid-row:1/3;align-self:start}
+html.phone #view .tp-er>:nth-child(2){grid-column:2/6}
+html.phone #view .tp-er>:nth-child(3){grid-column:2}html.phone #view .tp-er>:nth-child(4){grid-column:3;text-align:center}html.phone #view .tp-er>:nth-child(5){grid-column:4}html.phone #view .tp-er>:nth-child(6){grid-column:5}
+html.phone #view .tpx-tools{flex-wrap:wrap!important;gap:6px!important}
+html.phone #view .tp-warn,html.phone #view .tpx-warn{white-space:normal!important}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -7341,7 +7359,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="490",APPT="2026-11-22T08:08:00Z";   /* APPT: when this update was made */
+const APPV="491",APPT="2026-11-22T08:13:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
