@@ -1880,6 +1880,10 @@ html.phone .navbtn .nbadge{position:absolute!important;top:8px;left:calc(50% + 1
 html.phone .navbtn[aria-selected="true"]{color:var(--accent,#ffb648)!important}
 html.phone .navbtn[aria-selected="true"]::before{display:none!important}
 html.phone .toast{bottom:calc(200px + env(safe-area-inset-bottom,0px))}
+
+/* installed iPhone app: let the page paint the whole screen, past the status-bar-short height iOS reports */
+html.phone,html.phone body{min-height:calc(100% + env(safe-area-inset-top,0px))}
+html.phone #bgimg,html.phone #bgimg2,html.phone #bglive,html.phone .bgshade{bottom:calc(0px - env(safe-area-inset-top,0px))!important}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -7173,7 +7177,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="478",APPT="2026-11-22T03:43:00Z";   /* APPT: when this update was made */
+const APPV="479",APPT="2026-11-22T03:49:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -7268,7 +7272,10 @@ setInterval(()=>{if(typing())return;if(tab==="dash"||(tab==="pass"&&selP))render
 /* always show the full desktop site: scale it down to fit narrow screens */
 function fit(){const sh=$(".shell"),W=1180,de=document.documentElement,vw=de.clientWidth,vv=window.visualViewport;
   if(vv&&vv.scale>1.02&&sh.style.cssText)return; /* pinch-zoomed in: keep the layout as it was */
-  if(vw<W){const k=vw/W,h=de.clientHeight||innerHeight;sh.style.cssText=`position:fixed;left:0;top:0;width:${W}px;height:${h/k}px;transform:scale(${k});transform-origin:0 0`}
+  if(vw<W){const k=vw/W,sa=navigator.standalone===true||matchMedia("(display-mode: standalone)").matches,
+    /* installed iPhone app: the page reports a height short by the status bar, which left a black bar at the bottom — use the full screen */
+    full=sa&&de.classList.contains("phone")?(innerWidth>innerHeight?Math.min(screen.width,screen.height):Math.max(screen.width,screen.height)):0,
+    h=Math.max(de.clientHeight||0,innerHeight||0,full);sh.style.cssText=`position:fixed;left:0;top:0;width:${W}px;height:${h/k}px;transform:scale(${k});transform-origin:0 0`}
   else sh.style.cssText=""}
 addEventListener("resize",fit);fit();
 
