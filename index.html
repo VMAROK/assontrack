@@ -3,6 +3,8 @@
 <script>/* phones: lay the page out exactly like the iPad/desktop (1180px wide, scaled to fit) — only the tabs move to the bottom */
 (function(){try{var w=Math.min(screen.width,screen.height);if(w<700){/* was: setting the viewport to width=1180 — iPhone then left a black band at the bottom */document.documentElement.classList.add('phone')}}catch(e){}})();</script>
 <!-- phone height script removed (not needed with the scaled shell) -->
+<script>/* phones: mark the page while it's scrolling so animations can pause */
+(function(){var de=document.documentElement;if(!de.classList.contains('phone'))return;var t=0;document.addEventListener('scroll',function(){if(!t)de.classList.add('scrolling');clearTimeout(t);t=setTimeout(function(){de.classList.remove('scrolling');t=0},200)},{capture:true,passive:true})})();</script>
 <title>AssOnTrack</title>
 <meta name="description" content="Progress, diet and passion tracker">
 <meta name="theme-color" content="#060b17">
@@ -1905,10 +1907,10 @@ html.phone #view:has(>.grid.tiles .mgt){padding:10px 12px 24px!important}
 html.phone #view:has(>.grid.tiles .mgt) .panel{border-radius:16px!important;padding:14px!important}
 html.phone #view:has(>.grid.tiles .mgt)>.grid.tiles{gap:10px!important;margin-bottom:10px}
 html.phone #view:has(>.grid.tiles .mgt)>.grid.tiles>.tile{min-height:0!important;height:auto!important;padding:12px 8px!important;gap:2px}
-html.phone #view:has(>.grid.tiles .mgt)>.grid.tiles>.tile svg:not(.mgt svg){width:22px!important;height:22px!important}
+html.phone #view:has(>.grid.tiles .mgt)>.grid.tiles>.tile svg:not(.mgt svg):not(.wt-g){width:22px!important;height:22px!important}
 html.phone #view:has(>.grid.tiles .mgt)>.grid.tiles>.tile :is(.k,small,em,.lbl){font-size:12px!important;letter-spacing:.01em}
 html.phone #view:has(>.grid.tiles .mgt)>.grid.tiles>.tile>b,html.phone #view:has(>.grid.tiles .mgt)>.grid.tiles>.tile>b .tgt-in{font-size:26px!important;line-height:1.15}
-html.phone #view:has(>.grid.tiles .mgt)>.grid.tiles>.tile>svg{width:22px!important;height:22px!important}
+html.phone #view:has(>.grid.tiles .mgt)>.grid.tiles>.tile>svg.ic{width:22px!important;height:22px!important}
 html.phone #view:has(>.grid.tiles .mgt) .grid,html.phone #view:has(>.grid.tiles .mgt) .stack{gap:10px!important}
 html.phone #view:has(>.grid.tiles .mgt) .holo{max-height:300px!important;height:300px!important}
 html.phone #view:has(>.grid.tiles .mgt) .holo canvas{max-height:300px!important}
@@ -1968,7 +1970,7 @@ html.phone #view :is(.grid:not(.tiles),.passtop,.pgrid,.bm,.dashtop,.trtop,.body
 html.phone #view .grid.tiles{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
 html.phone #view .grid.tiles>.tile{min-height:0!important;height:auto!important;padding:12px 8px!important}
 html.phone #view .grid.tiles>.tile>b{font-size:24px!important;line-height:1.15}
-html.phone #view .grid.tiles>.tile>svg{width:22px!important;height:22px!important}
+html.phone #view .grid.tiles>.tile>svg.ic{width:22px!important;height:22px!important}
 html.phone #view .panel{border-radius:16px!important;padding:14px!important}
 html.phone #view :is(.grid,.stack){gap:10px!important}
 html.phone #view>*+*{margin-top:10px}
@@ -2063,6 +2065,15 @@ html.phone #view .tp-er>:nth-child(3){grid-column:2}html.phone #view .tp-er>:nth
 html.phone #view .tpx-tools{flex-wrap:wrap!important;gap:6px!important}
 html.phone #view .tp-warn,html.phone #view .tpx-warn{white-space:normal!important}
 html.phone #view .btn{white-space:normal;line-height:1.15;padding-left:10px;padding-right:10px}
+/* speed: the wallpaper spinner only spins while it's showing (it used to spin invisibly all the time) */
+#bgspin:not(.show){animation:none!important}
+/* speed on phones: the Spa glow orbs and the header sweep stay put instead of drifting (moving glows under blurred panels force a full repaint every frame) */
+html.phone #tplbg *,html.phone .topbar,html.phone .topbar::before,html.phone .topbar::after{animation-play-state:paused!important}
+/* speed on phones: everything that moves holds still while you're scrolling */
+html.phone.scrolling *,html.phone.scrolling *::before,html.phone.scrolling *::after{animation-play-state:paused!important}
+/* phones: the tab bar was sized for the shrunk page — scale it to the real screen */
+html.phone aside{zoom:var(--az,1)}
+html.phone #view .dstack .dtiles{height:auto!important}html.phone #view .dstack .dtile{height:auto!important;padding-bottom:12px!important}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -5525,7 +5536,7 @@ function avEditor(){if(figFit())return `<div class="aved">${sexRow(avatarOf())}<
 function h3Init(T){
   const canvas=document.createElement("canvas");canvas.className="h3c";
   let ren;try{ren=new T.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:"low-power",preserveDrawingBuffer:true})}catch(_){return null}
-  ren.setPixelRatio(Math.min(devicePixelRatio||1,2));ren.setClearColor(0x000000,0);
+  ren.setPixelRatio(Math.min(devicePixelRatio||1,document.documentElement.classList.contains("phone")?1.5:2));/* phones: a lighter canvas */ren.setClearColor(0x000000,0);
   const scene=new T.Scene(),cam=new T.PerspectiveCamera(28,.6,.1,50);cam.position.set(0,1.12,5.6);cam.lookAt(0,1.02,0);
   const U={t:{value:0},flick:{value:1}};
   // lights for the living figure
@@ -5934,7 +5945,12 @@ float musAt(vec3 c,out float ed,out float dep,out vec3 mc){float id=-1.;ed=99.;d
     cur=stage}
   let cur="holo",raf=0,last=0,host=null,t0=performance.now();
   function size(){if(!host)return;const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;if(canvas.width!==Math.round(w*ren.getPixelRatio())||canvas.height!==Math.round(h*ren.getPixelRatio())){ren.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}}
-  function frame(now){raf=requestAnimationFrame(frame);if(!host||!host.isConnected){stop();return}if(now-last<24)return;last=now;size();
+  /* only draw while the figure is on screen and the app is in front; phones draw at ~30fps */
+  let onScreen=true;try{new IntersectionObserver(e=>{onScreen=e[e.length-1].isIntersecting}).observe(canvas)}catch(_){}
+  const PH=document.documentElement.classList.contains("phone");
+  /* phones: hold the figure still while the page is being scrolled, so scrolling stays smooth */
+  let scrollT=0;if(PH)document.addEventListener("scroll",()=>{scrollT=performance.now()},{capture:true,passive:true});
+  function frame(now){raf=requestAnimationFrame(frame);if(!host||!host.isConnected){stop();return}if(!onScreen||document.hidden)return;if(PH&&now-scrollT<180)return;if(now-last<(PH?33:24))return;last=now;size();
     const t=(now-t0)/1000;U.t.value=t;U.flick.value=cur==="holo"?(Math.random()<.03?.55:1):1;
     wingsNow.forEach(w=>{w.rotation.y=w.userData.wing*(-.45-Math.sin(t*1.3)*.1)});
     if(flag){const c=flag.userData.cloth,pa=c.geometry.attributes.position,r=flag.userData.rest;for(let i=0;i<pa.count;i++){const x0=r[i*3];pa.setZ(i,Math.sin(x0*11-t*3.2)*.035*(x0/.46));pa.setY(i,r[i*3+1]+Math.sin(x0*7-t*2.4)*.01*(x0/.46))}pa.needsUpdate=true}
@@ -7211,9 +7227,15 @@ addEventListener("resize",()=>eqCards());
 /* TEMPORARY: numbered labels on the Training and Budget tabs so panels can be referred to by number. Delete this block and the dbgLabels() call above to remove. */
 const DBG_LABELS=true;
 let dbgOff=false;try{dbgOff=localStorage.getItem("aot-dbg-off")==="1"}catch(e){}
-function dbgToggle(){let b=document.getElementById("dbgTog");if(!b){b=document.createElement("button");b.id="dbgTog";b.type="button";b.addEventListener("click",()=>{dbgOff=!dbgOff;try{localStorage.setItem("aot-dbg-off",dbgOff?"1":"0")}catch(e){}dbgToggle()});document.body.appendChild(b)}
+function dbgToggle(){let b=document.getElementById("dbgTog");if(!b){b=document.createElement("button");b.id="dbgTog";b.type="button";b.addEventListener("click",()=>{dbgOff=!dbgOff;try{localStorage.setItem("aot-dbg-off",dbgOff?"1":"0")}catch(e){}dbgToggle();render()});document.body.appendChild(b)}
   b.hidden=!DBG_LABELS||(tab!=="train"&&tab!=="budget"&&tab!=="fuel"&&tab!=="pass");b.style.top=tab==="budget"||tab==="fuel"?"auto":"";b.style.bottom=tab==="budget"||tab==="fuel"?"calc(env(safe-area-inset-bottom,0px) + 18px)":"";b.textContent=dbgOff?"Labels: off":"Labels: on";b.setAttribute("aria-pressed",!dbgOff);document.body.classList.toggle("dbg-off",dbgOff)}
+/* was:
 function dbgLabels(){dbgToggle();if(!DBG_LABELS||(tab!=="train"&&tab!=="budget"&&tab!=="fuel"&&tab!=="pass"))return;const v=$("#view");let n=0;v.querySelectorAll(tab==="fuel"?".panel,.nm-sec,.nm-card,.nm-row,.nw-d,.us-g,.us-it":tab==="budget"?".panel,.bk-cat,.bk-g,.bi-card,.bl-cat,.bl-g,.bl-row":tab==="pass"?".panel,.plrow":".panel,.sp,.wk-sec,.tp-card,.tp-new").forEach(e=>{if(!e.offsetWidth)return;n++;if(getComputedStyle(e).position==="static")e.style.position="relative";e.classList.add("dbg-box");const l=document.createElement("span");l.className="dbg-n";l.textContent=n;e.appendChild(l)})}
+*/
+function dbgLabels(){dbgToggle();if(!DBG_LABELS||dbgOff||(tab!=="train"&&tab!=="budget"&&tab!=="fuel"&&tab!=="pass"))return;const v=$("#view");let n=0;
+  /* read everything first, then write — one layout instead of one per box */
+  const els=[...v.querySelectorAll(tab==="fuel"?".panel,.nm-sec,.nm-card,.nm-row,.nw-d,.us-g,.us-it":tab==="budget"?".panel,.bk-cat,.bk-g,.bi-card,.bl-cat,.bl-g,.bl-row":tab==="pass"?".panel,.plrow":".panel,.sp,.wk-sec,.tp-card,.tp-new")].filter(e=>e.offsetWidth).map(e=>[e,getComputedStyle(e).position==="static"]);
+  els.forEach(([e,st])=>{n++;if(st)e.style.position="relative";e.classList.add("dbg-box");const l=document.createElement("span");l.className="dbg-n";l.textContent=n;e.appendChild(l)})}
 function placeBranch(){const br=document.querySelector(".tkf-branch"),ch=document.querySelector(".tk-top-band .tkfilter .fchip.open");if(!br||!ch)return;const c=ch.getBoundingClientRect(),b=br.getBoundingClientRect();br.style.setProperty("--cx",Math.round(c.left+c.width/2-b.left)+"px");br.style.setProperty("--up",Math.round(b.top-c.bottom)+"px")}
 addEventListener("resize",()=>placeBranch());
 
@@ -7360,7 +7382,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="492",APPT="2026-11-22T08:17:00Z";   /* APPT: when this update was made */
+const APPV="493",APPT="2026-11-22T18:15:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -7458,7 +7480,9 @@ function fit(){const sh=$(".shell"),W=1180,de=document.documentElement,vw=de.cli
   if(vw<W){const k=vw/W,sa=navigator.standalone===true||matchMedia("(display-mode: standalone)").matches,
     /* installed iPhone app: the page reports a height short by the status bar, which left a black bar at the bottom — use the full screen */
     full=sa&&de.classList.contains("phone")?(innerWidth>innerHeight?Math.min(screen.width,screen.height):Math.max(screen.width,screen.height)):0,
-    h=Math.max(de.clientHeight||0,innerHeight||0,full);de.style.setProperty('--pz',1/k);sh.style.cssText=`position:fixed;left:0;top:0;width:${W}px;height:${h/k}px;transform:scale(${k});transform-origin:0 0`}
+    h=Math.max(de.clientHeight||0,innerHeight||0,full);if(de.classList.contains("phone")){/* phones: no shrink-then-zoom round trip (it made iOS paint 3× oversized layers) — lay out at the real screen width, same result */
+      de.style.setProperty('--pz',1);de.style.setProperty('--az',k);sh.style.cssText=`position:fixed;left:0;top:0;width:${vw}px;height:${h}px`;return}
+    de.style.setProperty('--pz',1/k);sh.style.cssText=`position:fixed;left:0;top:0;width:${W}px;height:${h/k}px;transform:scale(${k});transform-origin:0 0`}
   else sh.style.cssText=""}
 addEventListener("resize",fit);fit();
 
