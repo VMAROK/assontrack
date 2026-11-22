@@ -1892,6 +1892,8 @@ html.phone #view>.grid.tiles:has(.mgt){grid-template-columns:repeat(2,minmax(0,1
 /* phone, Nutrition at real phone size (like Lose It): same panels, same order, one column, normal phone text */
 /* phone, Nutrition: real mobile layout — undo the 3x shrink for this tab and stack everything in one column */
 html.phone #view:has(>.grid.tiles .mgt){zoom:var(--pz,1)}
+/* phone: sharp corners on every panel */
+html.phone .panel,html.phone .panel::before,html.phone .panel::after{border-radius:0!important}
 html.phone #view:has(>.grid.tiles .mgt) :is(.grid:not(.tiles),.bm.nwp,.passtop){grid-template-columns:minmax(0,1fr)!important;grid-template-areas:none!important}
 html.phone #view:has(>.grid.tiles .mgt) :is(.bm.nwp,.passtop)>*{grid-column:1!important;grid-row:auto!important}
 html.phone #view:has(>.grid.tiles .mgt) :is(.nm-secs,.wtr-sum){grid-template-columns:repeat(2,minmax(0,1fr))!important}
@@ -1904,7 +1906,7 @@ html.phone #view:has(>.grid.tiles .mgt) .nw-t em{font-size:12px}
 html.phone #view:has(>.grid.tiles .mgt) .nw-d{font-size:9px;gap:3px;padding-left:0;padding-right:0}
 html.phone #view:has(>.grid.tiles .mgt) .nw-d :is(.nw-k,.nw-l,.nw-ml){font-size:9px!important;letter-spacing:0;white-space:nowrap}
 html.phone #view:has(>.grid.tiles .mgt){padding:10px 12px 24px!important}
-html.phone #view:has(>.grid.tiles .mgt) .panel{border-radius:16px!important;padding:14px!important}
+html.phone #view:has(>.grid.tiles .mgt) .panel{border-radius:0!important;padding:14px!important}
 html.phone #view:has(>.grid.tiles .mgt)>.grid.tiles{gap:10px!important;margin-bottom:10px}
 html.phone #view:has(>.grid.tiles .mgt)>.grid.tiles>.tile{min-height:0!important;height:auto!important;padding:12px 8px!important;gap:2px}
 html.phone #view:has(>.grid.tiles .mgt)>.grid.tiles>.tile svg:not(.mgt svg):not(.wt-g){width:22px!important;height:22px!important}
@@ -1954,11 +1956,11 @@ html.phone #view[data-tab="budget"] .grid.tiles{grid-template-columns:repeat(2,m
 html.phone #view[data-tab="budget"] .grid.tiles>.tile{min-height:0!important;height:auto!important;padding:12px 8px!important}
 html.phone #view[data-tab="budget"] .grid.tiles>.tile>b{font-size:24px!important;line-height:1.15}
 html.phone #view[data-tab="budget"] .grid.tiles>.tile>svg{width:22px!important;height:22px!important}
-html.phone #view[data-tab="budget"] .panel{border-radius:16px!important;padding:14px!important}
+html.phone #view[data-tab="budget"] .panel{border-radius:0!important;padding:14px!important}
 html.phone #view[data-tab="budget"] :is(.grid,.stack){gap:10px!important}
 html.phone #view[data-tab="budget"] .bstick.stuck .tiles{grid-template-columns:repeat(4,minmax(0,1fr))!important}
 html.phone #view[data-tab="budget"] .bstick.stuck .tile>b{font-size:15px!important}
-html.phone #view[data-tab="budget"] .bstick.stuck .tile{padding:6px 4px!important;border-radius:12px!important}
+html.phone #view[data-tab="budget"] .bstick.stuck .tile{padding:6px 4px!important;border-radius:0!important}
 html.phone #view[data-tab="budget"] .bstick.stuck .tile small{font-size:10px!important;line-height:1.2}
 html.phone #view[data-tab="budget"] .bstick.stuck .tile>b{font-size:14px!important}
 html.phone #view[data-tab="budget"] .bc-d{min-height:46px!important}
@@ -1971,7 +1973,7 @@ html.phone #view .grid.tiles{grid-template-columns:repeat(2,minmax(0,1fr))!impor
 html.phone #view .grid.tiles>.tile{min-height:0!important;height:auto!important;padding:12px 8px!important}
 html.phone #view .grid.tiles>.tile>b{font-size:24px!important;line-height:1.15}
 html.phone #view .grid.tiles>.tile>svg.ic{width:22px!important;height:22px!important}
-html.phone #view .panel{border-radius:16px!important;padding:14px!important}
+html.phone #view .panel{border-radius:0!important;padding:14px!important}
 html.phone #view :is(.grid,.stack){gap:10px!important}
 html.phone #view>*+*{margin-top:10px}
 /* header at phone size too */
@@ -2164,7 +2166,7 @@ html.phone #view .panel.wahead::before,html.phone #view .panel.wahead::after,htm
 
 /* phone: tighter spacing — less room around the panels and a bit less inside them */
 html.phone #view{padding:6px 6px 18px!important}
-html.phone #view .panel{padding:11px!important;border-radius:14px!important}
+html.phone #view .panel{padding:11px!important;border-radius:0!important}
 html.phone #view :is(.grid,.stack,.passtop,.pgrid,.dashtop,.trtop,.bodytop){gap:6px!important}
 html.phone #view>*+*{margin-top:6px!important}
 html.phone #view .panel .panel{padding:10px!important}
@@ -7540,7 +7542,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="499",APPT="2026-11-22T21:25:00Z";   /* APPT: when this update was made */
+const APPV="500",APPT="2026-11-22T21:40:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
