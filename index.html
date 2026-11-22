@@ -1760,7 +1760,8 @@ html.tpl-spa .ptabs .tab:hover{background:rgba(255,170,90,.1)}
 html.tpl-spa .pd-hero::after{background:linear-gradient(90deg,transparent,rgba(255,170,70,.75),transparent)!important;box-shadow:0 0 10px rgba(255,160,60,.5)!important}
 html.tpl-spa .pd-hero{box-shadow:0 1px 0 rgba(255,170,90,.1),0 10px 24px -12px rgba(0,0,0,.6)!important}
 
-/* tasks, neater: one list, quick add on top, flat rows, project headers with a thin bar, completed folded */
+/* tasks redesign (quick add, flat rows) — reverted:
+/* tasks, neater: one list, quick add on top, flat rows, project headers with a thin bar, completed folded * /
 .tk2wrap{display:block!important}
 .tk2wrap>div{min-width:0}
 .tkq{margin:4px 0 14px;border:1px solid rgba(var(--lr),.22);border-radius:12px;background:rgba(2,4,10,.55);overflow:hidden}
@@ -1809,6 +1810,7 @@ html:not(.tpl-spa) .tkq-add{color:#04101f;background:linear-gradient(180deg,#7fd
 .tk2-dck{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:rgba(61,220,132,.18);color:#3ddc84;font-size:12px;font-weight:800}
 .tk2-donelist{margin-top:6px}
 .ptp .tkfilter,.ptp .tkf-branch{display:none!important}
+*/
 
 /* My passions gear: top-left corner, sticking out */
 .pleft .pmine>.ph .gear{right:auto!important;left:-15px!important;top:-15px!important}
@@ -6091,13 +6093,7 @@ function taskView(d,p){
   const PILL={new:"Not started",running:"In progress",paused:"Paused",overdue:"Deadline missed",planned:"Planned"};
   const card=t=>{const st=taskState(t),ms=taskMs(t),run=st==="running";
     if(!tkOpen.has(t.id)&&addTimeFor!==t.id){const left=t.due?t.due-Date.now():null;
-      /* neater row: done circle · full name with a small line under it · ▶ (timer only shows while running). was the boxed row with a status pill, 00:00:00 and a Start button */
-      const meta=[st==="planned"&&t.startOn?"Starts "+fmtDate(t.startOn):"",st==="overdue"?`<span class="late">Deadline missed</span>`:"",st==="paused"?"Paused":"",!run&&ms>0?fmtH(Math.round(ms/6e4))+" logged":"",t.planH?"of "+t.planH+"h":"",t.due&&st!=="overdue"?`<span class="${left<864e5?"soon":""}">${LOCK} ${fmtDate(ymd(new Date(t.due)))}</span>`:""].filter(Boolean).join(" · ");
-      const PLAY='<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>',PAUSE='<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg>';
-      return `<div class="tkrow tk2 st-${st}"><button class="tk2-ck" data-tkdone="${t.id}" aria-label="Mark ${esc(t.title)} done" title="Tap twice to mark done"></button><button class="tkrow-main" data-tkopen="${t.id}" aria-expanded="false" aria-label="${esc(t.title)}, ${PILL[st]}. Tap for details"><span class="tk2-x"><b class="tkr-title">${esc(t.title)}</b>${meta?`<small class="tk2-meta">${meta}</small>`:""}</span></button>${st==="planned"?"":run?`<span class="tk2-run" data-timer="${p.id}:${t.id}">${fmtClock(ms)}</span><button class="tk2-ic" data-tkpause="${t.id}" aria-label="Pause" title="Pause">${PAUSE}</button><button class="tk2-ic tk2-cx" data-tkcancel="${t.id}" aria-label="Cancel timer" title="Cancel timer (nothing is logged)">×</button>`:`<button class="tk2-ic tk2-play" data-tkstart="${t.id}" aria-label="${(t.runs||[]).length?"Resume":"Start"} ${esc(t.title)}" title="${(t.runs||[]).length?"Resume":"Start"}">${PLAY}</button>`}</div>`}
-      /* was:
       return `<div class="tkrow st-${st}"><button class="tkrow-main" data-tkopen="${t.id}" aria-expanded="false" aria-label="${esc(t.title)}, ${PILL[st]}. Tap to expand"><b class="tkr-title">${esc(t.title)}</b><span class="tk-pill">${PILL[st]}</span><span class="tkr-sp"></span><span class="tkr-time"${run?` data-timer="${p.id}:${t.id}"`:""}>${fmtClock(ms)}</span>${t.due?`<span class="tkr-due${left<0?" late":left<864e5?" soon":""}">${LOCK} ${fmtDate(ymd(new Date(t.due)))}</span>`:""}<svg class="tk-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>${st==="planned"?"":run?`<button class="tkr-act tkr-cancel" data-tkcancel="${t.id}" aria-label="Cancel timer" title="Cancel timer (nothing is logged)">×</button><button class="tkr-act" data-tkpause="${t.id}">Pause</button>`:`<button class="tkr-act" data-tkstart="${t.id}">${(t.runs||[]).length?"Resume":"Start"}</button>`}</div>`}
-      */
     const due=t.due?(()=>{const left=t.due-Date.now();return `<span class="tk-due${left<0?" late":left<864e5?" soon":""}">${LOCK} Due ${fmtDate(ymd(new Date(t.due)))}, ${clock(t.due)} · ${left<0?"missed "+fmtLeft(-left)+" ago":"in "+fmtLeft(left)}</span>`})():`<span class="tk-due none">No deadline</span>`;
     return `<div class="tkcard st-${st}"><div class="tk-top"><div class="tk-name">${isRn("task",t.id)?rnForm("task",t.id,t.title,PR.length?`<select id="rnP" class="rn-proj" aria-label="Project or sub-project" title="Project or sub-project">${["",...PR.map(x=>x.id)].map(id=>`<option value="${id}" ${(t.proj||"")===id?"selected":""}>${id?esc(prjLabel(PR.find(x=>x.id===id))):"No project"}</option>`).join("")}</select>`:""):`<b>${esc(t.title)}</b><span class="tk-pill">${PILL[st]}</span>`}</div>${isRn("task",t.id)?"":penBtn("task",t.id,t.title)}<button class="tk-fold" data-tkopen="${t.id}" aria-expanded="true" aria-label="Collapse task"><svg class="tk-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></div>
       <div class="tk-mid"><div class="tk-time"><b ${run?`data-timer="${p.id}:${t.id}"`:""}>${fmtClock(ms)}</b>${t.planH?`<small>of ${t.planH}h planned</small>`:""}</div>${due}</div>${t.planH?`<div class="track" style="--c:${ms>=t.planH*36e5?"#3ddc84":"var(--cyan)"}"><i style="width:${Math.min(ms/(t.planH*36e5),1)*100}%"></i></div>`:""}
@@ -6112,24 +6108,24 @@ function taskView(d,p){
          const n=cnt(t=>k==="all"||(k==="none"?!t.proj||!PR.some(q=>q.id===t.proj):ids.includes(t.proj)));const open=x&&openTop===x&&K.length,branch=open&&tkFilter!==k;
          const btn=`<button class="fchip${open?" open":""}${branch?" branch":""}" data-tkf="${k}" aria-pressed="${tkFilter===k}" ${x?`style="--pc:${prjColor(d,x)}"`:""} ${K.length?`aria-expanded="${!!open}"`:""}>${x?`<span class="pj-dot"></span>`:""}${esc(l)}<i>${n}</i>${K.length?`<svg class="tkf-chev" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`:""}</button>`;
          return btn}).join("")}</div>${openTop&&kidsOf(openTop).length?`<div class="tkf-branch${pop}" style="--pc:${prjColor(d,openTop)}"><span class="tkf-wire" aria-hidden="true"></span><div class="tkfilter tkf-subbar" role="group" aria-label="${esc(openTop.title)} sub-projects">${kidsOf(openTop).map(c=>`<button class="fchip sub" data-tkf="${c.id}" aria-pressed="${tkFilter===c.id}">${esc(c.title)}<i>${cnt(t=>t.proj===c.id)}</i></button>`).join("")}</div></div>`:""}`})():""}
-     </div><div class="tkwrap tk2wrap"><div>
-     <form class="tkq" id="tkForm"><div class="tkq-row"><span class="tkq-plus" aria-hidden="true">+</span><input id="tkT" required placeholder="Add a task" autocomplete="off" aria-label="New task"><button type="button" class="tkq-mb${tkMore?" on":""}" data-tkmore aria-expanded="${tkMore}">⋯ More</button><button class="tkq-add">Add</button></div>
-     <div class="tkq-more"${tkMore?"":" hidden"}>
+     </div><div class="tkwrap"><div>
+     
+     <div class="tklist">${!act.length?`<div class="empty" style="padding:22px 10px">${(p.tasks||[]).length&&tkFilter!=="all"?"No open tasks here":"No tasks yet"}</div>`:(()=>{
+       const sub=(x,ts)=>{const own=ts.filter(t=>t.proj===x.id),K=kidsOf(x);return own.map(card).join("")+K.map(k=>{const kt=ts.filter(t=>t.proj===k.id);return kt.length?`<div class="tksub"><div class="tkg-h sm">↳ <b>${esc(k.title)}</b><small>${prjStats(p,k).done} of ${prjStats(p,k).total} done</small></div>${kt.map(card).join("")}</div>`:""}).join("")};
+       const grp=(x,ts)=>`<div class="tkgroup" style="--pc:${prjColor(d,x)}"><div class="tkg-h"><span class="pj-dot"></span><b>${esc(x.title)}</b><small>${prjStats(p,x).done} of ${prjStats(p,x).total} done</small></div><div class="tkg-b">${sub(x,ts)}</div></div>`;
+       if(tkFilter==="all"&&PR.length){const loose=act.filter(t=>!t.proj||!PR.some(x=>x.id===t.proj));return TOPS.map(x=>{const ids=treeIds(x),ts=act.filter(t=>ids.includes(t.proj));return ts.length?grp(x,ts):""}).join("")+(loose.length?`<div class="tkgroup"><div class="tkg-h"><b class="muted">No project</b></div><div class="tkg-b">${loose.map(card).join("")}</div></div>`:"")}
+       if(fx&&!fx.parent&&kidsOf(fx).length)return sub(fx,act);
+       return act.map(card).join("")})()}</div>
+     <div class="ph tk-sec solo" style="margin-top:20px"><span>Completed</span><i>${tm.done} on time${tm.missed?` · ${tm.missed} missed`:""}</i></div>
+     <div class="rows">${fin.length?fin.map(frow).join(""):`<div class="empty" style="padding:16px">Nothing completed yet</div>`}</div></div>
+   <form class="f addform" id="tkForm"><div class="ph" style="margin-bottom:0"><span>New task</span></div>
+     <label>Task<input id="tkT" required placeholder="Describe the task" autocomplete="off"></label>
      ${PR.length?`<label>Project (optional)<select id="tkP"><option value="">No project</option>${PR.map(x=>`<option value="${x.id}" ${(prjFocus||tkFilter)===x.id?"selected":""}>${esc(prjLabel(x))}</option>`).join("")}</select></label>`:`<p class="note" style="margin:0">Tip: create a project in the Projects tab to group tasks.</p>`}
      <div class="f2"><label>Start date (optional)<input id="tkS" type="date" min="${today()}"></label><label>Hours to put in (optional)<input id="tkH" type="number" step="0.5" min="0" inputmode="decimal" placeholder="e.g. 5"></label></div>
      <div class="f2"><label>Due date (optional)<input id="tkD" type="date" min="${today()}"></label><label>Due time (optional)<input id="tkTm" type="time"></label></div>
      <label class="lockbox"><input id="tkAck" type="checkbox"><span><b>No turning back.</b> Once a deadline is set it can't be changed or removed, and the task can't be deleted. Missing it counts against your progress.</span></label>
-     <small class="note" style="margin:0">Tap ▶ when you begin and ⏸ when you stop. Tap the circle twice when it's finished. Every timed session adds to your hours.</small></div></form>
-     
-     <div class="tklist">${!act.length?`<div class="empty" style="padding:22px 10px">${(p.tasks||[]).length&&tkFilter!=="all"?"No open tasks here":"No tasks yet"}</div>`:(()=>{
-       const sub=(x,ts)=>{const own=ts.filter(t=>t.proj===x.id),K=kidsOf(x);return own.map(card).join("")+K.map(k=>{const kt=ts.filter(t=>t.proj===k.id);return kt.length?`<div class="tksub"><div class="tkg-h sm">↳ <b>${esc(k.title)}</b><small>${prjStats(p,k).done} of ${prjStats(p,k).total} done</small></div>${kt.map(card).join("")}</div>`:""}).join("")};
-       const grp=(x,ts)=>`<div class="tkgroup" style="--pc:${prjColor(d,x)}"><div class="tkg-h"><span class="pj-dot"></span><b>${esc(x.title)}</b><small>${prjStats(p,x).done} of ${prjStats(p,x).total}</small><i class="tkg-bar" aria-hidden="true"><i style="width:${prjStats(p,x).total?Math.round(prjStats(p,x).done/prjStats(p,x).total*100):0}%"></i></i></div><div class="tkg-b">${sub(x,ts)}</div></div>`;
-       if(tkFilter==="all"&&PR.length){const loose=act.filter(t=>!t.proj||!PR.some(x=>x.id===t.proj));return TOPS.map(x=>{const ids=treeIds(x),ts=act.filter(t=>ids.includes(t.proj));return ts.length?grp(x,ts):""}).join("")+(loose.length?`<div class="tkgroup"><div class="tkg-h"><b class="muted">No project</b></div><div class="tkg-b">${loose.map(card).join("")}</div></div>`:"")}
-       if(fx&&!fx.parent&&kidsOf(fx).length)return sub(fx,act);
-       return act.map(card).join("")})()}</div>
-     ${fin.length?`<button type="button" class="tk2-done" data-tkdoneopen aria-expanded="${tkDoneOpen}"><span class="tk2-dck">✓</span><b>${fin.length} completed</b><small>${tm.done} on time${tm.missed?` · ${tm.missed} missed`:""}</small><svg class="tk-chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>${tkDoneOpen?`<div class="rows tk2-donelist">${fin.map(frow).join("")}</div>`:""}`:""}
-     ${/* was: a "Completed" heading with every finished task listed under it */""}</div>
-   </div>`;
+     <button class="btn">Add task</button>
+     <small class="note" style="margin:0">Hit Start when you begin, Pause when you stop, and Mark done when it's finished. Every timed session adds to your hours.</small></form></div>`;
 }
 
 /* ---------- projects inside a passion ---------- */
@@ -7114,7 +7110,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="469",APPT="2026-11-22T00:33:00Z";   /* APPT: when this update was made */
+const APPV="470",APPT="2026-11-22T00:36:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
