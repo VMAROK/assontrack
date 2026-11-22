@@ -1912,6 +1912,37 @@ html.phone #view:has(>.grid.tiles .mgt)>.grid.tiles>.tile>svg{width:22px!importa
 html.phone #view:has(>.grid.tiles .mgt) .grid,html.phone #view:has(>.grid.tiles .mgt) .stack{gap:10px!important}
 html.phone #view:has(>.grid.tiles .mgt) .holo{max-height:300px!important;height:300px!important}
 html.phone #view:has(>.grid.tiles .mgt) .holo canvas{max-height:300px!important}
+
+/* ===== plain templates: flat app look — solid surfaces, no glow, no glass ===== */
+html.tpl-plain{--bg0:#121212;--card:#1c1c1e;--card2:#242427;--line:#2c2c30;--fg:#ececf1;--muted:#9a9aa3;--accent:#8ab4ff;--cyan:#8ab4ff}
+html.tpl-midnight{--bg0:#0b1120;--card:#121a2c;--card2:#18223a;--line:#22304d;--fg:#e6ecf7;--muted:#8d9ab3;--accent:#5b9dff;--cyan:#5b9dff}
+html.tpl-slate{--bg0:#1d2229;--card:#262c35;--card2:#2e3540;--line:#39414d;--fg:#e3e7ec;--muted:#9aa4b1;--accent:#7cc4b8;--cyan:#7cc4b8}
+html.tpl-plain body{color:var(--fg);background:var(--bg0)!important}
+html.tpl-plain.tpl-bg #tplbg{background:var(--bg0)!important}
+html.tpl-plain #tplbg i,html.tpl-plain #tplbg b{display:none!important}
+html.tpl-plain .panel{background:var(--card)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:1px solid var(--line)!important;box-shadow:none!important;border-radius:14px!important}
+html.tpl-plain .panel .panel,html.tpl-plain .tile{background:var(--card)!important}
+html.tpl-plain :is(.nav,nav,aside,header,.topbar){background:var(--bg0)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-color:var(--line)!important;box-shadow:none!important}
+html.tpl-plain .navbtn:not(.nav-done){color:var(--muted)}
+html.tpl-plain .navbtn[aria-selected="true"]:not(.nav-done){color:var(--fg)!important;background:var(--card2)!important;box-shadow:none!important;text-shadow:none!important}
+html.tpl-plain .navbtn svg{filter:none!important}
+html.tpl-plain :is(.tile b,h1,h2,.ph span,b,.big){text-shadow:none!important}
+html.tpl-plain .pill{color:var(--fg)!important;border-color:var(--line)!important;background:var(--card2)!important;box-shadow:none!important}
+html.tpl-plain :is(input,select,textarea){background:var(--bg0)!important;border-color:var(--line)!important;box-shadow:none!important;color:var(--fg)}
+html.tpl-plain :is(.btn,button.btn){background:var(--card2)!important;border-color:var(--line)!important;box-shadow:none!important;color:var(--fg)!important}
+html.tpl-plain .btn.primary,html.tpl-plain .seg2 [aria-pressed="true"],html.tpl-plain [role="tab"][aria-selected="true"]:not(.navbtn){background:var(--accent)!important;color:#0b0b0c!important;box-shadow:none!important;border-color:transparent!important;text-shadow:none!important}
+html.tpl-plain .seg2{background:var(--bg0)!important;border-color:var(--line)!important;box-shadow:none!important}
+html.tpl-plain #bgimg,html.tpl-plain #bgimg2,html.tpl-plain #bglive,html.tpl-plain .bgshade,html.tpl-plain #bubbles,html.tpl-plain .bubbles{visibility:hidden!important}
+html.tpl-plain .week,html.tpl-plain .psched .week{background:var(--bg0)!important;box-shadow:inset 0 0 0 1px var(--line)!important}
+.tpl-pv-plain{background:#121212}.tpl-pv-midnight{background:#0b1120}.tpl-pv-slate{background:#1d2229}
+.tpl-pv-plain i,.tpl-pv-midnight i,.tpl-pv-slate i{position:absolute;left:12%;right:12%;height:16px;border-radius:5px;background:#1c1c1e;border:1px solid #2c2c30}
+.tpl-pv-midnight i{background:#121a2c;border-color:#22304d}.tpl-pv-slate i{background:#262c35;border-color:#39414d}
+.tpl-pv-plain i:nth-child(1),.tpl-pv-midnight i:nth-child(1),.tpl-pv-slate i:nth-child(1){top:16%;right:52%}
+.tpl-pv-plain i:nth-child(2),.tpl-pv-midnight i:nth-child(2),.tpl-pv-slate i:nth-child(2){top:16%;left:52%}
+.tpl-pv-plain i:nth-child(3),.tpl-pv-midnight i:nth-child(3),.tpl-pv-slate i:nth-child(3){top:42%;height:40px}
+.tpl-pv-plain em,.tpl-pv-midnight em,.tpl-pv-slate em{position:absolute;bottom:12%;width:22%;height:8px;border-radius:4px;left:12%;background:#8ab4ff}
+.tpl-pv-midnight em{background:#5b9dff}.tpl-pv-slate em{background:#7cc4b8}
+.tpl-pv-plain em+em,.tpl-pv-midnight em+em,.tpl-pv-slate em+em{left:38%;background:#3a3a40;width:18%}
 /* builder's note: tabs marked finished glow light green */
 .navbtn.nav-done{color:#c4ffdc!important;text-shadow:0 0 8px rgba(120,255,180,.95),0 0 18px rgba(90,255,160,.7);box-shadow:inset 0 0 0 1.5px rgba(140,255,190,.85),0 0 22px rgba(90,255,160,.55),inset 0 0 14px rgba(90,255,160,.18);background:rgba(90,255,160,.1)!important;border-radius:12px}.navbtn.nav-done svg{color:#c4ffdc;filter:drop-shadow(0 0 4px rgba(120,255,180,1)) drop-shadow(0 0 9px rgba(90,255,160,.8))}
 .bc-cal{position:relative;overflow:hidden;color:rgb(var(--tL))!important;border-color:rgba(var(--tL),.6)!important;background:rgba(var(--tL),.12)!important;box-shadow:0 0 12px rgba(var(--tL),.3)}.bc-cal svg{filter:drop-shadow(0 0 4px rgba(var(--tL),.6))}
@@ -6897,16 +6928,20 @@ const spaFx={raf:0,run(){if(this.raf)return;const c=document.getElementById("tpl
   stop(){cancelAnimationFrame(this.raf);this.raf=0}};
 /* earlier: silk ribbons (v411), kaleidoscope trails (v410), black smoke (v405–v408) are in git history */
 /* earlier versions (kaleidoscope streaks, black smoke) are in git history (v405–v410) */
-const TEMPLATES=[{id:"spa",name:"Spa",sub:"Warm orange ambience, soft glass, slow glow",look:{color:"orange",glass:4,tone:42},bg:true}];
+const TEMPLATES=[{id:"spa",name:"Spa",sub:"Warm orange ambience, soft glass, slow glow",look:{color:"orange",glass:4,tone:42},bg:true},
+  /* plain, flat themes like an everyday app (Copilot-style): solid cards, no glow, no wallpaper */
+  {id:"plain",name:"Plain dark",sub:"Flat charcoal, quiet and simple",look:{color:"graphite",glass:0,tone:50},bg:true,plain:true},
+  {id:"midnight",name:"Midnight",sub:"Flat deep navy, clean blue accents",look:{color:"blue",glass:0,tone:50},bg:true,plain:true},
+  {id:"slate",name:"Slate",sub:"Soft grey-blue, low contrast, easy on the eyes",look:{color:"graphite",glass:0,tone:50},bg:true,plain:true}];
 const tplOf=()=>TEMPLATES.find(t=>t.id===(data.profile||{}).template)||null;
 const tplBgOn=()=>{const t=tplOf();return !!(t&&t.bg&&(data.profile||{}).tplBg!==false)};
 const effLook=()=>{const g=lookOf(),pl=passLook()||{},T=tplOf();if(T)return Object.assign({color:g.color,glass:g.glass,trans:g.trans,tone:g.tone??50},T.look);return {color:pl.color||g.color,glass:pl.glass??g.glass,trans:pl.trans??g.trans,tone:pl.tone??g.tone??50}};
 function applyLook(tmp){tmp=typeof tmp==="number"?{glass:tmp}:(tmp||{});const L=effLook(),g=(tmp.glass??L.glass)/100,t=(tmp.trans??L.trans)/100,r=document.documentElement.style;toneNow=(tmp.tone??L.tone)/100;r.setProperty("--go",(1-t*.88).toFixed(3));r.setProperty("--gb",(4+g*24).toFixed(1)+"px");
-  if(L.color==="auto"){const w=passWall()||wallOf();sampleColor(w.src).then(c=>{if(effLook().color==="auto"&&(passWall()||wallOf()).src===w.src)setTint(c.h,c.s)})}else{const P=LOOKS.find(x=>x.id===L.color)||LOOKS[0];setTint(P.h,P.s,P.l)}document.documentElement.classList.toggle("lk-orange",L.color==="orange");{const T=tplOf(),h=document.documentElement;TEMPLATES.forEach(x=>h.classList.toggle("tpl-"+x.id,!!T&&T.id===x.id));h.classList.toggle("tpl-bg",tplBgOn());spaFx.stop()/* lines off for now; was: if(tplBgOn())spaFx.run() */}}
+  if(L.color==="auto"){const w=passWall()||wallOf();sampleColor(w.src).then(c=>{if(effLook().color==="auto"&&(passWall()||wallOf()).src===w.src)setTint(c.h,c.s)})}else{const P=LOOKS.find(x=>x.id===L.color)||LOOKS[0];setTint(P.h,P.s,P.l)}document.documentElement.classList.toggle("lk-orange",L.color==="orange");{const T=tplOf(),h=document.documentElement;TEMPLATES.forEach(x=>h.classList.toggle("tpl-"+x.id,!!T&&T.id===x.id));h.classList.toggle("tpl-plain",!!T&&!!T.plain);h.classList.toggle("tpl-bg",tplBgOn());spaFx.stop()/* lines off for now; was: if(tplBgOn())spaFx.run() */}}
 function tplPanel(){const T=tplOf();return `<div class="panel tplp" style="margin-top:18px"><div class="ph"><span>Templates</span><i>${T?esc(T.name)+" is on":"Whole-page looks"}</i></div>
   <p class="note" style="margin:-2px 0 12px">A template restyles the whole app at once: colours, glass, type and its own backdrop. Your wallpaper and Boxes settings stay saved and come back when you switch it off.</p>
   <div class="tpl-row"><button type="button" class="tpl-c tpl-none" data-tpl="" aria-pressed="${!T}"><span class="tpl-pv"><span>Your own setup</span></span><b>None</b><small>Wallpaper and Boxes as you set them</small></button>${TEMPLATES.map(t=>`<button type="button" class="tpl-c" data-tpl="${t.id}" aria-pressed="${!!T&&T.id===t.id}"><span class="tpl-pv tpl-pv-${t.id}"><i></i><i></i><i></i><em></em><em></em></span><b>${esc(t.name)}</b><small>${esc(t.sub)}</small></button>`).join("")}</div>
-  ${T&&T.bg?`<div class="tpl-opt"><span>Backdrop</span><div class="seg2" role="group" aria-label="Backdrop"><button type="button" data-tplbg="1" aria-pressed="${tplBgOn()}">${esc(T.name)} glow</button><button type="button" data-tplbg="0" aria-pressed="${!tplBgOn()}">My wallpaper</button></div></div>`:""}</div>`}
+  ${T&&T.bg?`<div class="tpl-opt"><span>Backdrop</span><div class="seg2" role="group" aria-label="Backdrop"><button type="button" data-tplbg="1" aria-pressed="${tplBgOn()}">${T.plain?"Plain "+esc(T.name.replace(/^Plain /,"").toLowerCase())+" background":esc(T.name)+" glow"}</button><button type="button" data-tplbg="0" aria-pressed="${!tplBgOn()}">My wallpaper</button></div></div>`:""}</div>`}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tpl],[data-tplbg]");if(!b)return;e.preventDefault();e.stopPropagation();data.profile=data.profile||{};
   if(b.dataset.tplbg!=null){data.profile.tplBg=b.dataset.tplbg==="1"}else{const id=b.dataset.tpl;if(id)data.profile.template=id;else delete data.profile.template;toast(id?(TEMPLATES.find(t=>t.id===id)||{}).name+" template on":"Back to your own setup")}
   render();save()},true);
@@ -7205,7 +7240,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="485",APPT="2026-11-22T04:30:00Z";   /* APPT: when this update was made */
+const APPV="486",APPT="2026-11-22T04:54:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
