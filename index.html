@@ -2086,10 +2086,14 @@ html.phone #view .dstack .dtile>b{font-size:15px!important;align-self:end}
 html.phone #view .dstack .dtile>small{font-size:12px!important;align-self:start;line-height:1.25;text-align:left}
 html.phone #view .dstack .dtile .dview{position:absolute;inset:0;opacity:0;font-size:0;border:0;background:none;padding:0;margin:0}
 /* Dashboard "This week": day over date, empty days just blank */
-html.phone #view .wa-h{display:flex!important;flex-direction:column;align-items:center;gap:0;font-size:11px!important;text-transform:uppercase;letter-spacing:.04em}
-html.phone #view .wa-h small{font-size:16px!important;font-weight:700;letter-spacing:0}
-html.phone #view .wa-none{font-size:0!important}html.phone #view .wa-none::after{content:"·";font-size:18px;opacity:.35}
-html.phone #view .wa-grid{min-height:0!important}
+/* Dashboard "This week": one row per day — day on the left, what's on beside it */
+html.phone #view .wa-grid{grid-template-columns:minmax(0,1fr)!important;min-height:0!important}
+html.phone #view .wa-day{grid-template-columns:72px minmax(0,1fr)!important;align-items:center;align-content:center;gap:0 10px!important;min-height:46px!important;padding:6px 12px!important;border-left:0!important;border-top:1px solid rgba(var(--lr),.14)}
+html.phone #view .wa-day:first-child{border-top:0}
+html.phone #view .wa-day>:not(.wa-h){grid-column:2}
+html.phone #view .wa-h{grid-column:1;grid-row:1/span 9;display:flex!important;align-items:baseline;gap:6px;justify-content:flex-start;border:0!important;padding:0!important;font-size:14px!important}
+html.phone #view .wa-h small{font-size:14px!important;opacity:.7}
+html.phone #view .wa-none{font-size:13px!important;opacity:.45;text-align:left}
 /* Dashboard month header: title on one line */
 html.phone #view .calhead h2{font-size:19px!important;white-space:nowrap}html.phone #view .calhead .calnav{padding-left:10px!important;padding-right:10px!important}
 html.phone #view .calhead{gap:8px!important}
@@ -6005,7 +6009,7 @@ float musAt(vec3 c,out float ed,out float dep,out vec3 mc){float id=-1.;ed=99.;d
   const PH=document.documentElement.classList.contains("phone");
   /* phones: hold the figure still while the page is being scrolled, so scrolling stays smooth */
   let scrollT=0;if(PH)document.addEventListener("scroll",()=>{scrollT=performance.now()},{capture:true,passive:true});
-  function frame(now){raf=requestAnimationFrame(frame);if(!host||!host.isConnected){stop();return}if(!onScreen||document.hidden)return;if(PH&&now-scrollT<180)return;if(now-last<(PH?33:24))return;last=now;size();
+  function frame(now){raf=requestAnimationFrame(frame);if(!host||!host.isConnected){stop();return}if(!onScreen||document.hidden)return;if(PH&&now-scrollT<180)return;if(now-last<(PH?33:24))return;/* phones: the figure turns slowly on its own (a drag still spins it by hand) */if(PH&&typeof holoRot==="number"&&!holoDrag&&Math.abs(holoV)<.06&&last)holoRot=(holoRot+Math.min(100,now-last)*.025)%360;last=now;size();
     const t=(now-t0)/1000;U.t.value=t;U.flick.value=cur==="holo"?(Math.random()<.03?.55:1):1;
     wingsNow.forEach(w=>{w.rotation.y=w.userData.wing*(-.45-Math.sin(t*1.3)*.1)});
     if(flag){const c=flag.userData.cloth,pa=c.geometry.attributes.position,r=flag.userData.rest;for(let i=0;i<pa.count;i++){const x0=r[i*3];pa.setZ(i,Math.sin(x0*11-t*3.2)*.035*(x0/.46));pa.setY(i,r[i*3+1]+Math.sin(x0*7-t*2.4)*.01*(x0/.46))}pa.needsUpdate=true}
@@ -7437,7 +7441,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="496",APPT="2026-11-22T21:13:00Z";   /* APPT: when this update was made */
+const APPV="497",APPT="2026-11-22T21:17:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
