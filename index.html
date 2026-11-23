@@ -8166,7 +8166,7 @@ function tplPanel(){const T=tplOf();return `<div class="panel tplp" style="margi
     const row=(id,lab,v,min,max)=>`<div class="gap-row"><span class="gap-lab">${lab}</span><input type="range" min="${min}" max="${max}" step="1" value="${v}" data-gapsl="${id}" aria-label="${lab}"><b data-gapval="${id}">${v}px</b></div>`;
     return `<div class="tpl-opt tpl-opt-col"><span>Spacing</span><div class="gap-box">
       <label class="gap-link"><input type="checkbox" data-gaplink ${lk?"checked":""}> Link</label>
-      ${lk?row("all","Spacing",gi,0,40):row("in","Between panels",gi,0,40)+row("out","Screen edges",go,0,48)}
+      ${lk?row("all","Gap &amp; margins",gi,0,40):row("in","Gap",gi,0,40)+row("out","Margins",go,0,48)}
       <button type="button" class="gap-reset" data-gapreset>Reset</button></div></div>`})()}
   <div class="tpl-opt"><span>Corners</span><div class="seg2" role="group" aria-label="Panel corners"><button type="button" data-tplsharp="0" aria-pressed="${(data.profile||{}).tplSharp!==true}">Rounded</button><button type="button" data-tplsharp="1" aria-pressed="${(data.profile||{}).tplSharp===true}">Sharp</button></div></div>
   <div class="tpl-opt"><span>Side &amp; top bars</span><div class="seg2" role="group" aria-label="Side and top bars">${T?"":`<button type="button" data-tplbars="" aria-pressed="${!(data.profile||{}).tplBars}">Original</button>`}<button type="button" data-tplbars="panel" aria-pressed="${T?(data.profile||{}).tplBars!=="clear":(data.profile||{}).tplBars==="panel"}">Panel color</button><button type="button" data-tplbars="clear" aria-pressed="${(data.profile||{}).tplBars==="clear"}">No color</button></div></div>`:""}</div>`}
@@ -8482,7 +8482,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="575",APPT="2026-11-23T05:14:07Z";   /* APPT: when this update was made */
+const APPV="576",APPT="2026-11-23T05:16:53Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
