@@ -2317,6 +2317,7 @@ html.phone .tkd-theater,html.phone .tkd-theater>.tkd-pane{height:min(1000px,72vh
 #attCmp.ro .acmp-trim,#attCmp.ro .acmp-mir,#attCmp.ro .acmp-pick,#attCmp.ro [data-cmpgo="align"],#attCmp.ro [data-cmpgo="alignreset"],#attCmp.ro [data-cmpgo="lock"],#attCmp.ro [data-cmpgo="savealign"],#attCmp.ro .acmp-hint{display:none!important}
 .tkd-full{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border:0;background:#2f6fec;color:#fff;font:700 12.5px inherit;font-family:inherit;cursor:pointer;margin-left:6px}
 .tkd-fs{position:absolute;z-index:4;top:10px;right:10px;width:38px;height:38px;display:grid;place-items:center;cursor:pointer;color:#f2ede6;background:rgba(8,6,6,.55);border:1px solid rgba(255,255,255,.18);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.att-lost{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 10px;padding:10px 12px;border:1px solid #ffb547;background:rgba(255,181,71,.1);font-size:13px}.att-lost b{flex:1;min-width:200px;color:#ffd38a}.att-lost .btn{margin:0;padding:8px 14px}
 /* add + compare: one slim icon row */
 .att-tools{display:flex;align-items:center;gap:3px;margin-top:3px}
 .att-ic{position:relative;display:grid;place-items:center;width:40px;height:34px;padding:0;border:0;border-radius:0;cursor:pointer;color:var(--fg);background:rgba(var(--lr),.1);transition:background .15s}
@@ -6801,6 +6802,8 @@ const MDB={db:null,open(){return this.db||(this.db=new Promise((ok,no)=>{try{con
   async put(k,v){try{const rec=v instanceof Blob?{t:v.type||"",b:await v.arrayBuffer()}:v;const db=await this.open();await new Promise((ok,no)=>{const x=db.transaction("f","readwrite");x.objectStore("f").put(rec,k);x.oncomplete=ok;x.onerror=()=>no(x.error)})}catch(e){}},
   async get(k){try{const db=await this.open();const r=await new Promise(ok=>{const q=db.transaction("f").objectStore("f").get(k);q.onsuccess=()=>ok(q.result||null);q.onerror=()=>ok(null)});
     if(!r)return null;if(r.b)return new Blob([r.b],{type:r.t||""});if(r instanceof Blob){const b=new Blob([await r.arrayBuffer()],{type:r.type||""});this.put(k,b);return b}return null}catch(e){return null}},
+  async keys(){try{const db=await this.open();return await new Promise(ok=>{const q=db.transaction("f").objectStore("f").getAllKeys();q.onsuccess=()=>ok(q.result||[]);q.onerror=()=>ok([])})}catch(e){return []}},
+  async rec(k){try{const db=await this.open();return await new Promise(ok=>{const q=db.transaction("f").objectStore("f").get(k);q.onsuccess=()=>ok(q.result||null);q.onerror=()=>ok(null)})}catch(e){return null}},
   async del(k){try{const db=await this.open();db.transaction("f","readwrite").objectStore("f").delete(k)}catch(e){}}};
 const attURLs=new Map();
 async function attURL(a){if(attURLs.has(a.id))return attURLs.get(a.id);let blob=await MDB.get(a.id);
@@ -6874,7 +6877,8 @@ function attHtml(t){const A=t.att||[];
   const PLAY='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="rgba(0,0,0,.55)"/><path d="M10 8l6 4-6 4z" fill="#fff"/></svg>';
   const tile=a=>{const inner=attThumb(a);
     return `<div class="att-t"><button type="button" class="att-open" data-attview="${t.id}:${a.id}" aria-label="Open ${a.kind==="img"?"photo":a.kind==="vid"?"video":"YouTube video"}">${inner}</button><button type="button" class="att-x" data-attdel="${t.id}:${a.id}" aria-label="Remove">×</button></div>`};
-  return `<div class="att"><div class="att-h">${CLIP}<span>Media</span>${A.length?`<small>${A.length}</small>`:""}</div>
+  const lost=attLost&&attLost.length?`<div class="att-lost"><b>${attLost.length} video${attLost.length>1?"s":""}/photo${attLost.length>1?"s":""} found on this device that aren't in any task.</b><button type="button" class="btn" data-attrecover="${t.id}">Put them back in this task</button></div>`:"";
+  return lost+`<div class="att"><div class="att-h">${CLIP}<span>Media</span>${A.length?`<small>${A.length}</small>`:""}</div>
     ${A.length?(()=>{const cur=A.find(a=>a.id===attSel[t.id])||A[0],i=A.indexOf(cur);
       return `<div class="att-theater"><div class="att-stage" data-atttid="${t.id}"><div class="att-slot" data-attstage="${t.id}:${cur.id}"></div>
         ${A.length>1?`<span class="att-dots" aria-hidden="true">${A.map(a=>`<i${a.id===cur.id?' class="on"':""}></i>`).join("")}</span>`:""}
@@ -6908,7 +6912,15 @@ const attFind=id=>{for(const p of data.passions||[])for(const tk of p.tasks||[])
 /* side bar + top bar wear the exact colour of the panels: copy it from a real panel on screen */
 function barsSync(){const h=document.documentElement;if(!h.classList.contains("tpl-bars-pan"))return;const pn=document.querySelector("#view .panel:not(.kpan):not(.holopanel):not(.wallp)")||document.querySelector("#view .panel");if(!pn)return;
   const c=getComputedStyle(pn),r=h.style;r.setProperty("--bar-bg",c.backgroundColor);r.setProperty("--bar-bi",c.backgroundImage==="none"?"none":c.backgroundImage);const bf=c.backdropFilter||c.webkitBackdropFilter||"none";r.setProperty("--bar-bf",bf)}
-function attHydrate(){barsSync();try{tkDoneHydrate()}catch(_){}attStages();document.querySelectorAll("img[data-attposter]").forEach(el=>{if(el.src||el.dataset.pw)return;el.dataset.pw=1;const a=attFind(el.dataset.attposter);if(a)attPoster(a).then(u=>{if(u)el.src=u;else el.closest(".att-t")&&el.closest(".att-t").classList.add("noposter")})});document.querySelectorAll("[data-attsrc]").forEach(el=>{if(el.src)return;const id=el.dataset.attsrc;const t=[...document.querySelectorAll("[data-attview]")].length;
+/* safety net: files saved on this device that no task points to any more (e.g. after a sync replaced the task list) */
+let attLost=null,attLostBusy=false;
+async function attScanLost(){if(attLostBusy)return;attLostBusy=true;try{const used=new Set();(data.passions||[]).forEach(p=>(p.tasks||[]).forEach(t=>(t.att||[]).forEach(a=>used.add(a.id))));
+  const ks=(await MDB.keys()).filter(k=>typeof k==="string"&&!k.includes(":")&&!used.has(k)),out=[];
+  for(const k of ks){const r=await MDB.rec(k);const ty=r&&(r.t||r.type)||"";if(!r)continue;out.push({id:k,type:ty,kind:/^video\//.test(ty)?"vid":"img"})}
+  const was=JSON.stringify(attLost);attLost=out;if(was!==JSON.stringify(out)&&document.querySelector(".att"))render()}finally{attLostBusy=false}}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-attrecover]");if(!b||!attLost)return;e.preventDefault();e.stopPropagation();const t=findTaskAny(b.dataset.attrecover);if(!t)return;
+  t.att=t.att||[];attLost.forEach(x=>{t.att.push({id:x.id,kind:x.kind,type:x.kind==="vid"?(x.type||"video/mp4"):"image/jpeg",at:Date.now(),name:"Recovered"})});const n=attLost.length;attLost=[];save();render();toast(n+" put back")},true);
+function attHydrate(){barsSync();if(document.querySelector(".att"))setTimeout(attScanLost,300);try{tkDoneHydrate()}catch(_){}attStages();document.querySelectorAll("img[data-attposter]").forEach(el=>{if(el.src||el.dataset.pw)return;el.dataset.pw=1;const a=attFind(el.dataset.attposter);if(a)attPoster(a).then(u=>{if(u)el.src=u;else el.closest(".att-t")&&el.closest(".att-t").classList.add("noposter")})});document.querySelectorAll("[data-attsrc]").forEach(el=>{if(el.src)return;const id=el.dataset.attsrc;const t=[...document.querySelectorAll("[data-attview]")].length;
   for(const p of data.passions||[])for(const tk of p.tasks||[]){const a=(tk.att||[]).find(x=>x.id===id);if(a){attURL(a).then(u=>{if(u){el.src=u+(a.kind==="vid"?"#t="+((a.t0||0)+0.1).toFixed(1):"")}else el.closest(".att-t")&&el.closest(".att-t").classList.add("missing")});return}}});
   if(attView){const [tid,aid]=attView.split(":"),t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);let v=document.getElementById("attViewer");
     if(!a){attView=null;v&&v.remove();return}
@@ -8413,7 +8425,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="568",APPT="2026-11-23T04:40:00Z";   /* APPT: when this update was made */
+const APPV="569",APPT="2026-11-23T04:48:28Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
