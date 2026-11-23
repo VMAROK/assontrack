@@ -1389,8 +1389,10 @@ html.tpl-spa{--cyan:#ffb468;--fg:#fbeee2;--muted:#c9a991}
 /* template variation: panels darker than the wallpaper (a dark film over each panel, keeps the theme's colours and glow) */
 /* template variation: panel borders — none / light / dark (theme's own when unset) */
 html.tpl-bd-none.tpl-bd-none .panel:not(.kpan){border-color:transparent!important}
-html.tpl-bd-none.tpl-bd-none aside{border-right-color:transparent!important}
-html.tpl-bd-dark.tpl-bd-dark aside{border-right-color:rgba(0,0,0,.7)!important}
+html.tpl-bd-none.tpl-bd-none aside{border-color:transparent!important}
+html.tpl-bd-none.tpl-bd-none header,html.tpl-bd-none.tpl-bd-none .topbar{border-bottom-color:transparent!important}
+html.tpl-bd-dark.tpl-bd-dark aside{border-color:rgba(0,0,0,.7)!important}
+html.tpl-bd-dark.tpl-bd-dark header,html.tpl-bd-dark.tpl-bd-dark .topbar{border-bottom-color:rgba(0,0,0,.7)!important}
 html.tpl-bd-light.tpl-bd-light .panel:not(.kpan){border:1px solid rgba(255,255,255,.34)!important}
 html.tpl-bd-dark.tpl-bd-dark .panel:not(.kpan){border:1px solid rgba(0,0,0,.7)!important}
 html.tpl-bd-none .panel::before,html.tpl-bd-none .panel::after,html.tpl-bd-light .panel::before,html.tpl-bd-light .panel::after,html.tpl-bd-dark .panel::before,html.tpl-bd-dark .panel::after{display:none!important}
@@ -8084,7 +8086,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="536",APPT="2026-11-23T00:37:47Z";   /* APPT: when this update was made */
+const APPV="537",APPT="2026-11-23T00:49:50Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
