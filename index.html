@@ -7204,7 +7204,7 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
     const c=w&&w.querySelector(".acmp-ctl");if(c){const h=document.createElement("div");h.innerHTML=`<button type="button" class="att-b acmp-al${attCmp.align?" on":""}" data-cmpgo="align" aria-pressed="${attCmp.align}">✥ Align</button>${attCmp.align?`<button type="button" class="att-b" data-cmpgo="alignreset">Reset</button>`:""}`;
       c.querySelectorAll('[data-cmpgo="align"],[data-cmpgo="alignreset"]').forEach(x=>x.remove());{const sv=c.querySelector(".acmp-sv");[...h.children].forEach(x=>c.insertBefore(x,sv))}const box=w.querySelector(".acmp-box");let hint=box.querySelector(".acmp-hint");if(attCmp.align&&!hint)box.insertAdjacentHTML("beforeend",`<p class="acmp-hint">Drag a video to move it · pinch (or scroll) to zoom · tap Align again when they line up</p>`);if(!attCmp.align&&hint)hint.remove()}
     cmpStyle()}},true);
-let cmpDragAt=0;
+let cmpDragAt=0;const CMP_ZMAX=15;   /* how far you can zoom in compare (was 5×) */
 /* jump a side forward/back, inside its trim, keeping it playing or paused as it was */
 function cmpJump(side,n){const v=document.querySelector(`#attCmp video[data-cmpv="${side}"]`);if(!v||!v.duration)return;const it=cmpPool(attCmp.tid).find(x=>x.a.id===attCmp[side]),a=it&&it.a||{};
   const lo=a.t0||0,hi=a.t1!=null?a.t1:v.duration;v.currentTime=Math.max(lo,Math.min(hi-0.05,v.currentTime+n));
@@ -7227,12 +7227,12 @@ document.addEventListener("touchmove",e=>{if(e.touches.length>1&&e.target.closes
     else if(attCmp.align||t.s>1.01){if(attCmp.align)e.preventDefault();startPan(side,e.clientX,e.clientY)}},true);
   document.addEventListener("pointermove",e=>{if(!d||!P.has(e.pointerId))return;P.set(e.pointerId,{x:e.clientX,y:e.clientY,side:P.get(e.pointerId).side});const t=attCmp.tf[d.side];
     if(d.pinch){const q=pts(d.side);if(q.length<2)return;e.preventDefault();const [a,b]=q,mx=(a.x+b.x)/2,my=(a.y+b.y)/2,c=ctr(d.side);
-      t.s=Math.max(attCmp.align?.5:1,Math.min(5,d.s0*Math.hypot(a.x-b.x,a.y-b.y)/d.d0));t.x=mx-c.x-t.s*d.qx;t.y=my-c.y-t.s*d.qy;cmpDragAt=Date.now()}
+      t.s=Math.max(attCmp.align?.5:1,Math.min(CMP_ZMAX,d.s0*Math.hypot(a.x-b.x,a.y-b.y)/d.d0));t.x=mx-c.x-t.s*d.qx;t.y=my-c.y-t.s*d.qy;cmpDragAt=Date.now()}
     else{const dx=e.clientX-d.x0,dy=e.clientY-d.y0;if(!d.moved&&Math.hypot(dx,dy)<5)return;d.moved=true;e.preventDefault();t.x=d.tx+dx;t.y=d.ty+dy;cmpDragAt=Date.now()}
     if(!attCmp.align&&t.s<=1.01){t.s=1;t.x=0;t.y=0}cmpStyle()},true);
   const up=e=>{P.delete(e.pointerId);if(!P.size){d=null;return}if(d&&d.pinch){const q=[...P.values()].filter(x=>x.side===d.side);if(q.length===1&&(attCmp.align||attCmp.tf[d.side].s>1.01))startPan(d.side,q[0].x,q[0].y);else d=null}};
   document.addEventListener("pointerup",up,true);document.addEventListener("pointercancel",up,true);
-  document.addEventListener("wheel",e=>{if(!attCmp||!attCmp.align||attCmp.lock)return;const m=e.target.closest&&e.target.closest("#attCmp .acmp-m");if(!m)return;e.preventDefault();const t=attCmp.tf[m.closest(".acmp-p").dataset.side];t.s=Math.max(.5,Math.min(4,t.s*(e.deltaY<0?1.06:1/1.06)));cmpStyle()},{passive:false})})();
+  document.addEventListener("wheel",e=>{if(!attCmp||!attCmp.align||attCmp.lock)return;const m=e.target.closest&&e.target.closest("#attCmp .acmp-m");if(!m)return;e.preventDefault();const t=attCmp.tf[m.closest(".acmp-p").dataset.side];t.s=Math.max(.5,Math.min(CMP_ZMAX,t.s*(e.deltaY<0?1.06:1/1.06)));cmpStyle()},{passive:false})})();
 /* the only ways out of compare: the × or a hard swipe up. The window follows the finger and glides away;
    if something changed and wasn't saved, it asks first */
 function cmpDirty(){return !!attCmp&&attCmp.base!=null&&cmpSnap()!==attCmp.base}
@@ -8354,7 +8354,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="560",APPT="2026-11-23T03:46:30Z";   /* APPT: when this update was made */
+const APPV="561",APPT="2026-11-23T03:52:20Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
