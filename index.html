@@ -2220,6 +2220,9 @@ html.phone .att-strip .att-t{flex-basis:110px}
 .pt-info{display:flex;justify-content:space-between;align-items:center;min-height:34px}
 .pt-len{font:600 13px var(--mono);color:#ffd23f}
 .pt-all{font-size:14px;color:rgba(255,255,255,.8)}
+.att-peek{position:absolute;inset:0;z-index:2;background:#000;will-change:transform}.att-peek img{width:100%;height:100%;object-fit:contain;display:block}
+.att-slot{will-change:transform}.att-stage.swiping .att-slot{z-index:2}
+.att-stage{touch-action:pan-y}
 /* add + compare: one slim icon row */
 .att-tools{display:flex;align-items:center;gap:3px;margin-top:3px}
 .att-ic{position:relative;display:grid;place-items:center;width:40px;height:34px;padding:0;border:0;border-radius:0;cursor:pointer;color:var(--fg);background:rgba(var(--lr),.1);transition:background .15s}
@@ -6680,13 +6683,42 @@ function attStageEl(tid,a){const k=tid+":"+a.id;if(attStageEls.has(k))return att
       if(a.t1!=null){m.addEventListener("loadedmetadata",()=>{try{m.currentTime=a.t0||0}catch(_){}},{once:true});m.addEventListener("timeupdate",()=>{if(m.currentTime>=a.t1){m.pause();m.currentTime=a.t0||0}})}
       m.load()})}
   attStageEls.set(k,w);return w}
-/* swipe the big player left/right to go to the next/previous item (like the portfolio covers) */
+/* swipe the big player left/right: the picture follows your finger and the next one slides in (like the portfolio covers)
+   old version (jumped on release), kept for reference:
+/* swipe the big player left/right to go to the next/previous item (like the portfolio covers) * /
 (()=>{let sx=null,sy=0,st=null;
   document.addEventListener("touchstart",e=>{const g=e.target.closest&&e.target.closest(".att-stage");if(!g||e.touches.length>1){sx=null;return}const r=g.getBoundingClientRect(),y=e.touches[0].clientY;if(y>r.bottom-56){sx=null;return}sx=e.touches[0].clientX;sy=y;st=g},{passive:true});
   document.addEventListener("touchend",e=>{if(sx==null||!st)return;const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;sx=null;if(Math.abs(dx)<45||Math.abs(dx)<Math.abs(dy)*1.3)return;
     const tid=st.dataset.atttid,tk=findTaskAny(tid);if(!tk)return;const A=tk.att||[];if(A.length<2)return;const cur=A.findIndex(a=>a.id===(attSel[tid]||A[0].id));const nx=A[(Math.max(0,cur)+(dx<0?1:-1)+A.length)%A.length];
     st.querySelectorAll("video").forEach(v=>v.pause());attSel[tid]=nx.id;render()},{passive:true})})();
-function attStages(){document.querySelectorAll(".att-strip").forEach(sp=>{const on=sp.querySelector(".att-t.on");if(!on)return;const l=on.offsetLeft-sp.offsetLeft,r=l+on.offsetWidth;if(l<sp.scrollLeft||r>sp.scrollLeft+sp.clientWidth)sp.scrollLeft=Math.max(0,l-(sp.clientWidth-on.offsetWidth)/2)});
+*/
+(()=>{let g=null;
+  const peekSrc=a=>a.kind==="yt"?Promise.resolve(`https://i.ytimg.com/vi/${ytId(a.url)}/hqdefault.jpg`):a.kind==="vid"?attPoster(a):attURL(a);
+  const mkPeek=(st,a,side)=>{const d=document.createElement("div");d.className="att-peek";d.style.transform=`translate3d(${side*100}%,0,0)`;const im=document.createElement("img");im.alt="";d.appendChild(im);
+    peekSrc(a).then(u=>{if(u)im.src=u});st.appendChild(d);return d};
+  document.addEventListener("touchstart",e=>{const st=e.target.closest&&e.target.closest(".att-stage");if(!st||e.touches.length>1||g)return;
+    const r=st.getBoundingClientRect(),t=e.touches[0];if(t.clientY>r.bottom-56)return;   // leave the video's own timeline alone
+    const tid=st.dataset.atttid,tk=findTaskAny(tid),A=(tk&&tk.att)||[];if(A.length<2)return;
+    const ci=Math.max(0,A.findIndex(a=>a.id===(attSel[tid]||A[0].id)));
+    g={st,tid,A,ci,x0:t.clientX,y0:t.clientY,t0:performance.now(),dx:0,axis:null,w:r.width,cur:st.querySelector(".att-slot"),pv:null,nx:null}},{passive:true});
+  document.addEventListener("touchmove",e=>{if(!g)return;const t=e.touches[0],dx=t.clientX-g.x0,dy=t.clientY-g.y0;
+    if(!g.axis){if(Math.abs(dx)<6&&Math.abs(dy)<6)return;g.axis=Math.abs(dx)>Math.abs(dy)?"x":"y";if(g.axis==="y"){g=null;return}
+      const n=g.A.length;g.pv=mkPeek(g.st,g.A[(g.ci-1+n)%n],-1);g.nx=mkPeek(g.st,g.A[(g.ci+1)%n],1);g.st.classList.add("swiping");
+      g.st.querySelectorAll("video").forEach(v=>v.pause())}
+    e.preventDefault();g.dx=dx;const p=dx/g.w*100;
+    g.cur.style.transform=`translate3d(${p}%,0,0)`;g.pv.style.transform=`translate3d(${p-100}%,0,0)`;g.nx.style.transform=`translate3d(${p+100}%,0,0)`},{passive:false});
+  const end=()=>{if(!g)return;const G=g;g=null;if(G.axis!=="x")return;
+    const fast=Math.abs(G.dx)/Math.max(1,performance.now()-G.t0)>0.35,go=Math.abs(G.dx)>G.w*0.22||(fast&&Math.abs(G.dx)>20),d=G.dx<0?1:-1;
+    const E="transform .32s cubic-bezier(.22,.61,.36,1)";[G.cur,G.pv,G.nx].forEach(el=>el.style.transition=E);
+    if(go){G.cur.style.transform=`translate3d(${-d*100}%,0,0)`;(d>0?G.nx:G.pv).style.transform="translate3d(0,0,0)";(d>0?G.pv:G.nx).style.transform=`translate3d(${d>0?-200:200}%,0,0)`}
+    else{G.cur.style.transform="translate3d(0,0,0)";G.pv.style.transform="translate3d(-100%,0,0)";G.nx.style.transform="translate3d(100%,0,0)"}
+    setTimeout(()=>{G.st.classList.remove("swiping");G.cur.style.transition="";G.cur.style.transform="";
+      if(go){const n=G.A.length;attSel[G.tid]=G.A[(G.ci+d+n)%n].id;render()}else{G.pv.remove();G.nx.remove()}},330)};
+  document.addEventListener("touchend",end,{passive:true});document.addEventListener("touchcancel",end,{passive:true})})();
+
+function attWarm(){document.querySelectorAll(".att-stage[data-atttid]").forEach(st=>{const tk=findTaskAny(st.dataset.atttid),A=(tk&&tk.att)||[];if(A.length<2)return;const ci=Math.max(0,A.findIndex(a=>a.id===(attSel[tk.id]||A[0].id))),n=A.length;
+  [A[(ci+1)%n],A[(ci-1+n)%n]].forEach(a=>{if(a.kind==="vid")attPoster(a);else if(a.kind==="img")attURL(a);else{const im=new Image();im.src=`https://i.ytimg.com/vi/${ytId(a.url)}/hqdefault.jpg`}})})}
+function attStages(){setTimeout(attWarm,60);document.querySelectorAll(".att-strip").forEach(sp=>{const on=sp.querySelector(".att-t.on");if(!on)return;const l=on.offsetLeft-sp.offsetLeft,r=l+on.offsetWidth;if(l<sp.scrollLeft||r>sp.scrollLeft+sp.clientWidth)sp.scrollLeft=Math.max(0,l-(sp.clientWidth-on.offsetWidth)/2)});
   document.querySelectorAll("[data-attstage]").forEach(st=>{const [tid,aid]=st.dataset.attstage.split(":"),t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);if(!a)return;
   const el=attStageEl(tid,a);if(el.parentNode!==st){st.innerHTML="";st.appendChild(el)}})}
 const findTaskAny=id=>{for(const p of data.passions||[]){const t=(p.tasks||[]).find(x=>x.id===id);if(t)return t}return null};
@@ -7996,7 +8028,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="528",APPT="2026-11-23T00:12:55Z";   /* APPT: when this update was made */
+const APPV="529",APPT="2026-11-23T00:16:46Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
