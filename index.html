@@ -2198,6 +2198,27 @@ html.phone .att-strip .att-t{flex-basis:110px}
 .atrim-2 input::-moz-range-thumb{pointer-events:auto;width:22px;height:44px;border-radius:3px;background:#ffd23f;border:0;cursor:ew-resize}
 .atrim-2 input::-webkit-slider-runnable-track{background:none}
 .atrim-b{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+/* Photos-style trimmer */
+.ptrim{background:#000!important;padding:0!important;place-items:stretch!important;z-index:1150!important}
+.pt-box{display:grid;grid-template-rows:auto 1fr auto auto;height:100vh;height:100dvh;width:100%;max-width:820px;margin:0 auto;padding:max(10px,env(safe-area-inset-top)) 12px max(14px,env(safe-area-inset-bottom));box-sizing:border-box;gap:12px}
+.pt-top{display:flex;align-items:center;justify-content:space-between}.pt-top b{color:#fff;font-size:16px}
+.pt-txt{border:0;background:none;color:#fff;font:600 16px inherit;font-family:inherit;padding:8px 4px;cursor:pointer}
+.pt-done{color:#ffd23f}
+.pt-vid{position:relative;min-height:0}.pt-vid video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+.pt-row{display:flex;align-items:center;gap:10px}
+.pt-pp{flex:0 0 40px;height:52px;border:0;background:#1c1c1e;color:#fff;border-radius:6px;display:grid;place-items:center;cursor:pointer}
+.pt-strip{position:relative;flex:1;height:52px;touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer}
+.pt-frames{position:absolute;top:2px;bottom:2px;left:18px;right:18px;display:flex;overflow:hidden;background:#1c1c1e;border-radius:2px}
+.pt-frames canvas{height:100%;flex:1 1 0;min-width:0;object-fit:cover;width:auto}
+.pt-sh{position:absolute;top:2px;bottom:2px;background:rgba(0,0,0,.62);pointer-events:none}.pt-sh.l{left:0}.pt-sh.r{right:0}
+.pt-sel{position:absolute;top:0;bottom:0;border:3px solid #ffd23f;border-left:0;border-right:0;box-sizing:border-box;border-radius:6px;cursor:grab}
+.pt-h{position:absolute;top:-3px;bottom:-3px;width:18px;background:#ffd23f;display:grid;place-items:center;cursor:ew-resize;touch-action:none}
+.pt-h.l{left:0;border-radius:6px 0 0 6px}.pt-h.r{right:0;border-radius:0 6px 6px 0}
+.pt-h::before{content:"";position:absolute;inset:-6px -12px}
+.pt-ph{position:absolute;top:-4px;bottom:-4px;width:3px;margin-left:-1.5px;background:#fff;border-radius:2px;box-shadow:0 0 3px rgba(0,0,0,.6);pointer-events:none}
+.pt-info{display:flex;justify-content:space-between;align-items:center;min-height:34px}
+.pt-len{font:600 13px var(--mono);color:#ffd23f}
+.pt-all{font-size:14px;color:rgba(255,255,255,.8)}
 /* add + compare: one slim icon row */
 .att-tools{display:flex;align-items:center;gap:3px;margin-top:3px}
 .att-ic{position:relative;display:grid;place-items:center;width:40px;height:34px;padding:0;border:0;border-radius:0;cursor:pointer;color:var(--fg);background:rgba(var(--lr),.1);transition:background .15s}
@@ -6718,7 +6739,61 @@ function attDur(f){return new Promise(ok=>{const u=URL.createObjectURL(f),v=docu
   document.body.appendChild(v);v.src=u;try{v.load()}catch(e){}})}
 /* trim window: a video longer than 1 minute opens this — slide the 1-minute window to the part you want */
 const attMS=x=>Math.floor(x/60)+":"+String(Math.floor(x%60)).padStart(2,"0");
-function attTrimAsk(f,dur){return new Promise(done=>{const u=URL.createObjectURL(f),L=ATT_VMAX;let max=Math.max(0,dur-L),st=0;
+/* ===== trimmer like the iPhone Photos app: a strip of frames, a yellow frame with a handle on each end, the rest dimmed, a white playhead ===== */
+function trimUI(o){return new Promise(done=>{const max=o.max||ATT_VMAX;
+  const w=document.createElement("div");w.className="attv ptrim";w.setAttribute("role","dialog");w.setAttribute("aria-modal","true");
+  const CH=d=>`<svg viewBox="0 0 10 20" width="8" height="16" aria-hidden="true"><path d="${d}" fill="none" stroke="#1a1400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  w.innerHTML=`<div class="pt-box"><div class="pt-top"><button type="button" class="pt-txt" data-x>${o.isNew?"":"Cancel"}</button><b>${o.title||"Trim"}</b><button type="button" class="pt-txt pt-done" data-ok>Done</button></div>
+    <div class="pt-vid"><video playsinline muted preload="auto"><source src="${o.url}" type="${o.type||"video/mp4"}"></video></div>
+    <div class="pt-row"><button type="button" class="pt-pp" aria-label="Play"><svg viewBox="0 0 24 24" width="22" height="22"><path class="pt-ico" d="M7 5l12 7-12 7z" fill="currentColor"/></svg></button>
+      <div class="pt-strip"><div class="pt-frames"></div><i class="pt-sh l"></i><i class="pt-sh r"></i>
+        <div class="pt-sel"><span class="pt-h l" data-h="l">${CH("M7 3L3 10l4 7")}</span><span class="pt-h r" data-h="r">${CH("M3 3l4 7-4 7")}</span></div><i class="pt-ph"></i></div></div>
+    <div class="pt-info"><span class="pt-len"></span>${o.isNew||o.canReset?`<button type="button" class="pt-txt pt-all" data-all>${o.isNew?"Use whole video":"Full video"}</button>`:""}</div></div>`;
+  document.body.appendChild(w);
+  const v=w.querySelector("video"),strip=w.querySelector(".pt-strip"),sel=w.querySelector(".pt-sel"),shL=w.querySelector(".pt-sh.l"),shR=w.querySelector(".pt-sh.r"),ph=w.querySelector(".pt-ph"),len=w.querySelector(".pt-len"),pp=w.querySelector(".pt-pp");
+  let dur=0,t0=0,t1=0,drag=null;const HW=18;
+  const X=t=>HW+(strip.clientWidth-2*HW)*(t/dur);
+  const T=x=>Math.max(0,Math.min(dur,(x-HW)/(strip.clientWidth-2*HW)*dur));
+  const paint=()=>{if(!dur)return;const a=X(t0)-HW,b=X(t1)+HW;sel.style.left=a+"px";sel.style.width=(b-a)+"px";shL.style.width=Math.max(0,a+HW)+"px";shR.style.left=(b-HW)+"px";
+    len.textContent=attMS(t0)+" – "+attMS(t1)+" · "+(t1-t0).toFixed(1).replace(/\.0$/,"")+"s"+(dur>max&&t1-t0>=max-0.05?" (1 min max)":"")};
+  const head=()=>{if(dur)ph.style.left=X(v.currentTime)+"px";requestAnimationFrame(()=>{if(w.isConnected)head()})};
+  const setPP=()=>{w.querySelector(".pt-ico").setAttribute("d",v.paused?"M7 5l12 7-12 7z":"M7 5h3.5v14H7zM13.5 5H17v14h-3.5z")};
+  v.addEventListener("play",setPP);v.addEventListener("pause",setPP);
+  v.addEventListener("timeupdate",()=>{if(!dur||drag)return;if(v.currentTime>=t1-0.03||v.currentTime<t0-0.3)v.currentTime=t0});
+  const meta=()=>{if(dur||!isFinite(v.duration)||!(v.duration>0))return;dur=v.duration;
+    t0=Math.min(o.t0||0,dur);t1=o.t1!=null?Math.min(o.t1,dur):Math.min(dur,t0+max);if(t1-t0>max)t1=t0+max;paint();try{v.currentTime=t0}catch(_){}head();frames()};
+  v.addEventListener("loadedmetadata",meta);v.addEventListener("durationchange",meta);v.load();
+  /* filmstrip: grab frames from a second copy of the video */
+  function frames(){const box=w.querySelector(".pt-frames"),n=Math.max(6,Math.round(strip.clientWidth/34)),fv=document.createElement("video");fv.muted=true;fv.playsInline=true;fv.setAttribute("playsinline","");fv.preload="auto";
+    fv.innerHTML=`<source src="${o.url}" type="${o.type||"video/mp4"}">`;const H=48,cv=[];for(let i=0;i<n;i++){const c=document.createElement("canvas");c.height=H*2;box.appendChild(c);cv.push(c)}
+    let i=0;const next=()=>{if(i>=n||!w.isConnected){fv.removeAttribute("src");return}try{fv.currentTime=Math.min(dur-0.05,(i+0.5)/n*dur)}catch(_){}};
+    fv.addEventListener("seeked",()=>{const c=cv[i];if(c&&fv.videoWidth){const r=fv.videoWidth/fv.videoHeight;c.width=Math.round(c.height*Math.max(.5,Math.min(2,r)));const g=c.getContext("2d"),s=Math.max(c.width/fv.videoWidth,c.height/fv.videoHeight);g.drawImage(fv,(c.width-fv.videoWidth*s)/2,(c.height-fv.videoHeight*s)/2,fv.videoWidth*s,fv.videoHeight*s)}i++;next()});
+    fv.addEventListener("loadeddata",next,{once:true});fv.load()}
+  strip.addEventListener("pointerdown",e=>{if(!dur)return;e.preventDefault();const h=e.target.closest(".pt-h"),r=strip.getBoundingClientRect(),x=e.clientX-r.left;
+    v.pause();drag={k:h?h.dataset.h:(x>X(t0)&&x<X(t1)&&e.target.closest(".pt-sel")?"m":"s"),x0:x,a:t0,b:t1};try{strip.setPointerCapture(e.pointerId)}catch(_){}
+    if(drag.k==="s")v.currentTime=Math.max(t0,Math.min(t1,T(x)));strip.classList.add("drag")});
+  strip.addEventListener("pointermove",e=>{if(!drag)return;const r=strip.getBoundingClientRect(),x=e.clientX-r.left,t=T(x);
+    if(drag.k==="l"){t0=Math.max(0,Math.min(t,t1-0.5));if(t1-t0>max)t0=t1-max;v.currentTime=t0}
+    else if(drag.k==="r"){t1=Math.min(dur,Math.max(t,t0+0.5));if(t1-t0>max)t1=t0+max;v.currentTime=t1}
+    else if(drag.k==="m"){const d=T(x)-T(drag.x0),L=drag.b-drag.a;t0=Math.max(0,Math.min(dur-L,drag.a+d));t1=t0+L;v.currentTime=t0}
+    else v.currentTime=Math.max(t0,Math.min(t1,t));paint()});
+  const up=()=>{if(!drag)return;const k=drag.k;drag=null;strip.classList.remove("drag");if(k!=="s")v.currentTime=t0;const p=v.play();p&&p.catch(()=>{})};
+  strip.addEventListener("pointerup",up);strip.addEventListener("pointercancel",up);
+  pp.onclick=()=>{if(v.paused){if(v.currentTime>=t1-0.05)v.currentTime=t0;const p=v.play();p&&p.catch(()=>{})}else v.pause()};
+  const end=r=>{v.pause();w.remove();done(r)};
+  const x=w.querySelector("[data-x]");if(x&&!o.isNew)x.onclick=()=>end(null);else if(x)x.style.visibility="hidden";
+  const all=w.querySelector("[data-all]");if(all)all.onclick=()=>end("all");
+  w.querySelector("[data-ok]").onclick=()=>end(dur?(t0<=0.05&&t1>=dur-0.05?"all":[+t0.toFixed(1),+t1.toFixed(1)]):null);
+  addEventListener("resize",paint)})}
+/* over 1 minute when added: pick the minute to keep */
+function attTrimAsk(f,dur){const u=URL.createObjectURL(f);return trimUI({url:u,type:f.type,max:ATT_VMAX,title:"Pick up to 1 minute"}).then(r=>{URL.revokeObjectURL(u);if(r==="all")return dur&&dur>ATT_VMAX+0.5?[0,ATT_VMAX]:"all";return r})}
+/* trim a saved video (also opens right after adding one) */
+function attTrimEdit(tid,aid,isNew){const t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);if(!a)return Promise.resolve();
+  return attURL(a).then(u=>{if(!u){toast("This video isn't on this device yet");return}
+    return trimUI({url:u,type:a.type,t0:a.t0,t1:a.t1,isNew,canReset:true}).then(r=>{if(!r)return;if(r==="all"){delete a.t0;delete a.t1}else{a.t0=r[0];a.t1=r[1]}
+      [...attStageEls.keys()].forEach(k=>{if(k.endsWith(":"+a.id))attStageEls.delete(k)});save();render();if(!isNew)toast(r==="all"?"Showing the full video":"Trim saved")})})}
+/* old trimmers (single 1-minute box / two range sliders), kept for reference, not used: */
+function attTrimAskOld(f,dur){return new Promise(done=>{const u=URL.createObjectURL(f),L=ATT_VMAX;let max=Math.max(0,dur-L),st=0;
   const w=document.createElement("div");w.className="attv atrim";w.setAttribute("role","dialog");w.setAttribute("aria-modal","true");
   w.innerHTML=`<div class="atrim-box"><div class="atrim-h"><b>Trim video</b><small>Videos can be up to 1 minute. Slide the box to the part you want.</small></div>
     <video playsinline muted autoplay src="${u}"></video>
@@ -6740,7 +6815,7 @@ function attDrop(a){if(!a)return;MDB.del(a.id);if(a.path&&typeof sbOn==="functio
 function attPut(t,a){const r=attRepl&&attRepl.tid===t.id?attRepl.aid:null;t.att=t.att||[];const i=r?t.att.findIndex(x=>x.id===r):-1;
   if(i>=0){const old=t.att[i];t.att[i]=a;attDrop(old);attRepl=null}else t.att.push(a);attSel[t.id]=a.id}
 /* trim any saved video: drag the start and end handles (keeps the file, just plays that part) */
-function attTrimEdit(tid,aid,isNew){return new Promise(done=>{const t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);if(!a){done();return}
+function attTrimEditOld(tid,aid,isNew){return new Promise(done=>{const t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);if(!a){done();return}
   attURL(a).then(u=>{if(!u){toast("This video isn't on this device yet");done();return}
     const w=document.createElement("div");w.className="attv atrim";w.setAttribute("role","dialog");w.setAttribute("aria-modal","true");
     w.innerHTML=`<div class="atrim-box"><div class="atrim-h"><b>Trim video</b><small>Drag the two handles to keep just the part you want.</small></div>
@@ -6778,7 +6853,7 @@ async function attAddFiles(tid,files){const t=findTaskAny(tid);if(!t)return;attB
 let attPickFor=null,attPickEl=null,attPickAt=0;
 /* while the photo/video picker is open (or a video is being added or trimmed), never reload the page for an update —
    a reload kills the picker, so tapping its check mark did nothing */
-window.attHold=()=>(attPickAt&&Date.now()-attPickAt<600000)||!!attBusy||!!document.querySelector(".atrim");
+window.attHold=()=>(attPickAt&&Date.now()-attPickAt<600000)||!!attBusy||!!document.querySelector(".atrim,.ptrim");
 function attPicker(){if(attPickEl)return attPickEl;const i=document.createElement("input");i.type="file";
   i.style.cssText="position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0";
   i.addEventListener("cancel",()=>{attPickAt=0;attRepl=null});i.addEventListener("change",()=>{attPickAt=0;const fs=[...(i.files||[])],tid=attPickFor;i.value="";if(fs.length&&tid)attAddFiles(tid,fs)});
@@ -7904,7 +7979,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="526",APPT="2026-11-23T00:06:55Z";   /* APPT: when this update was made */
+const APPV="527",APPT="2026-11-23T00:09:59Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
