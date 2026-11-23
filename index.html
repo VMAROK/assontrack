@@ -7037,7 +7037,7 @@ let attCmp=null;
 const passOfTask=id=>(data.passions||[]).find(p=>(p.tasks||[]).some(t=>t.id===id));
 const attSame=a=>a.kind==="yt"?"yt:"+ytId(a.url):a.src?"id:"+a.src:(a.size&&a.name?"f:"+a.name+":"+a.size:"id:"+a.id);
 function cmpPool(tid){const t=findTaskAny(tid),p=passOfTask(tid);if(!t)return [];const out=(t.att||[]).map(a=>({a,t}));
-  ((p&&p.tasks)||[]).forEach(x=>{if(x.id!==tid)(x.att||[]).forEach(a=>out.push({a,t:x}))});
+  /* only this task's own media (was: every task in the passion) */
   /* the same video shows once, even if a duplicated task carries a copy of it */
   const seen=new Set();return out.filter(x=>{const k=attSame(x.a)+(x.a.t1!=null?"@"+(x.a.t0||0)+"-"+x.a.t1:"");if(seen.has(k))return false;seen.add(k);return true})}
 function cmpOpen(tid){const P=cmpPool(tid);if(P.length<2){toast("Add 2 videos or photos to compare them side by side");return}const own=P.filter(x=>x.t.id===tid);
@@ -7052,7 +7052,7 @@ function cmpRender(){let w=document.getElementById("attCmp");
   const pane=side=>{const it=get(attCmp[side]),a=it.a,y=a.kind==="yt"?ytId(a.url):null;
     const m=a.kind==="yt"?`<iframe src="https://www.youtube-nocookie.com/embed/${y}?playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="YouTube video"></iframe>`:a.kind==="vid"?`<video data-cmpv="${side}" playsinline controls preload="auto" ${side==="R"?"muted":""}></video>`:`<img data-cmpi="${side}" alt="${esc(a.name||"Photo")}">`;
     return `<div class="acmp-p" data-side="${side}"><div class="acmp-m">${m}<button type="button" class="acmp-mir" data-cmpmir="${side}" aria-pressed="false" title="Mirror (flip left to right)">⇋ Mirror</button>${a.kind==="vid"?`<button type="button" class="acmp-spd" data-cmpsp="${side}" title="Speed of this side">${attCmp["sp"+side]}×</button>`:""}${a.kind==="vid"?`<button type="button" class="acmp-trim${a.t1!=null?" on":""}" data-cmptrim="${side}" aria-label="Trim this video" title="Trim"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.1 15.9M14.5 14.5L20 20M8.1 8.1L12 12"/></svg></button>`:""}</div>
-      <div class="acmp-lab">${side==="L"?"Left":"Right"} · <span>${esc(it.t.title)}</span></div>
+      <div class="acmp-lab">${side==="L"?"Left":"Right"}</div>
       ${P.length>2?`<div class="acmp-pick" role="group" aria-label="Choose the ${side==="L"?"left":"right"} media">${P.map(x=>`<button type="button" class="acmp-th${x.a.id===attCmp[side]?" on":""}" data-cmppick="${side}:${x.a.id}" aria-pressed="${x.a.id===attCmp[side]}" title="${esc(x.t.title)}">${attThumb(x.a)}</button>`).join("")}</div>`:""}</div>`};
   w.innerHTML=`<div class="acmp-box"><div class="acmp-h"><b>Compare</b>${P.length>2?`<small>Pick what goes on each side</small>`:""}<button type="button" class="attv-x acmp-x" data-cmpclose aria-label="Close">×</button></div>
     <div class="acmp-panes">${pane("L")}${pane("R")}</div>
@@ -8179,7 +8179,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="545",APPT="2026-11-23T02:03:19Z";   /* APPT: when this update was made */
+const APPV="546",APPT="2026-11-23T02:06:03Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
