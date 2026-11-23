@@ -2297,7 +2297,7 @@ html.phone .tk-save-x{display:none}
 .tkd-open{position:absolute;left:0;top:14px;width:26px;height:26px;display:grid;place-items:center;border:0;background:none;color:var(--muted);cursor:pointer;z-index:2;transition:transform .2s}
 .tkd.open .tkd-open{transform:rotate(180deg)}
 .tkd-view{display:grid;gap:10px;padding:2px 0 16px 30px}
-.tkd-theater{position:relative;aspect-ratio:16/9;background:#000;overflow:hidden;display:grid;grid-template-columns:1fr;gap:2px;box-shadow:0 14px 30px -14px rgba(0,0,0,.9)}
+.tkd-theater{position:relative;height:min(68vh,620px);background:#000;overflow:hidden;display:grid;grid-template-columns:1fr;gap:2px;box-shadow:0 14px 30px -14px rgba(0,0,0,.9)}
 .tkd-theater.two{grid-template-columns:1fr 1fr}
 .tkd-pane{position:relative;overflow:hidden;background:#000;min-width:0}
 .tkd-pane video,.tkd-pane img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transform-origin:center}
@@ -7387,12 +7387,13 @@ document.addEventListener("change",e=>{const i=e.target.closest&&e.target.closes
 /* finished tasks can be opened to look back at them: read-only media, notes, and the comparison shown in the theater */
 const tkDoneSet=new Set();
 function tkDoneView(t){const A=(t.att||[]).filter(a=>a.kind!=="yt"||ytId(a.url)),V=A.filter(a=>a.kind!=="yt");
-  const pane=a=>{if(!a)return "";const v=a.view||{},tf=`translate(${(v.x||0)*100}%,${(v.y||0)*100}%) scale(${v.s||1}) scaleX(${v.m?-1:1})`;
+  /* whole video shown, never cropped (was: the saved move/zoom applied, which cut the picture off); mirror is kept */
+  const pane=a=>{if(!a)return "";const v=a.view||{},tf=`scaleX(${v.m?-1:1})`;
     return `<div class="tkd-pane">${a.kind==="vid"?`<video data-dvsrc="${a.id}" playsinline webkit-playsinline preload="metadata" style="transform:${tf}"></video>`:`<img data-dvsrc="${a.id}" alt="" style="transform:${tf}">`}</div>`};
   const two=V.length>=2,one=!two&&A[0];
   return `<div class="tkd-view">
     ${A.length?`<div class="tkd-theater${two?" two":""}">${two?pane(V[0])+pane(V[1]):one.kind==="yt"?`<iframe src="https://www.youtube-nocookie.com/embed/${ytId(one.url)}?playsinline=1&rel=0" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="YouTube video"></iframe>`:pane(one)}</div>
-      ${V.length&&!(one&&one.kind==="yt")?`<div class="tkd-ctl"><button type="button" class="tkd-pp" data-tkdplay aria-label="Play">▶</button><button type="button" class="tkd-pp" data-tkdback aria-label="Back to start">⟲</button>${two?`<span class="tkd-cap">Side by side${V.some(a=>a.view)?" · as you lined them up":""}</span>`:""}</div>`:""}
+      ${V.length&&!(one&&one.kind==="yt")?`<div class="tkd-ctl"><button type="button" class="tkd-pp" data-tkdplay aria-label="Play">▶</button><button type="button" class="tkd-pp" data-tkdback aria-label="Back to start">⟲</button>${two?`<span class="tkd-cap">Side by side</span>`:""}</div>`:""}
       <div class="tkd-gal">${A.map(a=>`<button type="button" class="tkd-th" data-attview="${t.id}:${a.id}" aria-label="Open">${attThumb(a)}${a.t1!=null||a.view?`<span class="att-bdgs">${a.t1!=null?`<i>${ICO_CUT}</i>`:""}${a.view?`<i>${ICO_MOVE}</i>`:""}</span>`:""}</button>`).join("")}</div>`:`<p class="tkd-none">No media on this task.</p>`}
     <div class="tkd-notes"><span>Notes</span><p>${t.note?esc(t.note):"<em>No notes.</em>"}</p></div>
     <div class="tkd-ro">${ICO_LOCK} Finished · view only. Tap Undo to edit it again.</div></div>`}
@@ -8396,7 +8397,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="562",APPT="2026-11-23T04:07:11Z";   /* APPT: when this update was made */
+const APPV="563",APPT="2026-11-23T04:14:19Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
