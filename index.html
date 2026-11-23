@@ -6026,7 +6026,7 @@ function bSpendGroupsEdit(b){const L=bSgs(b),M=today().slice(0,7),cnt=g=>b.spend
       ${bGeDel===i?`<button type="button" class="bge-del on" data-bgedel="${i}">Delete?</button>`:`<button type="button" class="bge-b bge-x" data-bgedel="${i}" aria-label="Delete ${esc(g)}"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>`}
     </div>${bGeCol===i?`<div class="bsg-pal bge-pal">${CATPAL.map(x=>`<button type="button" data-bgeset="${x}" style="--sw:${x}" aria-label="Colour ${x}"${x===c?' aria-pressed="true"':""}></button>`).join("")}<label class="bsg-cust" title="Any colour"><input type="color" data-bgecust value="${/^#[0-9a-f]{6}$/i.test(c)?c:"#3ddc84"}"></label></div>`:""}`}).join(""):`<p class="note" style="margin:10px 4px">No groups yet.</p>`}
     <div class="bge-add"><input id="bgeNew" placeholder="New group name" maxlength="30" aria-label="New group name"><button type="button" class="btn" data-bgeadd>＋ Add group</button></div>
-    <p class="note" style="margin:6px 4px 0">Deleting a group keeps its purchases; they move to No group.</p></div>`}
+    </div>`}
 (()=>{let d=null;
   document.addEventListener("pointerdown",e=>{const g=e.target.closest&&e.target.closest("[data-bgegrip]");if(!g)return;e.preventDefault();if(bGeCol!=null||bGeDel!=null){bGeCol=null;bGeDel=null;render();return}
     const r=g.closest(".bge-r");d={r,y0:e.clientY,rows:[...document.querySelectorAll(".bge-r")]};r.classList.add("bge-drag");document.body.classList.add("bdragging")},true);
@@ -6046,7 +6046,10 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(t.hasAttribute("data-bgecol")){const i=+t.dataset.bgecol;bGeCol=bGeCol===i?null:i;bGeDel=null;render();return}
   if(t.hasAttribute("data-bgeset")){b.spCol=b.spCol||{};b.spCol[L[bGeCol]]=t.dataset.bgeset;bGeCol=null;save();render();return}
   if(t.hasAttribute("data-bgemv")){const [i,d]=t.dataset.bgemv.split("|").map(Number),j=i+d;if(j<0||j>=L.length)return;[L[i],L[j]]=[L[j],L[i]];bGeCol=null;bGeDel=null;save();render();return}
-  if(t.hasAttribute("data-bgedel")){const i=+t.dataset.bgedel;if(bGeDel!==i){bGeDel=i;bGeCol=null;render();return}const g=L[i];L.splice(i,1);b.spends.forEach(s=>{if(s.sg===g)s.sg=""});if(b.spCol)delete b.spCol[g];if(bAddSg===g)bAddSg="";bGeDel=null;save();render();toast(g+" deleted");return}
+  if(t.hasAttribute("data-bgedel")){const i=+t.dataset.bgedel,g=L[i],n=b.spends.filter(s=>s.sg===g).length;bGeDel=null;
+    const drop=all=>{const j=L.indexOf(g);if(j>=0)L.splice(j,1);if(all)b.spends=b.spends.filter(s=>s.sg!==g);else b.spends.forEach(s=>{if(s.sg===g)s.sg=""});if(b.spCol)delete b.spCol[g];if(bAddSg===g)bAddSg="";save();render();toast(all?`${g} and its ${n} purchase${n===1?"":"s"} deleted`:`${g} deleted · purchases moved to No group`)};
+    if(!n){aotConfirm({title:`Delete ${g}?`,text:"This group has no purchases.",ok:"Delete",no:"Cancel",danger:true}).then(ok=>{if(ok)drop(false)});return}
+    aotChoose({title:`Delete ${g}?`,text:`${g} has ${n} purchase${n===1?"":"s"}.`,opts:[["grp","Delete just the group"],["all",`Delete the group and its ${n} purchase${n===1?"":"s"}`]]}).then(c=>{if(c==="grp")drop(false);else if(c==="all")drop(true)});return}
   if(t.hasAttribute("data-bgeadd")){const n=bSgAddName(($("#bgeNew")||{}).value);if(!n)return toast("Name the group");render();setTimeout(()=>{const i=$("#bgeNew");i&&i.focus()},30)}},true);
 /* spending, by group: one block per group with this month's total, count and share; tap to open its purchases */
 let bSgColFor=null,bSgOpen=new Set(),bSgAll=new Set();   /* open group (only one at a time) / groups showing every purchase */
@@ -8978,7 +8981,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="643",APPT="2026-11-23T22:42:07Z";   /* APPT: when this update was made */
+const APPV="644",APPT="2026-11-23T22:42:46Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
