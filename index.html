@@ -2896,6 +2896,9 @@ html.phone .bwi-sum b{font-size:16px}html.phone .bwi-sum small{font-size:10.5px}
 .bsg-n{font-weight:700;font-size:15px}.bsg-h small{color:var(--muted);font-size:12px;flex:1}
 .bsg-h b{font-family:var(--mono);font-size:15px}.bsg-h em{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--muted);min-width:38px;text-align:right}
 .bsg-car{color:var(--muted);transition:transform .2s;flex:none}.bsg.open .bsg-car{transform:rotate(180deg)}
+.bsg-dotb{width:16px;height:16px;cursor:pointer;border:2px solid rgba(255,255,255,.35)}
+.bsg-pal{display:flex;flex-wrap:wrap;gap:8px;padding:0 14px 12px}.bsg-pal button{width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,.2);background:var(--sw);cursor:pointer;padding:0}.bsg-pal button[aria-pressed="true"]{border-color:#fff;box-shadow:0 0 0 2px var(--sw)}
+.bsg-cust{width:28px;height:28px;border-radius:50%;overflow:hidden;border:2px dashed rgba(255,255,255,.45);background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);cursor:pointer;position:relative}.bsg-cust input{position:absolute;inset:0;opacity:0;cursor:pointer}
 .bsg-bar{height:4px;margin:0 14px 12px;border-radius:2px;background:rgba(var(--tX),.6);overflow:hidden}.bsg-bar i{display:block;height:100%;border-radius:2px;background:var(--gc);box-shadow:0 0 8px var(--gc)}
 .bsg-more{display:block;width:100%;padding:10px 14px;border:0;border-top:1px solid rgba(var(--lr),.14);background:rgba(var(--tL),.06);color:rgb(var(--tL));font:inherit;font-size:13px;font-weight:700;cursor:pointer}
 /* up to 12 purchases show in full; more than that and the list scrolls inside the group */
@@ -5825,6 +5828,7 @@ let bTapped=false,bDayShown=null,bNoSel=false,bDayWin=null,bTab="all",bEdit=null
 const B=()=>{if(!data.budget)data.budget={};const b=data.budget;b.items=b.items||[];b.spends=b.spends||[];b.cur=b.cur||"$";if(!b.home||!BCUR.includes(b.home))b.home="USD";b.items.forEach(i=>{if(!i.cur)i.cur=b.home});b.spends.forEach(x=>{if(!x.cur)x.cur=b.home});if(!b.cats)b.cats=BDEF.map(([n,c])=>({n,c,lim:(b.limits||{})[n]||0}));if(!b.cats.some(c=>c.inc))b.cats.push({n:"Paycheck",c:"#3ddc84",lim:0,inc:true},{n:"Side work",c:"#2ee6c5",lim:0,inc:true},{n:"Other income",c:"#a3e635",lim:0,inc:true});if(!Array.isArray(b.porder))b.porder=["bills","inc"];b.items.forEach(i=>{if(i.kind==="inc"&&!i.cat)i.cat="Paycheck"});return b};
 const bCat=n=>B().cats.find(c=>c.n===n);
 const bCol=n=>(bCat(n)||{c:"#9db0d0"}).c;
+function bNameCol(n){const b=B(),u=b.spCol&&b.spCol[n];if(u)return u;if(bCat(n))return bCol(n);return bSgCol(b,n)}
 const bFall=k=>k==="inc"?"Other income":"Other";
 const bItCat=it=>{const c=bCat(it.cat);return c&&!!c.inc===(it.kind==="inc")?it.cat:bFall(it.kind)};
 const bTitle=it=>(it.coTitle&&it.co?it.co:it.name)||it.co||"Untitled",bSubT=it=>it.co&&it.name&&it.co!==it.name?(it.coTitle?it.name:it.co):"";
@@ -5851,13 +5855,13 @@ const bIn=dd=>dd===0?"today":dd===1?"tomorrow":"in "+dd+" days";
 function bStats(){const b=B(),M=today().slice(0,7),act=b.items.filter(i=>!i.paused&&!(i.muted&&i.kind!=="inc")&&bActiveMonth(i,M)),sum=k=>act.filter(i=>i.kind===k).reduce((a,i)=>a+bMo(i),0);
   const sp=b.spends.filter(s=>(s.d||"").slice(0,7)===M),spent=sp.reduce((a,s)=>a+bSpAmt(s),0),byCat={},fixCat={},spCat={};
   act.filter(i=>i.kind!=="inc").forEach(i=>{const c=bItCat(i);fixCat[c]=(fixCat[c]||0)+bMo(i);byCat[c]=(byCat[c]||0)+bMo(i)});
-  sp.forEach(s=>{const c=bCat(s.cat)?s.cat:"Other";spCat[c]=(spCat[c]||0)+bSpAmt(s);byCat[c]=(byCat[c]||0)+bSpAmt(s)});
+  sp.forEach(s=>{const c=bCat(s.cat)?s.cat:"Other";spCat[c]=(spCat[c]||0)+bSpAmt(s);const g=s.sg||c;byCat[g]=(byCat[g]||0)+bSpAmt(s)});   /* donut: spending goes under its group */
   const inc=sum("inc"),subs=sum("sub"),bills=sum("bill"),paused=b.items.filter(i=>i.paused&&i.kind==="sub").reduce((a,i)=>a+bMo(i),0),MU=b.items.filter(i=>i.muted&&!i.paused&&i.kind!=="inc"),muted=MU.reduce((a,i)=>a+bMo(i),0);
   return {inc,subs,bills,spent,left:inc-subs-bills-spent,byCat,fixCat,spCat,sp,paused,muted,mutedN:MU.length}}
 function bDonut(S){const byCat=S.byCat,total=Object.values(byCat).reduce((a,v)=>a+v,0),R=58,C=2*Math.PI*R;let off=0;const segs=Object.entries(byCat).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);
-  const arcs=segs.map(([c,v])=>{const len=total?C*v/total:0,el=`<circle cx="80" cy="80" r="${R}" fill="none" stroke="${bCol(c)}" stroke-width="18" stroke-dasharray="${Math.max(0,len-(segs.length>1?2:0)).toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="${(-off).toFixed(1)}" transform="rotate(-90 80 80)"/>`;off+=len;return el}).join("");
+  const arcs=segs.map(([c,v])=>{const len=total?C*v/total:0,el=`<circle cx="80" cy="80" r="${R}" fill="none" stroke="${bNameCol(c)}" stroke-width="18" stroke-dasharray="${Math.max(0,len-(segs.length>1?2:0)).toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="${(-off).toFixed(1)}" transform="rotate(-90 80 80)"/>`;off+=len;return el}).join("");
   return `<div class="bd-wrap"><svg class="bd-donut" viewBox="0 0 160 160" aria-hidden="true"><circle cx="80" cy="80" r="${R}" fill="none" stroke="rgba(150,180,240,.12)" stroke-width="18"/>${arcs}<text x="80" y="74" text-anchor="middle" font-size="10.5" fill="#9fb0d0">out this month</text><text x="80" y="95" text-anchor="middle" font-size="19" font-weight="700" fill="#eef3ff" font-family="var(--mono)">${bMoney(total,0)}</text></svg>
-    <div class="bd-leg">${segs.length?segs.map(([c,v])=>`<button type="button" data-bcat="${esc(c)}" style="--cc:${bCol(c)}"><i></i><span>${esc(c)}</span><b>${bMoney(v,0)}</b><em>${total?Math.round(v/total*100):0}%</em></button>`).join(""):`<p class="note" style="margin:0">Add a subscription, bill or expense to see where your money goes.</p>`}</div></div>`}
+    <div class="bd-leg">${segs.length?segs.map(([c,v])=>`<button type="button" ${bCat(c)?`data-bcat="${esc(c)}"`:`data-bspv="grp"`} style="--cc:${bNameCol(c)}"><i></i><span>${esc(c)}</span><b>${bMoney(v,0)}</b><em>${total?Math.round(v/total*100):0}%</em></button>`).join(""):`<p class="note" style="margin:0">Add a subscription, bill or expense to see where your money goes.</p>`}</div></div>`}
 /* month calendar: each day shows what gets charged (and paid in) that day, plus what you spent */
 function bCal(){const b=B(),T=today(),x=bDate(T);x.setDate(1);x.setMonth(x.getMonth()+bMon);const y=x.getFullYear(),m=x.getMonth(),from=ymd(x),to=ymd(new Date(y,m+1,0,12)),nd=new Date(y,m+1,0).getDate(),lead=x.getDay();
   const ev=bEvMap(b,from,to,T);   /* was: each occurrence on its own date only (no grace periods) */const spd={};b.spends.forEach(s=>{if(s.d>=from&&s.d<=to)spd[s.d]=(spd[s.d]||0)+bSpAmt(s)});
@@ -5993,17 +5997,21 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(t.hasAttribute("data-bwigoal")){const L=bSp30(b),cut=[...bWhatCut],rate=L.filter(s=>bWhatCut.has(bSpKey(s))).reduce((a,s)=>a+bSpAmt(s),0),
       names=cut.map(k=>{const s=L.find(x=>bSpKey(x)===k);return s?((s.note||"").trim()||"No description"):k});
     b.spPlan={cut,names,rate,since:today(),ts:Date.now()};save();render();toast("Goal saved. Stick to it!")}},true);
+document.addEventListener("change",e=>{if(!e.target.matches||!e.target.matches("[data-bsgcust]")||!bSgColFor)return;const b=B();b.spCol=b.spCol||{};b.spCol[bSgColFor]=e.target.value;bSgColFor=null;save();render()},true);
 /* spending, by group: one block per group with this month's total, count and share; tap to open its purchases */
-let bSgOpen=new Set(),bSgAll=new Set();   /* open group (only one at a time) / groups showing every purchase */
-const bSgCol=(b,g)=>{if(!g)return "#8a94aa";const P=(typeof CATPAL!=="undefined"&&CATPAL.length?CATPAL:["#3ddc84","#4cc9ff","#ffb648","#ff6fb5","#b48cff","#ff7a85","#ffd166","#7c8cff"]),i=bSgs(b).indexOf(g);return P[(i<0?0:i)%P.length]};
+let bSgColFor=null,bSgOpen=new Set(),bSgAll=new Set();   /* open group (only one at a time) / groups showing every purchase */
+const bSgCol=(b,g)=>{if(!g)return "#8a94aa";if(b.spCol&&b.spCol[g])return b.spCol[g];if(bCat(g))return bCol(g);const P=(typeof CATPAL!=="undefined"&&CATPAL.length?CATPAL:["#3ddc84","#4cc9ff","#ffb648","#ff6fb5","#b48cff","#ff7a85","#ffd166","#7c8cff"]),i=bSgs(b).indexOf(g);return P[(i<0?0:i)%P.length]};
 function bSpendByGroup(b,L){const tot=L.reduce((a,s)=>a+bSpAmt(s),0),names=[...new Set([...bSgs(b),...L.map(s=>s.sg||"")])];
   const rows=names.map(g=>{const A=L.filter(s=>(s.sg||"")===g);return {g,A,t:A.reduce((a,s)=>a+bSpAmt(s),0)}}).filter(r=>r.g||r.A.length).sort((x,y)=>(!x.g)-(!y.g)||y.t-x.t);
   if(!rows.length)return `<p class="note" style="margin:10px 2px 0">Log what you spend day to day. Make groups like Gas or Food to see where it goes.</p>`;
   return `<div class="bsg-list">${rows.map(r=>{const c=bSgCol(b,r.g),pc=tot?Math.round(r.t/tot*100):0,open=bSgOpen.has(r.g||"\u0000");
-    return `<div class="bsg${open?" open":""}" style="--gc:${c}"><button type="button" class="bsg-h" data-bsgo="${esc(r.g)}" aria-expanded="${open}"><i class="bsg-dot"></i><span class="bsg-n">${esc(r.g||"No group")}</span><small>${r.A.length} purchase${r.A.length===1?"":"s"}</small><b>${bMoney(r.t)}</b><em>${pc}%</em><svg class="bsg-car" viewBox="0 0 24 24" width="16" height="16"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    return `<div class="bsg${open?" open":""}" style="--gc:${c}"><button type="button" class="bsg-h" data-bsgo="${esc(r.g)}" aria-expanded="${open}">${r.g?`<i class="bsg-dot bsg-dotb" data-bsgcol="${esc(r.g)}" role="button" aria-label="Change ${esc(r.g)} colour" title="Change colour"></i>`:`<i class="bsg-dot"></i>`}<span class="bsg-n">${esc(r.g||"No group")}</span><small>${r.A.length} purchase${r.A.length===1?"":"s"}</small><b>${bMoney(r.t)}</b><em>${pc}%</em><svg class="bsg-car" viewBox="0 0 24 24" width="16" height="16"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      ${bSgColFor===r.g&&r.g?`<div class="bsg-pal">${CATPAL.map(x=>`<button type="button" data-bsgset="${x}" style="--sw:${x}" aria-label="Colour ${x}"${x===c?' aria-pressed="true"':""}></button>`).join("")}<label class="bsg-cust" title="Any colour"><input type="color" data-bsgcust value="${/^#[0-9a-f]{6}$/i.test(c)?c:"#3ddc84"}"></label></div>`:""}
       <div class="bsg-bar"><i style="width:${pc}%"></i></div>
       ${open?`<div class="bsg-in${r.A.length>12?" scroll":""}">${r.A.length?r.A.map(s=>`<button type="button" class="bsg-r" data-bsedit="${s.id}"><span class="bsg-d">${s.d===today()?"Today":bDate(s.d).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</span><span class="bsg-w">${esc(s.note||"Spent")}</span><b>${bMoneyI(s)}</b></button>`).join("")/* "Show all" button removed: the list scrolls after 12 purchases */:`<p class="note" style="margin:8px 12px">Nothing in this group this month.</p>`}</div>`:""}</div>`}).join("")}</div>`}
-document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-bspv],[data-bsgo],[data-bsgall]");if(!t)return;e.preventDefault();e.stopImmediatePropagation();
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-bsgcol],[data-bsgset],[data-bspv],[data-bsgo],[data-bsgall]");if(!t)return;if(e.target.closest("[data-bsgcust]"))return;e.preventDefault();e.stopImmediatePropagation();
+  if(t.hasAttribute("data-bsgcol")){bSgColFor=bSgColFor===t.dataset.bsgcol?null:t.dataset.bsgcol;render();return}
+  if(t.hasAttribute("data-bsgset")){const b=B();b.spCol=b.spCol||{};b.spCol[bSgColFor]=t.dataset.bsgset;bSgColFor=null;save();render();return}
   if(t.hasAttribute("data-bspv")){B().spView=t.dataset.bspv;save();render();return}
   if(t.hasAttribute("data-bsgall")){const k=t.dataset.bsgall||"\u0000";bSgAll.has(k)?bSgAll.delete(k):bSgAll.add(k);render();return}
   const k=t.dataset.bsgo||"\u0000",was=bSgOpen.has(k);bSgOpen.clear();if(!was)bSgOpen.add(k);render()},true);   /* one group open at a time */
@@ -8912,7 +8920,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="637",APPT="2026-11-23T22:26:21Z";   /* APPT: when this update was made */
+const APPV="638",APPT="2026-11-23T22:28:22Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
