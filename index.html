@@ -1390,7 +1390,16 @@ html.tpl-bg #bgimg,html.tpl-bg #bgimg2,html.tpl-bg #bglive,html.tpl-bg #bgspin,h
 /* Spa: warm glass, soft corners, calm type */
 html.tpl-spa{--cyan:#ffb468;--fg:#fbeee2;--muted:#c9a991}
 /* template variation: panels darker than the wallpaper (a dark film over each panel, keeps the theme's colours and glow) */
-/* spacing option: how far apart panels sit, and a little less room inside them */
+/* spacing sliders: --gin = between panels, --gout = space around the edge of the screen (up to the bars) */
+html.gap-in #view .grid,html.gap-in #view .pgrid,html.gap-in #view .stack{gap:var(--gin)!important}
+html.gap-in #view .panel{margin-top:var(--gin)!important}
+html.gap-in #view .grid>.panel,html.gap-in #view .pgrid>*>.panel,html.gap-in #view .pgrid>.panel,html.gap-in #view .stack>.panel:first-child,html.gap-in #view>.panel:first-child,html.gap-in #view>:first-child{margin-top:0!important}
+html.gap-in .ptp-below{margin-top:var(--gin)!important}
+html.gap-out #view{padding-top:var(--gout)!important;padding-left:var(--gout)!important;padding-right:var(--gout)!important;padding-bottom:calc(var(--gout) + 16px)!important}
+.tpl-opt-col{align-items:flex-start!important}.gap-box{display:grid;gap:8px;flex:1;min-width:240px}
+.gap-row{display:grid;grid-template-columns:120px minmax(0,1fr) 46px;align-items:center;gap:10px;margin:0}.gap-lab{font-size:13px;color:var(--fg);white-space:nowrap}.gap-row input{width:100%;margin:0}.gap-row b{text-align:right;font:600 12px var(--mono)}
+.tpl-opt .gap-link{display:inline-flex!important;flex-direction:row!important;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer;margin:0;width:auto}.gap-link input{width:18px;height:18px;margin:0}.gap-reset{justify-self:start;border:0;background:none;color:var(--cyan);font:600 12.5px inherit;font-family:inherit;cursor:pointer;padding:0}
+/* old spacing buttons (Comfortable / Compact / Tight), kept for reference: */
 html.gap-compact #view .grid,html.gap-compact #view .pgrid,html.gap-compact #view .stack{gap:9px!important}
 html.gap-compact #view .panel{margin-top:9px!important;padding:12px 14px 14px!important}
 html.gap-compact #view .grid>.panel,html.gap-compact #view .pgrid>*>.panel,html.gap-compact #view .pgrid>.panel,html.gap-compact #view .stack>.panel:first-child,html.gap-compact #view>.panel:first-child{margin-top:0!important}
@@ -7435,6 +7444,11 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(t.dataset.tkmore!==undefined){tkMore=!tkMore;const m=t.closest("form").querySelector(".tkq-more");if(m)m.hidden=!tkMore;t.classList.toggle("on",tkMore);t.setAttribute("aria-expanded",tkMore);return}
   tkDoneOpen=!tkDoneOpen;render()});
 document.addEventListener("click",e=>{if(e.target&&e.target.matches&&e.target.matches("[data-tknewbg]")){tkNew=false;render()}},true);
+/* spacing sliders: move live, save when you let go; "one slider" sets both at once */
+document.addEventListener("input",e=>{const r=e.target.closest&&e.target.closest("[data-gapsl]");if(!r)return;const v=+r.value,k=r.dataset.gapsl,P=data.profile=data.profile||{};
+  if(k==="in"||k==="all")P.gapIn=v;if(k==="out"||k==="all")P.gapOut=v;const lab=document.querySelector(`[data-gapval="${k}"]`);if(lab)lab.textContent=v+"px";applyLook()});
+document.addEventListener("change",e=>{if(e.target.closest&&e.target.closest("[data-gapsl]"))save();const c=e.target.closest&&e.target.closest("[data-gaplink]");if(!c)return;const P=data.profile=data.profile||{};
+  P.gapLink=c.checked;if(c.checked){const v=P.gapIn??18;P.gapIn=v;P.gapOut=v}save();render();applyLook()});
 /* category color: tap a swatch (or pick any color) — saved right away */
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-catcol]");if(!b)return;e.preventDefault();e.stopPropagation();const [id,col]=b.dataset.catcol.split("|"),c=cats().find(x=>x.id===id);if(!c)return;c.color=col;save();render()},true);
 document.addEventListener("change",e=>{const i=e.target.closest&&e.target.closest("[data-catcolin]");if(!i)return;const c=cats().find(x=>x.id===i.dataset.catcolin);if(!c)return;c.color=i.value;save();render()});
@@ -8140,18 +8154,24 @@ const tplBgOn=()=>{const t=tplOf();return !!(t&&t.bg&&(data.profile||{}).tplBg!=
 const effLook=()=>{const g=lookOf(),pl=passLook()||{},T=tplOf();if(T)return Object.assign({color:g.color,glass:g.glass,trans:g.trans,tone:g.tone??50},T.look);return {color:pl.color||g.color,glass:pl.glass??g.glass,trans:pl.trans??g.trans,tone:pl.tone??g.tone??50}};
 function applyLook(tmp){tmp=typeof tmp==="number"?{glass:tmp}:(tmp||{});const L=effLook(),g=(tmp.glass??L.glass)/100,t=(tmp.trans??L.trans)/100,r=document.documentElement.style;toneNow=(tmp.tone??L.tone)/100;r.setProperty("--go",(1-t*.88).toFixed(3));r.setProperty("--gb",(4+g*24).toFixed(1)+"px");
   if(L.color==="auto"){const w=passWall()||wallOf();sampleColor(w.src).then(c=>{if(effLook().color==="auto"&&(passWall()||wallOf()).src===w.src)setTint(c.h,c.s)})}else{const P=LOOKS.find(x=>x.id===L.color)||LOOKS[0];setTint(P.h,P.s,P.l)}document.documentElement.classList.toggle("lk-orange",L.color==="orange");{const T=tplOf(),h=document.documentElement;TEMPLATES.forEach(x=>h.classList.toggle("tpl-"+x.id,!!T&&T.id===x.id));h.classList.toggle("tpl-plain",!!T&&!!T.plain);h.classList.toggle("tpl-bg",tplBgOn());/* these looks now work with or without a template (your own wallpaper too) */
-    const PF=data.profile||{};h.classList.toggle("tpl-dpan",PF.tplPan==="dark");["none","dark"].forEach(k=>h.classList.toggle("tpl-bd-"+k,PF.tplBd===k));h.classList.toggle("tpl-sharp",PF.tplSharp===true);["compact","tight"].forEach(k=>h.classList.toggle("gap-"+k,PF.tplGap===k));h.classList.toggle("tpl-bars-clear",PF.tplBars==="clear");h.classList.toggle("tpl-bars-pan",T?PF.tplBars!=="clear":PF.tplBars==="panel");setTimeout(barsSync,0);h.classList.remove("tpl-bd-light");spaFx.stop()/* lines off for now; was: if(tplBgOn())spaFx.run() */}}
+    const PF=data.profile||{};h.classList.toggle("tpl-dpan",PF.tplPan==="dark");["none","dark"].forEach(k=>h.classList.toggle("tpl-bd-"+k,PF.tplBd===k));h.classList.toggle("tpl-sharp",PF.tplSharp===true);/* spacing sliders (replace the old Comfortable / Compact / Tight buttons) */
+    const gi=PF.gapIn,go=PF.gapOut;h.classList.toggle("gap-in",gi!=null);h.classList.toggle("gap-out",go!=null);if(gi!=null)h.style.setProperty("--gin",gi+"px");if(go!=null)h.style.setProperty("--gout",go+"px");h.classList.toggle("tpl-bars-clear",PF.tplBars==="clear");h.classList.toggle("tpl-bars-pan",T?PF.tplBars!=="clear":PF.tplBars==="panel");setTimeout(barsSync,0);h.classList.remove("tpl-bd-light");spaFx.stop()/* lines off for now; was: if(tplBgOn())spaFx.run() */}}
 function tplPanel(){const T=tplOf();return `<div class="panel tplp" style="margin-top:18px"><div class="ph"><span>Templates</span><i>${T?esc(T.name)+" is on":"Whole-page looks"}</i></div>
   <p class="note" style="margin:-2px 0 12px">A template restyles the whole app at once: colours, glass, type and its own backdrop. Your wallpaper and Boxes settings stay saved and come back when you switch it off.</p>
   <div class="tpl-row"><button type="button" class="tpl-c tpl-none" data-tpl="" aria-pressed="${!T}"><span class="tpl-pv"><span>Your own setup</span></span><b>None</b><small>Wallpaper and Boxes as you set them</small></button>${TEMPLATES.map(t=>`<button type="button" class="tpl-c" data-tpl="${t.id}" aria-pressed="${!!T&&T.id===t.id}"><span class="tpl-pv tpl-pv-${t.id}"><i></i><i></i><i></i><em></em><em></em></span><b>${esc(t.name)}</b><small>${esc(t.sub)}</small></button>`).join("")}</div>
   ${T&&T.bg?`<div class="tpl-opt"><span>Backdrop</span><div class="seg2" role="group" aria-label="Backdrop"><button type="button" data-tplbg="1" aria-pressed="${tplBgOn()}">${T.plain?"Plain "+esc(T.name.replace(/^Plain /,"").toLowerCase())+" background":esc(T.name)+" glow"}</button><button type="button" data-tplbg="0" aria-pressed="${!tplBgOn()}">My wallpaper</button></div></div>`:""}
   ${true?`<div class="tpl-opt-h">${T?"Fine-tune "+esc(T.name):"Fine-tune your own setup"}</div><div class="tpl-opt"><span>Panels</span><div class="seg2" role="group" aria-label="Panels"><button type="button" data-tplpan="light" aria-pressed="${(data.profile||{}).tplPan!=="dark"}">Light</button><button type="button" data-tplpan="dark" aria-pressed="${(data.profile||{}).tplPan==="dark"}">Darker than the wallpaper</button></div></div>
   <div class="tpl-opt"><span>Borders</span><div class="seg2" role="group" aria-label="Panel borders">${[["","Light"],["none","No border"],["dark","Dark"]].map(([k,l])=>`<button type="button" data-tplbd="${k}" aria-pressed="${((data.profile||{}).tplBd||"")===k}">${l}</button>`).join("")}</div></div>
-  <div class="tpl-opt"><span>Spacing</span><div class="seg2" role="group" aria-label="Space between panels">${[["","Comfortable"],["compact","Compact"],["tight","Tight"]].map(([k,l])=>`<button type="button" data-tplgap="${k}" aria-pressed="${((data.profile||{}).tplGap||"")===k}">${l}</button>`).join("")}</div></div>
+  ${(()=>{const PF=data.profile||{},gi=PF.gapIn??18,go=PF.gapOut??24,lk=!!PF.gapLink;
+    const row=(id,lab,v,min,max)=>`<div class="gap-row"><span class="gap-lab">${lab}</span><input type="range" min="${min}" max="${max}" step="1" value="${v}" data-gapsl="${id}" aria-label="${lab}"><b data-gapval="${id}">${v}px</b></div>`;
+    return `<div class="tpl-opt tpl-opt-col"><span>Spacing</span><div class="gap-box">
+      <label class="gap-link"><input type="checkbox" data-gaplink ${lk?"checked":""}> One slider for both</label>
+      ${lk?row("all","All spacing",gi,0,40):row("in","Between panels",gi,0,40)+row("out","Screen edges",go,0,48)}
+      <button type="button" class="gap-reset" data-gapreset>Reset</button></div></div>`})()}
   <div class="tpl-opt"><span>Corners</span><div class="seg2" role="group" aria-label="Panel corners"><button type="button" data-tplsharp="0" aria-pressed="${(data.profile||{}).tplSharp!==true}">Rounded</button><button type="button" data-tplsharp="1" aria-pressed="${(data.profile||{}).tplSharp===true}">Sharp</button></div></div>
   <div class="tpl-opt"><span>Side &amp; top bars</span><div class="seg2" role="group" aria-label="Side and top bars">${T?"":`<button type="button" data-tplbars="" aria-pressed="${!(data.profile||{}).tplBars}">Original</button>`}<button type="button" data-tplbars="panel" aria-pressed="${T?(data.profile||{}).tplBars!=="clear":(data.profile||{}).tplBars==="panel"}">Panel color</button><button type="button" data-tplbars="clear" aria-pressed="${(data.profile||{}).tplBars==="clear"}">No color</button></div></div>`:""}</div>`}
-document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tpl],[data-tplbg],[data-tplpan],[data-tplbd],[data-tplbars],[data-tplsharp],[data-tplgap]");if(!b)return;e.preventDefault();e.stopPropagation();data.profile=data.profile||{};
-  if(b.dataset.tplgap!=null){if(b.dataset.tplgap)data.profile.tplGap=b.dataset.tplgap;else delete data.profile.tplGap;applyLook()}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tpl],[data-tplbg],[data-tplpan],[data-tplbd],[data-tplbars],[data-tplsharp],[data-gapreset]");if(!b)return;e.preventDefault();e.stopPropagation();data.profile=data.profile||{};
+  if(b.dataset.gapreset!==undefined){delete data.profile.gapIn;delete data.profile.gapOut;applyLook()}
   else if(b.dataset.tplsharp!=null){if(b.dataset.tplsharp==="1")data.profile.tplSharp=true;else delete data.profile.tplSharp;applyLook()}
   else if(b.dataset.tplbars!=null){if(b.dataset.tplbars)data.profile.tplBars=b.dataset.tplbars;else delete data.profile.tplBars;applyLook()}
   else if(b.dataset.tplbd!=null){if(b.dataset.tplbd)data.profile.tplBd=b.dataset.tplbd;else delete data.profile.tplBd;applyLook()}
@@ -8462,7 +8482,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="573",APPT="2026-11-23T05:04:32Z";   /* APPT: when this update was made */
+const APPV="574",APPT="2026-11-23T05:11:43Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
