@@ -2297,8 +2297,10 @@ html.phone .tk-save-x{display:none}
 .tkd-open{position:absolute;left:0;top:14px;width:26px;height:26px;display:grid;place-items:center;border:0;background:none;color:var(--muted);cursor:pointer;z-index:2;transition:transform .2s}
 .tkd.open .tkd-open{transform:rotate(180deg)}
 .tkd-view{display:grid;gap:10px;padding:2px 0 16px 30px}
-.tkd-theater{position:relative;height:min(68vh,620px);background:#000;overflow:hidden;display:grid;grid-template-columns:1fr;gap:2px;box-shadow:0 14px 30px -14px rgba(0,0,0,.9)}
-.tkd-theater.two{display:flex;justify-content:center;align-items:stretch}.tkd-theater.two>.tkd-pane{flex:1 1 0;height:100%}.tkd-theater.two>.tkd-pane[style*="aspect-ratio"]{flex:0 1 auto}
+.tkd-theater{position:relative;background:#000;overflow:hidden;display:grid;grid-template-columns:1fr;gap:2px;box-shadow:0 14px 30px -14px rgba(0,0,0,.9)}
+/* portrait: each side keeps its own tall shape and the pair fills the panel's width, showing your saved move / zoom / mirror */
+.tkd-theater{display:flex;align-items:flex-start;gap:2px;background:#000}.tkd-theater>.tkd-pane{flex:1 1 0;height:auto;max-height:none}
+.tkd-theater:not(.two)>.tkd-pane{flex:0 1 auto;width:min(100%,calc(78vh * .5625));margin:0 auto}
 .tkd-pane{position:relative;overflow:hidden;background:#000;min-width:0}
 .tkd-pane video,.tkd-pane img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transform-origin:center}
 .tkd-theater iframe{width:100%;height:100%;border:0}
@@ -2311,6 +2313,8 @@ html.phone .tk-save-x{display:none}
 .tkd-notes{display:grid;gap:3px}.tkd-notes span{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
 .tkd-notes p{margin:0;padding:7px 9px;border-left:2px solid rgba(var(--lr),.3);background:rgba(0,0,0,.15);font-size:13.5px;white-space:pre-wrap;color:var(--fg)}.tkd-notes em{color:var(--muted)}
 .tkd-ro{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}.tkd-none{margin:0;font-size:13px;color:var(--muted)}
+#attCmp.ro .acmp-trim,#attCmp.ro .acmp-mir,#attCmp.ro .acmp-pick,#attCmp.ro [data-cmpgo="align"],#attCmp.ro [data-cmpgo="alignreset"],#attCmp.ro [data-cmpgo="lock"],#attCmp.ro [data-cmpgo="savealign"],#attCmp.ro .acmp-hint{display:none!important}
+.tkd-full{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border:0;background:#2f6fec;color:#fff;font:700 12.5px inherit;font-family:inherit;cursor:pointer;margin-left:6px}
 /* add + compare: one slim icon row */
 .att-tools{display:flex;align-items:center;gap:3px;margin-top:3px}
 .att-ic{position:relative;display:grid;place-items:center;width:40px;height:34px;padding:0;border:0;border-radius:0;cursor:pointer;color:var(--fg);background:rgba(var(--lr),.1);transition:background .15s}
@@ -7130,13 +7134,14 @@ function cmpPool(tid){const t=findTaskAny(tid),p=passOfTask(tid);if(!t)return []
   const seen=new Set();return out.filter(x=>{const k=attSame(x.a)+(x.a.t1!=null?"@"+(x.a.t0||0)+"-"+x.a.t1:"");if(seen.has(k))return false;seen.add(k);return true})}
 function cmpOpen(tid){const P=cmpPool(tid);if(P.length<2){toast("Add 2 videos or photos to compare them side by side");return}const own=P.filter(x=>x.t.id===tid);
   attCmp={tid,L:own[0].a.id,R:(own[1]||P.find(x=>x.a.id!==own[0].a.id)).a.id,mL:false,mR:false,sp:1,spL:1,spR:1,align:false,hide:false,tf:{L:{x:0,y:0,s:1},R:{x:0,y:0,s:1}}};cmpRender()}
+function cmpOpenView(tid){cmpOpen(tid);if(!attCmp)return;attCmp.ro=true;attCmp.lock=true;const w=document.getElementById("attCmp");if(w){w.classList.add("ro");const h=w.querySelector(".acmp-h small");if(h)h.textContent="Finished · view only"}cmpStyle()}
 function cmpVids(){return [...document.querySelectorAll("#attCmp video[data-cmpv]")]}
 function cmpRender(){let w=document.getElementById("attCmp");
   if(!attCmp){if(w)w.remove();return}
   const P=cmpPool(attCmp.tid);const get=id=>P.find(x=>x.a.id===id);if(!get(attCmp.L)||!get(attCmp.R)){attCmp=null;w&&w.remove();return}
   const key=attCmp.L+"|"+attCmp.R;
   if(!w){w=document.createElement("div");w.id="attCmp";w.className="attv acmp";w.setAttribute("role","dialog");w.setAttribute("aria-modal","true");w.setAttribute("aria-label","Compare side by side");document.body.appendChild(w)}
-  if(w.dataset.k===key){cmpStyle();return}w.dataset.k=key;
+  if(w.dataset.k===key){cmpStyle();return}w.dataset.k=key;w.classList.toggle("ro",!!attCmp.ro);
   const pane=side=>{const it=get(attCmp[side]),a=it.a,y=a.kind==="yt"?ytId(a.url):null;
     const m=a.kind==="yt"?`<iframe src="https://www.youtube-nocookie.com/embed/${y}?playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="YouTube video"></iframe>`:a.kind==="vid"?`<video data-cmpv="${side}" playsinline webkit-playsinline preload="auto" ${side==="R"?"muted":""}></video>`:`<img data-cmpi="${side}" alt="${esc(a.name||"Photo")}">`;
     const BD=`<span class="acmp-bdgs">${a.t1!=null?`<i class="acmp-bdg" title="Trimmed">${ICO_CUT}</i>`:""}<i class="acmp-bdg acmp-bdg-al" title="Aligned" hidden>${ICO_MOVE}</i><i class="acmp-bdg acmp-bdg-sp" title="Speed" hidden></i><i class="acmp-bdg acmp-bdg-at" title="Saved spot" ${a.view&&a.view.at!=null?"":"hidden"}>${ICO_PIN}</i></span>`;
@@ -7253,7 +7258,7 @@ document.addEventListener("touchmove",e=>{if(e.touches.length>1&&e.target.closes
   document.addEventListener("wheel",e=>{if(!attCmp||!attCmp.align||attCmp.lock)return;const m=e.target.closest&&e.target.closest("#attCmp .acmp-m");if(!m)return;e.preventDefault();const t=attCmp.tf[m.closest(".acmp-p").dataset.side];t.s=Math.max(.5,Math.min(CMP_ZMAX,t.s*(e.deltaY<0?1.06:1/1.06)));cmpStyle()},{passive:false})})();
 /* the only ways out of compare: the × or a hard swipe up. The window follows the finger and glides away;
    if something changed and wasn't saved, it asks first */
-function cmpDirty(){return !!attCmp&&attCmp.base!=null&&cmpSnap()!==attCmp.base}
+function cmpDirty(){return !!attCmp&&!attCmp.ro&&attCmp.base!=null&&cmpSnap()!==attCmp.base}
 function cmpGone(){const w=document.getElementById("attCmp");if(!w){attCmp=null;return}w.querySelectorAll("video").forEach(v=>v.pause());w.style.transition="transform .32s cubic-bezier(.4,0,.2,1),opacity .32s";w.style.transform="translate3d(0,-100%,0)";w.style.opacity="0";setTimeout(()=>{attCmp=null;cmpRender()},330)}
 function cmpBack(){const w=document.getElementById("attCmp");if(!w)return;w.style.transition="transform .28s cubic-bezier(.2,.8,.2,1),opacity .28s";w.style.transform="";w.style.opacity=""}
 async function cmpClose(){if(!attCmp)return;if(cmpDirty()){cmpBack();const v=await aotChoose({title:"Save your changes?",text:"You changed the position, zoom, mirror or speed and haven't saved.",opts:[["save","Save and close"],["drop","Close without saving"]]});
@@ -7389,21 +7394,21 @@ const tkDoneSet=new Set(),tkdSaved=new Set();   /* finished tasks show the whole
 function tkDoneView(t){const A=(t.att||[]).filter(a=>a.kind!=="yt"||ytId(a.url)),V=A.filter(a=>a.kind!=="yt");
   /* whole video shown, never cropped (was: the saved move/zoom applied, which cut the picture off); mirror is kept */
   /* two looks: "Saved view" = exactly how you left it in compare (move, zoom, mirror); "Whole video" = the full picture, nothing cut off */
-  let first=true;const pane=a=>{if(!a)return "";const v=a.view||{},sv=`translate(${(v.x||0)*100}%,${(v.y||0)*100}%) scale(${v.s||1}) scaleX(${v.m?-1:1})`,wh=`scaleX(${v.m?-1:1})`,tf=tkdSaved.has(t.id)?sv:wh;
+  let first=true;const pane=a=>{if(!a)return "";const v=a.view||{},sv=`translate(${(v.x||0)*100}%,${(v.y||0)*100}%) scale(${v.s||1}) scaleX(${v.m?-1:1})`,wh=`scaleX(${v.m?-1:1})`,tf=sv;
     /* only one side keeps its sound: iPhone stops the other video if two with sound play at once */
     const mute=a.kind==="vid"&&!first;if(a.kind==="vid")first=false;
-    const pa=v.pa||"";return `<div class="tkd-pane" style="${tkdSaved.has(t.id)&&pa?`aspect-ratio:${pa}`:""}">${a.kind==="vid"?`<video data-dvsrc="${a.id}" data-pa="${pa}" data-tfs="${sv}" data-tfw="${wh}" playsinline webkit-playsinline preload="auto" ${mute?"muted":""} style="transform:${tf}"></video>`:`<img data-dvsrc="${a.id}" data-pa="${pa}" data-tfs="${sv}" data-tfw="${wh}" alt="" style="transform:${tf}">`}</div>`};
+    const pa=v.pa||"";return `<div class="tkd-pane" style="aspect-ratio:${pa||"9/16"}">${a.kind==="vid"?`<video data-dvsrc="${a.id}" data-pa="${pa}" data-tfs="${sv}" data-tfw="${wh}" playsinline webkit-playsinline preload="auto" ${mute?"muted":""} style="transform:${tf}"></video>`:`<img data-dvsrc="${a.id}" data-pa="${pa}" data-tfs="${sv}" data-tfw="${wh}" alt="" style="transform:${tf}">`}</div>`};
   const hasView=V.some(a=>a.view&&(Math.abs(a.view.x||0)>.002||Math.abs(a.view.y||0)>.002||Math.abs((a.view.s||1)-1)>.01));
   const two=V.length>=2,one=!two&&A[0];
   return `<div class="tkd-view">
     ${A.length?`<div class="tkd-theater${two?" two":""}">${two?pane(V[0])+pane(V[1]):one.kind==="yt"?`<iframe src="https://www.youtube-nocookie.com/embed/${ytId(one.url)}?playsinline=1&rel=0" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="YouTube video"></iframe>`:pane(one)}</div>
-      ${V.length&&!(one&&one.kind==="yt")?`<div class="tkd-ctl"><button type="button" class="tkd-pp" data-tkdplay aria-label="Play">▶</button><button type="button" class="tkd-pp" data-tkdback aria-label="Back to start">⟲</button>${hasView?`<span class="seg2 tkd-seg" role="group" aria-label="View"><button type="button" data-tkdmode="${t.id}:whole" aria-pressed="${!tkdSaved.has(t.id)}">Whole video</button><button type="button" data-tkdmode="${t.id}:saved" aria-pressed="${tkdSaved.has(t.id)}">Saved view</button></span>`:""}${two?`<span class="tkd-cap">Side by side · plays together</span>`:""}</div>`:""}
+      ${V.length&&!(one&&one.kind==="yt")?`<div class="tkd-ctl"><button type="button" class="tkd-pp" data-tkdplay aria-label="Play">▶</button><button type="button" class="tkd-pp" data-tkdback aria-label="Back to start">⟲</button>${two?`<button type="button" class="tkd-full" data-tkdfull="${t.id}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg> Full size${V.some(a=>a.view)?" · your saved comparison":""}</button>`:""}${two?`<span class="tkd-cap">Side by side · plays together</span>`:""}</div>`:""}
       <div class="tkd-gal">${A.map(a=>`<button type="button" class="tkd-th" data-attview="${t.id}:${a.id}" aria-label="Open">${attThumb(a)}${a.t1!=null||a.view?`<span class="att-bdgs">${a.t1!=null?`<i>${ICO_CUT}</i>`:""}${a.view?`<i>${ICO_MOVE}</i>`:""}</span>`:""}</button>`).join("")}</div>`:`<p class="tkd-none">No media on this task.</p>`}
     <div class="tkd-notes"><span>Notes</span><p>${t.note?esc(t.note):"<em>No notes.</em>"}</p></div>
     <div class="tkd-ro">${ICO_LOCK} Finished · view only. Tap Undo to edit it again.</div></div>`}
 function tkDoneHydrate(){document.querySelectorAll("[data-dvsrc]").forEach(el=>{if(el.dataset.dvok)return;el.dataset.dvok=1;const a=attFind(el.dataset.dvsrc);if(!a)return;
   attURL(a).then(u=>{if(!u)return;if(el.tagName==="IMG"){el.src=u;return}attPoster(a).then(pu=>{if(pu)el.poster=pu});const so=document.createElement("source");so.src=u;so.type=a.type||"video/mp4";el.appendChild(so);
-    const v=a.view||{};el.addEventListener("loadedmetadata",()=>{try{el.currentTime=v.at!=null?v.at:(a.t0||0)}catch(_){}el.playbackRate=v.sp||1},{once:true});el.addEventListener("play",()=>{el.playbackRate=v.sp||1});
+    const v=a.view||{};el.addEventListener("loadedmetadata",()=>{const pn=el.closest(".tkd-pane");if(pn&&!v.pa&&el.videoWidth)pn.style.aspectRatio=el.videoWidth+"/"+el.videoHeight;try{el.currentTime=v.at!=null?v.at:(a.t0||0)}catch(_){}el.playbackRate=v.sp||1},{once:true});el.addEventListener("play",()=>{el.playbackRate=v.sp||1});
     if(a.t1!=null)el.addEventListener("timeupdate",()=>{if(el.currentTime>=a.t1)el.currentTime=a.t0||0});el.load()})})}
 /* finished-task theater: one button plays/pauses both sides; tapping a side plays/pauses just that one */
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tkdplay],[data-tkdback],.tkd-pane");if(!b)return;const vw=b.closest(".tkd-view");if(!vw)return;e.preventDefault();e.stopPropagation();
@@ -7411,6 +7416,8 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   if(b.dataset.tkdback!==undefined)V.forEach(v=>{const a=attFind(v.dataset.dvsrc)||{};try{v.currentTime=a.view&&a.view.at!=null?a.view.at:(a.t0||0)}catch(_){}});
   else{const go=V.every(v=>v.paused);if(go){V.forEach(v=>{const a=attFind(v.dataset.dvsrc)||{};v.playbackRate=(a.view&&a.view.sp)||1});Promise.all(V.map(v=>{const p=v.play();return p&&p.catch?p.catch(()=>{}):null}))}else V.forEach(v=>v.pause())}
   setTimeout(()=>{if(pb)pb.textContent=V.some(v=>!v.paused)?"❚❚":"▶"},60)},true);
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tkdfull]");if(!b)return;e.preventDefault();e.stopPropagation();
+  const vw=b.closest(".tkd-view");vw&&vw.querySelectorAll("video").forEach(v=>v.pause());cmpOpenView(b.dataset.tkdfull);attHydrate()},true);
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tkdmode]");if(!b)return;e.preventDefault();e.stopPropagation();const [id,m]=b.dataset.tkdmode.split(":");
   m==="saved"?tkdSaved.add(id):tkdSaved.delete(id);const vw=b.closest(".tkd-view");vw.querySelectorAll("[data-tfs]").forEach(el=>{el.style.transform=m==="whole"?el.dataset.tfw:el.dataset.tfs;const pn=el.closest(".tkd-pane");if(pn)pn.style.aspectRatio=m==="saved"&&el.dataset.pa?el.dataset.pa:""});vw.classList.toggle("saved",m==="saved");
   vw.querySelectorAll("[data-tkdmode]").forEach(x=>x.setAttribute("aria-pressed",x===b))},true);
@@ -8403,7 +8410,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="565",APPT="2026-11-23T04:24:02Z";   /* APPT: when this update was made */
+const APPV="566",APPT="2026-11-23T04:27:18Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
