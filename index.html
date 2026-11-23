@@ -2766,6 +2766,9 @@ button.us-emptyadd{width:100%;font:inherit;cursor:pointer;background:none;color:
 .bm{display:grid;grid-template-columns:minmax(0,1.55fr) 1px minmax(0,1fr);gap:16px;align-items:start}.bm-sep{align-self:stretch;background:rgba(var(--lr),.22)}
 @media (max-width:1100px){.bm{grid-template-columns:minmax(0,1fr)}.bm-sep{height:1px}}
 .bc-h{display:flex;align-items:center;gap:6px;margin-bottom:10px}.bc-h b{font-size:15px;min-width:150px;text-align:center}.bc-nav,.bc-today{font:inherit;font-size:18px;line-height:1;width:32px;height:32px;border-radius:9px;cursor:pointer;color:#e6eeff;background:rgba(var(--tX),.45);border:1px solid rgba(var(--lr),.3)}.bc-today{width:auto;padding:0 12px;font-size:12.5px;font-weight:600;margin-left:auto}
+/* launch build: hidden tabs */
+html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
+html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
 /* square day boxes in every month calendar */
 .mcal .mc,.bc-grid .bc-d,.nwc-g button{aspect-ratio:1/1;min-height:0!important;height:auto!important;overflow:hidden}
 .bc-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border:1px solid rgba(var(--lr),.28);border-radius:12px;overflow:hidden}
@@ -3505,9 +3508,44 @@ document.addEventListener("click",async e=>{const t=e.target.closest&&e.target.c
   else if(t.id==="signOutBtn"){if(t.dataset.armed!=="1"){t.dataset.armed="1";t.textContent=syncDirty?"Unsynced changes will be lost. Tap again":"Tap again to sign out";return}
     await sb.auth.signOut();if(!isEmpty(data))snapshot(data,"Before signing out");data=EMPTY();try{localStorage.removeItem("aot");localStorage.removeItem("aot-owner")}catch(_){}sbUser=null;saveRef=null;setUplink();render();showAuth("in")}
   else if(t.dataset&&t.dataset.snap!==undefined){const i=+t.dataset.snap;if(snapArm!==i){snapArm=i;render();return}snapArm=null;let L=[];try{L=JSON.parse(localStorage.getItem("aot-snaps")||"[]")}catch(e){}const x=L[i];if(!x)return;snapshot(data,"Before restoring an earlier version");data=Object.assign(EMPTY(),x.data);stripCanceled(data);render();save();toast("Earlier version restored")}
-  else if(t.id==="exportBtn"){const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),u=URL.createObjectURL(blob),l=document.createElement("a");l.href=u;l.download="assontrack-backup-"+today()+".json";document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);toast("Backup downloaded")}
+  else if(t.id==="exportBtn"){bkExport();return}
+  else if(t.id==="exportBtnOld"){const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),u=URL.createObjectURL(blob),l=document.createElement("a");l.href=u;l.download="assontrack-backup-"+today()+".json";document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);toast("Backup downloaded")}
 });
+/* ---------- full backup file (.aotbackup): everything on this device in one file ----------
+   layout: "AOTBACKUP1\n" + header length + "\n" + header JSON + the raw bytes of each file, one after another */
+const BK_DBS=[["aot-media","f"],["aot-audio","f"],["aot-models","m"]];
+const bkOpen=(name,st)=>new Promise((ok,no)=>{try{const r=indexedDB.open(name);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(st))r.result.createObjectStore(st)};r.onsuccess=()=>{const d=r.result;if(d.objectStoreNames.contains(st))return ok(d);const v=d.version+1;d.close();const r2=indexedDB.open(name,v);r2.onupgradeneeded=()=>r2.result.createObjectStore(st);r2.onsuccess=()=>ok(r2.result);r2.onerror=()=>no(r2.error)};r.onerror=()=>no(r.error)}catch(e){no(e)}});
+const bkAll=(d,st)=>new Promise(ok=>{const out=[];try{const q=d.transaction(st).objectStore(st).openCursor();q.onsuccess=()=>{const c=q.result;if(!c)return ok(out);out.push([c.key,c.value]);c.continue()};q.onerror=()=>ok(out)}catch(e){ok(out)}});
+async function bkExport(){toast("Making your backup…");
+  try{const ls={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(/^aot/.test(k)&&k!=="aot-snaps")ls[k]=localStorage.getItem(k)}
+    const files=[],parts=[];
+    for(const [name,st] of BK_DBS){let d;try{d=await bkOpen(name,st)}catch(e){continue}
+      for(const [k,v] of await bkAll(d,st)){
+        if(v instanceof Blob){files.push({db:name,st,k,kind:"blob",t:v.type||"",n:v.size});parts.push(v)}
+        else if(v&&v.b instanceof ArrayBuffer){files.push({db:name,st,k,kind:"tb",t:v.t||"",n:v.b.byteLength});parts.push(new Blob([v.b]))}
+        else if(v instanceof ArrayBuffer){files.push({db:name,st,k,kind:"ab",n:v.byteLength});parts.push(new Blob([v]))}
+        else{try{files.push({db:name,st,k,kind:"json",v:JSON.parse(JSON.stringify(v)),n:0})}catch(e){}}}
+      try{d.close()}catch(e){}}
+    const head=new TextEncoder().encode(JSON.stringify({app:"AssOnTrack",type:"backup",version:1,exported:new Date().toISOString(),ls,files}));
+    const blob=new Blob(["AOTBACKUP1\n"+head.length+"\n",head,...parts],{type:"application/octet-stream"}),name="assontrack-backup-"+today()+".aotbackup";
+    const mb=(blob.size/1048576).toFixed(blob.size>1048576*10?0:1),file=new File([blob],name,{type:"application/octet-stream"});
+    if(navigator.canShare&&navigator.share&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:"AssOnTrack backup"});toast(`Backup saved · ${mb} MB`);return}catch(e){if(e&&e.name==="AbortError")return}}
+    const u=URL.createObjectURL(blob),l=document.createElement("a");l.href=u;l.download=name;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),60000);toast(`Backup downloaded · ${mb} MB`)}
+  catch(e){toast("Couldn't make the backup. Try again.")}}
+async function bkImport(f){const top=new TextDecoder().decode(await f.slice(0,40).arrayBuffer()),m=top.match(/^AOTBACKUP1\n(\d+)\n/);if(!m)throw 0;
+  const start=m[0].length,hl=+m[1],h=JSON.parse(new TextDecoder().decode(await f.slice(start,start+hl).arrayBuffer()));if(!h||h.type!=="backup")throw 0;
+  const nMedia=h.files.filter(x=>x.kind!=="json").length;
+  if(!(await aotConfirm({title:"Restore this backup?",text:`From ${new Date(h.exported).toLocaleString()} · everything you logged${nMedia?` plus ${nMedia} photo/video file${nMedia===1?"":"s"}`:""}. This replaces what's in the app now.`,ok:"Restore",no:"Cancel"})))return;
+  toast("Restoring…");let off=start+hl;const by={};
+  for(const x of h.files){const key=x.db+"|"+x.st;(by[key]=by[key]||{db:x.db,st:x.st,L:[]}).L.push([x,off]);off+=x.n}
+  for(const g of Object.values(by)){const d=await bkOpen(g.db,g.st);
+    for(const [x,o] of g.L){let v;if(x.kind==="json")v=x.v;else{const bl=f.slice(o,o+x.n);v=x.kind==="blob"?new Blob([await bl.arrayBuffer()],{type:x.t}):x.kind==="tb"?{t:x.t,b:await bl.arrayBuffer()}:await bl.arrayBuffer()}
+      await new Promise(ok=>{const tx=d.transaction(g.st,"readwrite");tx.objectStore(g.st).put(v,x.k);tx.oncomplete=ok;tx.onerror=ok})}
+    try{d.close()}catch(e){}}
+  Object.entries(h.ls||{}).forEach(([k,v])=>{try{localStorage.setItem(k,v)}catch(e){}});
+  toast("Backup restored");setTimeout(()=>location.reload(),700)}
 document.addEventListener("change",async e=>{if(e.target.id!=="importIn")return;const f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;
+  /* new full backup file */ {const top=new TextDecoder().decode(await f.slice(0,12).arrayBuffer());if(top.startsWith("AOTBACKUP1")){try{await bkImport(f)}catch(err){toast("That backup file couldn't be read.")}return}}
   try{let j=JSON.parse(await f.text());if(j&&j.data&&j.data.passions)j=j.data;
     if(!j||typeof j!=="object"||!Array.isArray(j.passions))throw 0;
     const n=j.passions.length;if(!confirm(`Import ${n} passion${n===1?"":"s"} and all logs from this file? This replaces what's in the app now.`))return;
@@ -8522,8 +8560,8 @@ function vSet(){
       :`<p class="note" style="margin-top:0">You're saving on this device only. Sign in to keep your logs safe and synced between your phone and computer.</p><div class="stack" style="margin-top:14px;gap:10px"><button class="btn" id="signInBtn">Sign in or create account</button></div>`)
       :`<p class="note" style="margin-top:0">Your logs are saved on this device.</p>`}
     <div class="ph" style="margin:20px 0 10px"><span>Backup</span></div>
-    <div class="stack" style="gap:10px"><button class="btn mag" id="exportBtn">Download a backup</button><label class="btn mag imp">Import from a backup file<input id="importIn" type="file" accept="application/json,.json"></label></div>${(()=>{let L=[];try{L=JSON.parse(localStorage.getItem("aot-snaps")||"[]")}catch(e){}return L.length?`<div class="ph" style="margin:20px 0 10px"><span>Earlier versions on this device</span></div><div class="snaps">${L.map((x,i)=>`<div class="snap"><span><b>${new Date(x.at).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</b><small>${esc(x.why||"")} · ${(x.data.passions||[]).length} passions${(x.data.categories||[]).length?", "+x.data.categories.length+" categories":""}</small></span><button class="mv${snapArm===i?" armed":""}" data-snap="${i}">${snapArm===i?"Tap again to restore":"Restore"}</button></div>`).join("")}</div><p class="note">The app keeps the last few copies it replaced, so nothing is lost if a sync goes the wrong way.</p>`:""})()}
-    <p class="note">A backup is a file with everything you've logged. Importing one replaces what's in the app.</p>
+    <div class="stack" style="gap:10px"><button class="btn mag" id="exportBtn">Save a backup</button><label class="btn mag imp">Restore from a backup<input id="importIn" type="file"></label></div>${(()=>{let L=[];try{L=JSON.parse(localStorage.getItem("aot-snaps")||"[]")}catch(e){}return L.length?`<div class="ph" style="margin:20px 0 10px"><span>Earlier versions on this device</span></div><div class="snaps">${L.map((x,i)=>`<div class="snap"><span><b>${new Date(x.at).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</b><small>${esc(x.why||"")} · ${(x.data.passions||[]).length} passions${(x.data.categories||[]).length?", "+x.data.categories.length+" categories":""}</small></span><button class="mv${snapArm===i?" armed":""}" data-snap="${i}">${snapArm===i?"Tap again to restore":"Restore"}</button></div>`).join("")}</div><p class="note">The app keeps the last few copies it replaced, so nothing is lost if a sync goes the wrong way.</p>`:""})()}
+    <p class="note">A backup is one file with everything you've logged, including your photos and videos. Save it to Files, iCloud Drive, Dropbox or AirDrop it to another device. Restoring one replaces what's in the app.</p>
     <div class="stack" style="margin-top:16px;gap:12px"><button class="btn red" id="clearBtn">Clear all my data</button></div></div>
   </div>`;
 }
@@ -8532,7 +8570,10 @@ const TITLES={dash:["Dashboard","Calendar and today's targets"],fuel:["Nutrition
 const typing=()=>{const a=document.activeElement;return !!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&a.type!=="range"&&a.type!=="checkbox"&&a.type!=="radio"&&a.type!=="file")};
 let renderWait=false;function softRender(){if(typing()){renderWait=true;return}renderWait=false;render()}
 document.addEventListener("focusout",()=>setTimeout(()=>{if(renderWait&&!typing()){renderWait=false;render()}},600));
-function render(){try{nwSync()}catch(_){}
+/* launch build: these tabs are hidden (their data stays). To bring one back, take it out of this list. */
+const LAUNCH_HIDE=["rem","kitchen","train","body"];
+document.documentElement.classList.add("launch");
+function render(){if(LAUNCH_HIDE.includes(tab))tab="dash";try{nwSync()}catch(_){}
   const v=$("#view"),y=v.scrollTop;v.dataset.tab=tab;
   const SCR=".theme-strip,.fd-list,.lk-row,.cat-bar,.wgrid,.avbg,.av-tabs,.wa-grid,.rows",keep=[];SCR.split(",").forEach(q=>v.querySelectorAll(q).forEach((el,i)=>{if(el.scrollLeft||el.scrollTop)keep.push([q,i,el.scrollLeft,el.scrollTop])}));
   v.innerHTML={dash:vDash,fuel:vFuel,kitchen:vKitchen,body:vBody,train:vTrain,pass:vPass,budget:vBudget,rem:vRem,set:vSet}[tab]()+`<footer class="foot">This is not a replacement for measuring your true progress away from the screen. This app is designed for those preferring organization.<br>Inspired by Lose It!</footer>`;
@@ -8571,7 +8612,7 @@ let confirmClear=false;
 function navGrpSet(){const g=document.getElementById("navGrp"),open=(()=>{try{return localStorage.getItem("aot-navtr")!=="0"}catch(_){return true}})();if(!g)return;g.classList.toggle("open",open);const t=document.querySelector('.navbtn[data-tab="train"]');if(t){t.classList.toggle("navgrp-closed",!open);const c=t.querySelector(".navcar");if(c)c.setAttribute("aria-expanded",String(open))}}
 document.addEventListener("click",e=>{const c=e.target.closest&&e.target.closest("[data-navtog]");if(!c)return;e.preventDefault();e.stopPropagation();const open=document.getElementById("navGrp").classList.contains("open");try{localStorage.setItem("aot-navtr",open?"0":"1")}catch(_){}navGrpSet()},true);
 document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.dataset&&e.target.dataset.navtog!=null){e.preventDefault();e.stopPropagation();e.target.click()}},true);
-function go(t){if(t!==tab)sfx("whoosh");if(t==="train"&&t!==tab){splitDay=dayIdx(today());catDayF={}}tab=t;confirmClear=false;render();$("#view").scrollTop=0}
+function go(t){if(LAUNCH_HIDE.includes(t))t="dash";if(t!==tab)sfx("whoosh");if(t==="train"&&t!==tab){splitDay=dayIdx(today());catDayF={}}tab=t;confirmClear=false;render();$("#view").scrollTop=0}
 document.addEventListener("change",e=>{const t=e.target;if(!t.dataset||!t.dataset.tkproj)return;const p=data.passions.find(x=>x.id===selP);const k=p&&(p.tasks||[]).find(x=>x.id===t.dataset.tkproj);if(!k)return;k.proj=t.value||null;render();save();toast(t.value?"Moved to "+t.options[t.selectedIndex].text:"Removed from project")});
 document.addEventListener("focusout",e=>{if(e.target.id==="slH"||e.target.id==="seH"){const m=parseHM(e.target.value);if(m!=null)e.target.value=String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&renaming&&e.target.id==="rnIn"){renaming=null;render()}});
@@ -8713,7 +8754,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="614",APPT="2026-11-23T08:49:16Z";   /* APPT: when this update was made */
+const APPV="615",APPT="2026-11-23T09:14:32Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
