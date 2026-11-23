@@ -2883,7 +2883,7 @@ html.phone .bc-mk{top:64%;width:26px;height:26px;font-size:16px}html.phone .bc-m
 .bwi-r{display:flex;align-items:center;gap:12px;width:100%;padding:10px 14px;border:0;border-top:1px solid rgba(var(--lr),.12);background:rgba(4,8,20,.3);color:inherit;font:inherit;text-align:left;cursor:pointer}.bwi-r:first-child{border-top:0}
 .bwi-n{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-weight:600}.bwi-n small{font-weight:400;font-size:12px;color:var(--muted)}.bwi-r>b{font-family:var(--mono)}
 .bwi-r>i{font-style:normal;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;border:1px solid rgba(61,220,132,.55);color:#3ddc84;background:rgba(61,220,132,.12);min-width:52px;text-align:center}
-.bwi-r.cut>i{border-color:rgba(255,94,108,.6);color:#ff8a95;background:rgba(255,77,94,.14)}.bwi-r.cut .bwi-n,.bwi-r.cut>b{text-decoration:line-through;text-decoration-thickness:2px;opacity:.55}
+.bwi-r.cut>i{border-color:rgba(255,94,108,.6);color:#ff8a95;background:rgba(255,77,94,.14)}.bwi-r.cut .bwi-n{text-decoration:line-through;text-decoration-thickness:2px;opacity:.55}.bwi-r>b.bwi-saved{color:#3ddc84}.bwi-sum2{grid-template-columns:1fr 1fr!important}
 .bwi-act{display:flex;gap:8px;flex-wrap:wrap}
 .bwi-goal{padding:14px;border-radius:14px;border:1px solid rgba(61,220,132,.45);background:rgba(61,220,132,.08);display:flex;flex-direction:column;gap:4px}.bwi-goal.slip{border-color:rgba(255,94,108,.5);background:rgba(255,77,94,.08)}.bwi-goal>span{font-size:13px;color:var(--muted)}
 .bwi-gs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}.bwi-gs>div{display:flex;flex-direction:column;gap:2px}.bwi-gs small{font-size:12px;color:var(--muted)}.bwi-gs b{font-family:var(--mono);font-size:18px}.bwi-gs .pos{color:#3ddc84}.bwi-gs .neg{color:#ff8a95}
@@ -5980,9 +5980,9 @@ function bSpendWhatIf(b){if(!bWhatCut)bWhatCut=new Set((b.spPlan&&b.spPlan.cut)|
   const R=[...M.values()].sort((a,z)=>z.t-a.t);if(!R.length)return `<p class="note" style="margin:10px 2px 0">Once you've logged some spending, pick what you'd stop buying here and see how much you'd save.</p>`;
   const now=R.reduce((a,r)=>a+r.t,0),keep=R.filter(r=>!bWhatCut.has(r.k)).reduce((a,r)=>a+r.t,0),sav=now-keep,P=b.spPlan;
   return `<div class="bwi">
-    <div class="bwi-sum"><div><small>Last 30 days</small><b>${bMoney(now)}</b></div><div><small>Only what you keep</small><b class="pos">${bMoney(keep)}</b></div><div class="bwi-sv"><small>You'd save</small><b>${bMoney(sav)}<em>/mo</em></b><span>${bMoney(sav*12)} a year</span></div></div>
-    <p class="bwi-hint">Tap what you'd stop buying.</p>
-    <div class="bwi-list">${R.map(r=>{const cut=bWhatCut.has(r.k);return `<button type="button" class="bwi-r${cut?" cut":""}" data-bwi="${esc(r.k)}" aria-pressed="${cut}"><span class="bwi-n">${esc(r.n)}<small>${r.cnt}× in 30 days${r.sg?` · ${esc(r.sg)}`:""}</small></span><b>${bMoney(r.t)}</b><i>${cut?"Cut":"Keep"}</i></button>`}).join("")}</div>
+    <div class="bwi-sum bwi-sum2"><div><small>Spent · last 30 days</small><b>${bMoney(now)}</b></div><div class="bwi-sv"><small>Savings</small><b>${bMoney(sav)}<em>/mo</em></b><span>${bMoney(sav*12)} a year</span></div></div>
+    <p class="bwi-hint">Cross out what you'd stop buying.</p>
+    <div class="bwi-list">${R.map(r=>{const cut=bWhatCut.has(r.k);return `<button type="button" class="bwi-r${cut?" cut":""}" data-bwi="${esc(r.k)}" aria-pressed="${cut}"><span class="bwi-n">${esc(r.n)}<small>${r.cnt}× in 30 days${r.sg?` · ${esc(r.sg)}`:""}</small></span>${cut?`<b class="bwi-saved">+${bMoney(r.t)} saved</b>`:`<b>${bMoney(r.t)}</b>`}</button>`}).join("")}</div>
     <div class="bwi-act">${bWhatCut.size?`<button type="button" class="btn" data-bwigoal>${P?"Update my goal":"Make this my goal"}</button>`:""}${P?`<button type="button" class="btn ghost" data-bwiclear>Clear goal</button>`:""}${bWhatCut.size?`<button type="button" class="btn ghost" data-bwireset>Reset</button>`:""}</div>
     ${P?bPlanCard(b):""}</div>`}
 function bPlanStats(b){const P=b.spPlan;if(!P)return null;const C=new Set(P.cut),S=b.spends.filter(s=>s.d>P.since||(s.d===P.since&&(s.t||0)>(P.ts||0))),   /* only what was bought after the goal was set */days=Math.max(1,Math.round((bDate(today())-bDate(P.since))/864e5)+1);
@@ -8920,7 +8920,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="638",APPT="2026-11-23T22:28:22Z";   /* APPT: when this update was made */
+const APPV="639",APPT="2026-11-23T22:30:29Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
