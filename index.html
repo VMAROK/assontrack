@@ -2771,6 +2771,9 @@ button.us-emptyadd{width:100%;font:inherit;cursor:pointer;background:none;color:
 .nw-d .nw-k,.nw-d .nw-l,.nw-d .nw-ml{visibility:hidden!important}
 /* centre the donut: split the (hidden) number lines above and below it so the box keeps its size */
 .nw-d .nw-t{order:0}.nw-d .nw-k{order:1}.nw-d .nw-ml{order:2}.nw-d .nw-ring{order:3}.nw-d .nw-l{order:4}.nw-d .nw-gw{order:5}html:not(.phone) .nw-d .nw-ring{position:relative;top:-8px}
+/* Nutrition week doors: no lines along the top and bottom (inner lines + top/bottom borders removed) */
+.nw-gate::before{display:none!important}.nw-gl{display:none!important}
+.nw-gate{border-top:0!important;border-bottom:0!important;box-shadow:0 2px 10px rgba(0,0,0,.18)!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -8759,7 +8762,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="622",APPT="2026-11-23T09:56:19Z";   /* APPT: when this update was made */
+const APPV="623",APPT="2026-11-23T10:00:05Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
