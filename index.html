@@ -2791,11 +2791,19 @@ html.phone .bc-grid .bc-d.past::after{top:4px;right:4px;width:8px;height:8px} */
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 5l14 14M19 5L5 19' stroke='%23c4c8d0' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat} */
 /* past days: a frosted grey glass laid over the whole day (list included), with the Nutrition-style X on top */
 .bc-grid .bc-d.past::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:3;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Ccircle cx='22' cy='22' r='17' fill='none' stroke='rgba(150,180,240,.14)' stroke-width='4.5'/%3E%3Cpath d='M15 15l14 14M29 15L15 29' fill='none' stroke='rgba(255,120,140,.55)' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E") 50% 56%/52px 52px no-repeat,linear-gradient(155deg,rgba(255,255,255,.07),rgba(255,255,255,0) 42%),rgba(4,8,20,.42);
+  background:linear-gradient(155deg,rgba(255,255,255,.07),rgba(255,255,255,0) 42%),rgba(4,8,20,.42);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 0 0 1px rgba(255,255,255,.03);
   backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}   /* was a grey tint: rgba(130,134,144,.16) + saturate(.7) */
-html.phone .bc-grid .bc-d.past::after{background-size:30px 30px,auto,auto}
-.bc-grid .bc-d.past .bc-n{z-index:4}   /* the date stays sharp above the glass */
+/* X + ring removed from the glass */
+.bc-grid .bc-d.past .bc-n{z-index:4}
+.bc-mk{position:absolute!important;left:50%;top:56%;transform:translate(-50%,-50%);z-index:4!important;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;font-weight:800;font-size:19px;line-height:1;pointer-events:none}
+.bc-mk svg{width:20px;height:20px}
+.bc-mk.ok{color:#3ddc84;background:rgba(61,220,132,.14);box-shadow:0 0 0 1.5px rgba(61,220,132,.55),0 0 14px rgba(61,220,132,.35)}
+.bc-mk.no{color:#ff5e6c;background:rgba(255,77,94,.14);box-shadow:0 0 0 1.5px rgba(255,94,108,.55),0 0 14px rgba(255,77,94,.35)}
+.bc-mk.late{color:#ffa630;background:rgba(255,166,48,.14);box-shadow:0 0 0 1.5px rgba(255,166,48,.6),0 0 14px rgba(255,166,48,.35)}
+.bc-mk.part{width:auto;min-width:40px;height:26px;padding:0 9px;border-radius:13px;font-family:var(--mono);font-size:13px;color:#3ddc84}
+.bc-mk.part.no{background:rgba(255,77,94,.16)}.bc-mk.part.late{background:rgba(255,166,48,.16)}
+html.phone .bc-mk{width:22px;height:22px;font-size:13px}html.phone .bc-mk svg{width:13px;height:13px}html.phone .bc-mk.part{min-width:28px;height:18px;padding:0 5px;font-size:10px}   /* the date stays sharp above the glass */
 /* past days grey */
 /* grey now comes from the glass layer: .bc-grid .bc-d.past:not(.sel){background:rgba(130,134,144,.2)} */.bc-grid .bc-d.past .bc-n{color:#a3a7b0;opacity:1}
 .bc-grid .bc-d.past>*{position:relative;z-index:1}
@@ -2815,6 +2823,13 @@ html.phone .bc-grid .bc-d.past::after{background-size:30px 30px,auto,auto}
 .bdw-r{display:flex;align-items:center;gap:10px;width:100%;padding:10px 10px;border:0;border-top:1px solid rgba(var(--lr),.14);background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}.bdw-r:hover{background:rgba(var(--tL),.08)}
 .bdw-r>i{width:4px;align-self:stretch;border-radius:2px;background:var(--cc);flex:none}.bdw-r>span{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.bdw-r>span b{font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bdw-r small{font-size:11.5px;color:var(--muted)}
 .bdw-r>em{font-style:normal;font-family:var(--mono);font-weight:700;font-size:14.5px;color:#ff8a95;white-space:nowrap}.bdw-r>em.pos{color:#3ddc84}.bdw-r.mu{opacity:.55}
+.bdw-hint{margin:12px 2px 0;font-size:12.5px;color:var(--muted)}
+.bdw-box{flex:none;width:22px;height:22px;border-radius:7px;border:2px solid var(--cc);display:grid;place-items:center;background:rgba(4,8,20,.4);transition:background .15s}
+.bdw-r>span.bdw-box{flex:0 0 22px;display:grid;gap:0}
+.bdw-ck.done .bdw-box{background:#3ddc84;border-color:#3ddc84;color:#06180d}.bdw-box svg{width:15px;height:15px}
+.bdw-ck.done>span:not(.bdw-box) b,.bdw-ck.done>em{text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:rgba(230,238,255,.7)}
+.bdw-ck.done>span,.bdw-ck.done>em{opacity:.5}.bdw-ck.done>.bdw-box{opacity:1}
+.bdw-sp{cursor:default}.bdw-sp:hover{background:none}
 html.phone .bdw{padding:10px;align-items:end}html.phone .bdw-p{max-height:86vh}html.phone .bdw-t{gap:5px}html.phone .bdw-t b{font-size:12.5px}html.phone .bdw-t small{font-size:10px}
 .bc-dl{display:grid;gap:0;margin-top:8px;border:1px solid rgba(var(--lr),.25);border-radius:10px;overflow:hidden}
 .bc-r,.bs-r{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;font:inherit;color:inherit;text-align:left;cursor:pointer;background:rgba(var(--tX),.35);border:0;border-top:1px solid rgba(var(--lr),.16);box-shadow:inset 3px 0 0 var(--cc)}.bc-r:first-child{border-top:0}
@@ -5726,7 +5741,7 @@ function bCal(){const b=B(),T=today(),x=bDate(T);x.setDate(1);x.setMonth(x.getMo
   const ev={};b.items.filter(i=>!i.paused).forEach(i=>bOcc(i,from,to).forEach(ds=>(ev[ds]=ev[ds]||[]).push(i)));const spd={};b.spends.forEach(s=>{if(s.d>=from&&s.d<=to)spd[s.d]=(spd[s.d]||0)+bSpAmt(s)});
   if(!bSel||bSel.slice(0,7)!==from.slice(0,7))bSel=from.slice(0,7)===T.slice(0,7)?T:from;
   let cells="";for(let i=0;i<lead;i++)cells+=`<span class="bc-d pad"></span>`;
-  for(let d=1;d<=nd;d++){const ds=ymd(new Date(y,m,d,12)),E=ev[ds]||[];cells+=`<button type="button" class="bc-d${ds===T?" td":""}${ds===bSel&&!bNoSel?" sel":""}${ds<T?" past":""}" data-bday="${ds}"><span class="bc-n">${d}</span><span class="bc-ev">${E.slice(0,3).map(i=>`<i class="${i.kind==="inc"?"inc":""}${i.muted&&i.kind!=="inc"?" mu":""}" style="--cc:${i.kind==="inc"?"#3ddc84":bCol(bItCat(i))}">${esc(bTitle(i))}</i>`).join("")}${E.length>3?`<i class="more">+${E.length-3}</i>`:""}</span>${spd[ds]?`<span class="bc-sp">${bMoney(spd[ds],0)}</span>`:""}</button>`}
+  for(let d=1;d<=nd;d++){const ds=ymd(new Date(y,m,d,12)),E=ev[ds]||[];cells+=`<button type="button" class="bc-d${ds===T?" td":""}${ds===bSel&&!bNoSel?" sel":""}${ds<T?" past":""}" data-bday="${ds}"><span class="bc-n">${d}</span>${bDayMark(b,ds,E,T)}<span class="bc-ev">${E.slice(0,3).map(i=>`<i class="${i.kind==="inc"?"inc":""}${i.muted&&i.kind!=="inc"?" mu":""}" style="--cc:${i.kind==="inc"?"#3ddc84":bCol(bItCat(i))}">${esc(bTitle(i))}</i>`).join("")}${E.length>3?`<i class="more">+${E.length-3}</i>`:""}</span>${spd[ds]?`<span class="bc-sp">${bMoney(spd[ds],0)}</span>`:""}</button>`}
   const tail=(7-(lead+nd)%7)%7;for(let i=0;i<tail;i++)cells+=`<span class="bc-d pad"></span>`;
   const SE=(ev[bSel]||[]),SS=b.spends.filter(s=>s.d===bSel),tot=SE.filter(i=>i.kind!=="inc").reduce((a,i)=>a+fxc(+i.amt||0,i.cur,bHome()),0)+SS.reduce((a,s)=>a+bSpAmt(s),0);
   const day=`<div class="bc-day"><div class="bc-dh"><b>${bSel===T?"Today":bDate(bSel).toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"})}</b>${tot?`<span>${bMoney(tot)} out</span>`:""}</div>${SE.length||SS.length?`<div class="bc-dl">${SE.map(i=>`<button type="button" class="bc-r" data-bedit="${i.id}" style="--cc:${i.kind==="inc"?"#3ddc84":bCol(bItCat(i))}"><span>${esc(bTitle(i))}<small>${bSubT(i)?esc(bSubT(i))+" · ":""}${BKN[i.kind][0]}</small></span><b class="${i.kind==="inc"?"pos":""}">${i.kind==="inc"?"+":""}${bMoneyI(i)}</b></button>`).join("")}${SS.map(s=>`<button type="button" class="bc-r" data-bsedit="${s.id}" style="--cc:${bCol(s.cat)}"><span>${esc(s.note||s.cat)}<small>Spent · ${esc(s.cat)}</small></span><b>${bMoneyI(s)}</b></button>`).join("")}</div>`:`<p class="note" style="margin:6px 0 0">Nothing charged this day.</p>`}</div>`;
@@ -5734,20 +5749,32 @@ function bCal(){const b=B(),T=today(),x=bDate(T);x.setDate(1);x.setMonth(x.getMo
     <div class="bc-grid">${WKO.map(i=>`<span class="bc-wd">${DAYS[i]}</span>`).join("")}${cells}</div>${day}</div>${(bDayArgs=[b,bSel,SE,SS,T],setTimeout(bDayPaint,0),"")}`}
 let bDayArgs=null;
 function bDayPaint(){let h=document.getElementById("bdwHost");if(!bDayWin||tab!=="budget"||!bDayArgs||bDayArgs[1]!==bDayWin){if(h)h.remove();return}if(!h){h=document.createElement("div");h.id="bdwHost";document.body.appendChild(h)}h.innerHTML=bDayPop(...bDayArgs)}
+/* paid / received check-offs, one per item per date: b.paid["itemId|date"] = when it was crossed off */
+const bPaidK=(i,ds)=>i.id+"|"+ds,bIsPaid=(b,i,ds)=>!!(b.paid&&b.paid[bPaidK(i,ds)]);
+/* mark for a past day: green check when everything is crossed off, red X when a bill wasn't paid,
+   orange ? when only income is missing (delayed), and a count like 2/3 when part of it is done */
+function bDayMark(b,ds,E,T){if(ds>=T||!E.length)return "";const n=E.length,k=E.filter(i=>bIsPaid(b,i,ds)).length,billMiss=E.some(i=>i.kind!=="inc"&&!bIsPaid(b,i,ds));
+  const OK='<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        NO='<svg viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
+  if(k===n)return `<span class="bc-mk ok" title="All paid / received">${OK}</span>`;
+  if(k===0)return billMiss?`<span class="bc-mk no" title="Not paid">${NO}</span>`:`<span class="bc-mk late" title="Income not received yet">?</span>`;
+  return `<span class="bc-mk part ${billMiss?"no":"late"}" title="${k} of ${n} done">${k}/${n}</span>`}
 /* tap a day in the budget calendar: a window with everything that day */
 document.addEventListener("click",e=>{if(!bDayWin||!e.target.closest)return;if(e.target.closest("[data-bdwx]")||(e.target.matches&&e.target.matches("[data-bdwbg]"))){e.preventDefault();e.stopImmediatePropagation();bDayWin=null;bNoSel=true;render();return}
+  {const pb=e.target.closest(".bdw [data-bpaid]");if(pb){e.preventDefault();e.stopImmediatePropagation();const b=B();b.paid=b.paid||{};const k=pb.dataset.bpaid;if(b.paid[k])delete b.paid[k];else b.paid[k]=Date.now();save();render();return}}
   if(e.target.closest(".bdw [data-bedit],.bdw [data-bsedit],.navbtn,[data-tab]")){bDayWin=null;setTimeout(bDayPaint,0)}},true);
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&bDayWin){bDayWin=null;bNoSel=true;render()}});
 function bDayPop(b,ds,SE,SS,T){const H=bHome(),inc=SE.filter(i=>i.kind==="inc"),out=SE.filter(i=>i.kind!=="inc"),
     inT=inc.reduce((a,i)=>a+fxc(+i.amt||0,i.cur,H),0),fxT=out.filter(i=>!i.muted).reduce((a,i)=>a+fxc(+i.amt||0,i.cur,H),0),spT=SS.reduce((a,s)=>a+bSpAmt(s),0),net=inT-fxT-spT;
-  const row=i=>`<button type="button" class="bdw-r${i.muted&&i.kind!=="inc"?" mu":""}" data-bedit="${i.id}" style="--cc:${i.kind==="inc"?"#3ddc84":bCol(bItCat(i))}"><i></i><span><b>${esc(bTitle(i))}</b><small>${[bSubT(i)&&esc(bSubT(i)),BKN[i.kind][0],esc(bItCat(i)),(BCYC.find(x=>x[0]===i.cyc)||[0,""])[1],i.muted&&i.kind!=="inc"?"Excluded":""].filter(Boolean).join(" · ")}</small></span><em class="${i.kind==="inc"?"pos":""}">${i.kind==="inc"?"+":"−"}${bMoneyI(i)}</em></button>`;
-  const srow=x=>`<button type="button" class="bdw-r" data-bsedit="${x.id}" style="--cc:${bCol(x.cat)}"><i></i><span><b>${esc(x.note||x.cat)}</b><small>Spent · ${esc(x.cat)}${x.time?" · "+fmtTime(x.time):""}</small></span><em>−${bMoneyI(x)}</em></button>`;
+  /* was: rows opened the editor — const row=i=>`<button type="button" class="bdw-r${i.muted&&i.kind!=="inc"?" mu":""}" data-bedit="${i.id}" style="--cc:${i.kind==="inc"?"#3ddc84":bCol(bItCat(i))}"><i></i><span><b>${esc(bTitle(i))}</b><small>${[bSubT(i)&&esc(bSubT(i)),BKN[i.kind][0],esc(bItCat(i)),(BCYC.find(x=>x[0]===i.cyc)||[0,""])[1],i.muted&&i.kind!=="inc"?"Excluded":""].filter(Boolean).join(" · ")}</small></span><em class="${i.kind==="inc"?"pos":""}">${i.kind==="inc"?"+":"−"}${bMoneyI(i)}</em></button>`; */
+  const row=i=>{const pd=bIsPaid(b,i,ds),inc=i.kind==="inc";return `<button type="button" class="bdw-r bdw-ck${pd?" done":""}${i.muted&&!inc?" mu":""}" data-bpaid="${i.id}|${ds}" aria-pressed="${pd}" title="${pd?"Tap to undo":inc?"Tap when you've received it":"Tap when you've paid it"}" style="--cc:${inc?"#3ddc84":bCol(bItCat(i))}"><span class="bdw-box" aria-hidden="true">${pd?'<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>':""}</span><span><b>${esc(bTitle(i))}</b><small>${[bSubT(i)&&esc(bSubT(i)),BKN[i.kind][0],esc(bItCat(i)),(BCYC.find(x=>x[0]===i.cyc)||[0,""])[1],i.muted&&!inc?"Excluded":""].filter(Boolean).join(" · ")}</small></span><em class="${inc?"pos":""}">${inc?"+":"−"}${bMoneyI(i)}</em></button>`};
+  const srow=x=>`<button type="button" class="bdw-r bdw-sp" style="--cc:${bCol(x.cat)}"><i></i><span><b>${esc(x.note||x.cat)}</b><small>Spent · ${esc(x.cat)}${x.time?" · "+fmtTime(x.time):""}</small></span><em>−${bMoneyI(x)}</em></button>`;
   const sec=(t,L,f)=>L.length?`<div class="bdw-s">${t?`<div class="bdw-sh">${t}<span>${L.length}</span></div>`:""}${L.map(f).join("")}</div>`:"";
   return `<div class="bdw" data-bdwbg><div class="bdw-p panel" role="dialog" aria-modal="true" aria-label="Day overview">
     <div class="bdw-h"><div><b>${bDate(ds).toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</b>${ds===T?"<small>Today</small>":""}</div><button type="button" class="bdw-x" data-bdwx aria-label="Close">×</button></div>
     <!-- was four totals (In / Charged / Spent / Net): <div class="bdw-t"><div class="pos"><small>In</small><b>+${bMoney(inT)}</b></div><div class="neg"><small>Charged</small><b>−${bMoney(fxT)}</b></div><div class="neg"><small>Spent</small><b>−${bMoney(spT)}</b></div><div class="${net<0?"neg":"pos"}"><small>Net</small><b>${net<0?"−":"+"}${bMoney(Math.abs(net))}</b></div></div> -->
     <div class="bdw-tot ${net<0?"neg":net>0?"pos":""}"><small>Total</small><b>${net<0?"−":net>0?"+":""}${bMoney(Math.abs(net))}</b></div>
-    ${SE.length||SS.length?sec("Income",inc,row)+sec("",out,row)/* "Charged" heading removed */+sec("Spent",SS,srow):`<p class="note" style="margin:14px 2px 4px">Nothing charged, paid in or spent this day.</p>`}
+    ${SE.length?`<p class="bdw-hint">${SE.some(i=>!bIsPaid(b,i,ds))?"Tap each one to cross it off once it's paid or received.":"All crossed off ✓ · tap one to undo"}</p>`:""}${SE.length||SS.length?sec("Income",inc,row)+sec("",out,row)/* "Charged" heading removed */+sec("Spent",SS,srow):`<p class="note" style="margin:14px 2px 4px">Nothing charged, paid in or spent this day.</p>`}
   </div></div>`}
 function bCard(it){const m=bMo(it),nx=it.paused?null:bNext(it),dd=nx?bDays(nx):null,c=bCol(bItCat(it)),cy=(BCYC.find(x=>x[0]===it.cyc)||BCYC[1])[1];
   return `<button type="button" class="bi-card${it.paused?" paused":""}${it.muted&&it.kind!=="inc"?" muted":""}" data-bedit="${it.id}" data-bid="${it.id}" style="--cc:${c}"><span class="bi-top"><span class="bi-ic">${esc((bTitle(it)||"?").trim().slice(0,1).toUpperCase())}</span><span class="bi-tr">${it.kind!=="inc"?`<span class="bi-x${it.muted?" on":""}" role="button" tabindex="0" data-bxt="${it.id}" aria-pressed="${!!it.muted}" aria-label="${it.muted?"Include in totals":"Exclude from totals"}" title="${it.muted?"Include in totals":"Exclude from totals"}">${BMUTE.replace('width="12" height="12"','width="15" height="15"')}</span>`:""}${it.muted&&it.kind!=="inc"?"":it.paused?`<span class="bi-next">paused</span>`:nx?`<span class="bi-next${dd<=3?" soon":""}">${bIn(dd)}</span>`:""}${it.lvl?`<span class="bi-lv" data-lvl="${it.lvl}">${it.lvl}</span>`:""}</span></span>
@@ -8660,7 +8687,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="609",APPT="2026-11-23T08:25:43Z";   /* APPT: when this update was made */
+const APPV="610",APPT="2026-11-23T08:33:11Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
