@@ -1,7 +1,10 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <script>/* phones: lay the page out exactly like the iPad/desktop (1180px wide, scaled to fit) — only the tabs move to the bottom */
-(function(){try{var w=Math.min(screen.width,screen.height);if(w<700){/* was: setting the viewport to width=1180 — iPhone then left a black band at the bottom */document.documentElement.classList.add('phone')}}catch(e){}})();</script>
+(function(){try{var w=Math.min(screen.width,screen.height),W=Math.max(screen.width,screen.height);
+  /* iPad / tablet: a touch screen that's not a phone → tabs go to a bottom bar (computers keep the side panel) */
+  if(w>=700&&W<=1600&&(navigator.maxTouchPoints||0)>0&&matchMedia("(pointer:coarse)").matches)document.documentElement.classList.add('tablet');
+  if(w<700){/* was: setting the viewport to width=1180 — iPhone then left a black band at the bottom */document.documentElement.classList.add('phone')}}catch(e){}})();</script>
 <!-- phone height script removed (not needed with the scaled shell) -->
 <script>/* phones: mark the page while it's scrolling so animations can pause */
 (function(){var de=document.documentElement;if(!de.classList.contains('phone'))return;var t=0;document.addEventListener('scroll',function(){if(!t)de.classList.add('scrolling');clearTimeout(t);t=setTimeout(function(){de.classList.remove('scrolling');t=0},200)},{capture:true,passive:true})})();</script>
@@ -1902,6 +1905,22 @@ html.phone .navbtn[aria-selected="true"]{color:var(--accent,#ffb648)!important}
 html.phone .navbtn[aria-selected="true"]::before{display:none!important}
 html.phone .toast{bottom:calc(200px + env(safe-area-inset-bottom,0px))}
 
+/* iPad: tabs in a bottom bar (was the side panel); swipe the bar for more tabs */
+html.tablet .shell{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto minmax(0,1fr) auto!important}
+html.tablet .topbar{grid-column:1!important;grid-row:1!important}
+html.tablet #view{grid-column:1!important;grid-row:2!important;-webkit-overflow-scrolling:touch}
+html.tablet aside{grid-column:1!important;grid-row:3!important;display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;justify-content:flex-start!important;gap:0!important;padding:0 0 max(4px,env(safe-area-inset-bottom,0px))!important;border-right:0!important;border-top:1px solid rgba(var(--lr),.3);overflow-x:auto!important;overflow-y:hidden!important;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none;min-height:0}
+html.tablet aside::-webkit-scrollbar{display:none}
+html.tablet aside .logo,html.tablet aside .side-foot{display:none!important}
+html.tablet .navgrp,html.tablet .navgrp-in,html.tablet aside .navgrp-wrap{display:contents!important}
+html.tablet .navgrp .navsub{display:flex!important;pointer-events:auto!important}
+html.tablet .navcar,html.tablet .navbtn.navsub::after,html.tablet .navbtn.navsub::before{display:none!important}
+html.tablet .navbtn,html.tablet .navbtn.navsub{position:relative;flex:1 0 104px!important;width:auto!important;max-width:none!important;height:66px;box-sizing:border-box;scroll-snap-align:start;flex-direction:column!important;gap:4px!important;font-size:12px!important;font-weight:500!important;padding:10px 4px 0!important;margin:0!important;justify-content:flex-start;align-items:center;text-align:center;border-radius:0!important;border:0!important;background:none!important;box-shadow:none!important;min-width:0;white-space:nowrap}
+html.tablet .navbtn svg{width:24px!important;height:24px!important;flex:none}
+html.tablet .navbtn .nbadge{position:absolute!important;top:4px;left:calc(50% + 8px);right:auto!important;margin:0!important}
+html.tablet .navbtn[aria-selected="true"]{color:var(--accent,#ffb648)!important}
+html.tablet .navbtn[aria-selected="true"]::before{display:none!important}
+html.tablet .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 /* installed iPhone app: let the page paint the whole screen, past the status-bar-short height iOS reports */
 html.phone,html.phone body{min-height:calc(100% + env(safe-area-inset-top,0px))}
 html.phone #bgimg,html.phone #bgimg2,html.phone #bglive,html.phone .bgshade{bottom:calc(0px - env(safe-area-inset-top,0px))!important}
@@ -8431,7 +8450,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="571",APPT="2026-11-23T04:55:40Z";   /* APPT: when this update was made */
+const APPV="572",APPT="2026-11-23T05:00:24Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
