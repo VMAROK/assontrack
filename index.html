@@ -2301,6 +2301,8 @@ html.phone .tk-save-x{display:none}
 .acmp-p.mir .acmp-m video,.acmp-p.mir .acmp-m img{transform:scaleX(-1)}
 .acmp-mir{position:absolute;top:6px;left:6px;font:600 11.5px inherit;font-family:inherit;padding:5px 9px;border-radius:99px;border:0;background:rgba(0,0,0,.6);color:#fff;cursor:pointer}
 .acmp-mir[aria-pressed="true"]{background:#ffd23f;color:#111}
+.acmp-tr{display:grid;gap:4px}.acmp-tr .pt-strip{height:44px}.acmp-tr .pt-info{min-height:28px}.acmp-tr .pt-txt{font-size:14px;padding:4px 8px}.acmp-tr .pt-len{font-size:11.5px}.acmp-tr .pt-info{display:flex;flex-wrap:wrap;gap:0 6px;align-items:center}.acmp-tr .pt-info>span:last-child{display:flex;gap:2px;margin-left:auto}.acmp-tr .pt-info>span:last-child button{white-space:nowrap}
+.acmp-p.trimming{grid-template-rows:1fr auto auto auto}.acmp-p.trimming .acmp-pick{display:none}
 .acmp-trim{position:absolute;top:6px;right:6px;width:30px;height:30px;display:grid;place-items:center;border:0;border-radius:99px;background:rgba(0,0,0,.6);color:#fff;cursor:pointer}.acmp-trim.on{color:#ffd23f}
 .acmp-lab{font-size:12px;color:rgba(255,255,255,.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.acmp-lab span{color:#fff;font-weight:600}
 .acmp-pick{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.acmp-pick::-webkit-scrollbar{display:none}
@@ -6880,6 +6882,33 @@ function trimUI(o){return new Promise(done=>{const max=o.max||ATT_VMAX;
   const all=w.querySelector("[data-all]");if(all)all.onclick=()=>end("all");
   w.querySelector("[data-ok]").onclick=()=>end(dur?(t0<=0.05&&t1>=dur-0.05?"all":[+t0.toFixed(1),+t1.toFixed(1)]):null);
   addEventListener("resize",paint)})}
+/* the same Photos-style strip, but built under a video that stays on screen (used in compare so you can line the two up) */
+function mkTrimStrip(o){const host=o.host,v=o.v,max=o.max||ATT_VMAX;
+  const CH=d=>`<svg viewBox="0 0 10 20" width="8" height="16" aria-hidden="true"><path d="${d}" fill="none" stroke="#1a1400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  host.innerHTML=`<div class="pt-row"><div class="pt-strip"><div class="pt-frames"></div><i class="pt-sh l"></i><i class="pt-sh r"></i><div class="pt-sel"><span class="pt-h l" data-h="l">${CH("M7 3L3 10l4 7")}</span><span class="pt-h r" data-h="r">${CH("M3 3l4 7-4 7")}</span></div><i class="pt-ph"></i></div></div>
+    <div class="pt-info"><span class="pt-len"></span><span><button type="button" class="pt-txt" data-trx>Cancel</button><button type="button" class="pt-txt pt-done" data-trok>Done</button></span></div>`;
+  const strip=host.querySelector(".pt-strip"),sel=host.querySelector(".pt-sel"),shL=host.querySelector(".pt-sh.l"),shR=host.querySelector(".pt-sh.r"),ph=host.querySelector(".pt-ph"),len=host.querySelector(".pt-len");
+  let dur=v.duration||0,t0=0,t1=0,drag=null,alive=true;const HW=18;
+  const X=t=>HW+(strip.clientWidth-2*HW)*(t/dur),T=x=>Math.max(0,Math.min(dur,(x-HW)/(strip.clientWidth-2*HW)*dur));
+  const paint=()=>{if(!dur)return;const a=X(t0)-HW,b=X(t1)+HW;sel.style.left=a+"px";sel.style.width=(b-a)+"px";shL.style.width=Math.max(0,a+HW)+"px";shR.style.left=(b-HW)+"px";len.textContent=attMS(t0)+" – "+attMS(t1)+" · "+(t1-t0).toFixed(1).replace(/\.0$/,"")+"s"};
+  const head=()=>{if(!alive)return;if(dur)ph.style.left=X(v.currentTime)+"px";requestAnimationFrame(head)};
+  const loop=()=>{if(!dur||drag)return;if(v.currentTime>=t1-0.03||v.currentTime<t0-0.3)v.currentTime=t0};v.addEventListener("timeupdate",loop);
+  const start=()=>{dur=v.duration;t0=Math.min(o.t0||0,dur);t1=o.t1!=null?Math.min(o.t1,dur):Math.min(dur,t0+max);paint();head();
+    const box=host.querySelector(".pt-frames"),n=Math.max(6,Math.round(strip.clientWidth/30)),fv=document.createElement("video");fv.muted=true;fv.playsInline=true;fv.setAttribute("playsinline","");fv.preload="auto";
+    fv.innerHTML=`<source src="${o.url}" type="${o.type||"video/mp4"}">`;const cv=[];for(let i=0;i<n;i++){const c=document.createElement("canvas");c.height=80;box.appendChild(c);cv.push(c)}let i=0;
+    const next=()=>{if(i>=n||!alive)return;try{fv.currentTime=Math.min(dur-0.05,(i+0.5)/n*dur)}catch(_){}};
+    fv.addEventListener("seeked",()=>{const c=cv[i];if(c&&fv.videoWidth){c.width=Math.round(c.height*Math.max(.5,Math.min(2,fv.videoWidth/fv.videoHeight)));const g=c.getContext("2d"),k=Math.max(c.width/fv.videoWidth,c.height/fv.videoHeight);g.drawImage(fv,(c.width-fv.videoWidth*k)/2,(c.height-fv.videoHeight*k)/2,fv.videoWidth*k,fv.videoHeight*k)}i++;next()});
+    fv.addEventListener("loadeddata",next,{once:true});fv.load()};
+  if(dur)start();else v.addEventListener("loadedmetadata",start,{once:true});
+  strip.addEventListener("pointerdown",e=>{if(!dur)return;e.preventDefault();const h=e.target.closest(".pt-h"),r=strip.getBoundingClientRect(),x=e.clientX-r.left;v.pause();
+    drag={k:h?h.dataset.h:(e.target.closest(".pt-sel")?"m":"s"),x0:x,a:t0,b:t1};try{strip.setPointerCapture(e.pointerId)}catch(_){}if(drag.k==="s")v.currentTime=Math.max(t0,Math.min(t1,T(x)))});
+  strip.addEventListener("pointermove",e=>{if(!drag)return;const r=strip.getBoundingClientRect(),x=e.clientX-r.left,t=T(x);
+    if(drag.k==="l"){t0=Math.max(0,Math.min(t,t1-0.5));if(t1-t0>max)t0=t1-max;v.currentTime=t0}else if(drag.k==="r"){t1=Math.min(dur,Math.max(t,t0+0.5));if(t1-t0>max)t1=t0+max;v.currentTime=t1}
+    else if(drag.k==="m"){const L=drag.b-drag.a;t0=Math.max(0,Math.min(dur-L,drag.a+T(x)-T(drag.x0)));t1=t0+L;v.currentTime=t0}else v.currentTime=Math.max(t0,Math.min(t1,t));paint()});
+  const up=()=>{if(!drag)return;const k=drag.k;drag=null;if(k!=="s")v.currentTime=t0};strip.addEventListener("pointerup",up);strip.addEventListener("pointercancel",up);
+  const fin=r=>{alive=false;v.removeEventListener("timeupdate",loop);host.innerHTML="";o.done(r)};
+  host.querySelector("[data-trx]").onclick=e=>{e.stopPropagation();fin(null)};
+  host.querySelector("[data-trok]").onclick=e=>{e.stopPropagation();fin(dur?(t0<=0.05&&t1>=dur-0.05?"all":[+t0.toFixed(1),+t1.toFixed(1)]):null)}}
 /* over 1 minute when added: pick the minute to keep */
 function attTrimAsk(f,dur){const u=URL.createObjectURL(f);return trimUI({url:u,type:f.type,max:ATT_VMAX,title:"Pick up to 1 minute"}).then(r=>{URL.revokeObjectURL(u);if(r==="all")return dur&&dur>ATT_VMAX+0.5?[0,ATT_VMAX]:"all";return r})}
 /* trim a saved video (also opens right after adding one) */
@@ -7038,8 +7067,13 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   if(b.dataset.cmpclose!==undefined){attCmp=null;cmpRender();return}
   if(!attCmp)return;
   if(b.dataset.cmppick){const [s,id]=b.dataset.cmppick.split(":");attCmp[s]=id;cmpRender();attHydrate();return}
-  if(b.dataset.cmptrim){const side=b.dataset.cmptrim,it=cmpPool(attCmp.tid).find(x=>x.a.id===attCmp[side]);if(!it)return;cmpVids().forEach(v=>v.pause());
-    attTrimEdit(it.t.id,it.a.id).then(()=>{const w=document.getElementById("attCmp");if(w)w.dataset.k="";cmpRender();attHydrate()});return}
+  if(b.dataset.cmptrim){const side=b.dataset.cmptrim,it=cmpPool(attCmp.tid).find(x=>x.a.id===attCmp[side]);if(!it)return;
+    /* trim right there under this side's video, the other side keeps playing so you can line them up (old: full-screen trimmer) */
+    const pane=b.closest(".acmp-p"),v=pane&&pane.querySelector("video[data-cmpv]");if(!v||pane.querySelector(".acmp-tr"))return;
+    const host=document.createElement("div");host.className="acmp-tr";pane.insertBefore(host,pane.querySelector(".acmp-lab"));pane.classList.add("trimming");
+    attURL(it.a).then(u=>mkTrimStrip({host,v,url:u,type:it.a.type,t0:it.a.t0,t1:it.a.t1,done:r=>{host.remove();pane.classList.remove("trimming");if(!r)return;const a=it.a;
+      if(r==="all"){delete a.t0;delete a.t1}else{a.t0=r[0];a.t1=r[1]}[...attStageEls.keys()].forEach(k=>{if(k.endsWith(":"+a.id))attStageEls.delete(k)});save();render();
+      const w=document.getElementById("attCmp");if(w)w.dataset.k="";cmpRender();attHydrate();toast("Trim saved")}}));return}
   if(b.dataset.cmpmir){const k="m"+b.dataset.cmpmir;attCmp[k]=!attCmp[k];cmpStyle();return}
   const V=cmpVids(),g=b.dataset.cmpgo;
   if(g==="play")V.forEach(v=>{const p=v.play();p&&p.catch(()=>{})});
@@ -8109,7 +8143,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="543",APPT="2026-11-23T01:48:30Z";   /* APPT: when this update was made */
+const APPV="544",APPT="2026-11-23T01:53:01Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
