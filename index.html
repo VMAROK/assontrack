@@ -2190,7 +2190,9 @@ html.phone .att-strip .att-t{flex-basis:110px}
 .tkcard .tk-btns:has(.tk-save){flex-wrap:nowrap!important;gap:8px!important}.tkcard .tk-btns:has(.tk-save) .tk-end{margin-left:auto;flex-shrink:0}
 .att-rep{position:absolute;z-index:4;top:8px;left:8px;height:34px;display:inline-flex;align-items:center;gap:6px;padding:0 10px;border-radius:0;cursor:pointer;font:600 12.5px inherit;font-family:inherit;color:#f2ede6;background:rgba(8,6,6,.55);border:1px solid rgba(255,255,255,.16);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .att-rep.on{background:rgba(47,111,236,.75);border-color:rgba(150,190,255,.6)}
-.att-trimb{top:50px!important}.att-trimb small{font:600 11px var(--mono);opacity:.8;margin-left:4px}
+.att-trimb{position:absolute;z-index:4;top:8px;right:46px;width:34px;height:34px;display:grid;place-items:center;padding:0;cursor:pointer;color:#f2ede6;background:rgba(8,6,6,.55);border:1px solid rgba(255,255,255,.16);border-radius:0;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.att-trimb.on{color:#ffd23f;border-color:rgba(255,210,63,.55)}
+.att-stage:has(.att-trimb) .att-dots{right:96px}
 .atrim-2 input{pointer-events:none;-webkit-appearance:none;appearance:none;background:none;opacity:1!important}
 .atrim-2 input::-webkit-slider-thumb{pointer-events:auto;-webkit-appearance:none;width:22px;height:44px;border-radius:3px;background:#ffd23f;cursor:ew-resize;box-shadow:0 0 0 2px rgba(0,0,0,.5)}
 .atrim-2 input::-moz-range-thumb{pointer-events:auto;width:22px;height:44px;border-radius:3px;background:#ffd23f;border:0;cursor:ew-resize}
@@ -6677,7 +6679,7 @@ function attHtml(t){const A=t.att||[];
       return `<div class="att-theater"><div class="att-stage" data-atttid="${t.id}"><div class="att-slot" data-attstage="${t.id}:${cur.id}"></div>
         ${A.length>1?`<span class="att-dots" aria-hidden="true">${A.map(a=>`<i${a.id===cur.id?' class="on"':""}></i>`).join("")}</span>`:""}
         <button type="button" class="att-rep${attRepl&&attRepl.aid===cur.id?" on":""}" data-attrep="${t.id}:${cur.id}" aria-label="Replace this ${cur.kind==="yt"?"link":cur.kind==="vid"?"video":"photo"}" title="Replace"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h13l-3-3M20 17H7l3 3"/></svg><span>Replace</span></button>
-        ${cur.kind==="vid"?`<button type="button" class="att-rep att-trimb" data-atttrim="${t.id}:${cur.id}" aria-label="Trim this video" title="Trim"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.1 15.9M14.5 14.5L20 20M8.1 8.1L12 12"/></svg><span>Trim${cur.t1!=null?` <small>${attMS(cur.t0||0)}–${attMS(cur.t1)}</small>`:""}</span></button>`:""}
+        ${cur.kind==="vid"?`<button type="button" class="att-trimb${cur.t1!=null?" on":""}" data-atttrim="${t.id}:${cur.id}" aria-label="Trim this video" title="Trim"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.1 15.9M14.5 14.5L20 20M8.1 8.1L12 12"/></svg></button>`:""}
         <button type="button" class="att-fs" data-attview="${t.id}:${cur.id}" aria-label="Full screen" title="Full screen"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>
       <!-- old caption bar ("2 of 3", type, full screen), replaced by the corner lines like the portfolio -->
       ${true?`<div class="att-strip">${A.map(a=>`<div class="att-t${a.id===cur.id?" on":""}"><button type="button" class="att-open" data-attsel="${t.id}:${a.id}" aria-pressed="${a.id===cur.id}" aria-label="Show this ${a.kind==="img"?"photo":"video"}">${attThumb(a)}</button><button type="button" class="att-x" data-attdel="${t.id}:${a.id}" aria-label="Remove">×</button></div>`).join("")}</div>`:""}</div>`})():""}
@@ -6738,14 +6740,14 @@ function attDrop(a){if(!a)return;MDB.del(a.id);if(a.path&&typeof sbOn==="functio
 function attPut(t,a){const r=attRepl&&attRepl.tid===t.id?attRepl.aid:null;t.att=t.att||[];const i=r?t.att.findIndex(x=>x.id===r):-1;
   if(i>=0){const old=t.att[i];t.att[i]=a;attDrop(old);attRepl=null}else t.att.push(a);attSel[t.id]=a.id}
 /* trim any saved video: drag the start and end handles (keeps the file, just plays that part) */
-function attTrimEdit(tid,aid){const t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);if(!a)return;
-  attURL(a).then(u=>{if(!u){toast("This video isn't on this device yet");return}
+function attTrimEdit(tid,aid,isNew){return new Promise(done=>{const t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);if(!a){done();return}
+  attURL(a).then(u=>{if(!u){toast("This video isn't on this device yet");done();return}
     const w=document.createElement("div");w.className="attv atrim";w.setAttribute("role","dialog");w.setAttribute("aria-modal","true");
     w.innerHTML=`<div class="atrim-box"><div class="atrim-h"><b>Trim video</b><small>Drag the two handles to keep just the part you want.</small></div>
       <video playsinline muted autoplay preload="auto"><source src="${u}" type="${a.type||"video/mp4"}"></video>
       <div class="atrim-bar atrim-2"><i></i><input type="range" class="r0" min="0" max="1" step="0.1" value="0" aria-label="Start"><input type="range" class="r1" min="0" max="1" step="0.1" value="1" aria-label="End"></div>
       <div class="atrim-t"><span></span><span class="atrim-tot">Loading…</span></div>
-      <div class="atrim-b"><button type="button" class="att-b" data-x>Cancel</button><button type="button" class="att-b" data-reset>Full video</button><button type="button" class="btn" data-ok>Save trim</button></div></div>`;
+      <div class="atrim-b">${isNew?"":`<button type="button" class="att-b" data-x>Cancel</button>`}<button type="button" class="att-b" data-reset>${isNew?"Use whole video":"Full video"}</button><button type="button" class="btn" data-ok>${isNew?"Use this part":"Save trim"}</button></div></div>`;
     document.body.appendChild(w);const v=w.querySelector("video"),r0=w.querySelector(".r0"),r1=w.querySelector(".r1"),box=w.querySelector(".atrim-bar i"),lab=w.querySelector(".atrim-t span");let dur=0;
     const upd=()=>{if(!dur)return;let s0=+r0.value,s1=+r1.value;if(s1-s0<0.5){if(document.activeElement===r0)s0=r0.value=Math.max(0,s1-0.5);else s1=r1.value=Math.min(dur,s0+0.5)}
       if(s1-s0>ATT_VMAX){if(document.activeElement===r0)s1=r1.value=s0+ATT_VMAX;else s0=r0.value=s1-ATT_VMAX}
@@ -6755,9 +6757,9 @@ function attTrimEdit(tid,aid){const t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>
     r0.addEventListener("input",()=>{upd();try{v.currentTime=+r0.value;v.play()}catch(_){}});
     r1.addEventListener("input",()=>{upd();try{v.currentTime=Math.max(+r0.value,+r1.value-1.5);v.play()}catch(_){}});
     v.addEventListener("timeupdate",()=>{if(dur&&(v.currentTime>=+r1.value||v.currentTime<+r0.value-0.5))v.currentTime=+r0.value});
-    const end=ch=>{v.pause();w.remove();if(!ch)return;if(ch==="reset"){delete a.t0;delete a.t1}else{a.t0=+(+r0.value).toFixed(1);a.t1=+(+r1.value).toFixed(1);if(a.t0<=0.05&&a.t1>=dur-0.05){delete a.t0;delete a.t1}}
-      [...attStageEls.keys()].forEach(k=>{if(k.endsWith(":"+a.id))attStageEls.delete(k)});save();render();toast(ch==="reset"?"Showing the full video":"Trim saved")};
-    w.querySelector("[data-x]").onclick=()=>end(null);w.querySelector("[data-reset]").onclick=()=>end("reset");w.querySelector("[data-ok]").onclick=()=>end(dur?"ok":null)})}
+    const end=ch=>{v.pause();w.remove();done();if(!ch)return;if(ch==="reset"){delete a.t0;delete a.t1}else{a.t0=+(+r0.value).toFixed(1);a.t1=+(+r1.value).toFixed(1);if(a.t0<=0.05&&a.t1>=dur-0.05){delete a.t0;delete a.t1}}
+      [...attStageEls.keys()].forEach(k=>{if(k.endsWith(":"+a.id))attStageEls.delete(k)});save();render();if(!isNew)toast(ch==="reset"?"Showing the full video":"Trim saved")};
+    const x=w.querySelector("[data-x]");if(x)x.onclick=()=>end(null);w.querySelector("[data-reset]").onclick=()=>end("reset");w.querySelector("[data-ok]").onclick=()=>end(dur?"ok":null)})})}
 const attWait=(p,ms)=>Promise.race([p,new Promise(ok=>setTimeout(ok,ms))]);
 async function attAddFiles(tid,files){const t=findTaskAny(tid);if(!t)return;attBusy=tid;render();
   try{for(const f of files){const vid=/^video\//.test(f.type)||/\.(mov|mp4|m4v|webm)$/i.test(f.name||"");if(!vid&&!/^image\//.test(f.type))continue;
@@ -6766,6 +6768,7 @@ async function attAddFiles(tid,files){const t=findTaskAny(tid);if(!t)return;attB
     const blob=vid?(f.type?f:new Blob([f],{type:vt})):await attShrink(f),id=uid(),a={id,kind:vid?"vid":"img",name:f.name||"",type:vid?vt:"image/jpeg",at:Date.now(),size:blob.size};if(cut){a.t0=cut[0];a.t1=cut[1]}
     await attWait(MDB.put(id,blob),15000);
     attPut(t,a);
+    if(vid&&!cut){save();render();await attTrimEdit(t.id,a.id,true)}
     /* upload in the background so the screen never waits on it */
     if(typeof sbOn==="function"&&sbOn()){const ext=vid?((f.name||"").split(".").pop()||"mp4").toLowerCase():"jpg",pth=sbUser.id+"/att/"+id+"."+ext;
       sb.storage.from("models").upload(pth,blob,{upsert:true,contentType:blob.type||"application/octet-stream"}).then(({error})=>{if(!error){a.path=pth;save()}}).catch(()=>{})}}}
@@ -7901,7 +7904,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="524",APPT="2026-11-23T00:00:29Z";   /* APPT: when this update was made */
+const APPV="525",APPT="2026-11-23T00:03:33Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
