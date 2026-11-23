@@ -5720,8 +5720,11 @@ function bSpend(S){const b=B(),L=b.spends.filter(s=>(s.d||"").slice(0,7)===today
     ${G.length?G.map(([d,A])=>`<div class="bs-g"><div class="bs-gh"><span>${d===today()?"Today":bDate(d).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}</span><b>${bMoney(A.reduce((a,s)=>a+bSpAmt(s),0))}</b></div>${A.map(s=>`<button type="button" class="bs-r" data-bsedit="${s.id}" style="--cc:${bCol(s.cat)}"><i></i><span>${esc(s.note||s.cat)}<small>${esc(s.cat)}</small></span><b>${bMoneyI(s)}</b></button>`).join("")}</div>`).join(""):`<p class="note" style="margin:10px 2px 0">Log what you spend day to day. It counts against this month and its category.</p>`}`}
 /* the Budget tab's top tiles stick to the top while you scroll, shrinking to a slim bar */
 let bStOn=false,bStH=0;
-function bStickInit(){const el=document.getElementById("bStick"),v=document.getElementById("view");if(!el||!v)return;el.classList.remove("stuck");el.style.height="";bStH=el.offsetHeight;el.style.height=bStH+"px";bStickChk()}
-function bStickChk(){const el=document.getElementById("bStick"),sn=document.getElementById("bStickS"),v=document.getElementById("view");if(!el||!sn||!v)return;const on=sn.getBoundingClientRect().top<v.getBoundingClientRect().top+2;bStOn=on;if(on!==el.classList.contains("stuck"))el.classList.toggle("stuck",on)}
+/* old: locked the tiles' height from one measurement, which could be taken too early and leave the tiles spilling onto the calendar panel
+function bStickInit(){const el=document.getElementById("bStick"),v=document.getElementById("view");if(!el||!v)return;el.classList.remove("stuck");el.style.height="";bStH=el.offsetHeight;el.style.height=bStH+"px";bStickChk()} */
+/* now: the height follows the tiles naturally, and is only held (at the full size) while the slim stuck bar is showing */
+function bStickInit(){const el=document.getElementById("bStick"),v=document.getElementById("view");if(!el||!v)return;if(!el.classList.contains("stuck")){el.style.height="";bStH=el.offsetHeight}bStickChk()}
+function bStickChk(){const el=document.getElementById("bStick"),sn=document.getElementById("bStickS"),v=document.getElementById("view");if(!el||!sn||!v)return;const on=sn.getBoundingClientRect().top<v.getBoundingClientRect().top+2;bStOn=on;if(on!==el.classList.contains("stuck")){if(on){el.style.height="";bStH=el.offsetHeight;el.style.height=bStH+"px"}el.classList.toggle("stuck",on);if(!on)el.style.height=""}}
 document.addEventListener("scroll",e=>{if(tab==="budget"&&e.target&&e.target.id==="view")bStickChk()},true);
 addEventListener("resize",()=>{if(tab==="budget")bStickInit()});
 /* view switch under the calendar: separate panels, or income and expenses combined into one running calculation */
@@ -5920,7 +5923,7 @@ function vBudget(){fxLoad();const b=B();b.mode="comb";const S=bStats(),out=S.sub
   const mb=S.mutedN?`<div class="panel bmu"><span class="bmu-i">${BMUTE}</span><span class="bmu-t"><span><b class="bmu-n">${S.mutedN} excluded</b> · saves <b>${bMoney(S.muted)}</b>/mo · <b>${bMoney(S.muted*12,0)}</b>/yr</span><small>Excluded bills and subscriptions are left out of every total so you can see what cutting them would do. Nothing is cancelled.</small></span><button type="button" class="btn ghost" data-bunmute>Include all</button></div>`:"";
   /* measure the top tiles again once the page has settled (measuring too early left no gap above the calendar until you tapped the tab again) */
   setTimeout(bStickInit,0);setTimeout(bStickInit,150);setTimeout(bStickInit,500);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>setTimeout(bStickInit,0));
-  return bModeIn(b,`<div class="bstick-s" id="bStickS"></div><div class="bstick${bStOn?" stuck":""}" id="bStick"${bStH?` style="height:${bStH}px"`:""}><div class="grid tiles">
+  return bModeIn(b,`<div class="bstick-s" id="bStickS"></div><div class="bstick${bStOn?" stuck":""}" id="bStick"${bStOn&&bStH?` style="height:${bStH}px"`:""}><div class="grid tiles">
     <div class="panel tile" style="--c:var(--lime)">${ic("bolt")}<small>Income</small><b>${bMoney(S.inc,0)}</b><em>per month</em></div>
     <div class="panel tile" style="--c:var(--magenta)">${ic("star")}<small>Fixed costs</small><b>${bMoney(S.subs+S.bills,0)}</b><em>${bMoney(S.subs,0)} subs · ${bMoney(S.bills,0)} bills<i class="bx-was"${S.mutedN?"":' style="visibility:hidden"'}>was ${bMoney(S.subs+S.bills+S.muted,0)} · −${bMoney(S.muted,0)} excluded</i></em></div>
     <div class="panel tile" style="--c:var(--amber)">${ic("fire")}<small>Spent this month</small><b>${bMoney(S.spent,0)}</b><em>${S.sp.length} expense${S.sp.length===1?"":"s"}</em></div>
@@ -8599,7 +8602,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="589",APPT="2026-11-23T06:14:14Z";   /* APPT: when this update was made */
+const APPV="590",APPT="2026-11-23T06:17:02Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
