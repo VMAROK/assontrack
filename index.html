@@ -2872,6 +2872,20 @@ html.phone .bc-mk{top:64%;width:26px;height:26px;font-size:16px}html.phone .bc-m
 .bdw-in{margin-top:14px;padding:16px 4px 4px;border-top:1px solid rgba(var(--lr),.2)}.bdw-in .bdw-h b{font-size:17px}
 .bs-ng{display:flex;gap:6px;align-items:center;min-width:0}.bs-ng input{flex:1;min-width:0}.bs-ngx{width:34px;height:34px;border-radius:50%;border:1px solid rgba(var(--tX),.7);background:none;color:var(--fg);font-size:18px;cursor:pointer;flex:none}
 .bsh-sg{flex-wrap:wrap}
+.bs-vw{display:inline-flex;gap:4px;padding:3px;margin:2px 0 10px;border-radius:12px;background:rgba(4,8,20,.45);border:1px solid rgba(var(--lr),.2)}
+.bs-vw button{padding:6px 14px;border-radius:9px;border:0;background:none;color:var(--muted);font:inherit;font-size:13px;font-weight:600;cursor:pointer}.bs-vw button[aria-pressed="true"]{background:rgba(var(--tL),.22);color:var(--fg)}
+.bsg-list{display:flex;flex-direction:column;gap:8px}
+.bsg{border:1px solid rgba(var(--lr),.22);border-radius:12px;overflow:hidden;background:rgba(4,8,20,.35)}
+.bsg-h{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px 8px;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.bsg-dot{width:10px;height:10px;border-radius:50%;background:var(--gc);box-shadow:0 0 8px var(--gc);flex:none}
+.bsg-n{font-weight:700;font-size:15px}.bsg-h small{color:var(--muted);font-size:12px;flex:1}
+.bsg-h b{font-family:var(--mono);font-size:15px}.bsg-h em{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--muted);min-width:38px;text-align:right}
+.bsg-car{color:var(--muted);transition:transform .2s;flex:none}.bsg.open .bsg-car{transform:rotate(180deg)}
+.bsg-bar{height:4px;margin:0 14px 12px;border-radius:2px;background:rgba(var(--tX),.6);overflow:hidden}.bsg-bar i{display:block;height:100%;border-radius:2px;background:var(--gc);box-shadow:0 0 8px var(--gc)}
+.bsg-in{border-top:1px solid rgba(var(--lr),.18)}
+.bsg-r{display:flex;align-items:center;gap:12px;width:100%;padding:10px 14px;border:0;border-top:1px solid rgba(var(--lr),.1);background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}.bsg-r:first-child{border-top:0}
+.bsg-d{color:var(--muted);font-size:12px;min-width:56px}.bsg-w{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bsg-r b{font-family:var(--mono)}
+html.phone .bsg-h small{display:none}html.phone .bsg-n{flex:1}
 .bs-ngrow{grid-column:1/-1;display:flex;align-items:center;gap:8px}.bs-ngrow>span{font-size:13px;color:var(--muted);flex:none}.bs-ngrow input{flex:1;min-width:0}.bs-ngok{width:40px;height:40px;border-radius:12px;border:1px solid rgba(61,220,132,.6);background:rgba(61,220,132,.16);color:#3ddc84;display:grid;place-items:center;cursor:pointer;flex:none}
 .bsh-gn{margin:22px 0 0;font-size:12px;color:var(--muted);align-self:center}
 .bdw-hint{margin:12px 2px 0;font-size:12.5px;color:var(--muted)}
@@ -5935,9 +5949,24 @@ function bAll(S,only,m){const b=B(),inc=m==="i",it=b.items.filter(i=>(inc?i.kind
       ${lim?`<div class="bk-bar"><i style="width:${Math.min(100,f*100)}%;background:${f>1?"#ff4d5e":f>.85?"#ffb648":c.c}"></i></div>`:""}
       ${!inc&&S.spCat[c.n]?`<button type="button" class="bk-sp" data-btab="spend">${bMoney(S.spCat[c.n])} spent this month</button>`:""}
       ${L.length||GS.length?`${loose.length?`<div class="bi-grid">${loose.map(bCard).join("")}</div>`:""}${GS.map(g=>{const G=L.filter(i=>i.grp===g);return `<div class="bk-g" data-bdg="${esc(JSON.stringify([c.n,g]))}"><button type="button" class="bk-gh" data-bgrp="${esc(JSON.stringify([c.n,g]))}"><span>${esc(g)}</span><i>${G.length}</i><b>${bMoney(G.filter(i=>!i.paused&&!i.muted).reduce((a,i)=>a+bMo(i),0))}/mo</b></button>${G.length?`<div class="bi-grid">${G.map(bCard).join("")}</div>`:`<div class="bk-gempty">${addB(c.n,g)}</div>`}</div>`}).join("")}<div class="bk-more">${addB(c.n)}<button type="button" data-bnewgrp="${esc(c.n)}">＋ Group</button></div>`:`<div class="bk-empty"><span>Nothing here yet</span>${addB(c.n)}<button type="button" data-bnewgrp="${esc(c.n)}">＋ Group</button></div>`}</section>`}).join("")}</div>`}
+/* spending, by group: one block per group with this month's total, count and share; tap to open its purchases */
+let bSgOpen=new Set();
+const bSgCol=(b,g)=>{if(!g)return "#8a94aa";const P=(typeof CATPAL!=="undefined"&&CATPAL.length?CATPAL:["#3ddc84","#4cc9ff","#ffb648","#ff6fb5","#b48cff","#ff7a85","#ffd166","#7c8cff"]),i=bSgs(b).indexOf(g);return P[(i<0?0:i)%P.length]};
+function bSpendByGroup(b,L){const tot=L.reduce((a,s)=>a+bSpAmt(s),0),names=[...new Set([...bSgs(b),...L.map(s=>s.sg||"")])];
+  const rows=names.map(g=>{const A=L.filter(s=>(s.sg||"")===g);return {g,A,t:A.reduce((a,s)=>a+bSpAmt(s),0)}}).filter(r=>r.g||r.A.length).sort((x,y)=>(!x.g)-(!y.g)||y.t-x.t);
+  if(!rows.length)return `<p class="note" style="margin:10px 2px 0">Log what you spend day to day. Make groups like Gas or Food to see where it goes.</p>`;
+  return `<div class="bsg-list">${rows.map(r=>{const c=bSgCol(b,r.g),pc=tot?Math.round(r.t/tot*100):0,open=bSgOpen.has(r.g||"\u0000");
+    return `<div class="bsg${open?" open":""}" style="--gc:${c}"><button type="button" class="bsg-h" data-bsgo="${esc(r.g)}" aria-expanded="${open}"><i class="bsg-dot"></i><span class="bsg-n">${esc(r.g||"No group")}</span><small>${r.A.length} purchase${r.A.length===1?"":"s"}</small><b>${bMoney(r.t)}</b><em>${pc}%</em><svg class="bsg-car" viewBox="0 0 24 24" width="16" height="16"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="bsg-bar"><i style="width:${pc}%"></i></div>
+      ${open?`<div class="bsg-in">${r.A.length?r.A.map(s=>`<button type="button" class="bsg-r" data-bsedit="${s.id}"><span class="bsg-d">${s.d===today()?"Today":bDate(s.d).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</span><span class="bsg-w">${esc(s.note||"Spent")}</span><b>${bMoneyI(s)}</b></button>`).join(""):`<p class="note" style="margin:8px 12px">Nothing in this group this month.</p>`}</div>`:""}</div>`}).join("")}</div>`}
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-bspv],[data-bsgo]");if(!t)return;e.preventDefault();e.stopImmediatePropagation();
+  if(t.hasAttribute("data-bspv")){B().spView=t.dataset.bspv;save();render();return}
+  const k=t.dataset.bsgo||"\u0000";bSgOpen.has(k)?bSgOpen.delete(k):bSgOpen.add(k);render()},true);
 function bSpend(S){const b=B(),L=b.spends.filter(s=>(s.d||"").slice(0,7)===today().slice(0,7)).sort((a,z)=>a.d<z.d?1:a.d>z.d?-1:0),G=[];L.forEach(s=>{let g=G.find(x=>x[0]===s.d);if(!g)G.push(g=[s.d,[]]);g[1].push(s)});
   return `<form class="bs-add" id="bsForm" autocomplete="off">${moneyIn("bsAmt",0,bAddCur&&BCUR.includes(bAddCur)?bAddCur:bHome(),true)}<input id="bsNote" placeholder="What for?" aria-label="What for">${`<select id="bsCat" aria-label="Group"><option value=""${!bAddSg?" selected":""}>No group</option>${bSgs(b).map(g=>`<option value="${esc(g)}"${g===bAddSg?" selected":""}>${esc(g)}</option>`).join("")}<option value="__new"${bSgNew?" selected":""}>＋ New group…</option></select>`}<!-- was: preset categories (Housing, Utilities, Food…) --><button class="btn" type="submit">Add</button>${bSgNew?`<div class="bs-ngrow"><span>New group</span><input id="bsNewG" aria-label="New group name" maxlength="30"><button type="button" class="bs-ngok" data-bsgadd aria-label="Create group" title="Create group"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="bs-ngx" data-bsgx aria-label="Cancel">×</button></div>`:""}</form>
-    ${G.length?G.map(([d,A])=>`<div class="bs-g"><div class="bs-gh"><span>${d===today()?"Today":bDate(d).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}</span><b>${bMoney(A.reduce((a,s)=>a+bSpAmt(s),0))}</b></div>${A.map(s=>`<button type="button" class="bs-r" data-bsedit="${s.id}" style="--cc:${bCol(s.cat)}"><i></i><span>${esc(s.note||s.sg||"Spent")}${s.sg?`<small>${esc(s.sg)}</small>`:""}</span><b>${bMoneyI(s)}</b></button>`).join("")}</div>`).join(""):`<p class="note" style="margin:10px 2px 0">Log what you spend day to day. It counts against this month and its category.</p>`}`}
+    <div class="bs-vw" role="group" aria-label="View">${[["grp","By group"],["day","By day"]].map(([k,n])=>`<button type="button" data-bspv="${k}" aria-pressed="${(b.spView||"grp")===k}">${n}</button>`).join("")}</div>
+    ${(b.spView||"grp")==="grp"?bSpendByGroup(b,L):""}
+    ${(b.spView||"grp")!=="day"?"":G.length?G.map(([d,A])=>`<div class="bs-g"><div class="bs-gh"><span>${d===today()?"Today":bDate(d).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}</span><b>${bMoney(A.reduce((a,s)=>a+bSpAmt(s),0))}</b></div>${A.map(s=>`<button type="button" class="bs-r" data-bsedit="${s.id}" style="--cc:${bCol(s.cat)}"><i></i><span>${esc(s.note||s.sg||"Spent")}${s.sg?`<small>${esc(s.sg)}</small>`:""}</span><b>${bMoneyI(s)}</b></button>`).join("")}</div>`).join(""):`<p class="note" style="margin:10px 2px 0">Log what you spend day to day. It counts against this month and its category.</p>`}`}
 /* the Budget tab's top tiles stick to the top while you scroll, shrinking to a slim bar */
 let bStOn=false,bStH=0;
 /* old: locked the tiles' height from one measurement, which could be taken too early and leave the tiles spilling onto the calendar panel
@@ -8836,7 +8865,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="633",APPT="2026-11-23T22:11:58Z";   /* APPT: when this update was made */
+const APPV="634",APPT="2026-11-23T22:17:43Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
