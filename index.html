@@ -2270,7 +2270,7 @@ html.phone .tk-save-x{display:none}
 .psm-pr{display:grid;gap:5px}.psm-prh{display:flex;justify-content:space-between;gap:10px;font-size:13px}.psm-prh span{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.psm-prh small{color:var(--muted);font:500 12px var(--mono);white-space:nowrap}
 .psm-bar{height:6px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}.psm-bar i{display:block;height:100%;border-radius:3px}
 .psm-split{display:flex;height:10px;border-radius:5px;overflow:hidden}.psm-split i{display:block;height:100%}
-.psm-key{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}.psm-empty{margin:0;font-size:13px;color:var(--muted)}
+.psm-key{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}.psm-key em{font-style:normal;opacity:.75}.psm-empty{margin:0;font-size:13px;color:var(--muted)}
 .tknew-win{z-index:1100!important;background:rgba(0,0,0,.55)!important;align-items:center}
 .tknew-box{width:min(480px,100%);max-height:calc(100dvh - 32px);overflow:auto;background:#15181f;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 18px 16px;box-shadow:0 24px 60px rgba(0,0,0,.6)}
 .tknew-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.tknew-h b{font-size:18px;color:#fff}
@@ -7615,7 +7615,7 @@ function passSummary(d){const P=d.passions||[];if(!P.length)return "";const p=P.
   if(!other){const og=P.filter(q=>!q.cat||!C.some(k=>k.id===q.cat)).reduce((a,q)=>a+(+q.goal||0)*60,0);if(og)byC.push({n:"Other",c:"#8a93a6",m:0,g:og})}
   const allG=byC.reduce((a,x)=>a+(x.g||0),0);
   const split=(k,tot)=>`<div class="psm-split">${byC.filter(x=>x[k]).map(x=>`<i style="width:${x[k]/tot*100}%;background:${x.c}"></i>`).join("")}</div>`;
-  const key=(k,tot)=>`<div class="psm-key">${byC.filter(x=>x[k]).map(x=>`<span><b style="color:${x.c}">●</b> ${esc(x.n)} ${Math.round(x[k]/tot*100)}%</span>`).join("")}</div>`;
+  const key=(k,tot)=>`<div class="psm-key">${byC.filter(x=>x[k]).map(x=>`<span><b style="color:${x.c}">●</b> ${esc(x.n)} ${Math.round(x[k]/tot*100)}% <em>${hm(x[k])}${k==="m"?` · ${P.filter(q=>(C.find(c=>c.name===x.n)?q.cat===C.find(c=>c.name===x.n).id:(!q.cat||!C.some(c=>c.id===q.cat)))&&minsWk(q)).map(q=>esc(q.name)).join(", ")}`:""}</em></span>`).join("")}</div>`;
   const R=50,CIRC=2*Math.PI*R;
   return `<div class="panel psum"><div class="ph"><span>${esc(p.name)} · progress</span><i>This week</i></div>
     <div class="psm-top"><div class="psm-ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="${R}" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="11"/><circle cx="60" cy="60" r="${R}" fill="none" stroke="var(--cyan)" stroke-width="11" stroke-linecap="round" stroke-dasharray="${(pc*CIRC).toFixed(1)} ${CIRC.toFixed(1)}" transform="rotate(-90 60 60)"/></svg><div><b>${hm(wm)}</b><small>${gm?"of "+p.goal+"h goal":"no weekly goal"}</small></div></div>
@@ -8321,7 +8321,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="555",APPT="2026-11-23T02:49:47Z";   /* APPT: when this update was made */
+const APPV="556",APPT="2026-11-23T02:51:11Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
