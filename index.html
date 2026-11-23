@@ -5804,12 +5804,16 @@ const bSpAmt=x=>fxc(+x.amt||0,x.cur||bHome(),bHome());
 const bDate=s=>new Date(s+"T12:00");
 const bAddM=(ds,k)=>{const x=bDate(ds),d=x.getDate();x.setDate(1);x.setMonth(x.getMonth()+k);x.setDate(Math.min(d,new Date(x.getFullYear(),x.getMonth()+1,0).getDate()));return ymd(x)};
 /* every charge date of an item between from and to (inclusive) */
-function bOcc(it,from,to){if(!it.start)return [];const out=[];if(it.cyc==="wk"){const s=bDate(it.start),k0=Math.floor((bDate(from)-s)/6048e5);for(let k=k0;k<k0+60;k++){const x=new Date(s);x.setDate(x.getDate()+7*k);const ds=ymd(x);if(ds>to)break;if(ds>=from)out.push(ds)}return out}
+/* start / end of an item: occurrences before "from" or after its end don't exist */
+function bEndDate(it){if(it.endMode==="date"&&it.until)return it.until;if(it.endMode==="total"&&+it.total>0&&+it.amt>0&&it.start){const n=Math.ceil(+it.total/+it.amt-1e-9),f=it.from||it.start,x=bDate(f);x.setFullYear(x.getFullYear()+40);const L=bOcc0(it,f,ymd(x));return L[n-1]||null}return null}
+function bOcc(it,from,to){let L=bOcc0(it,from,to);const f0=it.from||(it.endMode==="total"&&+it.total>0?it.start:"");if(f0)L=L.filter(d=>d>=f0);const e=bEndDate(it);if(e)L=L.filter(d=>d<=e);return L}
+function bActiveMonth(it,M){const e=bEndDate(it);return !(it.from&&it.from.slice(0,7)>M)&&!(e&&e.slice(0,7)<M)}
+function bOcc0(it,from,to){if(!it.start)return [];const out=[];if(it.cyc==="wk"){const s=bDate(it.start),k0=Math.floor((bDate(from)-s)/6048e5);for(let k=k0;k<k0+60;k++){const x=new Date(s);x.setDate(x.getDate()+7*k);const ds=ymd(x);if(ds>to)break;if(ds>=from)out.push(ds)}return out}
   const m=it.cyc==="qtr"?3:it.cyc==="yr"?12:1,s=bDate(it.start),f=bDate(from),k0=Math.floor(((f.getFullYear()-s.getFullYear())*12+f.getMonth()-s.getMonth())/m)-1;for(let k=k0;k<k0+40;k++){const ds=bAddM(it.start,k*m);if(ds>to)break;if(ds>=from)out.push(ds)}return out}
 const bNext=it=>{const T=today(),x=bDate(T);x.setDate(x.getDate()+400);return bOcc(it,T,ymd(x))[0]||null};
 const bDays=ds=>Math.round((bDate(ds)-bDate(today()))/864e5);
 const bIn=dd=>dd===0?"today":dd===1?"tomorrow":"in "+dd+" days";
-function bStats(){const b=B(),act=b.items.filter(i=>!i.paused&&!(i.muted&&i.kind!=="inc")),M=today().slice(0,7),sum=k=>act.filter(i=>i.kind===k).reduce((a,i)=>a+bMo(i),0);
+function bStats(){const b=B(),M=today().slice(0,7),act=b.items.filter(i=>!i.paused&&!(i.muted&&i.kind!=="inc")&&bActiveMonth(i,M)),sum=k=>act.filter(i=>i.kind===k).reduce((a,i)=>a+bMo(i),0);
   const sp=b.spends.filter(s=>(s.d||"").slice(0,7)===M),spent=sp.reduce((a,s)=>a+bSpAmt(s),0),byCat={},fixCat={},spCat={};
   act.filter(i=>i.kind!=="inc").forEach(i=>{const c=bItCat(i);fixCat[c]=(fixCat[c]||0)+bMo(i);byCat[c]=(byCat[c]||0)+bMo(i)});
   sp.forEach(s=>{const c=bCat(s.cat)?s.cat:"Other";spCat[c]=(spCat[c]||0)+bSpAmt(s);byCat[c]=(byCat[c]||0)+bSpAmt(s)});
@@ -6144,6 +6148,10 @@ function bSheet(){let o=document.getElementById("bSheet");if(!bEdit){if(o){o.cla
     var body=`<div class="bsh-2"><label class="tp-lab">Name<input id="beName" value="${esc(v.name||"")}"></label><label class="tp-lab">Company<input id="beCo" value="${esc(v.co||"")}"></label></div>
       <div class="tp-lab bsh-ct"${v.co?"":" hidden"}>Show as the title<div class="bsh-seg"><button type="button" data-becot="0" aria-pressed="${!v.coTitle}">Name</button><button type="button" data-becot="1" aria-pressed="${!!v.coTitle}">Company</button></div></div>
       <div class="bsh-2"><label class="tp-lab">Amount${moneyIn("beAmt",v.amt,v.cur||bHome(),true)}</label><label class="tp-lab">${v.kind==="inc"?"Next payday":"Next charge"}<input id="beStart" type="date" value="${v.start||""}"></label></div>
+      <div class="bsh-2"><label class="tp-lab">Start date · optional<input id="beFrom" type="date" value="${v.from||""}"></label>
+        <div class="tp-lab">Ends<div class="bsh-seg">${[["none","Never"],["date","On a date"],["total","After a total"]].map(([k,n])=>`<button type="button" data-beend="${k}" aria-pressed="${(v.endMode||"none")===k}">${n}</button>`).join("")}</div></div></div>
+      ${v.endMode==="date"?`<label class="tp-lab">End date<input id="beUntil" type="date" value="${v.until||""}"></label>`:""}
+      ${v.endMode==="total"?`<div class="bsh-2"><label class="tp-lab">${v.kind==="inc"?"Total to receive":"Total to pay"}<input id="beTotal" type="text" inputmode="decimal" placeholder="0.00" value="${v.total||""}"></label><p class="note bsh-gn">${+v.total>0&&+v.amt>0?`${Math.ceil(+v.total/+v.amt-1e-9)} payments${bEndDate(v)?` · last one ${bDate(bEndDate(v)).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})}`:""}`:"It stops once this much has been paid."}</p></div>`:""}
       ${v.kind!=="inc"?`<div class="bsh-2"><label class="tp-lab">Grace period ends · optional<input id="beGrace" type="date" value="${v.graceEnd||""}"></label><p class="note bsh-gn">If it isn't paid by the due date, it moves to this day on the calendar.</p></div>`:""}
       <div class="tp-lab">How often<div class="bsh-seg">${BCYC.map(([k,n])=>`<button type="button" data-becyc="${k}" aria-pressed="${v.cyc===k}">${n}</button>`).join("")}</div></div>
       ${1?`<div class="tp-lab">Category${catChips(v.cat,v.kind==="inc")}</div>${(()=>{const GS=bGroups(v.cat);return `<div class="tp-lab">Group · optional<div class="bsh-cats bsh-grps"><button type="button" data-begrp="" aria-pressed="${!v.grp}">None</button>${GS.map(g=>`<button type="button" data-begrp="${esc(g)}" aria-pressed="${v.grp===g}">${esc(g)}</button>`).join("")}${e.ng?`<span class="bsh-nc"><input id="beNG" aria-label="New group name"><button type="button" class="btn" data-bngadd>Add</button></span>`:`<button type="button" class="bsh-plus" data-bng>＋ New group</button>`}</div></div>`})()}`:""}${e.t==="item"&&v.kind!=="inc"&&bSecs(B()).some(x=>!x.inc&&!x.left&&!x.spent&&!x.sum&&x.id!=="exp")?`<div class="tp-lab">Budget group<div class="bsh-cats bsh-grps"><button type="button" data-besec="" aria-pressed="${!v.sec}">Expenses</button>${bSecs(B()).filter(x=>!x.inc&&!x.left&&!x.spent&&!x.sum&&x.id!=="exp").map(x=>`<button type="button" data-besec="${x.id}" aria-pressed="${v.sec===x.id}">${esc(x.n)}</button>`).join("")}</div></div>`:""}
@@ -6157,7 +6165,7 @@ function bSheet(){let o=document.getElementById("bSheet");if(!bEdit){if(o){o.cla
       <div class="tp-lab">Color<div class="bsh-sw">${BPAL.map(c=>`<button type="button" data-becol="${c}" aria-pressed="${v.c===c}" style="--cc:${c}" aria-label="Color ${c}"></button>`).join("")}</div></div>${!isNew&&cnt?`<p class="note" style="margin:0">${cnt} item${cnt===1?"":"s"} in this category. Deleting it moves them to ${v.inc?"Other income":"Other"}.</p>`:""}`}
   o.innerHTML=`<div class="wp-box panel bsh" role="dialog" aria-label="Edit"><div class="wp-h">${h}<button type="button" class="x wp-x" data-bclose aria-label="Close">×</button></div><div class="bsh-g">${body}</div><div class="bsh-acts">${acts}<span style="flex:1"></span><button type="button" class="btn ghost" data-bclose>Cancel</button><button type="button" class="btn" data-bsave>Save</button></div></div>`}
 function bRead(){const e=bEdit;if(!e)return;const g=id=>{const x=document.getElementById(id);return x?x.value:null},num=s=>parseFloat(String(s||"").replace(/[^0-9.]/g,""))||0,v=e.v;
-  if(e.t==="item"){if(g("beName")!=null)v.name=g("beName").trim();if(g("beCo")!=null)v.co=g("beCo").trim();v.amt=mnyVal("beAmt");v.cur=mnyCur("beAmt");v.start=g("beStart")||"";if(g("beGrace")!=null){const ge=g("beGrace")||"";if(ge){if(ge!==v.graceEnd||!v.graceSince)v.graceSince=today();v.graceEnd=ge}else{delete v.graceEnd;delete v.graceSince}}}   /* was: silently dropped unless it came after the next charge date */
+  if(e.t==="item"){if(g("beName")!=null)v.name=g("beName").trim();if(g("beCo")!=null)v.co=g("beCo").trim();v.amt=mnyVal("beAmt");v.cur=mnyCur("beAmt");v.start=g("beStart")||"";if(g("beFrom")!=null){const f=g("beFrom")||"";if(f)v.from=f;else delete v.from}if(g("beUntil")!=null)v.until=g("beUntil")||"";if(g("beTotal")!=null)v.total=num(g("beTotal"))||"";if(g("beGrace")!=null){const ge=g("beGrace")||"";if(ge){if(ge!==v.graceEnd||!v.graceSince)v.graceSince=today();v.graceEnd=ge}else{delete v.graceEnd;delete v.graceSince}}}   /* was: silently dropped unless it came after the next charge date */
   else if(e.t==="spend"){v.amt=mnyVal("beAmt");v.cur=mnyCur("beAmt");v.d=g("beStart")||today();v.note=(g("beName")||"").trim()}
   else if(e.t==="grp"){v.n=(g("beName")||"").trim()}
   else{if(g("beName")!=null&&e.orig!=="Other"&&e.orig!=="Other income")v.n=g("beName").trim();v.lim=v.inc?0:mnyVal("beAmt")}}
@@ -6226,7 +6234,7 @@ document.addEventListener("contextmenu",e=>{if(e.target.closest&&e.target.closes
 /* hold-to-delete buttons (sheet and menu) */
 document.addEventListener("pointerdown",e=>{const h=e.target.closest&&e.target.closest("[data-bhold]");if(!h)return;e.preventDefault();e.stopPropagation();h.classList.add("go");clearTimeout(bHoldT);bHoldT=setTimeout(()=>{bHoldT=null;const k=h.dataset.bhold;if(k==="sheet")bDelSheet();else{const id=k.slice(3),b=B(),it=b.items.find(x=>x.id===id);cmHeld=true;cmAt=Date.now();cmShow(null);if(it){b.items=b.items.filter(x=>x.id!==id);toast(it.name+" deleted");render();save()}}},1200)},true);
 ["pointerup","pointercancel","pointerleave"].forEach(k=>document.addEventListener(k,e=>{if(!bHoldT)return;if(k==="pointerleave"&&!(e.target.closest&&e.target.closest("[data-bhold]")))return;clearTimeout(bHoldT);bHoldT=null;document.querySelectorAll("[data-bhold].go").forEach(b=>b.classList.remove("go"))},true));
-document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-btab],[data-bnew],[data-bedit],[data-bsedit],[data-bcat],[data-bnewcat],[data-bday],[data-bmon],[data-bclose],[data-becyc],[data-becot],[data-becat],[data-begrp],[data-belv],[data-bng],[data-bngadd],[data-bgrp],[data-bnewgrp],[data-becol],[data-bnc],[data-bncadd],[data-bsave],[data-bpause],[data-bhold],[data-bmode],[data-bview],[data-bxt],[data-bmedit],[data-bmpause],[data-bmdup],[data-bmmute],[data-bunmute],[data-bmutes],#bSheet");if(!t)return;const b=B(),d=t.dataset;
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-btab],[data-bnew],[data-bedit],[data-bsedit],[data-bcat],[data-bnewcat],[data-bday],[data-bmon],[data-bclose],[data-becyc],[data-becot],[data-becat],[data-begrp],[data-belv],[data-beend],[data-bng],[data-bngadd],[data-bgrp],[data-bnewgrp],[data-becol],[data-bnc],[data-bncadd],[data-bsave],[data-bpause],[data-bhold],[data-bmode],[data-bview],[data-bxt],[data-bmedit],[data-bmpause],[data-bmdup],[data-bmmute],[data-bunmute],[data-bmutes],#bSheet");if(!t)return;const b=B(),d=t.dataset;
   if(t.id==="bSheet"){if(e.target.id==="bSheet"){bEdit=null;bSheet()}return}
   if(d.bhold!=null){e.stopPropagation();return}
   if(d.bmode){B().mode=d.bmode;render();save();return}
@@ -6251,6 +6259,7 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(d.becot){bRead();bEdit.v.coTitle=d.becot==="1";bSheet();return}
   if(d.becat){bRead();bEdit.v.cat=d.becat;if(bEdit.v.grp&&!bGroups(d.becat).includes(bEdit.v.grp))bEdit.v.grp="";bSheet();return}
   if(d.begrp!=null){bRead();bEdit.v.grp=d.begrp;bSheet();return}
+  if(d.beend){bRead();bEdit.v.endMode=d.beend;bSheet();return}
   if(d.belv){bRead();bEdit.v.lvl=bEdit.v.lvl===d.belv?"":d.belv;bSheet();return}
   if(d.bng!=null){bRead();bEdit.ng=true;bSheet();setTimeout(()=>{const i=document.getElementById("beNG");i&&i.focus()},30);return}
   if(d.bngadd!=null){const i=document.getElementById("beNG"),n=(i&&i.value||"").trim();bRead();if(n){const c=bCat(bEdit.v.cat);if(c){c.groups=c.groups||[];if(!c.groups.includes(n))c.groups.push(n);save()}bEdit.v.grp=n}bEdit.ng=false;bSheet();return}
@@ -6261,6 +6270,8 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(d.bmutes!=null){bRead();bEdit.v.muted=!bEdit.v.muted;if(!bEdit.v.muted)delete bEdit.v.muted;bSheet();return}
   if(d.bsave!=null){bRead();const e=bEdit,v=e.v;
     if(e.t==="item"){if(!v.name&&v.co)v.name=v.co;if(!v.name)return toast("Give it a name");if(!v.co)delete v.coTitle;if(!v.amt)return toast("Enter an amount");
+      if(v.endMode==="date"&&!v.until)return toast("Pick the end date");if(v.endMode==="total"&&!(+v.total>0))return toast("Enter the total to be paid");
+      if(v.from&&v.endMode==="date"&&v.until&&v.until<v.from)return toast("The end date has to be after the start date");
       if(v.graceEnd&&v.kind!=="inc"){if(!v.start)return toast("Set the next charge date first, then the grace period");if(!["mo","qtr","yr"].includes(v.cyc)&&v.graceEnd<=v.start)return toast("The grace period has to end after the next charge date")}
       const i=b.items.findIndex(x=>x.id===v.id);if(i>=0)b.items[i]=v;else b.items.push(v);toast(bTitle(v)+" saved")}
     else if(e.t==="grp"){if(!v.n)return toast("Give the group a name");const c=bCat(v.cat);if(!c)return;c.groups=c.groups||[];if(v.n!==e.orig&&c.groups.includes(v.n))return toast(v.n+" already exists");if(e.isNew)c.groups.push(v.n);else{c.groups=c.groups.map(x=>x===e.orig?v.n:x);b.items.forEach(i=>{if(bItCat(i)===v.cat&&i.grp===e.orig)i.grp=v.n})}toast(v.n+" saved")}
@@ -8811,7 +8822,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="630",APPT="2026-11-23T11:24:42Z";   /* APPT: when this update was made */
+const APPV="631",APPT="2026-11-23T11:26:40Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
