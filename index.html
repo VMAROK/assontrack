@@ -5851,7 +5851,10 @@ function bPlace(b,i,occ,T){const ge=bGraceEnd(i,occ);if(!ge)return occ;const pd=
   if(pd){const d=ymd(new Date(pd));return d>occ?d:occ}return T>occ?ge:occ}
 /* everything shown on each day of a range: occurrences placed where they currently belong */
 function bEvMap(b,from,to,T){const ev={},f0=(()=>{const x=bDate(from);x.setDate(x.getDate()-70);return ymd(x)})();
-  b.items.filter(i=>!i.paused).forEach(i=>{const has=!!bGraceEnd(i,i.start||from);bOcc(i,has?f0:from,to).forEach(occ=>{const ds=has?bPlace(b,i,occ,T):occ;if(ds<from||ds>to)return;const v=has?Object.assign(Object.create(i),{_occ:occ}):i;(ev[ds]=ev[ds]||[]).push(v)})});return ev}
+  b.items.filter(i=>!i.paused).forEach(i=>{const has=!!bGraceEnd(i,i.start||from);
+    /* grace only counts from the payment that was current when it was set; older missed payments stay on their own day */
+    const cut=has?(()=>{const ref=i.graceSince||T,x=bDate(ref);x.setDate(x.getDate()-400);const L=bOcc(i,ymd(x),ref);return L.length?L[L.length-1]:ref})():"";
+    bOcc(i,has?f0:from,to).forEach(occ=>{const ds=has&&occ>=cut?bPlace(b,i,occ,T):occ;if(ds<from||ds>to)return;const v=has?Object.assign(Object.create(i),{_occ:occ}):i;(ev[ds]=ev[ds]||[]).push(v)})});return ev}
 /* mark for a past day: green check when everything is crossed off, red X when a bill wasn't paid,
    orange ? when only income is missing (delayed), and a count like 2/3 when part of it is done */
 function bDayMark(b,ds,E,T){if(ds>=T||!E.length)return "";const n=E.length,k=E.filter(i=>bIsPaid(b,i,ds)).length,billMiss=E.some(i=>i.kind!=="inc"&&!bIsPaid(b,i,ds));
@@ -6154,7 +6157,7 @@ function bSheet(){let o=document.getElementById("bSheet");if(!bEdit){if(o){o.cla
       <div class="tp-lab">Color<div class="bsh-sw">${BPAL.map(c=>`<button type="button" data-becol="${c}" aria-pressed="${v.c===c}" style="--cc:${c}" aria-label="Color ${c}"></button>`).join("")}</div></div>${!isNew&&cnt?`<p class="note" style="margin:0">${cnt} item${cnt===1?"":"s"} in this category. Deleting it moves them to ${v.inc?"Other income":"Other"}.</p>`:""}`}
   o.innerHTML=`<div class="wp-box panel bsh" role="dialog" aria-label="Edit"><div class="wp-h">${h}<button type="button" class="x wp-x" data-bclose aria-label="Close">×</button></div><div class="bsh-g">${body}</div><div class="bsh-acts">${acts}<span style="flex:1"></span><button type="button" class="btn ghost" data-bclose>Cancel</button><button type="button" class="btn" data-bsave>Save</button></div></div>`}
 function bRead(){const e=bEdit;if(!e)return;const g=id=>{const x=document.getElementById(id);return x?x.value:null},num=s=>parseFloat(String(s||"").replace(/[^0-9.]/g,""))||0,v=e.v;
-  if(e.t==="item"){if(g("beName")!=null)v.name=g("beName").trim();if(g("beCo")!=null)v.co=g("beCo").trim();v.amt=mnyVal("beAmt");v.cur=mnyCur("beAmt");v.start=g("beStart")||"";if(g("beGrace")!=null){const ge=g("beGrace")||"";if(ge)v.graceEnd=ge;else delete v.graceEnd}}   /* was: silently dropped unless it came after the next charge date */
+  if(e.t==="item"){if(g("beName")!=null)v.name=g("beName").trim();if(g("beCo")!=null)v.co=g("beCo").trim();v.amt=mnyVal("beAmt");v.cur=mnyCur("beAmt");v.start=g("beStart")||"";if(g("beGrace")!=null){const ge=g("beGrace")||"";if(ge){if(ge!==v.graceEnd||!v.graceSince)v.graceSince=today();v.graceEnd=ge}else{delete v.graceEnd;delete v.graceSince}}}   /* was: silently dropped unless it came after the next charge date */
   else if(e.t==="spend"){v.amt=mnyVal("beAmt");v.cur=mnyCur("beAmt");v.d=g("beStart")||today();v.note=(g("beName")||"").trim()}
   else if(e.t==="grp"){v.n=(g("beName")||"").trim()}
   else{if(g("beName")!=null&&e.orig!=="Other"&&e.orig!=="Other income")v.n=g("beName").trim();v.lim=v.inc?0:mnyVal("beAmt")}}
@@ -8808,7 +8811,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="629",APPT="2026-11-23T11:19:09Z";   /* APPT: when this update was made */
+const APPV="630",APPT="2026-11-23T11:24:42Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
