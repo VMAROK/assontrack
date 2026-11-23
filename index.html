@@ -2304,7 +2304,7 @@ html.phone .tk-save-x{display:none}
 .tkd-theater iframe{width:100%;height:100%;border:0}
 .tkd-cap{font-size:11.5px;color:var(--muted)}
 .tkd-ctl{display:flex;align-items:center;gap:6px;margin-top:-4px}.tkd-pp{min-width:34px;height:30px;border:0;background:rgba(255,255,255,.1);color:var(--fg);cursor:pointer;font-size:13px}
-.tkd-pane{cursor:pointer}
+.tkd-pane{cursor:pointer}.tkd-seg{margin-left:6px}.tkd-seg button{font-size:12px;padding:5px 10px}
 .tkd-gal{display:flex;gap:3px;overflow-x:auto;scrollbar-width:none}.tkd-gal::-webkit-scrollbar{display:none}
 .tkd-th{all:unset;position:relative;flex:0 0 96px;aspect-ratio:16/9;background:#111;cursor:pointer;overflow:hidden}
 .tkd-th img,.tkd-th video{width:100%;height:100%;object-fit:cover;display:block}.tkd-th .att-play svg{width:16px;height:16px}.tkd-th .att-yt::after{display:none}
@@ -7385,15 +7385,19 @@ document.addEventListener("click",e=>{if(e.target&&e.target.matches&&e.target.ma
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-catcol]");if(!b)return;e.preventDefault();e.stopPropagation();const [id,col]=b.dataset.catcol.split("|"),c=cats().find(x=>x.id===id);if(!c)return;c.color=col;save();render()},true);
 document.addEventListener("change",e=>{const i=e.target.closest&&e.target.closest("[data-catcolin]");if(!i)return;const c=cats().find(x=>x.id===i.dataset.catcolin);if(!c)return;c.color=i.value;save();render()});
 /* finished tasks can be opened to look back at them: read-only media, notes, and the comparison shown in the theater */
-const tkDoneSet=new Set();
+const tkDoneSet=new Set(),tkdWhole=new Set();
 function tkDoneView(t){const A=(t.att||[]).filter(a=>a.kind!=="yt"||ytId(a.url)),V=A.filter(a=>a.kind!=="yt");
   /* whole video shown, never cropped (was: the saved move/zoom applied, which cut the picture off); mirror is kept */
-  const pane=a=>{if(!a)return "";const v=a.view||{},tf=`scaleX(${v.m?-1:1})`;
-    return `<div class="tkd-pane">${a.kind==="vid"?`<video data-dvsrc="${a.id}" playsinline webkit-playsinline preload="metadata" style="transform:${tf}"></video>`:`<img data-dvsrc="${a.id}" alt="" style="transform:${tf}">`}</div>`};
+  /* two looks: "Saved view" = exactly how you left it in compare (move, zoom, mirror); "Whole video" = the full picture, nothing cut off */
+  let first=true;const pane=a=>{if(!a)return "";const v=a.view||{},sv=`translate(${(v.x||0)*100}%,${(v.y||0)*100}%) scale(${v.s||1}) scaleX(${v.m?-1:1})`,wh=`scaleX(${v.m?-1:1})`,tf=tkdWhole.has(t.id)?wh:sv;
+    /* only one side keeps its sound: iPhone stops the other video if two with sound play at once */
+    const mute=a.kind==="vid"&&!first;if(a.kind==="vid")first=false;
+    return `<div class="tkd-pane">${a.kind==="vid"?`<video data-dvsrc="${a.id}" data-tfs="${sv}" data-tfw="${wh}" playsinline webkit-playsinline preload="auto" ${mute?"muted":""} style="transform:${tf}"></video>`:`<img data-dvsrc="${a.id}" data-tfs="${sv}" data-tfw="${wh}" alt="" style="transform:${tf}">`}</div>`};
+  const hasView=V.some(a=>a.view&&(Math.abs(a.view.x||0)>.002||Math.abs(a.view.y||0)>.002||Math.abs((a.view.s||1)-1)>.01));
   const two=V.length>=2,one=!two&&A[0];
   return `<div class="tkd-view">
     ${A.length?`<div class="tkd-theater${two?" two":""}">${two?pane(V[0])+pane(V[1]):one.kind==="yt"?`<iframe src="https://www.youtube-nocookie.com/embed/${ytId(one.url)}?playsinline=1&rel=0" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="YouTube video"></iframe>`:pane(one)}</div>
-      ${V.length&&!(one&&one.kind==="yt")?`<div class="tkd-ctl"><button type="button" class="tkd-pp" data-tkdplay aria-label="Play">▶</button><button type="button" class="tkd-pp" data-tkdback aria-label="Back to start">⟲</button>${two?`<span class="tkd-cap">Side by side</span>`:""}</div>`:""}
+      ${V.length&&!(one&&one.kind==="yt")?`<div class="tkd-ctl"><button type="button" class="tkd-pp" data-tkdplay aria-label="Play">▶</button><button type="button" class="tkd-pp" data-tkdback aria-label="Back to start">⟲</button>${hasView?`<span class="seg2 tkd-seg" role="group" aria-label="View"><button type="button" data-tkdmode="${t.id}:saved" aria-pressed="${!tkdWhole.has(t.id)}">Saved view</button><button type="button" data-tkdmode="${t.id}:whole" aria-pressed="${tkdWhole.has(t.id)}">Whole video</button></span>`:""}${two?`<span class="tkd-cap">Side by side · plays together</span>`:""}</div>`:""}
       <div class="tkd-gal">${A.map(a=>`<button type="button" class="tkd-th" data-attview="${t.id}:${a.id}" aria-label="Open">${attThumb(a)}${a.t1!=null||a.view?`<span class="att-bdgs">${a.t1!=null?`<i>${ICO_CUT}</i>`:""}${a.view?`<i>${ICO_MOVE}</i>`:""}</span>`:""}</button>`).join("")}</div>`:`<p class="tkd-none">No media on this task.</p>`}
     <div class="tkd-notes"><span>Notes</span><p>${t.note?esc(t.note):"<em>No notes.</em>"}</p></div>
     <div class="tkd-ro">${ICO_LOCK} Finished · view only. Tap Undo to edit it again.</div></div>`}
@@ -7404,10 +7408,12 @@ function tkDoneHydrate(){document.querySelectorAll("[data-dvsrc]").forEach(el=>{
 /* finished-task theater: one button plays/pauses both sides; tapping a side plays/pauses just that one */
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tkdplay],[data-tkdback],.tkd-pane");if(!b)return;const vw=b.closest(".tkd-view");if(!vw)return;e.preventDefault();e.stopPropagation();
   const V=[...vw.querySelectorAll("video[data-dvsrc]")],pb=vw.querySelector("[data-tkdplay]");
-  if(b.matches(".tkd-pane")){const v=b.querySelector("video");if(v)v.paused?v.play().catch(()=>{}):v.pause()}
-  else if(b.dataset.tkdback!==undefined)V.forEach(v=>{const a=attFind(v.dataset.dvsrc)||{};try{v.currentTime=a.view&&a.view.at!=null?a.view.at:(a.t0||0)}catch(_){}});
-  else{const go=V.every(v=>v.paused);V.forEach(v=>go?v.play().catch(()=>{}):v.pause())}
+  if(b.dataset.tkdback!==undefined)V.forEach(v=>{const a=attFind(v.dataset.dvsrc)||{};try{v.currentTime=a.view&&a.view.at!=null?a.view.at:(a.t0||0)}catch(_){}});
+  else{const go=V.every(v=>v.paused);if(go){V.forEach(v=>{const a=attFind(v.dataset.dvsrc)||{};v.playbackRate=(a.view&&a.view.sp)||1});Promise.all(V.map(v=>{const p=v.play();return p&&p.catch?p.catch(()=>{}):null}))}else V.forEach(v=>v.pause())}
   setTimeout(()=>{if(pb)pb.textContent=V.some(v=>!v.paused)?"❚❚":"▶"},60)},true);
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tkdmode]");if(!b)return;e.preventDefault();e.stopPropagation();const [id,m]=b.dataset.tkdmode.split(":");
+  m==="whole"?tkdWhole.add(id):tkdWhole.delete(id);const vw=b.closest(".tkd-view");vw.querySelectorAll("[data-tfs]").forEach(el=>el.style.transform=m==="whole"?el.dataset.tfw:el.dataset.tfs);
+  vw.querySelectorAll("[data-tkdmode]").forEach(x=>x.setAttribute("aria-pressed",x===b))},true);
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tkdview]");if(!b)return;e.preventDefault();e.stopPropagation();const id=b.dataset.tkdview;tkDoneSet.has(id)?tkDoneSet.delete(id):tkDoneSet.add(id);render()},true);
 let tkNew=false,tkFilter="all",addingPrj=false,prjFocus=null,addingSub=null,tkLastOpen=null;const tkOpen=new Set();
 const projOf=(d,p)=>(d.projects||[]).filter(x=>x.pid===p.id).sort((a,b)=>(a.created||0)-(b.created||0));
@@ -8397,7 +8403,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="563",APPT="2026-11-23T04:14:19Z";   /* APPT: when this update was made */
+const APPV="564",APPT="2026-11-23T04:19:54Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
