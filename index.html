@@ -2302,9 +2302,15 @@ html.phone .tk-save-x{display:none}
 .acmp-mir{position:absolute;top:6px;left:6px;font:600 11.5px inherit;font-family:inherit;padding:5px 9px;border-radius:99px;border:0;background:rgba(0,0,0,.6);color:#fff;cursor:pointer}
 .acmp-mir[aria-pressed="true"]{background:#ffd23f;color:#111}
 .acmp-tr{display:grid;gap:4px}.acmp-tr .pt-strip{height:44px}.acmp-tr .pt-info{min-height:28px}.acmp-tr .pt-txt{font-size:14px;padding:4px 8px}.acmp-tr .pt-len{font-size:11.5px}.acmp-tr .pt-info{display:flex;flex-wrap:wrap;gap:0 6px;align-items:center}.acmp-tr .pt-info>span:last-child{display:flex;gap:2px;margin-left:auto}.acmp-tr .pt-info>span:last-child button{white-space:nowrap}
-.acmp-p.trimming{grid-template-rows:1fr auto auto auto}.acmp-p.trimming .acmp-pick{display:none}
+.acmp-p.trimming{grid-template-rows:1fr auto auto auto auto}
+.acmp-p:has(.acmp-cb){grid-template-rows:1fr auto auto auto}.acmp-p.trimming .acmp-pick{display:none}
 .acmp-spd{position:absolute;top:6px;right:42px;height:30px;padding:0 9px;border:0;border-radius:99px;background:rgba(0,0,0,.6);color:#fff;font:700 12px var(--mono);cursor:pointer}
-#attCmp .acmp-m{touch-action:pan-x pan-y}
+#attCmp .acmp-m{touch-action:none}
+.acmp-cb{display:flex;align-items:center;gap:8px;padding:4px 2px;transition:opacity .2s}
+#attCmp.chrome-off .acmp-cb,#attCmp.chrome-off .acmp-mir,#attCmp.chrome-off .acmp-spd,#attCmp.chrome-off .acmp-trim{opacity:0;pointer-events:none}
+.acmp-cb button{flex:0 0 auto;min-width:32px;height:30px;border:0;border-radius:6px;background:rgba(255,255,255,.1);color:#fff;font-size:13px;cursor:pointer;display:grid;place-items:center}
+.acmp-tm{font:600 11.5px var(--mono);color:rgba(255,255,255,.75);flex:0 0 auto}
+.acmp-seek{flex:1;min-width:40px;accent-color:#ffd23f;height:20px}
 #attCmp.aligning .acmp-m{cursor:grab;touch-action:none;outline:2px dashed rgba(255,210,63,.55);outline-offset:-2px}
 #attCmp .acmp-m video,#attCmp .acmp-m img{transform-origin:center;transition:none}
 .acmp-al.on{background:#ffd23f!important;color:#111!important;border-color:#ffd23f!important}
@@ -7050,8 +7056,9 @@ function cmpRender(){let w=document.getElementById("attCmp");
   if(!w){w=document.createElement("div");w.id="attCmp";w.className="attv acmp";w.setAttribute("role","dialog");w.setAttribute("aria-modal","true");w.setAttribute("aria-label","Compare side by side");document.body.appendChild(w)}
   if(w.dataset.k===key){cmpStyle();return}w.dataset.k=key;
   const pane=side=>{const it=get(attCmp[side]),a=it.a,y=a.kind==="yt"?ytId(a.url):null;
-    const m=a.kind==="yt"?`<iframe src="https://www.youtube-nocookie.com/embed/${y}?playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="YouTube video"></iframe>`:a.kind==="vid"?`<video data-cmpv="${side}" playsinline controls preload="auto" ${side==="R"?"muted":""}></video>`:`<img data-cmpi="${side}" alt="${esc(a.name||"Photo")}">`;
+    const m=a.kind==="yt"?`<iframe src="https://www.youtube-nocookie.com/embed/${y}?playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="YouTube video"></iframe>`:a.kind==="vid"?`<video data-cmpv="${side}" playsinline webkit-playsinline preload="auto" ${side==="R"?"muted":""}></video>`:`<img data-cmpi="${side}" alt="${esc(a.name||"Photo")}">`;
     return `<div class="acmp-p" data-side="${side}"><div class="acmp-m">${m}<button type="button" class="acmp-mir" data-cmpmir="${side}" aria-pressed="false" title="Mirror (flip left to right)">⇋ Mirror</button>${a.kind==="vid"?`<button type="button" class="acmp-spd" data-cmpsp="${side}" title="Speed of this side">${attCmp["sp"+side]}×</button>`:""}${a.kind==="vid"?`<button type="button" class="acmp-trim${a.t1!=null?" on":""}" data-cmptrim="${side}" aria-label="Trim this video" title="Trim"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.1 15.9M14.5 14.5L20 20M8.1 8.1L12 12"/></svg></button>`:""}</div>
+      ${a.kind==="vid"?`<div class="acmp-cb" data-side="${side}"><button type="button" class="acmp-pp" data-cmppp="${side}" aria-label="Play">▶</button><span class="acmp-tm">0:00</span><input type="range" class="acmp-seek" data-cmpseek="${side}" min="0" max="1000" value="0" aria-label="Seek"><span class="acmp-tm acmp-dur">0:00</span><button type="button" class="acmp-mute" data-cmpmute="${side}" aria-label="Sound">${side==="R"?"🔇":"🔊"}</button><button type="button" class="acmp-fs" data-cmpfs="${side}" aria-label="Full screen" title="Full screen"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>`:""}
       <div class="acmp-lab">${side==="L"?"Left":"Right"}</div>
       ${P.length>2?`<div class="acmp-pick" role="group" aria-label="Choose the ${side==="L"?"left":"right"} media">${P.map(x=>`<button type="button" class="acmp-th${x.a.id===attCmp[side]?" on":""}" data-cmppick="${side}:${x.a.id}" aria-pressed="${x.a.id===attCmp[side]}" title="${esc(x.t.title)}">${attThumb(x.a)}</button>`).join("")}</div>`:""}</div>`};
   w.innerHTML=`<div class="acmp-box"><div class="acmp-h"><b>Compare</b>${P.length>2?`<small>Pick what goes on each side</small>`:""}<button type="button" class="attv-x acmp-x" data-cmpclose aria-label="Close">×</button></div>
@@ -7062,19 +7069,24 @@ function cmpRender(){let w=document.getElementById("attCmp");
     attURL(a).then(u=>{const el=w.querySelector(a.kind==="vid"?`[data-cmpv="${side}"]`:`[data-cmpi="${side}"]`);if(!el)return;
       if(!u){el.replaceWith(Object.assign(document.createElement("p"),{className:"attv-miss",textContent:"This file isn't on this device yet."}));return}
       if(a.kind!=="vid"){el.src=u;return}
-      attPoster(a).then(pu=>{if(pu)el.poster=pu});const so=document.createElement("source");so.src=u;so.type=a.type||"video/mp4";el.appendChild(so);el.playbackRate=attCmp["sp"+side];el.controls=!attCmp.hide&&!attCmp.align;
+      attPoster(a).then(pu=>{if(pu)el.poster=pu});const so=document.createElement("source");so.src=u;so.type=a.type||"video/mp4";el.appendChild(so);el.playbackRate=attCmp["sp"+side];el.controls=false;cmpBar(el,side);
       el.addEventListener("loadedmetadata",()=>{try{el.currentTime=a.t0||0}catch(_){}el.playbackRate=attCmp?attCmp["sp"+side]:1},{once:true});
       if(a.t1!=null)el.addEventListener("timeupdate",()=>{if(el.currentTime>=a.t1)el.currentTime=a.t0||0});
       el.load()})});
   cmpStyle()}
+/* compare's own player bar (the phone's built-in one turned a pinch into full screen) */
+function cmpBar(v,side){const bar=document.querySelector(`#attCmp .acmp-cb[data-side="${side}"]`);if(!bar)return;const pp=bar.querySelector(".acmp-pp"),sk=bar.querySelector(".acmp-seek"),tm=bar.querySelector(".acmp-tm"),du=bar.querySelector(".acmp-dur");
+  const upd=()=>{const d=v.duration||0;pp.textContent=v.paused?"▶":"❚❚";tm.textContent=attMS(v.currentTime||0);du.textContent=attMS(d);if(d&&!sk.matches(":active"))sk.value=Math.round(v.currentTime/d*1000)};
+  ["timeupdate","play","pause","loadedmetadata","durationchange"].forEach(k=>v.addEventListener(k,upd));
+  sk.addEventListener("input",()=>{if(v.duration)v.currentTime=sk.value/1000*v.duration;upd()})}
 function cmpStyle(){const w=document.getElementById("attCmp");if(!w||!attCmp)return;w.classList.toggle("aligning",!!attCmp.align);w.classList.toggle("chrome-off",!!attCmp.hide);
   ["L","R"].forEach(s=>{const on=attCmp["m"+s];const p=w.querySelector(`.acmp-p[data-side="${s}"]`);if(!p)return;p.classList.toggle("mir",on);const b=p.querySelector("[data-cmpmir]");b&&b.setAttribute("aria-pressed",on);
-    const t=attCmp.tf[s],m=p.querySelector(".acmp-m video,.acmp-m img");if(m){m.style.transform=`translate(${t.x}px,${t.y}px) scale(${t.s}) scaleX(${on?-1:1})`;if(m.tagName==="VIDEO")m.controls=!attCmp.hide&&!attCmp.align}
+    const t=attCmp.tf[s],m=p.querySelector(".acmp-m video,.acmp-m img");if(m){m.style.transform=`translate(${t.x}px,${t.y}px) scale(${t.s}) scaleX(${on?-1:1})`}
     const sp=p.querySelector("[data-cmpsp]");if(sp)sp.textContent=attCmp["sp"+s]+"×"})}
 const cmpStart=side=>{const a=attCmp&&cmpPool(attCmp.tid).find(x=>x.a.id===attCmp[side]);return a?a.a.t0||0:0};
-document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-cmpopen],[data-cmpclose],[data-cmppick],[data-cmpmir],[data-cmpgo],[data-cmptrim],[data-cmpsp]");
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-cmpopen],[data-cmpclose],[data-cmppick],[data-cmpmir],[data-cmpgo],[data-cmptrim],[data-cmpsp],[data-cmppp],[data-cmpfs],[data-cmpmute]");
   if(!b){/* was: tapping outside closed the window. Now a tap on empty space hides / shows the video controls; only × or a hard swipe up closes */
-    if(attCmp&&Date.now()-cmpDragAt>400&&e.target.closest&&e.target.closest("#attCmp")&&!e.target.closest("video,iframe,.acmp-tr,.acmp-pick,.acmp-ctl,button,.acmp-m")){attCmp.hide=!attCmp.hide;cmpStyle()}return}
+    if(attCmp&&Date.now()-cmpDragAt>400&&e.target.closest&&e.target.closest("#attCmp")&&!e.target.closest("iframe,.acmp-tr,.acmp-pick,.acmp-ctl,.acmp-cb,button,input")&&!(attCmp.align&&e.target.closest(".acmp-m"))){attCmp.hide=!attCmp.hide;cmpStyle()}return}
   e.preventDefault();e.stopPropagation();
   if(b.dataset.cmpopen){cmpOpen(b.dataset.cmpopen);attHydrate();return}
   if(b.dataset.cmpclose!==undefined){attCmp=null;cmpRender();return}
@@ -7088,6 +7100,11 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
       if(r==="all"){delete a.t0;delete a.t1}else{a.t0=r[0];a.t1=r[1]}[...attStageEls.keys()].forEach(k=>{if(k.endsWith(":"+a.id))attStageEls.delete(k)});save();render();
       const w=document.getElementById("attCmp");if(w)w.dataset.k="";cmpRender();attHydrate();toast("Trim saved")}}));return}
   if(b.dataset.cmpmir){const k="m"+b.dataset.cmpmir;attCmp[k]=!attCmp[k];cmpStyle();return}
+  if(b.dataset.cmppp||b.dataset.cmpfs||b.dataset.cmpmute){const sd=b.dataset.cmppp||b.dataset.cmpfs||b.dataset.cmpmute,v=document.querySelector(`#attCmp video[data-cmpv="${sd}"]`);if(!v)return;
+    if(b.dataset.cmppp){if(v.paused){const p=v.play();p&&p.catch(()=>{})}else v.pause()}
+    else if(b.dataset.cmpmute){v.muted=!v.muted;b.textContent=v.muted?"🔇":"🔊"}
+    else{/* full screen only from this button */if(v.webkitEnterFullscreen&&!v.requestFullscreen)v.webkitEnterFullscreen();else{const f=v.requestFullscreen||v.webkitRequestFullscreen;try{const r=f&&f.call(v);r&&r.catch&&r.catch(()=>{v.webkitEnterFullscreen&&v.webkitEnterFullscreen()})}catch(_){v.webkitEnterFullscreen&&v.webkitEnterFullscreen()}}}
+    return}
   if(b.dataset.cmpsp){const k="sp"+b.dataset.cmpsp,n=attCmp[k]===1?.75:attCmp[k]===.75?.5:attCmp[k]===.5?.25:1;attCmp[k]=n;const v=document.querySelector(`#attCmp video[data-cmpv="${b.dataset.cmpsp}"]`);if(v)v.playbackRate=n;cmpStyle();return}
   const V=cmpVids(),g=b.dataset.cmpgo;
   if(g==="play")V.forEach(v=>{const p=v.play();p&&p.catch(()=>{})});
@@ -7099,6 +7116,8 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
       c.querySelectorAll('[data-cmpgo="align"],[data-cmpgo="alignreset"]').forEach(x=>x.remove());c.append(...h.children);const box=w.querySelector(".acmp-box");let hint=box.querySelector(".acmp-hint");if(attCmp.align&&!hint)box.insertAdjacentHTML("beforeend",`<p class="acmp-hint">Drag a video to move it · pinch (or scroll) to zoom · tap Align again when they line up</p>`);if(!attCmp.align&&hint)hint.remove()}
     cmpStyle()}},true);
 let cmpDragAt=0;
+["gesturestart","gesturechange","gestureend"].forEach(k=>document.addEventListener(k,e=>{if(e.target.closest&&e.target.closest("#attCmp .acmp-m"))e.preventDefault()},{passive:false}));
+document.addEventListener("touchmove",e=>{if(e.touches.length>1&&e.target.closest&&e.target.closest("#attCmp .acmp-m"))e.preventDefault()},{passive:false});
 /* align mode: drag a side to move it, pinch / scroll to zoom it, so the two dancers line up */
 (()=>{let d=null;const P=new Map();
   /* two fingers zoom a side any time; one finger moves it only in Align mode (otherwise taps still reach the video's own controls) */
@@ -8179,7 +8198,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="546",APPT="2026-11-23T02:06:03Z";   /* APPT: when this update was made */
+const APPV="547",APPT="2026-11-23T02:08:42Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
