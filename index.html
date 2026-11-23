@@ -7077,7 +7077,8 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 let attRepl=null;
 function attDrop(a){if(!a)return;MDB.del(a.id);MDB.del(a.id+":p"+(a.t0||0));if(a.path&&typeof sbOn==="function"&&sbOn())try{sb.storage.from("models").remove([a.path])}catch(_){}if(attURLs.has(a.id)){URL.revokeObjectURL(attURLs.get(a.id));attURLs.delete(a.id)}[...attStageEls.keys()].forEach(k=>{if(k.endsWith(":"+a.id))attStageEls.delete(k)})}
 function attPut(t,a){const r=attRepl&&attRepl.tid===t.id?attRepl.aid:null;t.att=t.att||[];const i=r?t.att.findIndex(x=>x.id===r):-1;
-  if(i>=0){const old=t.att[i];t.att[i]=a;attDrop(old);attRepl=null}else t.att.push(a);attSel[t.id]=a.id}
+  /* replacing keeps what you did to the old one: trim, alignment (move / zoom / mirror), speed and saved spot */
+  if(i>=0){const old=t.att[i];if(old.kind==="vid"&&a.kind==="vid"){["t0","t1","view"].forEach(k=>{if(old[k]!=null&&a[k]==null)a[k]=JSON.parse(JSON.stringify(old[k]))})}t.att[i]=a;attDrop(old);attRepl=null}else t.att.push(a);attSel[t.id]=a.id}
 /* trim any saved video: drag the start and end handles (keeps the file, just plays that part) */
 function attTrimEditOld(tid,aid,isNew){return new Promise(done=>{const t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);if(!a){done();return}
   attURL(a).then(u=>{if(!u){toast("This video isn't on this device yet");done();return}
@@ -8430,7 +8431,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="570",APPT="2026-11-23T04:51:52Z";   /* APPT: when this update was made */
+const APPV="571",APPT="2026-11-23T04:55:40Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
