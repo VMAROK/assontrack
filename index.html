@@ -2366,7 +2366,7 @@ html.phone .tkd-theater,html.phone .tkd-theater>.tkd-pane{height:min(1000px,72vh
 .bsecs{display:grid;gap:10px}
 .bro-drag{position:relative;z-index:6;box-shadow:0 12px 28px rgba(0,0,0,.55);transition:none!important;opacity:.96}
 .bco-r{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-.bsec-sum{position:relative}.bsum-c>.bsec-grip{position:absolute;left:6px;top:50%;transform:translateY(-50%);z-index:2}.bsum-c.has-g{padding-left:36px}.bsum-c.bsum-off>.bsec-grip{position:static;transform:none}html.phone .bsum-c>.bsec-grip{left:2px}html.phone .bsum-c.has-g{padding-left:26px}
+.bsec-sum{position:relative}.bsum-c:not(.bsum-off){align-items:center;text-align:center;padding-left:40px!important;padding-right:40px!important}.bsum-c:not(.bsum-off)>span{padding-right:0!important}html.phone .bsum-c:not(.bsum-off){padding-left:26px!important;padding-right:26px!important;padding-top:30px!important}.bsum-c>.bsec-grip{position:absolute;left:6px;top:50%;transform:translateY(-50%);z-index:2}.bsum-c.has-g{padding-left:36px}.bsum-c.bsum-off>.bsec-grip{position:static;transform:none}html.phone .bsum-c>.bsec-grip{left:2px}html.phone .bsum-c.has-g{padding-left:26px}
 .bsum{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .bsum-c{position:relative;cursor:grab;touch-action:pan-y;-webkit-user-select:none;user-select:none}.bsum-drag{z-index:6;cursor:grabbing;box-shadow:0 14px 30px rgba(0,0,0,.55);transition:none!important}.bsum-tgt{outline:2px dashed rgba(255,255,255,.55);outline-offset:3px}
 .bsum-h{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(var(--tX),.6);background:rgba(4,8,20,.45);color:var(--muted);cursor:pointer;padding:0}.bsum-h:hover{color:var(--text)}
@@ -8599,7 +8599,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="587",APPT="2026-11-23T06:07:32Z";   /* APPT: when this update was made */
+const APPV="588",APPT="2026-11-23T06:10:25Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
