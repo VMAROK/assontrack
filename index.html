@@ -2883,6 +2883,8 @@ html.phone .bc-mk{top:64%;width:26px;height:26px;font-size:16px}html.phone .bc-m
 .bsg-car{color:var(--muted);transition:transform .2s;flex:none}.bsg.open .bsg-car{transform:rotate(180deg)}
 .bsg-bar{height:4px;margin:0 14px 12px;border-radius:2px;background:rgba(var(--tX),.6);overflow:hidden}.bsg-bar i{display:block;height:100%;border-radius:2px;background:var(--gc);box-shadow:0 0 8px var(--gc)}
 .bsg-more{display:block;width:100%;padding:10px 14px;border:0;border-top:1px solid rgba(var(--lr),.14);background:rgba(var(--tL),.06);color:rgb(var(--tL));font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+/* up to 12 purchases show in full; more than that and the list scrolls inside the group */
+.bsg-in.scroll{max-height:calc(var(--bsgrh,43.4px) * 12);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .bsg-in{border-top:1px solid rgba(var(--lr),.18)}
 .bsg-r{display:flex;align-items:center;gap:12px;width:100%;padding:10px 14px;border:0;border-top:1px solid rgba(var(--lr),.1);background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}.bsg-r:first-child{border-top:0}
 .bsg-d{color:var(--muted);font-size:12px;min-width:56px}.bsg-w{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bsg-r b{font-family:var(--mono)}
@@ -5959,7 +5961,7 @@ function bSpendByGroup(b,L){const tot=L.reduce((a,s)=>a+bSpAmt(s),0),names=[...n
   return `<div class="bsg-list">${rows.map(r=>{const c=bSgCol(b,r.g),pc=tot?Math.round(r.t/tot*100):0,open=bSgOpen.has(r.g||"\u0000");
     return `<div class="bsg${open?" open":""}" style="--gc:${c}"><button type="button" class="bsg-h" data-bsgo="${esc(r.g)}" aria-expanded="${open}"><i class="bsg-dot"></i><span class="bsg-n">${esc(r.g||"No group")}</span><small>${r.A.length} purchase${r.A.length===1?"":"s"}</small><b>${bMoney(r.t)}</b><em>${pc}%</em><svg class="bsg-car" viewBox="0 0 24 24" width="16" height="16"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <div class="bsg-bar"><i style="width:${pc}%"></i></div>
-      ${open?`<div class="bsg-in">${r.A.length?(bSgAll.has(r.g||"\u0000")?r.A:r.A.slice(0,5)).map(s=>`<button type="button" class="bsg-r" data-bsedit="${s.id}"><span class="bsg-d">${s.d===today()?"Today":bDate(s.d).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</span><span class="bsg-w">${esc(s.note||"Spent")}</span><b>${bMoneyI(s)}</b></button>`).join("")+(r.A.length>5?`<button type="button" class="bsg-more" data-bsgall="${esc(r.g)}">${bSgAll.has(r.g||"\u0000")?"Show fewer":`Show all ${r.A.length}`}</button>`:""):`<p class="note" style="margin:8px 12px">Nothing in this group this month.</p>`}</div>`:""}</div>`}).join("")}</div>`}
+      ${open?`<div class="bsg-in${r.A.length>12?" scroll":""}">${r.A.length?r.A.map(s=>`<button type="button" class="bsg-r" data-bsedit="${s.id}"><span class="bsg-d">${s.d===today()?"Today":bDate(s.d).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</span><span class="bsg-w">${esc(s.note||"Spent")}</span><b>${bMoneyI(s)}</b></button>`).join("")/* "Show all" button removed: the list scrolls after 12 purchases */:`<p class="note" style="margin:8px 12px">Nothing in this group this month.</p>`}</div>`:""}</div>`}).join("")}</div>`}
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-bspv],[data-bsgo],[data-bsgall]");if(!t)return;e.preventDefault();e.stopImmediatePropagation();
   if(t.hasAttribute("data-bspv")){B().spView=t.dataset.bspv;save();render();return}
   if(t.hasAttribute("data-bsgall")){const k=t.dataset.bsgall||"\u0000";bSgAll.has(k)?bSgAll.delete(k):bSgAll.add(k);render();return}
@@ -8867,7 +8869,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="635",APPT="2026-11-23T22:19:58Z";   /* APPT: when this update was made */
+const APPV="636",APPT="2026-11-23T22:22:12Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
