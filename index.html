@@ -7611,17 +7611,26 @@ function passSummary(d){const P=d.passions||[];if(!P.length)return "";const p=P.
   const C=cats(),COL=["#ff6b8a","#5b8cff","#3ddc84","#ffb547","#a77bff","#2fd4d4"],byC=C.map((c,i)=>({n:c.name,c:COL[i%COL.length],m:P.filter(q=>q.cat===c.id).reduce((a,q)=>a+minsWk(q),0)})),other=P.filter(q=>!q.cat||!C.some(c=>c.id===q.cat)).reduce((a,q)=>a+minsWk(q),0);
   if(other)byC.push({n:"Other",c:"#8a93a6",m:other});const allM=byC.reduce((a,x)=>a+x.m,0);
   /* the plan: weekly goal hours per category, to set against what was actually logged */
-  byC.forEach(x=>{const c=C.find(q=>q.name===x.n);x.g=(c?P.filter(q=>q.cat===c.id):P.filter(q=>!q.cat||!C.some(k=>k.id===q.cat))).reduce((a,q)=>a+(+q.goal||0)*60,0)});
-  if(!other){const og=P.filter(q=>!q.cat||!C.some(k=>k.id===q.cat)).reduce((a,q)=>a+(+q.goal||0)*60,0);if(og)byC.push({n:"Other",c:"#8a93a6",m:0,g:og})}
+  /* the plan = the time you set aside this week: your schedule's slots (each slot's length on the days it falls this week,
+     plus weekly / monthly amounts) — or the passion's weekly hours goal if that's bigger */
+  const planM=q=>{let m=0;if(modesOf(q).includes("schedule"))(q.slots||[]).forEach(sl=>{
+      if(isMo(sl)){if(slotState(d,q,sl,wk)!=="none")m+=(+sl.dur||0)/4.35;return}
+      if(isWk(sl)){if(slotState(d,q,sl,wk)!=="none")m+=+sl.dur||0;return}
+      for(let i=0;i<7;i++){const x=new Date(wk+"T12:00");x.setDate(x.getDate()+i);const ds=ymd(x);if(dow(ds)!==sl.day||slotState(d,q,sl,ds)==="none")continue;
+        if(sl.dur)m+=+sl.dur;else{const a=toMin(sl.start),b=toMin(sl.end);m+=b>a?b-a:60}}});
+    return Math.max(m,(+q.goal||0)*60)};
+  const inC=x=>{const c=C.find(q=>q.name===x.n);return c?P.filter(q=>q.cat===c.id):P.filter(q=>!q.cat||!C.some(k=>k.id===q.cat))};
+  byC.forEach(x=>{x.g=inC(x).reduce((a,q)=>a+planM(q),0)});
+  if(!other){const og=P.filter(q=>!q.cat||!C.some(k=>k.id===q.cat)).reduce((a,q)=>a+planM(q),0);if(og)byC.push({n:"Other",c:"#8a93a6",m:0,g:og})}
   const allG=byC.reduce((a,x)=>a+(x.g||0),0);
   const split=(k,tot)=>`<div class="psm-split">${byC.filter(x=>x[k]).map(x=>`<i style="width:${x[k]/tot*100}%;background:${x.c}"></i>`).join("")}</div>`;
-  const key=(k,tot)=>`<div class="psm-key">${byC.filter(x=>x[k]).map(x=>`<span><b style="color:${x.c}">●</b> ${esc(x.n)} ${Math.round(x[k]/tot*100)}% <em>${hm(x[k])}${k==="m"?` · ${P.filter(q=>(C.find(c=>c.name===x.n)?q.cat===C.find(c=>c.name===x.n).id:(!q.cat||!C.some(c=>c.id===q.cat)))&&minsWk(q)).map(q=>esc(q.name)).join(", ")}`:""}</em></span>`).join("")}</div>`;
+  const key=(k,tot)=>`<div class="psm-key">${byC.filter(x=>x[k]).map(x=>`<span><b style="color:${x.c}">●</b> ${esc(x.n)} ${Math.round(x[k]/tot*100)}% <em>${hm(x[k])}${k==="g"?` · ${inC(x).filter(q=>planM(q)).map(q=>esc(q.name)).join(", ")}`:""}${k==="m"?` · ${P.filter(q=>(C.find(c=>c.name===x.n)?q.cat===C.find(c=>c.name===x.n).id:(!q.cat||!C.some(c=>c.id===q.cat)))&&minsWk(q)).map(q=>esc(q.name)).join(", ")}`:""}</em></span>`).join("")}</div>`;
   const R=50,CIRC=2*Math.PI*R;
   return `<div class="panel psum"><div class="ph"><span>${esc(p.name)} · progress</span><i>This week</i></div>
     <div class="psm-top"><div class="psm-ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="${R}" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="11"/><circle cx="60" cy="60" r="${R}" fill="none" stroke="var(--cyan)" stroke-width="11" stroke-linecap="round" stroke-dasharray="${(pc*CIRC).toFixed(1)} ${CIRC.toFixed(1)}" transform="rotate(-90 60 60)"/></svg><div><b>${hm(wm)}</b><small>${gm?"of "+p.goal+"h goal":"no weekly goal"}</small></div></div>
       <div class="psm-n"><div><b>${nProg}</b><small>In progress</small></div><div><b style="color:#3ddc84">${nDone}</b><small>Done this week</small></div><div><b style="color:${late?"var(--red)":"#ffb547"}">${soon.length}</b><small>${late?"Due / overdue":"Due in 3 days"}</small></div></div></div>
     ${leaves.length?`<div class="psm-sec"><div class="psm-l">Projects</div>${leaves.map(prow).join("")}</div>`:`<div class="psm-sec"><div class="psm-l">Projects</div><p class="psm-empty">No projects yet. Add one in the Projects tab below.</p></div>`}
-    ${C.length?`<div class="psm-sec"><div class="psm-l">Where you planned your time · weekly goals</div>${allG?split("g",allG)+key("g",allG):`<p class="psm-empty">Set weekly hour goals on your passions to see your plan.</p>`}
+    ${C.length?`<div class="psm-sec"><div class="psm-l">Where you planned your time · this week's schedule</div>${allG?split("g",allG)+key("g",allG):`<p class="psm-empty">Nothing planned this week yet. Add time slots to your weekly schedule, or a weekly hours goal.</p>`}
       <div class="psm-l" style="margin-top:4px">Where it actually went · this week</div>${allM?split("m",allM)+key("m",allM):`<p class="psm-empty">No time logged this week yet.</p>`}</div>`:""}
   </div>`}
 function passTP(d){const P=d.passions||[];if(!P.length)return "";const cur=P.find(x=>x.id===selP);
@@ -8321,7 +8330,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="556",APPT="2026-11-23T02:51:11Z";   /* APPT: when this update was made */
+const APPV="557",APPT="2026-11-23T02:56:39Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
