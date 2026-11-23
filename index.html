@@ -2768,6 +2768,8 @@ button.us-emptyadd{width:100%;font:inherit;cursor:pointer;background:none;color:
 .bc-h{display:flex;align-items:center;gap:6px;margin-bottom:10px}.bc-h b{font-size:15px;min-width:150px;text-align:center}.bc-nav,.bc-today{font:inherit;font-size:18px;line-height:1;width:32px;height:32px;border-radius:9px;cursor:pointer;color:#e6eeff;background:rgba(var(--tX),.45);border:1px solid rgba(var(--lr),.3)}.bc-today{width:auto;padding:0 12px;font-size:12.5px;font-weight:600;margin-left:auto}
 /* Nutrition week: no numbers under the donut (calories, limit, macros); day + date stay, box keeps its size */
 .nw-d .nw-k,.nw-d .nw-l,.nw-d .nw-ml{visibility:hidden!important}
+/* centre the donut: split the (hidden) number lines above and below it so the box keeps its size */
+.nw-d .nw-t{order:0}.nw-d .nw-k{order:1}.nw-d .nw-ml{order:2}.nw-d .nw-ring{order:3}.nw-d .nw-l{order:4}.nw-d .nw-gw{order:5}html:not(.phone) .nw-d .nw-ring{position:relative;top:-8px}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -8756,7 +8758,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="618",APPT="2026-11-23T09:30:43Z";   /* APPT: when this update was made */
+const APPV="619",APPT="2026-11-23T09:35:26Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
