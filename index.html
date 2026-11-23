@@ -2290,6 +2290,9 @@ html.phone .tk-save-x{display:none}
 .cat-col-own input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .cat-chak{margin-top:12px}.cat-chak small{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
 .cat-chak-n{display:flex;gap:8px;margin-top:4px}.cat-chak-n span{width:28px;text-align:center;font-size:8.5px;line-height:1.1;color:var(--muted)}
+.pcat-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.pcat-top>.cat-bar{flex:0 1 auto;min-width:0;margin-bottom:0!important}
+.pcat-btns{margin-left:auto;display:flex;gap:8px}.pcat-btns .btn{padding:8px 16px;margin:0}
+.pcatp>.cat-mgr{margin-top:12px}
 /* add + compare: one slim icon row */
 .att-tools{display:flex;align-items:center;gap:3px;margin-top:3px}
 .att-ic{position:relative;display:grid;place-items:center;width:40px;height:34px;padding:0;border:0;border-radius:0;cursor:pointer;color:var(--fg);background:rgba(var(--lr),.1);transition:background .15s}
@@ -6620,7 +6623,7 @@ function catManager(P){if(!catMgr)return "";const C=cats(),n=id=>P.filter(p=>p.c
      <div class="cm-lab">Color<div class="cat-cols" role="radiogroup" aria-label="Category color">${CATPAL.map(x=>`<button type="button" class="cat-col${catColor(c)===x?" on":""}" style="--sw:${x}" data-catcol="${c.id}|${x}" role="radio" aria-checked="${catColor(c)===x}" aria-label="Color ${x}"></button>`).join("")}<label class="cat-col cat-col-own" title="Pick any color" style="--sw:${catColor(c)}"><input type="color" value="${catColor(c)}" data-catcolin="${c.id}" aria-label="Pick any color"></label></div>
        <div class="cat-chak"><small>Chakras</small><div class="cat-cols" role="radiogroup" aria-label="Chakra colors">${CHAKRA.map(([x,nm])=>`<button type="button" class="cat-col${catColor(c)===x?" on":""}" style="--sw:${x}" data-catcol="${c.id}|${x}" role="radio" aria-checked="${catColor(c)===x}" aria-label="${nm} chakra" title="${nm}"></button>`).join("")}</div><div class="cat-chak-n">${CHAKRA.map(([x,nm])=>`<span>${nm}</span>`).join("")}</div></div></div>
      ${catThemePanel()}
-     ${catDelArm===c.id?`<div class="cm-confirm"><span>Delete <b>${esc(c.name)}</b>? Its passions are kept, they just lose this category.</span><button class="cm-ic danger" data-catdel="${c.id}">Delete</button><button class="cm-ic" data-cmdelno>Cancel</button></div>`:`<div class="cm-actions"><button class="cm-delink" data-cmdel="${c.id}">Delete category</button><span class="cm-btns"><button class="btn ghost" data-catcancelx>Cancel</button><button class="btn" data-catsave>Save</button></span></div>`}</div>`})()}
+     ${catDelArm===c.id?`<div class="cm-confirm"><span>Delete <b>${esc(c.name)}</b>? Its passions are kept, they just lose this category.</span><button class="cm-ic danger" data-catdel="${c.id}">Delete</button><button class="cm-ic" data-cmdelno>Cancel</button></div>`:`<div class="cm-actions"><button class="cm-delink" data-cmdel="${c.id}">Delete category</button><!-- Cancel / Save moved up next to the category tabs --></div>`}</div>`})()}
   </div>`}
 function catThemePanel(){const c=cats().find(x=>x.id===passCat);if(!catThemeOpen||!c)return "";const cl=c.look||{},gl=lookOf(),inP=D().passions.filter(p=>p.cat===c.id),own=inP.filter(p=>p.wall||p.look).length;
   return `<div class="cat-theme"><div class="ct-head"><b>Theme for ${esc(c.name)}</b><small>Every passion in ${esc(c.name)} uses this unless it has its own theme.</small></div>
@@ -7618,7 +7621,8 @@ function commitPanel(d,P,wk){
 function figurePanel(){return `<div class="panel holopanel"><div class="ph"><span>${figFit()?"Your body":"Your figure"}</span><button class="addp gear avgear${avEdit?" on":""}" data-avedit aria-expanded="${avEdit}" aria-label="Customize" title="Customize"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button></div>${holoView()}<div class="avfoot">${avEdit?avEditor()+`<div class="av-actions"><button class="btn ghost" data-avcancel>Cancel</button><button class="btn" data-avsave>Save</button></div>`:""}</div></div>`}
 /* Tasks & Projects next to My passions: the picked passion, or the first one when none is picked (using it picks that one) */
 /* editing categories happens here, in the panel beside My passions (it used to take over My passions itself) */
-function passCatPanel(d){const ALL=sortPass(d.passions||[]);return `<div class="panel pcatp">${catTabs(ALL)}${catManager(ALL)}</div>`}
+function passCatPanel(d){const ALL=sortPass(d.passions||[]);const ed=catMgr&&catThemeOpen&&cats().some(x=>x.id===passCat)&&catDelArm!==passCat;
+  return `<div class="panel pcatp"><div class="pcat-top">${catTabs(ALL)}${ed?`<span class="cm-btns pcat-btns"><button class="btn ghost" data-catcancelx>Cancel</button><button class="btn" data-catsave>Save</button></span>`:""}</div>${catManager(ALL)}</div>`}
 /* progress summary for the selected passion: hours vs goal, task counts, each project, and where time goes by category */
 function passSummary(d){const P=d.passions||[];if(!P.length)return "";const p=P.find(x=>x.id===selP)||sortPass(P)[0],wk=weekKey(today()),now=Date.now(),wkStart=+new Date(wk+"T00:00");
   const minsWk=q=>d.sessions.filter(s=>s.pid===q.id&&!s.planned&&weekKey(s.d)===wk).reduce((a,s)=>a+(+s.mins||0),0);
@@ -8350,7 +8354,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="559",APPT="2026-11-23T03:39:08Z";   /* APPT: when this update was made */
+const APPV="560",APPT="2026-11-23T03:46:30Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
