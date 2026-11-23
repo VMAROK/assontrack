@@ -6946,9 +6946,7 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   if(b.dataset.attview){document.querySelectorAll(".att-stage video").forEach(v=>v.pause());attView=b.dataset.attview;attHydrate();return}
   if(b.dataset.attclose!==undefined){attView=null;attHydrate();return}
   if(b.dataset.attdel){const [tid,aid]=b.dataset.attdel.split(":"),t=findTaskAny(tid);if(!t)return;
-    /* old: the × turned into "Remove?" on the tile itself — now a proper window asks first */
-    if(b.dataset.armed!=="1"){const a0=(t.att||[]).find(x=>x.id===aid);if(!a0)return;
-      aotConfirm({title:"Delete this "+(a0.kind==="yt"?"YouTube link":a0.kind==="vid"?"video":"photo")+"?",text:"Are you sure you want to delete it? This can't be undone.",ok:"Hold to delete",danger:true,hold:true}).then(y=>{if(y){const nb=document.querySelector(`[data-attdel="${tid}:${aid}"]`);if(nb){nb.dataset.armed="1";nb.click()}}});return}
+    if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="Remove?";b.classList.add("armed");setTimeout(()=>{if(b.isConnected){b.dataset.armed="";b.textContent="×";b.classList.remove("armed")}},2500);return}
     const a=(t.att||[]).find(x=>x.id===aid);t.att=(t.att||[]).filter(x=>x.id!==aid);if(a){MDB.del(a.id);if(a.path&&typeof sbOn==="function"&&sbOn())try{sb.storage.from("models").remove([a.path])}catch(_){}if(attURLs.has(a.id)){URL.revokeObjectURL(attURLs.get(a.id));attURLs.delete(a.id)}}
     save();render()}},true);
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&attView){attView=null;attHydrate()}});
@@ -8018,7 +8016,10 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
     if(b.dataset.tkstart){if(t.doneAt||taskState(t)==="planned")return;(t.runs=t.runs||[]).push({s:Date.now()});toast("Timer started")}
     else if(b.dataset.tkpause){const m=stopRun(p,t);toast(m>=1?fmtH(m)+" logged":"Paused")}
     else if(b.dataset.tkdone){if(b.dataset.armed!=="1"){b.dataset.armed="1";b.classList.add("armed");b.insertAdjacentHTML("beforeend","<span>Done?</span>");return}stopRun(p,t);t.doneAt=Date.now();toast(`Done · ${fmtH(Math.round(taskMs(t)/6e4))} total`)}
-    else if(b.dataset.tkdel){if(t.due&&!t.doneAt){toast("A task with a deadline can't be deleted");return}if(b.dataset.armed!=="1"){b.dataset.armed="1";b.classList.add("armed");if(b.classList.contains("tk-ic"))b.insertAdjacentHTML("beforeend","<span>Delete?</span>");else{b.textContent="Delete?";b.style.fontSize="12px";b.style.color="var(--red)"}return}p.tasks=p.tasks.filter(x=>x.id!==id);toast("Task deleted")}
+    else if(b.dataset.tkdel){if(t.due&&!t.doneAt){toast("A task with a deadline can't be deleted");return}/* old: the button turned into "Delete?" in place — now a window asks, and Delete must be held
+      if(b.dataset.armed!=="1"){b.dataset.armed="1";b.classList.add("armed");...b.textContent="Delete?"...return} */
+      aotConfirm({title:"Delete this task?",text:"Are you sure you want to delete \u201c"+t.title+"\u201d? Its time and media go with it. This can't be undone.",ok:"Hold to delete",danger:true,hold:true}).then(y=>{if(!y)return;const pp=data.passions.find(x=>(x.tasks||[]).some(q=>q.id===id));if(!pp)return;
+        const tk=pp.tasks.find(x=>x.id===id);(tk&&tk.att||[]).forEach(a=>{try{attDrop(a)}catch(_){}});pp.tasks=pp.tasks.filter(x=>x.id!==id);toast("Task deleted");render();save()});return}
     render();save()}
   else if(b.dataset.donesess){const x=data.sessions.find(s=>s.id===b.dataset.donesess);if(x){x.planned=false;render();save();toast("Marked done")}}
   else if(b.hasAttribute("data-addproj")){addingProj=!addingProj;render();if(addingProj){const n=$("#prT");n&&n.focus()}}
@@ -8054,7 +8055,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="531",APPT="2026-11-23T00:22:58Z";   /* APPT: when this update was made */
+const APPV="532",APPT="2026-11-23T00:27:23Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
