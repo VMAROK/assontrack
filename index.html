@@ -2288,6 +2288,8 @@ html.phone .tk-save-x{display:none}
 .cat-col.on{border-color:#fff;box-shadow:0 0 0 2px var(--sw)}
 .cat-col-own{background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red)}
 .cat-col-own input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.cat-chak{margin-top:12px}.cat-chak small{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.cat-chak-n{display:flex;gap:8px;margin-top:4px}.cat-chak-n span{width:28px;text-align:center;font-size:8.5px;line-height:1.1;color:var(--muted)}
 /* add + compare: one slim icon row */
 .att-tools{display:flex;align-items:center;gap:3px;margin-top:3px}
 .att-ic{position:relative;display:grid;place-items:center;width:40px;height:34px;padding:0;border:0;border-radius:0;cursor:pointer;color:var(--fg);background:rgba(var(--lr),.1);transition:background .15s}
@@ -6580,6 +6582,7 @@ let passCat="all",catAdding=false,catEditing=null,catThemeOpen=false,catMgr=fals
 const cats=()=>(D().categories||[]);
 /* each passion category has a color (picked in category settings; a default from this palette until then) */
 const CATPAL=["#ff6b8a","#5b8cff","#3ddc84","#ffb547","#a77bff","#2fd4d4","#ff8a3d","#f06bd8","#9ad14b","#e8e8e8"];
+const CHAKRA=[["#e53935","Root"],["#fb8c00","Sacral"],["#fdd835","Solar plexus"],["#43a047","Heart"],["#1e88e5","Throat"],["#3949ab","Third eye"],["#8e24aa","Crown"]];
 const catColor=c=>{if(!c)return null;if(c.color)return c.color;const i=cats().findIndex(x=>x.id===c.id);return CATPAL[(i<0?0:i)%6]};
 const passCatColor=p=>{const c=p&&p.cat&&cats().find(x=>x.id===p.cat);return c?catColor(c):null};
 const catName=id=>(cats().find(c=>c.id===id)||{}).name||"";
@@ -6614,7 +6617,8 @@ function catManager(P){if(!catMgr)return "";const C=cats(),n=id=>P.filter(p=>p.c
   return `<div class="cat-mgr"><div class="cm-head"><b>Categories</b><small>${cats().length?"Tap a category to edit it, or + to add one.":"Tap + to add your first category."}</small><button class="x" data-catmgr aria-label="Close category settings">×</button></div>
   ${(()=>{const c=catThemeOpen&&C.find(x=>x.id===passCat);if(!c)return "";
    return `<div class="cm-body"><label class="cm-lab">Name<input id="catEditIn" value="${esc(catDraftName??c.name)}" maxlength="28" aria-label="Category name" autocomplete="off" enterkeyhint="done"></label>
-     <div class="cm-lab">Color<div class="cat-cols" role="radiogroup" aria-label="Category color">${CATPAL.map(x=>`<button type="button" class="cat-col${catColor(c)===x?" on":""}" style="--sw:${x}" data-catcol="${c.id}|${x}" role="radio" aria-checked="${catColor(c)===x}" aria-label="Color ${x}"></button>`).join("")}<label class="cat-col cat-col-own" title="Pick any color" style="--sw:${catColor(c)}"><input type="color" value="${catColor(c)}" data-catcolin="${c.id}" aria-label="Pick any color"></label></div></div>
+     <div class="cm-lab">Color<div class="cat-cols" role="radiogroup" aria-label="Category color">${CATPAL.map(x=>`<button type="button" class="cat-col${catColor(c)===x?" on":""}" style="--sw:${x}" data-catcol="${c.id}|${x}" role="radio" aria-checked="${catColor(c)===x}" aria-label="Color ${x}"></button>`).join("")}<label class="cat-col cat-col-own" title="Pick any color" style="--sw:${catColor(c)}"><input type="color" value="${catColor(c)}" data-catcolin="${c.id}" aria-label="Pick any color"></label></div>
+       <div class="cat-chak"><small>Chakras</small><div class="cat-cols" role="radiogroup" aria-label="Chakra colors">${CHAKRA.map(([x,nm])=>`<button type="button" class="cat-col${catColor(c)===x?" on":""}" style="--sw:${x}" data-catcol="${c.id}|${x}" role="radio" aria-checked="${catColor(c)===x}" aria-label="${nm} chakra" title="${nm}"></button>`).join("")}</div><div class="cat-chak-n">${CHAKRA.map(([x,nm])=>`<span>${nm}</span>`).join("")}</div></div></div>
      ${catThemePanel()}
      ${catDelArm===c.id?`<div class="cm-confirm"><span>Delete <b>${esc(c.name)}</b>? Its passions are kept, they just lose this category.</span><button class="cm-ic danger" data-catdel="${c.id}">Delete</button><button class="cm-ic" data-cmdelno>Cancel</button></div>`:`<div class="cm-actions"><button class="cm-delink" data-cmdel="${c.id}">Delete category</button><span class="cm-btns"><button class="btn ghost" data-catcancelx>Cancel</button><button class="btn" data-catsave>Save</button></span></div>`}</div>`})()}
   </div>`}
@@ -8346,7 +8350,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="558",APPT="2026-11-23T03:01:53Z";   /* APPT: when this update was made */
+const APPV="559",APPT="2026-11-23T03:39:08Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
