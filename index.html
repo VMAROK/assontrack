@@ -2784,7 +2784,7 @@ button.us-emptyadd{width:100%;font:inherit;cursor:pointer;background:none;color:
 .bdw-x{width:34px;height:34px;border-radius:50%;border:1px solid rgba(var(--tX),.7);background:rgba(4,8,20,.5);color:var(--fg);font-size:20px;line-height:1;cursor:pointer;flex:none}
 .bdw-t{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:14px 0 4px}.bdw-t>div{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px;border-radius:12px;background:rgba(var(--tX),.35);border:1px solid rgba(var(--lr),.18)}
 .bdw-t small{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.03em}.bdw-t b{font-family:var(--mono);font-size:15px}.bdw-t .pos b{color:#3ddc84}.bdw-t .neg b{color:#ff8a95}
-.bdw-tot{display:flex;align-items:baseline;justify-content:space-between;margin:14px 0 2px;padding:12px 14px;border-radius:12px;background:rgba(var(--tX),.35);border:1px solid rgba(var(--lr),.18)}.bdw-tot small{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}.bdw-tot b{font-family:var(--mono);font-size:22px}
+.bdw-tot{display:flex;align-items:baseline;justify-content:space-between;margin:14px 0 2px;padding:12px 14px;border-radius:12px;background:rgba(var(--tX),.35);border:1px solid rgba(var(--lr),.18)}.bdw-tot small{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}.bdw-tot b{font-family:var(--mono);font-size:22px}.bdw-tot.neg b{color:#ff8a95}.bdw-tot.pos b{color:#3ddc84}
 .bdw-s{margin-top:14px}.bdw-sh{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:0 2px 6px}.bdw-sh span{font-size:11px;opacity:.7}
 .bdw-r{display:flex;align-items:center;gap:10px;width:100%;padding:10px 10px;border:0;border-top:1px solid rgba(var(--lr),.14);background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}.bdw-r:hover{background:rgba(var(--tL),.08)}
 .bdw-r>i{width:4px;align-self:stretch;border-radius:2px;background:var(--cc);flex:none}.bdw-r>span{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.bdw-r>span b{font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bdw-r small{font-size:11.5px;color:var(--muted)}
@@ -5720,7 +5720,7 @@ function bDayPop(b,ds,SE,SS,T){const H=bHome(),inc=SE.filter(i=>i.kind==="inc"),
   return `<div class="bdw" data-bdwbg><div class="bdw-p panel" role="dialog" aria-modal="true" aria-label="Day overview">
     <div class="bdw-h"><div><b>${bDate(ds).toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</b>${ds===T?"<small>Today</small>":""}</div><button type="button" class="bdw-x" data-bdwx aria-label="Close">×</button></div>
     <!-- was four totals (In / Charged / Spent / Net): <div class="bdw-t"><div class="pos"><small>In</small><b>+${bMoney(inT)}</b></div><div class="neg"><small>Charged</small><b>−${bMoney(fxT)}</b></div><div class="neg"><small>Spent</small><b>−${bMoney(spT)}</b></div><div class="${net<0?"neg":"pos"}"><small>Net</small><b>${net<0?"−":"+"}${bMoney(Math.abs(net))}</b></div></div> -->
-    <div class="bdw-tot"><small>Total</small><b>${bMoney(fxT+spT)}</b></div>
+    <div class="bdw-tot ${net<0?"neg":net>0?"pos":""}"><small>Total</small><b>${net<0?"−":net>0?"+":""}${bMoney(Math.abs(net))}</b></div>
     ${SE.length||SS.length?sec("Income",inc,row)+sec("",out,row)/* "Charged" heading removed */+sec("Spent",SS,srow):`<p class="note" style="margin:14px 2px 4px">Nothing charged, paid in or spent this day.</p>`}
   </div></div>`}
 function bCard(it){const m=bMo(it),nx=it.paused?null:bNext(it),dd=nx?bDays(nx):null,c=bCol(bItCat(it)),cy=(BCYC.find(x=>x[0]===it.cyc)||BCYC[1])[1];
@@ -8634,7 +8634,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="596",APPT="2026-11-23T07:53:31Z";   /* APPT: when this update was made */
+const APPV="597",APPT="2026-11-23T07:55:35Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
