@@ -2678,6 +2678,8 @@ button.us-emptyadd{width:100%;font:inherit;cursor:pointer;background:none;color:
 .fpic{flex:none;width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:22px;line-height:1;background:rgba(255,255,255,.07) center/cover no-repeat;border:1px solid rgba(var(--lr),.22);font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}.fpic.sm{width:32px;height:32px;font-size:18px;border-radius:9px}.fpic.xs{width:22px;height:22px;font-size:14px;border-radius:6px;border:0;background-color:transparent;margin-right:2px}
 .fd-r{display:flex;align-items:center;gap:10px}.fd-r .fd-rm{flex:1;min-width:0}.fpic.nm-ic{width:34px;height:34px;font-size:20px;color:inherit;background-color:color-mix(in srgb,var(--cc) 22%,rgba(255,255,255,.05));border-color:color-mix(in srgb,var(--cc) 45%,transparent)}.fpic.nm-ic.sm{width:30px;height:30px;font-size:17px}.nq-c{align-items:center}
 .tgt-in{all:unset;display:inline-block;font-variant-numeric:tabular-nums;text-shadow:inherit;font:inherit;color:inherit;letter-spacing:inherit;line-height:inherit;text-align:center;min-width:2ch;cursor:text;-webkit-user-select:text;user-select:text}.tgt-in::placeholder{color:inherit;opacity:.6}
+/* the editable numbers in the tiles never get a box, whatever the theme or panel colour */
+html .tile input.tgt-in,html .tile .tgt-in,html .tile .mgt input{background:transparent!important;border:0!important;box-shadow:none!important;outline:0;padding:0!important;border-radius:0!important}
 .mbar{margin-top:2px}.mbar-h{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--muted)}.mbar-h b{font-family:var(--mono);color:#eef3ff}
 .mbar-b{display:flex;gap:3px;height:14px;margin-top:6px;border-radius:99px;overflow:hidden;background:rgba(150,180,240,.14)}.mbar-b i{display:block;min-width:4px;background:var(--mc);box-shadow:none;transition:flex .6s cubic-bezier(.34,1.3,.64,1)}
 .mbar-sep{height:1px;background:rgba(150,180,240,.18);margin:14px 0 12px}
@@ -2789,6 +2791,7 @@ html.tpl-spa .nw-d.td.td{background:linear-gradient(180deg,rgba(255,176,32,.38),
 .navbtn[data-tab="budget"]{position:relative}
 .navbtn[data-tab="budget"]::after{content:"";position:absolute;inset:0;margin:auto;width:34px;height:34px;pointer-events:none;opacity:.55;filter:drop-shadow(0 0 8px rgba(61,220,132,.9));
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4.5 12.5l5 5L19.5 7' fill='none' stroke='%233ddc84' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
+.bp-h>.bmode{margin:0 0 0 10px!important;flex:none}.bp-h>.bmode button{width:38px;height:34px}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4003,7 +4006,7 @@ function vFuel(){
    <div class="stack">
     ${foodLogPanel(S)}
    </div></div>
-  ${nModeBar()}${nPro().nMode==="calc"?nCalc(S):nMeals(S)}${usPanel()}${fuelTrend(S)}`;
+  <!-- the Meals / Calculator switch now sits inside the panel header -->${nPro().nMode==="calc"?nCalc(S):nMeals(S)}${usPanel()}${fuelTrend(S)}`;
 }
 /* ---------- nutrition: day picker, meals as sections, quick re-log, water, donut, calculator ---------- */
 const NMC={Breakfast:"#ffd166",Lunch:"#3ddc84",Dinner:"#7c8cff",Snack:"#ff6fb5"};
@@ -4139,7 +4142,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&(usPick||usEdit||us
 /* past days sit behind sliding doors so old numbers don't pull your attention; the eye opens them. Scrolling makes the doors jump and land again */
 /* calendar: jump to any day, past or future; the week strip follows */
 let nwCalM=null;
-const nwGoDate=v=>{nwOff=0;nwOffKeep=null;const mon=x=>{const d=new Date(x+"T12:00");d.setDate(d.getDate()-d.getDay());return d};nWk=Math.round((mon(v)-mon(today()))/(7*864e5));nDay=v===today()?null:v;nwCalClose();render()};
+const nwGoDate=v=>{if(!v||!/^\d{4}-\d\d-\d\d$/.test(v))return;nwOff=0;nwOffKeep=null;const mon=x=>{const d=new Date(x+"T12:00");d.setDate(d.getDate()-d.getDay());return d};nWk=Math.round((mon(v)-mon(today()))/(7*864e5));nDay=v===today()?null:v;nwCalClose();render()};
 function nwCalClose(){const o=document.getElementById("nwCalPop");if(o)o.remove();nwCalM=null;document.removeEventListener("pointerdown",nwCalOut,true)}
 function nwCalOut(e){if(!e.target.closest("#nwCalPop,[data-nwcal]"))nwCalClose()}
 function nwCalHTML(){const [y,m]=nwCalM,first=new Date(y,m,1,12),pad=first.getDay(),days=new Date(y,m+1,0).getDate(),td=today(),sel=nD(),has=new Set((data.meals||[]).map(x=>x.d));
@@ -4157,9 +4160,9 @@ const nwLab=(wk0,off)=>{const a=new Date(wk0);a.setDate(a.getDate()+off);const e
 let nwScT=0;
 function nwStripInit(){const r=document.getElementById("nwStrip");if(!r||r.dataset.init)return;r.dataset.init="1";const cw=()=>r.clientWidth/7;r.scrollLeft=(+r.dataset.off)*cw();
   const at=L=>{const t=nWk*7+(L-14);return [Math.floor(t/7),((t%7)+7)%7]};
-  r.addEventListener("scroll",()=>{const [w,o]=at(Math.round(r.scrollLeft/cw()));const wk0=new Date(today()+"T12:00");wk0.setDate(wk0.getDate()-wk0.getDay()+w*7);const h=document.querySelector(".nwp .bc-h b");if(h)h.textContent=nwLab(wk0,o);
-    clearTimeout(nwScT);nwScT=setTimeout(()=>{const L2=Math.round(r.scrollLeft/cw());if(L2>=5&&L2<=23){nwOffKeep=at(L2);return}const [nw,no]=at(L2);nWk=nw;nwOff=no;const y=$("#view").scrollTop;render();$("#view").scrollTop=y},160)},{passive:true})}
-let nwOffKeep=null;const nwSync=()=>{if(nwOffKeep){[nWk,nwOff]=nwOffKeep;nwOffKeep=null}};
+  r.addEventListener("scroll",()=>{if(!cw())return;const [w,o]=at(Math.round(r.scrollLeft/cw()));const wk0=new Date(today()+"T12:00");wk0.setDate(wk0.getDate()-wk0.getDay()+w*7);const h=document.querySelector(".nwp .bc-h b");if(h)h.textContent=nwLab(wk0,o);
+    clearTimeout(nwScT);nwScT=setTimeout(()=>{if(!cw())return;const L2=Math.round(r.scrollLeft/cw());if(L2>=5&&L2<=23){nwOffKeep=at(L2);return}const [nw,no]=at(L2);nWk=nw;nwOff=no;const y=$("#view").scrollTop;render();$("#view").scrollTop=y},160)},{passive:true})}
+let nwOffKeep=null;const nwSync=()=>{if(nwOffKeep){if(nwOffKeep.every(Number.isFinite))[nWk,nwOff]=nwOffKeep;nwOffKeep=null}};
 /* (was) swipe the week strip left/right to change weeks */
 let nwSw=null,nwSwNoClick=0;
 document.addEventListener("pointerdown",e=>{const r=e.target.closest&&e.target.closest(".nwp .nw-row:not(.nw-tix)");if(!r||tab!=="fuel")return;nwSw={x:e.clientX,y:e.clientY,r,dx:0,on:false}},{passive:true});
@@ -4187,7 +4190,8 @@ document.addEventListener("scroll",e=>{if(tab!=="fuel"||nwGateOpen)return;const 
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-nwgate]");if(!b)return;e.preventDefault();e.stopPropagation();nwGateOpen=!nwGateOpen;try{localStorage.setItem("aot-nwgate",nwGateOpen?"1":"0")}catch(x){}
   const row=document.querySelector(".nw-row");b.classList.toggle("on",nwGateOpen);b.setAttribute("aria-pressed",nwGateOpen);b.title=b.ariaLabel=nwGateOpen?"Close past days":"Show past days";b.innerHTML=nwGateOpen?NWEYE[0]:NWEYE[1];
   if(!row)return;row.classList.toggle("gopen",nwGateOpen);},true);
-function nWeekPanel(d,S){const wk0=new Date(today()+"T12:00");wk0.setDate(wk0.getDate()-wk0.getDay()+nWk*7);const base=new Date(wk0);base.setDate(base.getDate()-14);
+function nWeekPanel(d,S){if(!Number.isFinite(nWk))nWk=0;if(!Number.isFinite(nwOff))nwOff=0;   /* guard: a bad date could leave these as NaN ("Invalid Date / undefined NaN") */
+  const wk0=new Date(today()+"T12:00");wk0.setDate(wk0.getDate()-wk0.getDay()+nWk*7);const base=new Date(wk0);base.setDate(base.getDate()-14);
   const nwSlam=false;nwSlamDone=true;const nwPrev=nwSel,nwNow=nD();nwSel=nwNow;
   /* one ring per day: calories inside, macros around it */
   const MC0=["#f27fb2","#a688f2","#b8875f","#f2c14e"];
@@ -4223,13 +4227,13 @@ function nSplit(nm){nm=String(nm||"Food");let br="";const B=[...(typeof FFCHAINS
 function nRow(m){const x=nSplit(m.name),G=[["P",m.protein,"#a688f2"],["C",m.carbs,"#f27fb2"],["F",m.fat,"#f2c14e"],["Fb",m.fiber,"#b8875f"]].filter(g=>+g[1]>0);
   return `<button type="button" class="nm-row" data-nm="${m.id}" style="--cc:${NMC[m.type]||NMC.Snack}">${fPic(m,"nm-ic sm")}<span class="nm-t"><b>${esc(x.t)}</b>${x.br||x.d?`<small class="nm-sub">${x.br?`<em class="nm-br">${esc(x.br)}</em>`:""}${esc(x.d)}</small>`:""}<span class="nm-mc">${G.length?G.map(g=>`<i style="--mc:${g[2]}"><s>${g[0]}</s>${n0(g[1])}g</i>`).join(""):`<i class="nm-nomac">no macros</i>`}</span></span><span class="nm-v"><b>${n0(m.kcal)}</b><small>cal</small></span></button>`}
 function nMeals(S){const list=nPro().nView==="list",tm=S.tm,T=+S.g.kcal||0;
-  return `<div class="panel bpan nmp" style="margin-top:12px"><div class="ph bp-h"><span>Meals · ${nDayLbl(nD())}</span><div class="seg2 bview" role="group" aria-label="View"><button data-nview="cards" aria-pressed="${!list}">Cards</button><button data-nview="list" aria-pressed="${list}">List</button></div><span class="bp-add"><i>${n0(S.kcal)}${T?" / "+n0(T):""} kcal</i></span></div>
+  return `<div class="panel bpan nmp" style="margin-top:12px"><div class="ph bp-h"><span>Meals · ${nDayLbl(nD())}</span><div class="seg2 bview" role="group" aria-label="View"><button data-nview="cards" aria-pressed="${!list}">Cards</button><button data-nview="list" aria-pressed="${list}">List</button></div><span class="bp-add"><i>${n0(S.kcal)}${T?" / "+n0(T):""} kcal</i></span>${nModeBar()}</div>
     ${(()=>{const tot=+S.kcal||0,mx=Math.max(T,tot)||1;return tot||T?`<div class="nm-prog${T&&tot>T?" over":""}"><div class="nm-pb">${MEALT.map(t=>{const k=tm.filter(m=>(m.type||"Snack")===t).reduce((a,m)=>a+(+m.kcal||0),0);return k?`<i style="width:${(k/mx*100).toFixed(2)}%;--cc:${NMC[t]}" title="${t} ${n0(k)} kcal"></i>`:""}).join("")}${T&&tot<T?`<u style="left:${(T/mx*100).toFixed(2)}%"></u>`:""}</div><small>${T?tot>T?`${n0(tot-T)} kcal over`:`${n0(T-tot)} kcal left`:`${n0(tot)} kcal`}</small></div>`:""})()}<div class="nm-secs${list?" list":""}">${MEALT.map(t=>{const L=tm.filter(m=>(m.type||"Snack")===t),k=L.reduce((a,m)=>a+(+m.kcal||0),0),p=L.reduce((a,m)=>a+(+m.protein||0),0);
       return `<section class="nm-sec${L.length?"":" nm-empty"}" data-nsec="${t}" style="--cc:${NMC[t]}"><div class="nm-h"><span class="nm-ht"><i></i>${t}</span><span class="nm-hv">${L.length?`${n0(k)} kcal${p?` · ${n0(p)} g protein`:""}`:"nothing yet"}</span><button type="button" class="nm-add" data-nadd="${t}">＋ Add</button></div>
         ${L.length?(list?`<div class="nm-rows">${L.map(nRow).join("")}</div>`:`<div class="nm-grid">${L.map(nCard).join("")}</div>`):list?"":`<button type="button" class="nm-none" data-nadd="${t}">＋ Add ${t.toLowerCase()}</button>`}</section>`}).join("")}</div></div>`}
 /* (was) the calculator view as stacked boxes:
 function nCalc(S){const g=S.g,T=+g.kcal||0,P=+g.protein||0,tm=S.tm,left=T-S.kcal;
-  return `<div class="panel bpan bco nmc" style="margin-top:12px"><div class="ph bp-h"><span>${nD()===today()?"Today's math":"Math · "+nDayLbl(nD())}</span></div>
+  return `<div class="panel bpan bco nmc" style="margin-top:12px"><div class="ph bp-h"><span>${nD()===today()?"Today's math":"Math · "+nDayLbl(nD())}</span><span style="flex:1"></span>${nModeBar()}</div>
     <div class="bco-sec"><div class="bco-h pos"><span>Calorie target</span><b>${T?n0(T)+" kcal":"not set"}</b></div></div>
     ${MEALT.map(t=>{const L=tm.filter(m=>(m.type||"Snack")===t),k=L.reduce((a,m)=>a+(+m.kcal||0),0);return `<div class="bco-sec"><div class="bco-h neg" style="--cc:${NMC[t]}"><span><i class="nmc-dot"></i>${t}</span><b>${k?"−"+n0(k):"0"} kcal</b></div>${L.map(m=>`<button type="button" class="bco-r" data-nm="${m.id}" style="--cc:${NMC[t]}">${fPic(m,"sm")}<span class="bco-t"><b>${esc(m.name)}</b><small>${nMacTxt(m)||"No macros"}</small></span><span class="bco-v neg">−${n0(m.kcal)}</span></button>`).join("")||`<p class="note bco-none">Nothing logged</p>`}</div>`}).join("")}
     <div class="bco-eq ${T&&left<0?"neg":"pos"}"><div class="bco-f">${n0(T)} <em>−</em> ${n0(S.kcal)} <em>=</em></div><div class="bco-l"><span>${!T?"Set a calorie target":left<0?"Over today":"Left to eat"}</span><b>${T?n0(Math.abs(left))+" kcal":"–"}</b></div>
@@ -4239,7 +4243,7 @@ function nCalc(S){const g=S.g,T=+g.kcal||0,P=+g.protein||0,tm=S.tm,left=T-S.kcal
 function nCalc(S){const g=S.g,T=+g.kcal||0,P=+g.protein||0,tm=S.tm,E=+S.kcal||0,left=T-E,over=T&&left<0,mx=Math.max(T,E)||1;let run=T;
   const meals=MEALT.map(t=>{const L=tm.filter(m=>(m.type||"Snack")===t),k=L.reduce((a,m)=>a+(+m.kcal||0),0);run-=k;return {t,L,k,run}});
   const bar=`<div class="mc-bar">${meals.map(x=>x.k?`<i style="width:${(x.k/mx*100).toFixed(2)}%;--cc:${NMC[x.t]}"></i>`:"").join("")}${T&&E<T?`<u style="left:${(T/mx*100).toFixed(2)}%"></u>`:""}</div>`;
-  return `<div class="panel bpan nmc mc" style="margin-top:12px"><div class="ph bp-h"><span>${nD()===today()?"Today's math":"Math · "+nDayLbl(nD())}</span></div>
+  return `<div class="panel bpan nmc mc" style="margin-top:12px"><div class="ph bp-h"><span>${nD()===today()?"Today's math":"Math · "+nDayLbl(nD())}</span><span style="flex:1"></span>${nModeBar()}</div>
   <div class="mc-eq${over?" over":""}">
     <div class="mc-n"><small>Target</small><b>${T?n0(T):"–"}</b><em>cal</em></div><span class="mc-op">−</span>
     <div class="mc-n"><small>Eaten</small><b>${n0(E)}</b><em>cal</em></div><span class="mc-op">=</span>
@@ -9029,7 +9033,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="652",APPT="2026-11-23T23:07:08Z";   /* APPT: when this update was made */
+const APPV="653",APPT="2026-11-23T23:16:32Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
