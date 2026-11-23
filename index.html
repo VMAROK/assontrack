@@ -2777,6 +2777,10 @@ button.us-emptyadd{width:100%;font:inherit;cursor:pointer;background:none;color:
 .bc-sp{margin-top:auto;font-family:var(--mono);font-size:10px;color:#ffb648;text-align:right}
 .bc-d.td{z-index:1;background:linear-gradient(180deg,rgba(var(--tL),.3),rgba(var(--tL),.12));box-shadow:inset 0 2px 0 rgba(var(--tL),1)}.bc-d.td .bc-n{color:#fff;font-weight:800}
 .bc-d.sel{z-index:2;background:linear-gradient(180deg,rgba(var(--tL),.42),rgba(var(--tL),.18));box-shadow:inset 0 0 0 2px rgba(var(--tL),1),0 0 22px rgba(var(--tL),.45)}.bc-d.sel .bc-n{color:#fff;font-weight:800}
+/* today stands out on its own colour (amber), so it never looks like a tapped day */
+.bc-grid .bc-d.td{background:linear-gradient(180deg,rgba(255,176,32,.38),rgba(255,140,0,.14));box-shadow:inset 0 0 0 2px #ffb020,0 0 20px rgba(255,176,32,.55)}
+.bc-grid .bc-d.td .bc-n{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 5px;border-radius:11px;background:#ffb020;color:#1a1000!important;font-weight:800;align-self:flex-start}
+.bc-grid .bc-d.td.sel{box-shadow:inset 0 0 0 2px #ffb020,inset 0 0 0 4px rgba(255,255,255,.9),0 0 24px rgba(255,176,32,.65)}
 .bc-day{margin-top:10px}.bc-dh{display:flex;justify-content:space-between;align-items:baseline;font-size:14px}.bc-dh span{font-family:var(--mono);font-size:13px;color:var(--muted)}
 .bdw{position:fixed;inset:0;z-index:1100;display:grid;place-items:center;padding:20px;background:rgba(2,6,16,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:fadeIn .18s}
 .bdw-p{width:min(560px,100%);max-height:min(82vh,760px);overflow:auto;margin:0!important;padding:18px 18px 14px!important}
@@ -5956,7 +5960,7 @@ function vBudget(){fxLoad();const b=B();b.mode="comb";const S=bStats(),out=S.sub
   setTimeout(bStickInit,0);setTimeout(bStickInit,150);setTimeout(bStickInit,500);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>setTimeout(bStickInit,0));
   return bModeIn(b,`<div class="bstick-s" id="bStickS"></div><div class="bstick${bStOn?" stuck":""}" id="bStick"${bStOn&&bStH?` style="height:${bStH}px"`:""}><div class="grid tiles">
     <div class="panel tile" style="--c:var(--lime)">${ic("bolt")}<small>Income</small><b>${bMoney(S.inc,0)}</b><em>per month</em></div>
-    <div class="panel tile" style="--c:var(--magenta)">${ic("star")}<small>Fixed costs</small><b>${bMoney(S.subs+S.bills,0)}</b><em>${bMoney(S.subs,0)} subs · ${bMoney(S.bills,0)} bills<i class="bx-was"${S.mutedN?"":' style="visibility:hidden"'}>was ${bMoney(S.subs+S.bills+S.muted,0)} · −${bMoney(S.muted,0)} excluded</i></em></div>
+    <div class="panel tile" style="--c:#ff5e6c">${ic("star")}<small>Expenses</small><b>${bMoney(S.subs+S.bills,0)}</b><em>${bMoney(S.subs,0)} subs · ${bMoney(S.bills,0)} bills<i class="bx-was"${S.mutedN?"":' style="visibility:hidden"'}>was ${bMoney(S.subs+S.bills+S.muted,0)} · −${bMoney(S.muted,0)} excluded</i></em></div>
     <div class="panel tile" style="--c:var(--amber)">${ic("fire")}<small>Spent this month</small><b>${bMoney(S.spent,0)}</b><em>${S.sp.length} expense${S.sp.length===1?"":"s"}</em></div>
     <div class="panel tile tdn" style="--c:var(--cyan)"><small>Left this month</small>${ring}<em style="${S.left<0?"color:#ff8a95":""}">${bMoney(S.left,0)} ${S.left<0?"over":"left"}<i class="bmu-was"${S.mutedN?"":' style="visibility:hidden"'}>${bMoney(S.left-S.muted,0)} with everything</i></em></div></div></div>
   <div class="panel bm" style="margin-top:18px">${bCal()}<div class="bm-sep"></div><div class="bm-r"><div class="ph"><span>Where it goes</span><label class="bhome" title="Currency for totals">Totals in<select data-bhome aria-label="Currency for totals">${BCUR.map(c=>`<option value="${c}"${c===b.home?" selected":""}>${c} ${curSym(c)}</option>`).join("")}</select></label></div>${bDonut(S)}</div></div>
@@ -8634,7 +8638,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="597",APPT="2026-11-23T07:55:35Z";   /* APPT: when this update was made */
+const APPV="598",APPT="2026-11-23T07:58:48Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
