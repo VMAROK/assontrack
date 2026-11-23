@@ -5666,7 +5666,7 @@ const BDEF=[["Housing","#7c8cff"],["Utilities","#4cc9ff"],["Food","#3ddc84"],["T
 const BPAL=["#7c8cff","#4cc9ff","#3ddc84","#ffb648","#ff6fb5","#b48cff","#ff7a85","#ffd166","#5ee3d0","#9db0d0","#ff8a4c","#a3e635"];
 const BCYC=[["wk","Weekly",52/12],["mo","Monthly",1],["qtr","Every 3 months",1/3],["yr","Yearly",1/12]];
 const BKN={sub:["Subscription","Subscriptions"],bill:["Bill","Bills"],inc:["Income","Income"]};
-let bDayWin=null,bTab="all",bEdit=null,bSel=null,bMon=0,bAddCat="Food",bFlash=null,bAddCur=null;
+let bNoSel=false,bDayWin=null,bTab="all",bEdit=null,bSel=null,bMon=0,bAddCat="Food",bFlash=null,bAddCur=null;
 const B=()=>{if(!data.budget)data.budget={};const b=data.budget;b.items=b.items||[];b.spends=b.spends||[];b.cur=b.cur||"$";if(!b.home||!BCUR.includes(b.home))b.home="USD";b.items.forEach(i=>{if(!i.cur)i.cur=b.home});b.spends.forEach(x=>{if(!x.cur)x.cur=b.home});if(!b.cats)b.cats=BDEF.map(([n,c])=>({n,c,lim:(b.limits||{})[n]||0}));if(!b.cats.some(c=>c.inc))b.cats.push({n:"Paycheck",c:"#3ddc84",lim:0,inc:true},{n:"Side work",c:"#2ee6c5",lim:0,inc:true},{n:"Other income",c:"#a3e635",lim:0,inc:true});if(!Array.isArray(b.porder))b.porder=["bills","inc"];b.items.forEach(i=>{if(i.kind==="inc"&&!i.cat)i.cat="Paycheck"});return b};
 const bCat=n=>B().cats.find(c=>c.n===n);
 const bCol=n=>(bCat(n)||{c:"#9db0d0"}).c;
@@ -5704,7 +5704,7 @@ function bCal(){const b=B(),T=today(),x=bDate(T);x.setDate(1);x.setMonth(x.getMo
   const ev={};b.items.filter(i=>!i.paused).forEach(i=>bOcc(i,from,to).forEach(ds=>(ev[ds]=ev[ds]||[]).push(i)));const spd={};b.spends.forEach(s=>{if(s.d>=from&&s.d<=to)spd[s.d]=(spd[s.d]||0)+bSpAmt(s)});
   if(!bSel||bSel.slice(0,7)!==from.slice(0,7))bSel=from.slice(0,7)===T.slice(0,7)?T:from;
   let cells="";for(let i=0;i<lead;i++)cells+=`<span class="bc-d pad"></span>`;
-  for(let d=1;d<=nd;d++){const ds=ymd(new Date(y,m,d,12)),E=ev[ds]||[];cells+=`<button type="button" class="bc-d${ds===T?" td":""}${ds===bSel?" sel":""}${ds<T?" past":""}" data-bday="${ds}"><span class="bc-n">${d}</span><span class="bc-ev">${E.slice(0,3).map(i=>`<i class="${i.kind==="inc"?"inc":""}${i.muted&&i.kind!=="inc"?" mu":""}" style="--cc:${i.kind==="inc"?"#3ddc84":bCol(bItCat(i))}">${esc(bTitle(i))}</i>`).join("")}${E.length>3?`<i class="more">+${E.length-3}</i>`:""}</span>${spd[ds]?`<span class="bc-sp">${bMoney(spd[ds],0)}</span>`:""}</button>`}
+  for(let d=1;d<=nd;d++){const ds=ymd(new Date(y,m,d,12)),E=ev[ds]||[];cells+=`<button type="button" class="bc-d${ds===T?" td":""}${ds===bSel&&!bNoSel?" sel":""}${ds<T?" past":""}" data-bday="${ds}"><span class="bc-n">${d}</span><span class="bc-ev">${E.slice(0,3).map(i=>`<i class="${i.kind==="inc"?"inc":""}${i.muted&&i.kind!=="inc"?" mu":""}" style="--cc:${i.kind==="inc"?"#3ddc84":bCol(bItCat(i))}">${esc(bTitle(i))}</i>`).join("")}${E.length>3?`<i class="more">+${E.length-3}</i>`:""}</span>${spd[ds]?`<span class="bc-sp">${bMoney(spd[ds],0)}</span>`:""}</button>`}
   const tail=(7-(lead+nd)%7)%7;for(let i=0;i<tail;i++)cells+=`<span class="bc-d pad"></span>`;
   const SE=(ev[bSel]||[]),SS=b.spends.filter(s=>s.d===bSel),tot=SE.filter(i=>i.kind!=="inc").reduce((a,i)=>a+fxc(+i.amt||0,i.cur,bHome()),0)+SS.reduce((a,s)=>a+bSpAmt(s),0);
   const day=`<div class="bc-day"><div class="bc-dh"><b>${bSel===T?"Today":bDate(bSel).toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"})}</b>${tot?`<span>${bMoney(tot)} out</span>`:""}</div>${SE.length||SS.length?`<div class="bc-dl">${SE.map(i=>`<button type="button" class="bc-r" data-bedit="${i.id}" style="--cc:${i.kind==="inc"?"#3ddc84":bCol(bItCat(i))}"><span>${esc(bTitle(i))}<small>${bSubT(i)?esc(bSubT(i))+" · ":""}${BKN[i.kind][0]}</small></span><b class="${i.kind==="inc"?"pos":""}">${i.kind==="inc"?"+":""}${bMoneyI(i)}</b></button>`).join("")}${SS.map(s=>`<button type="button" class="bc-r" data-bsedit="${s.id}" style="--cc:${bCol(s.cat)}"><span>${esc(s.note||s.cat)}<small>Spent · ${esc(s.cat)}</small></span><b>${bMoneyI(s)}</b></button>`).join("")}</div>`:`<p class="note" style="margin:6px 0 0">Nothing charged this day.</p>`}</div>`;
@@ -5713,9 +5713,9 @@ function bCal(){const b=B(),T=today(),x=bDate(T);x.setDate(1);x.setMonth(x.getMo
 let bDayArgs=null;
 function bDayPaint(){let h=document.getElementById("bdwHost");if(!bDayWin||tab!=="budget"||!bDayArgs||bDayArgs[1]!==bDayWin){if(h)h.remove();return}if(!h){h=document.createElement("div");h.id="bdwHost";document.body.appendChild(h)}h.innerHTML=bDayPop(...bDayArgs)}
 /* tap a day in the budget calendar: a window with everything that day */
-document.addEventListener("click",e=>{if(!bDayWin||!e.target.closest)return;if(e.target.closest("[data-bdwx]")||(e.target.matches&&e.target.matches("[data-bdwbg]"))){e.preventDefault();e.stopImmediatePropagation();bDayWin=null;bDayPaint();return}
+document.addEventListener("click",e=>{if(!bDayWin||!e.target.closest)return;if(e.target.closest("[data-bdwx]")||(e.target.matches&&e.target.matches("[data-bdwbg]"))){e.preventDefault();e.stopImmediatePropagation();bDayWin=null;bNoSel=true;render();return}
   if(e.target.closest(".bdw [data-bedit],.bdw [data-bsedit],.navbtn,[data-tab]")){bDayWin=null;setTimeout(bDayPaint,0)}},true);
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&bDayWin){bDayWin=null;bDayPaint()}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&bDayWin){bDayWin=null;bNoSel=true;render()}});
 function bDayPop(b,ds,SE,SS,T){const H=bHome(),inc=SE.filter(i=>i.kind==="inc"),out=SE.filter(i=>i.kind!=="inc"),
     inT=inc.reduce((a,i)=>a+fxc(+i.amt||0,i.cur,H),0),fxT=out.filter(i=>!i.muted).reduce((a,i)=>a+fxc(+i.amt||0,i.cur,H),0),spT=SS.reduce((a,s)=>a+bSpAmt(s),0),net=inT-fxT-spT;
   const row=i=>`<button type="button" class="bdw-r${i.muted&&i.kind!=="inc"?" mu":""}" data-bedit="${i.id}" style="--cc:${i.kind==="inc"?"#3ddc84":bCol(bItCat(i))}"><i></i><span><b>${esc(bTitle(i))}</b><small>${[bSubT(i)&&esc(bSubT(i)),BKN[i.kind][0],esc(bItCat(i)),(BCYC.find(x=>x[0]===i.cyc)||[0,""])[1],i.muted&&i.kind!=="inc"?"Excluded":""].filter(Boolean).join(" · ")}</small></span><em class="${i.kind==="inc"?"pos":""}">${i.kind==="inc"?"+":"−"}${bMoneyI(i)}</em></button>`;
@@ -6069,7 +6069,7 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
     if(d.bmmute){it.muted=!it.muted;if(!it.muted)delete it.muted;toast(it.muted?bTitle(it)+" excluded · saves "+bMoney(bMo(it))+"/mo":bTitle(it)+" included again")}else if(d.bmpause){it.paused=!it.paused;toast(it.name+(it.paused?" paused":" resumed"))}else{const c=JSON.parse(JSON.stringify(it));c.id=uid();c.name=it.name+" copy";b.items.splice(b.items.indexOf(it)+1,0,c);toast("Duplicated "+it.name)}render();save();return}
   if(d.btab){bTab=d.btab;render();return}
   if(d.bmon!=null){bDayWin=null;bMon=d.bmon==="0"?0:bMon+(+d.bmon);bSel=null;render();return}
-  if(d.bday){bSel=d.bday;bDayWin=d.bday;render();return}
+  if(d.bday){bSel=d.bday;bDayWin=d.bday;bNoSel=false;render();return}
   if(d.bgrp){const [cn,g]=JSON.parse(d.bgrp);bOpen("grp",{n:g,cat:cn},false,g);return}
   if(d.bnewgrp){bOpen("grp",{n:"",cat:d.bnewgrp},true);return}
   if(d.bnew){bNewExp=d.bnew==="exp";const k=bNewExp?"bill":d.bnew;bOpen("item",{id:uid(),kind:k,name:"",amt:"",cyc:"mo",grp:d.bncGrp||"",cat:d.bncCat&&bCat(d.bncCat)?d.bncCat:k==="inc"?((b.cats.find(c=>c.inc)||{}).n||""):k==="sub"?"Subscriptions":k==="bill"?(b.cats.find(c=>c.n==="Housing")?"Housing":"Other"):"",start:""},true);return}
@@ -8638,7 +8638,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="598",APPT="2026-11-23T07:58:48Z";   /* APPT: when this update was made */
+const APPV="599",APPT="2026-11-23T08:03:01Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
