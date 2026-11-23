@@ -2789,12 +2789,14 @@ button.us-emptyadd{width:100%;font:inherit;cursor:pointer;background:none;color:
 html.phone .bc-grid .bc-d.past::after{top:4px;right:4px;width:8px;height:8px} */
 /* big grey X: .bc-grid .bc-d.past::after{content:"";position:absolute;left:50%;top:55%;width:46%;aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none;z-index:0;opacity:.25;
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 5l14 14M19 5L5 19' stroke='%23c4c8d0' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat} */
-/* past days: same X as the Nutrition week (faint ring, small soft-red X) */
-.bc-grid .bc-d.past::after{content:"";position:absolute;left:50%;top:56%;width:52px;height:52px;transform:translate(-50%,-50%);pointer-events:none;z-index:0;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Ccircle cx='22' cy='22' r='17' fill='none' stroke='rgba(150,180,240,.14)' stroke-width='4.5'/%3E%3Cpath d='M15 15l14 14M29 15L15 29' fill='none' stroke='rgba(255,120,140,.55)' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat}
-html.phone .bc-grid .bc-d.past::after{width:30px;height:30px}
+/* past days: a frosted grey glass laid over the whole day (list included), with the Nutrition-style X on top */
+.bc-grid .bc-d.past::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:3;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Ccircle cx='22' cy='22' r='17' fill='none' stroke='rgba(150,180,240,.14)' stroke-width='4.5'/%3E%3Cpath d='M15 15l14 14M29 15L15 29' fill='none' stroke='rgba(255,120,140,.55)' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E") 50% 56%/52px 52px no-repeat,rgba(130,134,144,.16);
+  backdrop-filter:blur(1.6px) saturate(.7);-webkit-backdrop-filter:blur(1.6px) saturate(.7)}
+html.phone .bc-grid .bc-d.past::after{background-size:30px 30px,auto}
+.bc-grid .bc-d.past .bc-n{z-index:4}   /* the date stays sharp above the glass */
 /* past days grey */
-.bc-grid .bc-d.past:not(.sel){background:rgba(130,134,144,.2)}.bc-grid .bc-d.past .bc-n{color:#a3a7b0;opacity:1}
+/* grey now comes from the glass layer: .bc-grid .bc-d.past:not(.sel){background:rgba(130,134,144,.2)} */.bc-grid .bc-d.past .bc-n{color:#a3a7b0;opacity:1}
 .bc-grid .bc-d.past>*{position:relative;z-index:1}
 /* today stands out on its own colour (amber), so it never looks like a tapped day */
 .bc-grid .bc-d.td{background:linear-gradient(180deg,rgba(255,176,32,.38),rgba(255,140,0,.14));box-shadow:inset 0 0 0 2px #ffb020,0 0 20px rgba(255,176,32,.55)}
@@ -8657,7 +8659,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="607",APPT="2026-11-23T08:17:25Z";   /* APPT: when this update was made */
+const APPV="608",APPT="2026-11-23T08:21:33Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
