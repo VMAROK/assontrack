@@ -2812,6 +2812,7 @@ html.tpl-dpan .flogp .fd-chain,html.tpl-dpan .flogp .fd-ct{background:rgba(255,2
 .nw-c .nw-ring.nw-ring{width:72px;height:72px;max-width:100%;aspect-ratio:1}   /* third ring (water) added outside; box grown so the old rings keep their size */
 @keyframes nwpWr{from{stroke-dasharray:var(--a) var(--c)}to{stroke-dasharray:var(--b) var(--c)}}.nwp-wr.go{animation:nwpWr .35s cubic-bezier(.25,.8,.3,1) both}   /* water ring grows/shrinks from the last value, fast and smooth */
 .nm-grid,.nm-rows{position:relative}.nm-card,.nm-row{touch-action:pan-y;position:relative;z-index:1}.nm-swdel{position:absolute;z-index:0;width:64px;display:grid;place-items:center;border:0;border-radius:0;background:#e5484d;color:#fff;cursor:pointer;opacity:0;transition:opacity .2s}.nm-swdel.on{opacity:1}   /* swipe-left delete on meal items */
+.nwp .nwat-cups.nwat-cups{justify-content:center}   /* water cups under Macronutrients: centered on every device/rotation */
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9068,7 +9069,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="662",APPT="2026-11-23T23:43:09Z";   /* APPT: when this update was made */
+const APPV="663",APPT="2026-11-23T23:44:09Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
