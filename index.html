@@ -3962,7 +3962,7 @@ function foodLogPanel(S){const rec=fForm&&fForm.kind==="recipe",man=fForm&&fForm
       <button class="x wok" data-fopen aria-label="Clear" title="Clear"${act?"":" hidden"}>${open?`<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`:`<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>`}</button></div>
     <div class="fd-pop fd fd-inline" id="fdPop">${fForm?foodFormHTML():""}${man?"":`<div id="fdOut">${open?foodResults():""}</div>`}${fForm?"":`<div class="fd-btns fd-new"><button class="btn" data-fnew="food">Create a food</button><button class="btn" data-fnew="recipe">Create a recipe</button></div>`}</div>
     ${""/* quick re-log list removed here: the meals panel below already shows your logs. was: <div class="flog">${nQuick()}</div> */}</div>`}
-function fuelTrend(S){const g=S.g,T=+g.kcal||0,D14=S.days,mx=Math.max(T*1.15,...D14.map(x=>x.kcal),600),UN="#3ddc84",OV="#ffb648";
+function fuelTrend(S){const g=S.g,T=+g.kcal||0,D14=S.days,mx=Math.max(T*1.15,...D14.map(x=>x.kcal),600),UN="#3ddc84",OV="#ff5e6c";   /* over the limit is red (was orange #ffb648) */
   if(!D14.some(x=>x.n))return `<div class="panel wtr" style="margin-top:18px"><div class="ph"><span>Calories trend</span><i>Last 14 days</i></div><div class="empty">Your graph starts with the first thing you log</div></div>`;
   const X0=46,X1=588,Y0=14,Y1=160,bw=(X1-X0)/14,py=v=>Y1-v/mx*(Y1-Y0);
   const bars=D14.map((x,i)=>{const cx=X0+bw*i+bw*.18,w=bw*.64,over=T&&x.kcal>T,c=over?OV:UN,h=x.n?Math.max(3,Y1-py(x.kcal)):2,dn=new Date(x.ds+"T12:00").getDate(),td=x.ds===today();
@@ -9040,7 +9040,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="655",APPT="2026-11-23T23:28:08Z";   /* APPT: when this update was made */
+const APPV="656",APPT="2026-11-23T23:29:23Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
