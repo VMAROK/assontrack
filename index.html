@@ -2316,6 +2316,7 @@ html.phone .tkd-theater,html.phone .tkd-theater>.tkd-pane{height:min(1000px,72vh
 .tkd-ro{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}.tkd-none{margin:0;font-size:13px;color:var(--muted)}
 #attCmp.ro .acmp-trim,#attCmp.ro .acmp-mir,#attCmp.ro .acmp-pick,#attCmp.ro [data-cmpgo="align"],#attCmp.ro [data-cmpgo="alignreset"],#attCmp.ro [data-cmpgo="lock"],#attCmp.ro [data-cmpgo="savealign"],#attCmp.ro .acmp-hint{display:none!important}
 .tkd-full{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border:0;background:#2f6fec;color:#fff;font:700 12.5px inherit;font-family:inherit;cursor:pointer;margin-left:6px}
+.tkd-fs{position:absolute;z-index:4;top:10px;right:10px;width:38px;height:38px;display:grid;place-items:center;cursor:pointer;color:#f2ede6;background:rgba(8,6,6,.55);border:1px solid rgba(255,255,255,.18);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 /* add + compare: one slim icon row */
 .att-tools{display:flex;align-items:center;gap:3px;margin-top:3px}
 .att-ic{position:relative;display:grid;place-items:center;width:40px;height:34px;padding:0;border:0;border-radius:0;cursor:pointer;color:var(--fg);background:rgba(var(--lr),.1);transition:background .15s}
@@ -7391,36 +7392,37 @@ document.addEventListener("click",e=>{if(e.target&&e.target.matches&&e.target.ma
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-catcol]");if(!b)return;e.preventDefault();e.stopPropagation();const [id,col]=b.dataset.catcol.split("|"),c=cats().find(x=>x.id===id);if(!c)return;c.color=col;save();render()},true);
 document.addEventListener("change",e=>{const i=e.target.closest&&e.target.closest("[data-catcolin]");if(!i)return;const c=cats().find(x=>x.id===i.dataset.catcolin);if(!c)return;c.color=i.value;save();render()});
 /* finished tasks can be opened to look back at them: read-only media, notes, and the comparison shown in the theater */
-const tkDoneSet=new Set(),tkdSaved=new Set();   /* finished tasks show the whole video unless you pick "Saved view" */
+const tkDoneSet=new Set(),tkdSaved=new Set(),tkdOrig=new Set();   /* tkdOrig: tasks switched to the original, unmodified videos */   /* finished tasks show the whole video unless you pick "Saved view" */
 function tkDoneView(t){const A=(t.att||[]).filter(a=>a.kind!=="yt"||ytId(a.url)),V=A.filter(a=>a.kind!=="yt");
   /* whole video shown, never cropped (was: the saved move/zoom applied, which cut the picture off); mirror is kept */
   /* two looks: "Saved view" = exactly how you left it in compare (move, zoom, mirror); "Whole video" = the full picture, nothing cut off */
-  let first=true;const pane=a=>{if(!a)return "";const v=a.view||{},sv=`translate(${(v.x||0)*100}%,${(v.y||0)*100}%) scale(${v.s||1}) scaleX(${v.m?-1:1})`,wh=`scaleX(${v.m?-1:1})`,tf=sv;
+  let first=true;const pane=a=>{if(!a)return "";const v=a.view||{},sv=`translate(${(v.x||0)*100}%,${(v.y||0)*100}%) scale(${v.s||1}) scaleX(${v.m?-1:1})`,wh="none",tf=tkdOrig.has(t.id)?wh:sv;
     /* only one side keeps its sound: iPhone stops the other video if two with sound play at once */
     const mute=a.kind==="vid"&&!first;if(a.kind==="vid")first=false;
     const pa=v.pa||"";return `<div class="tkd-pane" style="aspect-ratio:${pa||"9/16"}">${a.kind==="vid"?`<video data-dvsrc="${a.id}" data-pa="${pa}" data-tfs="${sv}" data-tfw="${wh}" playsinline webkit-playsinline preload="auto" ${mute?"muted":""} style="transform:${tf}"></video>`:`<img data-dvsrc="${a.id}" data-pa="${pa}" data-tfs="${sv}" data-tfw="${wh}" alt="" style="transform:${tf}">`}</div>`};
   const hasView=V.some(a=>a.view&&(Math.abs(a.view.x||0)>.002||Math.abs(a.view.y||0)>.002||Math.abs((a.view.s||1)-1)>.01));
   const two=V.length>=2,one=!two&&A[0];
   return `<div class="tkd-view">
-    ${A.length?`<div class="tkd-theater${two?" two":""}">${two?pane(V[0])+pane(V[1]):one.kind==="yt"?`<iframe src="https://www.youtube-nocookie.com/embed/${ytId(one.url)}?playsinline=1&rel=0" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="YouTube video"></iframe>`:pane(one)}</div>
-      ${V.length&&!(one&&one.kind==="yt")?`<div class="tkd-ctl"><button type="button" class="tkd-pp" data-tkdplay aria-label="Play">▶</button><button type="button" class="tkd-pp" data-tkdback aria-label="Back to start">⟲</button>${two?`<button type="button" class="tkd-full" data-tkdfull="${t.id}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg> Full size${V.some(a=>a.view)?" · your saved comparison":""}</button>`:""}${two?`<span class="tkd-cap">Side by side · plays together</span>`:""}</div>`:""}
+    ${A.length?`<div class="tkd-theater${two?" two":""}">${two?`<span class="tkd-fs" data-tkdfull="${t.id}" role="button" tabindex="0" aria-label="Full screen" title="Full screen"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></span>`:""}${two?pane(V[0])+pane(V[1]):one.kind==="yt"?`<iframe src="https://www.youtube-nocookie.com/embed/${ytId(one.url)}?playsinline=1&rel=0" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="YouTube video"></iframe>`:pane(one)}</div>
+      ${V.length&&!(one&&one.kind==="yt")?`<div class="tkd-ctl"><button type="button" class="tkd-pp" data-tkdplay aria-label="Play">▶</button><button type="button" class="tkd-pp" data-tkdback aria-label="Back to start">⟲</button>${hasView?`<span class="seg2 tkd-seg" role="group" aria-label="View"><button type="button" data-tkdmode="${t.id}:saved" aria-pressed="${!tkdOrig.has(t.id)}">Saved view</button><button type="button" data-tkdmode="${t.id}:whole" aria-pressed="${tkdOrig.has(t.id)}">Original</button></span>`:""}${two?`<span class="tkd-cap">Side by side · plays together</span>`:""}</div>`:""}
       <div class="tkd-gal">${A.map(a=>`<button type="button" class="tkd-th" data-attview="${t.id}:${a.id}" aria-label="Open">${attThumb(a)}${a.t1!=null||a.view?`<span class="att-bdgs">${a.t1!=null?`<i>${ICO_CUT}</i>`:""}${a.view?`<i>${ICO_MOVE}</i>`:""}</span>`:""}</button>`).join("")}</div>`:`<p class="tkd-none">No media on this task.</p>`}
     <div class="tkd-notes"><span>Notes</span><p>${t.note?esc(t.note):"<em>No notes.</em>"}</p></div>
     <div class="tkd-ro">${ICO_LOCK} Finished · view only. Tap Undo to edit it again.</div></div>`}
 function tkDoneHydrate(){document.querySelectorAll("[data-dvsrc]").forEach(el=>{if(el.dataset.dvok)return;el.dataset.dvok=1;const a=attFind(el.dataset.dvsrc);if(!a)return;
   attURL(a).then(u=>{if(!u)return;if(el.tagName==="IMG"){el.src=u;return}attPoster(a).then(pu=>{if(pu)el.poster=pu});const so=document.createElement("source");so.src=u;so.type=a.type||"video/mp4";el.appendChild(so);
-    const v=a.view||{};el.addEventListener("loadedmetadata",()=>{const pn=el.closest(".tkd-pane");if(pn&&!v.pa&&el.videoWidth)pn.style.aspectRatio=el.videoWidth+"/"+el.videoHeight;try{el.currentTime=v.at!=null?v.at:(a.t0||0)}catch(_){}el.playbackRate=v.sp||1},{once:true});el.addEventListener("play",()=>{el.playbackRate=v.sp||1});
+    const v=a.view||{};el.addEventListener("loadedmetadata",()=>{const pn=el.closest(".tkd-pane");if(pn&&!v.pa&&el.videoWidth)pn.style.aspectRatio=el.videoWidth+"/"+el.videoHeight;try{el.currentTime=v.at!=null?v.at:(a.t0||0)}catch(_){}el.playbackRate=v.sp||1},{once:true});el.addEventListener("play",()=>{const vw=el.closest(".tkd-view"),orig=vw&&vw.querySelector('[data-tkdmode$=":whole"][aria-pressed="true"]');el.playbackRate=orig?1:(v.sp||1)});
     if(a.t1!=null)el.addEventListener("timeupdate",()=>{if(el.currentTime>=a.t1)el.currentTime=a.t0||0});el.load()})})}
 /* finished-task theater: one button plays/pauses both sides; tapping a side plays/pauses just that one */
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tkdplay],[data-tkdback],.tkd-pane");if(!b)return;const vw=b.closest(".tkd-view");if(!vw)return;e.preventDefault();e.stopPropagation();
   const V=[...vw.querySelectorAll("video[data-dvsrc]")],pb=vw.querySelector("[data-tkdplay]");
   if(b.dataset.tkdback!==undefined)V.forEach(v=>{const a=attFind(v.dataset.dvsrc)||{};try{v.currentTime=a.view&&a.view.at!=null?a.view.at:(a.t0||0)}catch(_){}});
-  else{const go=V.every(v=>v.paused);if(go){V.forEach(v=>{const a=attFind(v.dataset.dvsrc)||{};v.playbackRate=(a.view&&a.view.sp)||1});Promise.all(V.map(v=>{const p=v.play();return p&&p.catch?p.catch(()=>{}):null}))}else V.forEach(v=>v.pause())}
+  else{const go=V.every(v=>v.paused);if(go){const orig=vw.querySelector('[data-tkdmode$=":whole"][aria-pressed="true"]');V.forEach(v=>{const a=attFind(v.dataset.dvsrc)||{};v.playbackRate=orig?1:((a.view&&a.view.sp)||1)});Promise.all(V.map(v=>{const p=v.play();return p&&p.catch?p.catch(()=>{}):null}))}else V.forEach(v=>v.pause())}
   setTimeout(()=>{if(pb)pb.textContent=V.some(v=>!v.paused)?"❚❚":"▶"},60)},true);
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tkdfull]");if(!b)return;e.preventDefault();e.stopPropagation();
-  const vw=b.closest(".tkd-view");vw&&vw.querySelectorAll("video").forEach(v=>v.pause());cmpOpenView(b.dataset.tkdfull);attHydrate()},true);
+  const vw=b.closest(".tkd-view");vw&&vw.querySelectorAll("video").forEach(v=>v.pause());const id=b.dataset.tkdfull;cmpOpenView(id);
+  if(attCmp&&tkdOrig.has(id)){attCmp.tf={L:{x:0,y:0,s:1},R:{x:0,y:0,s:1}};cmpStyle()}attHydrate()},true);
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tkdmode]");if(!b)return;e.preventDefault();e.stopPropagation();const [id,m]=b.dataset.tkdmode.split(":");
-  m==="saved"?tkdSaved.add(id):tkdSaved.delete(id);const vw=b.closest(".tkd-view");vw.querySelectorAll("[data-tfs]").forEach(el=>{el.style.transform=m==="whole"?el.dataset.tfw:el.dataset.tfs;const pn=el.closest(".tkd-pane");if(pn)pn.style.aspectRatio=m==="saved"&&el.dataset.pa?el.dataset.pa:""});vw.classList.toggle("saved",m==="saved");
+  m==="whole"?tkdOrig.add(id):tkdOrig.delete(id);const vw=b.closest(".tkd-view");vw.querySelectorAll("[data-tfs]").forEach(el=>{el.style.transform=m==="whole"?el.dataset.tfw:el.dataset.tfs});
   vw.querySelectorAll("[data-tkdmode]").forEach(x=>x.setAttribute("aria-pressed",x===b))},true);
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tkdview]");if(!b)return;e.preventDefault();e.stopPropagation();const id=b.dataset.tkdview;tkDoneSet.has(id)?tkDoneSet.delete(id):tkDoneSet.add(id);render()},true);
 let tkNew=false,tkFilter="all",addingPrj=false,prjFocus=null,addingSub=null,tkLastOpen=null;const tkOpen=new Set();
@@ -8411,7 +8413,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="567",APPT="2026-11-23T04:35:28Z";   /* APPT: when this update was made */
+const APPV="568",APPT="2026-11-23T04:40:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
