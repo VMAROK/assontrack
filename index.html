@@ -2223,6 +2223,15 @@ html.phone .att-strip .att-t{flex-basis:110px}
 .att-peek{position:absolute;inset:0;z-index:2;background:#000;will-change:transform}.att-peek img{width:100%;height:100%;object-fit:contain;display:block}
 .att-slot{will-change:transform}.att-stage.swiping .att-slot{z-index:2}
 .att-stage{touch-action:pan-y}
+.aconf{z-index:1200!important;background:rgba(0,0,0,.6)!important}
+.aconf-box{width:min(340px,100%);background:#15181f;border:1px solid rgba(255,255,255,.1);padding:20px 18px 14px;display:grid;gap:8px;box-shadow:0 20px 50px rgba(0,0,0,.6)}
+.aconf-box b{font-size:17px;color:#fff}.aconf-box p{margin:0 0 8px;font-size:14px;color:rgba(255,255,255,.7);line-height:1.45}
+.aconf-b{display:flex;justify-content:flex-end;gap:8px}
+.aconf-b button{font:inherit;font-size:14px;font-weight:700;padding:9px 16px;border:0;cursor:pointer;color:#fff;background:rgba(255,255,255,.1)}
+.aconf-b .aconf-ok{background:#2f6fec}.aconf-b .aconf-ok.danger{background:#7a1f2b}
+.aconf-ok{position:relative;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:none}
+.aconf-fill{position:absolute;inset:0;background:#e0384d;transform:scaleX(0);transform-origin:left;transition:transform .2s ease-out;z-index:-1}
+.aconf-ok{isolation:isolate}.aconf-ok.holding .aconf-fill{transform:scaleX(1);transition:transform .9s linear}.aconf-ok.done .aconf-fill{transform:scaleX(1)}
 /* add + compare: one slim icon row */
 .att-tools{display:flex;align-items:center;gap:3px;margin-top:3px}
 .att-ic{position:relative;display:grid;place-items:center;width:40px;height:34px;padding:0;border:0;border-radius:0;cursor:pointer;color:var(--fg);background:rgba(var(--lr),.1);transition:background .15s}
@@ -6858,6 +6867,17 @@ function attTrimAskOld(f,dur){return new Promise(done=>{const u=URL.createObject
   v.addEventListener("timeupdate",()=>{if(v.currentTime>=st+L||v.currentTime<st-0.5)v.currentTime=st});
   const end=val=>{v.pause();v.removeAttribute("src");URL.revokeObjectURL(u);w.remove();done(val)};
   w.querySelector("[data-x]").onclick=()=>end(null);w.querySelector("[data-ok]").onclick=()=>end(dur?[st,Math.min(dur,st+L)]:"all")})}
+/* a small "are you sure?" window */
+function aotConfirm(o){return new Promise(done=>{const w=document.createElement("div");w.className="attv aconf";w.setAttribute("role","alertdialog");w.setAttribute("aria-modal","true");
+  w.innerHTML=`<div class="aconf-box"><b>${esc(o.title||"Are you sure?")}</b>${o.text?`<p>${esc(o.text)}</p>`:""}<div class="aconf-b"><button type="button" class="aconf-no">${esc(o.no||"Cancel")}</button><button type="button" class="aconf-ok${o.danger?" danger":""}">${esc(o.ok||"OK")}</button></div></div>`;
+  document.body.appendChild(w);const fin=v=>{w.remove();document.removeEventListener("keydown",k,true);done(v)};const k=e=>{if(e.key==="Escape"){e.stopPropagation();fin(false)}};document.addEventListener("keydown",k,true);
+  w.addEventListener("click",e=>{e.stopPropagation();if(e.target===w)fin(false)});w.querySelector(".aconf-no").onclick=()=>fin(false);const okb=w.querySelector(".aconf-ok");
+  if(!o.hold)okb.onclick=()=>fin(true);
+  else{/* must be held: the button fills up, letting go early cancels */let ht=null;okb.insertAdjacentHTML("afterbegin",'<i class="aconf-fill"></i>');
+    const go=e=>{if(e)e.preventDefault();if(ht)return;okb.classList.add("holding");ht=setTimeout(()=>{ht=null;okb.classList.remove("holding");okb.classList.add("done");setTimeout(()=>fin(true),120)},900)};
+    const stop=()=>{if(!ht)return;clearTimeout(ht);ht=null;okb.classList.remove("holding")};
+    okb.addEventListener("pointerdown",go);["pointerup","pointerleave","pointercancel"].forEach(t=>okb.addEventListener(t,stop));okb.addEventListener("contextmenu",e=>e.preventDefault());
+    okb.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&!e.repeat)go(e)});okb.addEventListener("keyup",e=>{if(e.key==="Enter"||e.key===" ")stop()})}setTimeout(()=>w.querySelector(".aconf-no").focus(),30)})}
 /* replace: the new item takes the old one's place */
 let attRepl=null;
 function attDrop(a){if(!a)return;MDB.del(a.id);MDB.del(a.id+":p"+(a.t0||0));if(a.path&&typeof sbOn==="function"&&sbOn())try{sb.storage.from("models").remove([a.path])}catch(_){}if(attURLs.has(a.id)){URL.revokeObjectURL(attURLs.get(a.id));attURLs.delete(a.id)}[...attStageEls.keys()].forEach(k=>{if(k.endsWith(":"+a.id))attStageEls.delete(k)})}
@@ -6923,7 +6943,9 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   if(b.dataset.attview){document.querySelectorAll(".att-stage video").forEach(v=>v.pause());attView=b.dataset.attview;attHydrate();return}
   if(b.dataset.attclose!==undefined){attView=null;attHydrate();return}
   if(b.dataset.attdel){const [tid,aid]=b.dataset.attdel.split(":"),t=findTaskAny(tid);if(!t)return;
-    if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="Remove?";b.classList.add("armed");setTimeout(()=>{if(b.isConnected){b.dataset.armed="";b.textContent="×";b.classList.remove("armed")}},2500);return}
+    /* old: the × turned into "Remove?" on the tile itself — now a proper window asks first */
+    if(b.dataset.armed!=="1"){const a0=(t.att||[]).find(x=>x.id===aid);if(!a0)return;
+      aotConfirm({title:"Delete this "+(a0.kind==="yt"?"YouTube link":a0.kind==="vid"?"video":"photo")+"?",text:"Are you sure you want to delete it? This can't be undone.",ok:"Hold to delete",danger:true,hold:true}).then(y=>{if(y){const nb=document.querySelector(`[data-attdel="${tid}:${aid}"]`);if(nb){nb.dataset.armed="1";nb.click()}}});return}
     const a=(t.att||[]).find(x=>x.id===aid);t.att=(t.att||[]).filter(x=>x.id!==aid);if(a){MDB.del(a.id);if(a.path&&typeof sbOn==="function"&&sbOn())try{sb.storage.from("models").remove([a.path])}catch(_){}if(attURLs.has(a.id)){URL.revokeObjectURL(attURLs.get(a.id));attURLs.delete(a.id)}}
     save();render()}},true);
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&attView){attView=null;attHydrate()}});
@@ -8028,7 +8050,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="529",APPT="2026-11-23T00:16:46Z";   /* APPT: when this update was made */
+const APPV="530",APPT="2026-11-23T00:19:40Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
