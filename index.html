@@ -141,7 +141,7 @@
 </style>
 </head><body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap">
 <style>
 /* Layout: starship command console. Fixed starfield behind; left sidebar + top status bar; HUD panels in auto-fit grids. Under 860px the sidebar becomes a bottom dock. Single deliberate dark look. */
 :root{
@@ -2874,9 +2874,11 @@ html.phone .bc-mk{top:64%;width:26px;height:26px;font-size:16px}html.phone .bc-m
 .bsh-sg{flex-wrap:wrap}
 /* dark title strip across the top of a Budget panel */
 .bstrip-p{padding-top:0!important;overflow:hidden}
-.bstrip{display:flex;align-items:baseline;gap:10px;margin:0 -18px 14px;padding:12px 18px;background:rgba(2,5,14,.62);border-bottom:1px solid rgba(var(--lr),.2)}
-.bstrip b{font-size:15px;font-weight:800;letter-spacing:.02em}.bstrip small{font-size:12px;color:var(--muted);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bstrip i{font-style:normal;font-family:var(--mono);font-size:13px;color:var(--muted);margin-left:auto;white-space:nowrap}
-html.phone .bstrip-p.bstrip-p{padding-top:0!important}html.phone .bstrip{margin:-14px -14px 12px;padding:11px 14px}html.phone .bstrip small{display:none}
+.bstrip{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px;margin:0 -18px 14px;padding:12px 18px;background:rgba(2,5,14,.62);border-bottom:1px solid rgba(var(--lr),.2)}
+.bstrip b{font-family:"Sora",var(--display);font-size:17px;font-weight:700;letter-spacing:.04em;background:linear-gradient(90deg,#eef3ff,rgb(var(--tL)) 120%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.bstrip small{font-size:11.5px;color:var(--muted);letter-spacing:.02em}
+.bstrip i{font-style:normal;font-family:var(--mono);font-size:13px;color:var(--muted);white-space:nowrap;position:absolute;right:18px;top:50%;transform:translateY(-50%)}
+html.phone .bstrip-p.bstrip-p{padding-top:0!important}html.phone .bstrip{margin:-14px -14px 12px;padding:11px 14px}html.phone .bstrip small{display:none}html.phone .bstrip i{position:static;transform:none;font-size:11.5px}html.phone .bstrip b{font-size:16px}
 .bs-vw{display:inline-flex;gap:4px;padding:3px;margin:2px 0 10px;border-radius:12px;background:rgba(4,8,20,.45);border:1px solid rgba(var(--lr),.2)}
 .bs-vw button{padding:6px 14px;border-radius:9px;border:0;background:none;color:var(--muted);font:inherit;font-size:13px;font-weight:600;cursor:pointer}.bs-vw button[aria-pressed="true"]{background:rgba(var(--tL),.22);color:var(--fg)}
 .bwi{display:flex;flex-direction:column;gap:10px}
@@ -6241,7 +6243,7 @@ function vBudget(){fxLoad();const b=B();b.mode="comb";const S=bStats(),out=S.sub
   <!--BMODE-->${b.mode==="comb"?bCombined(S):(b.porder||["bills","inc"]).map(k=>k==="inc"?`<div class="panel bpan" data-bpanel="inc" style="margin-top:18px"><div class="ph bp-h"><button type="button" class="bp-grip" data-bpgrip aria-label="Drag to move this panel" title="Drag to move"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></button><span>Income</span><div class="seg2 bview" role="group" aria-label="View"><button data-bview="cards" data-bvk="i" aria-pressed="${b.viewI!=="list"}">Cards</button><button data-bview="list" data-bvk="i" aria-pressed="${b.viewI==="list"}">List</button></div><span class="bp-add"><i>${bMoney(S.inc)}/mo</i><button type="button" data-bnew="inc">＋ Income</button><button type="button" data-bnewcat="inc">＋ Category</button></span></div>${b.viewI==="list"?bList(S,"i"):bAll(S,null,"i")}</div>`:`<div class="panel bpan" data-bpanel="bills" style="margin-top:18px"><div class="ph bp-h"><button type="button" class="bp-grip" data-bpgrip aria-label="Drag to move this panel" title="Drag to move"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></button><span>Bills &amp; subscriptions</span><div class="seg2 bview" role="group" aria-label="View"><button data-bview="cards" aria-pressed="${b.view!=="list"}">Cards</button><button data-bview="list" aria-pressed="${b.view==="list"}">List</button></div><span class="bp-add"><button type="button" data-bnew="sub">＋ Subscription</button><button type="button" data-bnew="bill">＋ Bill</button><button type="button" data-bnewcat>＋ Category</button></span></div>
     <div class="bi-sum"><span><b>${bMoney(S.subs)}</b>/mo subscriptions · <b>${bMoney(S.bills)}</b>/mo bills</span>${S.paused?`<span class="bi-save">Paused ones save ${bMoney(S.paused*12,0)}/yr</span>`:""}</div>${b.view==="list"?bList(S):bAll(S)}</div>`).join("")}
   ${kBudPanel()}${mb?mb.replace('class="panel bmu"','class="panel bmu" style="margin-top:18px"'):""}
-  <div class="panel bpan bstrip-p" style="margin-top:18px"><div class="bstrip"><b>Extras</b><small>Day-to-day, non-essential spending</small><i>${bMoney(S.spent)} this month</i></div><!-- was: <span>Spending</span> title row -->${bSpend(S)}</div>`)}
+  <div class="panel bpan bstrip-p" style="margin-top:18px"><div class="bstrip"><b>Extras</b><small>Day-to-day, non-essential spending</small><i class="bstrip-amt">${bMoney(S.spent)} this month</i></div><!-- was: <span>Spending</span> title row -->${bSpend(S)}</div>`)}
 /* popup sheet: edits an item, an expense or a category */
 const bHoldBtn=`<button type="button" class="btn ghost bh-del" data-bhold="sheet"><i></i><span>Hold to delete</span></button>`;
 function bSheet(){let o=document.getElementById("bSheet");if(!bEdit){if(o){o.classList.add("out");setTimeout(()=>o.remove(),180)}return}if(!o){o=document.createElement("div");o.id="bSheet";o.className="wp-sheet";document.body.appendChild(o)}const b=B(),e=bEdit,v=e.v,isNew=e.isNew;let h="",acts="";
@@ -8925,7 +8927,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="640",APPT="2026-11-23T22:33:54Z";   /* APPT: when this update was made */
+const APPV="641",APPT="2026-11-23T22:37:02Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
