@@ -2310,6 +2310,10 @@ html.phone .tk-save-x{display:none}
 #attCmp.chrome-off .acmp-cb,#attCmp.chrome-off .acmp-mir,#attCmp.chrome-off .acmp-spd,#attCmp.chrome-off .acmp-trim{opacity:0;pointer-events:none}
 .acmp-cb button{flex:0 0 auto;min-width:32px;height:30px;border:0;border-radius:6px;background:rgba(255,255,255,.1);color:#fff;font-size:13px;cursor:pointer;display:grid;place-items:center}
 .acmp-tm{font:600 11.5px var(--mono);color:rgba(255,255,255,.75);flex:0 0 auto}
+.acmp-j{background:none!important;min-width:30px!important}
+.acmp-flash{position:absolute;top:0;bottom:0;width:42%;display:grid;place-items:center;pointer-events:none;background:radial-gradient(closest-side,rgba(255,255,255,.22),transparent);animation:acmpF .65s ease-out forwards;z-index:3}
+.acmp-flash.l{left:0}.acmp-flash.r{right:0}.acmp-flash span{font:700 15px var(--mono);color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+@keyframes acmpF{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
 .acmp-seek{flex:1;min-width:40px;accent-color:#ffd23f;height:20px}
 #attCmp.aligning .acmp-m{cursor:grab;touch-action:none;outline:2px dashed rgba(255,210,63,.55);outline-offset:-2px}
 #attCmp .acmp-m video,#attCmp .acmp-m img{transform-origin:center;transition:none}
@@ -7058,7 +7062,7 @@ function cmpRender(){let w=document.getElementById("attCmp");
   const pane=side=>{const it=get(attCmp[side]),a=it.a,y=a.kind==="yt"?ytId(a.url):null;
     const m=a.kind==="yt"?`<iframe src="https://www.youtube-nocookie.com/embed/${y}?playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="YouTube video"></iframe>`:a.kind==="vid"?`<video data-cmpv="${side}" playsinline webkit-playsinline preload="auto" ${side==="R"?"muted":""}></video>`:`<img data-cmpi="${side}" alt="${esc(a.name||"Photo")}">`;
     return `<div class="acmp-p" data-side="${side}"><div class="acmp-m">${m}<button type="button" class="acmp-mir" data-cmpmir="${side}" aria-pressed="false" title="Mirror (flip left to right)">⇋ Mirror</button>${a.kind==="vid"?`<button type="button" class="acmp-spd" data-cmpsp="${side}" title="Speed of this side">${attCmp["sp"+side]}×</button>`:""}${a.kind==="vid"?`<button type="button" class="acmp-trim${a.t1!=null?" on":""}" data-cmptrim="${side}" aria-label="Trim this video" title="Trim"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.1 15.9M14.5 14.5L20 20M8.1 8.1L12 12"/></svg></button>`:""}</div>
-      ${a.kind==="vid"?`<div class="acmp-cb" data-side="${side}"><button type="button" class="acmp-pp" data-cmppp="${side}" aria-label="Play">▶</button><span class="acmp-tm">0:00</span><input type="range" class="acmp-seek" data-cmpseek="${side}" min="0" max="1000" value="0" aria-label="Seek"><span class="acmp-tm acmp-dur">0:00</span><button type="button" class="acmp-mute" data-cmpmute="${side}" aria-label="Sound">${side==="R"?"🔇":"🔊"}</button><button type="button" class="acmp-fs" data-cmpfs="${side}" aria-label="Full screen" title="Full screen"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>`:""}
+      ${a.kind==="vid"?`<div class="acmp-cb" data-side="${side}"><button type="button" class="acmp-j" data-cmpjump="${side}:-30" aria-label="Back 30 seconds" title="Back 30s"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/><text x="12.2" y="15.2" font-size="7.2" font-weight="700" text-anchor="middle" fill="currentColor" stroke="none" font-family="system-ui">30</text></svg></button><button type="button" class="acmp-pp" data-cmppp="${side}" aria-label="Play">▶</button><button type="button" class="acmp-j" data-cmpjump="${side}:30" aria-label="Forward 30 seconds" title="Forward 30s"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4h-4"/><text x="11.8" y="15.2" font-size="7.2" font-weight="700" text-anchor="middle" fill="currentColor" stroke="none" font-family="system-ui">30</text></svg></button><span class="acmp-tm">0:00</span><input type="range" class="acmp-seek" data-cmpseek="${side}" min="0" max="1000" value="0" aria-label="Seek"><span class="acmp-tm acmp-dur">0:00</span><button type="button" class="acmp-mute" data-cmpmute="${side}" aria-label="Sound">${side==="R"?"🔇":"🔊"}</button><button type="button" class="acmp-fs" data-cmpfs="${side}" aria-label="Full screen" title="Full screen"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>`:""}
       <div class="acmp-lab">${side==="L"?"Left":"Right"}</div>
       ${P.length>2?`<div class="acmp-pick" role="group" aria-label="Choose the ${side==="L"?"left":"right"} media">${P.map(x=>`<button type="button" class="acmp-th${x.a.id===attCmp[side]?" on":""}" data-cmppick="${side}:${x.a.id}" aria-pressed="${x.a.id===attCmp[side]}" title="${esc(x.t.title)}">${attThumb(x.a)}</button>`).join("")}</div>`:""}</div>`};
   w.innerHTML=`<div class="acmp-box"><div class="acmp-h"><b>Compare</b>${P.length>2?`<small>Pick what goes on each side</small>`:""}<button type="button" class="attv-x acmp-x" data-cmpclose aria-label="Close">×</button></div>
@@ -7084,8 +7088,13 @@ function cmpStyle(){const w=document.getElementById("attCmp");if(!w||!attCmp)ret
     const t=attCmp.tf[s],m=p.querySelector(".acmp-m video,.acmp-m img");if(m){m.style.transform=`translate(${t.x}px,${t.y}px) scale(${t.s}) scaleX(${on?-1:1})`}
     const sp=p.querySelector("[data-cmpsp]");if(sp)sp.textContent=attCmp["sp"+s]+"×"})}
 const cmpStart=side=>{const a=attCmp&&cmpPool(attCmp.tid).find(x=>x.a.id===attCmp[side]);return a?a.a.t0||0:0};
-document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-cmpopen],[data-cmpclose],[data-cmppick],[data-cmpmir],[data-cmpgo],[data-cmptrim],[data-cmpsp],[data-cmppp],[data-cmpfs],[data-cmpmute]");
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-cmpopen],[data-cmpclose],[data-cmppick],[data-cmpmir],[data-cmpgo],[data-cmptrim],[data-cmpsp],[data-cmppp],[data-cmpfs],[data-cmpmute],[data-cmpjump]");
   if(!b){/* was: tapping outside closed the window. Now a tap on empty space hides / shows the video controls; only × or a hard swipe up closes */
+    /* double-tap a video: left half back 10s, right half forward 10s (YouTube-style), playing or paused */
+    const mv=attCmp&&!attCmp.align&&e.target.closest&&e.target.closest("#attCmp .acmp-m");
+    if(mv&&mv.querySelector("video")&&!e.target.closest("button")&&Date.now()-cmpDragAt>400){const side=mv.closest(".acmp-p").dataset.side,r=mv.getBoundingClientRect(),now=Date.now();
+      if(cmpTap&&cmpTap.side===side&&now-cmpTap.t<320){clearTimeout(cmpTapT);cmpTapT=null;cmpTap={side,t:now,chain:true};cmpJump(side,e.clientX<r.left+r.width/2?-10:10);return}
+      cmpTap={side,t:now};clearTimeout(cmpTapT);cmpTapT=setTimeout(()=>{cmpTapT=null;if(attCmp){attCmp.hide=!attCmp.hide;cmpStyle()}},320);return}
     if(attCmp&&Date.now()-cmpDragAt>400&&e.target.closest&&e.target.closest("#attCmp")&&!e.target.closest("iframe,.acmp-tr,.acmp-pick,.acmp-ctl,.acmp-cb,button,input")&&!(attCmp.align&&e.target.closest(".acmp-m"))){attCmp.hide=!attCmp.hide;cmpStyle()}return}
   e.preventDefault();e.stopPropagation();
   if(b.dataset.cmpopen){cmpOpen(b.dataset.cmpopen);attHydrate();return}
@@ -7100,6 +7109,7 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
       if(r==="all"){delete a.t0;delete a.t1}else{a.t0=r[0];a.t1=r[1]}[...attStageEls.keys()].forEach(k=>{if(k.endsWith(":"+a.id))attStageEls.delete(k)});save();render();
       const w=document.getElementById("attCmp");if(w)w.dataset.k="";cmpRender();attHydrate();toast("Trim saved")}}));return}
   if(b.dataset.cmpmir){const k="m"+b.dataset.cmpmir;attCmp[k]=!attCmp[k];cmpStyle();return}
+  if(b.dataset.cmpjump){const [sd,n]=b.dataset.cmpjump.split(":");cmpJump(sd,+n);return}
   if(b.dataset.cmppp||b.dataset.cmpfs||b.dataset.cmpmute){const sd=b.dataset.cmppp||b.dataset.cmpfs||b.dataset.cmpmute,v=document.querySelector(`#attCmp video[data-cmpv="${sd}"]`);if(!v)return;
     if(b.dataset.cmppp){if(v.paused){const p=v.play();p&&p.catch(()=>{})}else v.pause()}
     else if(b.dataset.cmpmute){v.muted=!v.muted;b.textContent=v.muted?"🔇":"🔊"}
@@ -7116,19 +7126,32 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
       c.querySelectorAll('[data-cmpgo="align"],[data-cmpgo="alignreset"]').forEach(x=>x.remove());c.append(...h.children);const box=w.querySelector(".acmp-box");let hint=box.querySelector(".acmp-hint");if(attCmp.align&&!hint)box.insertAdjacentHTML("beforeend",`<p class="acmp-hint">Drag a video to move it · pinch (or scroll) to zoom · tap Align again when they line up</p>`);if(!attCmp.align&&hint)hint.remove()}
     cmpStyle()}},true);
 let cmpDragAt=0;
+/* jump a side forward/back, inside its trim, keeping it playing or paused as it was */
+function cmpJump(side,n){const v=document.querySelector(`#attCmp video[data-cmpv="${side}"]`);if(!v||!v.duration)return;const it=cmpPool(attCmp.tid).find(x=>x.a.id===attCmp[side]),a=it&&it.a||{};
+  const lo=a.t0||0,hi=a.t1!=null?a.t1:v.duration;v.currentTime=Math.max(lo,Math.min(hi-0.05,v.currentTime+n));
+  const m=v.closest(".acmp-m");if(m){const f=document.createElement("div");f.className="acmp-flash "+(n<0?"l":"r");f.innerHTML=`<span>${n<0?"«":"»"} ${Math.abs(n)}s</span>`;m.appendChild(f);setTimeout(()=>f.remove(),650)}}
+let cmpTapT=null,cmpTap=null;
 ["gesturestart","gesturechange","gestureend"].forEach(k=>document.addEventListener(k,e=>{if(e.target.closest&&e.target.closest("#attCmp .acmp-m"))e.preventDefault()},{passive:false}));
 document.addEventListener("touchmove",e=>{if(e.touches.length>1&&e.target.closest&&e.target.closest("#attCmp .acmp-m"))e.preventDefault()},{passive:false});
 /* align mode: drag a side to move it, pinch / scroll to zoom it, so the two dancers line up */
 (()=>{let d=null;const P=new Map();
-  /* two fingers zoom a side any time; one finger moves it only in Align mode (otherwise taps still reach the video's own controls) */
+  /* two fingers: zoom around the point between them and move with them (any time).
+     one finger: moves the video in Align mode, or once it's zoomed in; a plain tap still reaches the buttons/double-tap */
+  const ctr=side=>{const m=document.querySelector(`#attCmp .acmp-p[data-side="${side}"] .acmp-m`).getBoundingClientRect();return {x:m.left+m.width/2,y:m.top+m.height/2}};
+  const pts=side=>[...P.values()].filter(q=>q.side===side);
+  const startPinch=side=>{const t=attCmp.tf[side],[a,b]=pts(side),mx=(a.x+b.x)/2,my=(a.y+b.y)/2,c=ctr(side);
+    d={side,pinch:true,d0:Math.hypot(a.x-b.x,a.y-b.y)||1,s0:t.s,qx:(mx-c.x-t.x)/t.s,qy:(my-c.y-t.y)/t.s}};
+  const startPan=(side,x,y)=>{const t=attCmp.tf[side];d={side,x0:x,y0:y,tx:t.x,ty:t.y,moved:false}};
   document.addEventListener("pointerdown",e=>{if(!attCmp)return;const m=e.target.closest&&e.target.closest("#attCmp .acmp-m");if(!m||e.target.closest("button"))return;
     const side=m.closest(".acmp-p").dataset.side;P.set(e.pointerId,{x:e.clientX,y:e.clientY,side});const t=attCmp.tf[side];
-    const same=[...P.values()].filter(q=>q.side===side);
-    if(same.length===2){e.preventDefault();const [a,b]=same;d={side,pinch:true,d0:Math.hypot(a.x-b.x,a.y-b.y)||1,s0:t.s}}
-    else if(attCmp.align){e.preventDefault();d={side,x0:e.clientX,y0:e.clientY,tx:t.x,ty:t.y};try{m.setPointerCapture(e.pointerId)}catch(_){}}},true);
-  document.addEventListener("pointermove",e=>{if(!d||!P.has(e.pointerId))return;e.preventDefault();cmpDragAt=Date.now();P.set(e.pointerId,{x:e.clientX,y:e.clientY,side:P.get(e.pointerId).side});const t=attCmp.tf[d.side];
-    if(d.pinch&&P.size>=2){const [a,b]=[...P.values()].filter(q=>q.side===d.side);if(!b)return;t.s=Math.max(.5,Math.min(4,d.s0*Math.hypot(a.x-b.x,a.y-b.y)/d.d0))}else if(!d.pinch){t.x=d.tx+e.clientX-d.x0;t.y=d.ty+e.clientY-d.y0}cmpStyle()},true);
-  const up=e=>{P.delete(e.pointerId);if(!P.size)d=null;else if(d&&d.pinch){if(attCmp&&attCmp.align){const t=attCmp.tf[d.side],[q]=[...P.values()];d={side:d.side,x0:q.x,y0:q.y,tx:t.x,ty:t.y}}else d=null}};
+    if(pts(side).length===2){e.preventDefault();startPinch(side)}
+    else if(attCmp.align||t.s>1.01){if(attCmp.align)e.preventDefault();startPan(side,e.clientX,e.clientY)}},true);
+  document.addEventListener("pointermove",e=>{if(!d||!P.has(e.pointerId))return;P.set(e.pointerId,{x:e.clientX,y:e.clientY,side:P.get(e.pointerId).side});const t=attCmp.tf[d.side];
+    if(d.pinch){const q=pts(d.side);if(q.length<2)return;e.preventDefault();const [a,b]=q,mx=(a.x+b.x)/2,my=(a.y+b.y)/2,c=ctr(d.side);
+      t.s=Math.max(attCmp.align?.5:1,Math.min(5,d.s0*Math.hypot(a.x-b.x,a.y-b.y)/d.d0));t.x=mx-c.x-t.s*d.qx;t.y=my-c.y-t.s*d.qy;cmpDragAt=Date.now()}
+    else{const dx=e.clientX-d.x0,dy=e.clientY-d.y0;if(!d.moved&&Math.hypot(dx,dy)<5)return;d.moved=true;e.preventDefault();t.x=d.tx+dx;t.y=d.ty+dy;cmpDragAt=Date.now()}
+    if(!attCmp.align&&t.s<=1.01){t.s=1;t.x=0;t.y=0}cmpStyle()},true);
+  const up=e=>{P.delete(e.pointerId);if(!P.size){d=null;return}if(d&&d.pinch){const q=[...P.values()].filter(x=>x.side===d.side);if(q.length===1&&(attCmp.align||attCmp.tf[d.side].s>1.01))startPan(d.side,q[0].x,q[0].y);else d=null}};
   document.addEventListener("pointerup",up,true);document.addEventListener("pointercancel",up,true);
   document.addEventListener("wheel",e=>{if(!attCmp||!attCmp.align)return;const m=e.target.closest&&e.target.closest("#attCmp .acmp-m");if(!m)return;e.preventDefault();const t=attCmp.tf[m.closest(".acmp-p").dataset.side];t.s=Math.max(.5,Math.min(4,t.s*(e.deltaY<0?1.06:1/1.06)));cmpStyle()},{passive:false})})();
 /* the only ways out of compare: the × or a hard swipe up */
@@ -8198,7 +8221,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="547",APPT="2026-11-23T02:08:42Z";   /* APPT: when this update was made */
+const APPV="548",APPT="2026-11-23T02:14:28Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
