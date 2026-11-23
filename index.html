@@ -6808,7 +6808,12 @@ const MDB={db:null,open(){return this.db||(this.db=new Promise((ok,no)=>{try{con
 const attURLs=new Map();
 async function attURL(a){if(attURLs.has(a.id))return attURLs.get(a.id);let blob=await MDB.get(a.id);
   if(!blob&&a.path&&typeof sbOn==="function"&&sbOn()){try{const {data}=await sb.storage.from("models").download(a.path);if(data){blob=a.type&&data.type!==a.type?new Blob([data],{type:a.type}):data;MDB.put(a.id,blob)}}catch(e){}}
+  /* not on this device and no saved link: look in your account's backup folder for a file with this video's name (the upload can finish after the link was lost) */
+  if(!blob&&typeof sbOn==="function"&&sbOn()&&sbUser){try{const L=await attCloudList(),hit=L.find(f=>f.name.split(".")[0]===a.id||(a.src&&f.name.split(".")[0]===a.src));
+    if(hit){const pth=sbUser.id+"/att/"+hit.name,{data:dl}=await sb.storage.from("models").download(pth);if(dl){blob=a.type&&dl.type!==a.type?new Blob([dl],{type:a.type}):dl;MDB.put(a.id,blob);if(!a.path){a.path=pth;save()}}}}catch(e){}}
   if(!blob)return null;const u=URL.createObjectURL(blob);attURLs.set(a.id,u);return u}
+let attCloudL=null;
+function attCloudList(){if(!attCloudL)attCloudL=(async()=>{const out=[];for(let off=0;off<5000;off+=1000){const {data:l,error}=await sb.storage.from("models").list(sbUser.id+"/att",{limit:1000,offset:off});if(error||!l)break;out.push(...l);if(l.length<1000)break}return out})().catch(()=>{attCloudL=null;return []});return attCloudL}
 let attLinkFor=null,attBusy=null,attView=null;
 /* theater: the big player keeps its element between redraws so a playing video doesn't restart */
 const attSel={},attStageEls=new Map();
@@ -8425,7 +8430,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="569",APPT="2026-11-23T04:48:28Z";   /* APPT: when this update was made */
+const APPV="570",APPT="2026-11-23T04:51:52Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
