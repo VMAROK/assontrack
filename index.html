@@ -2874,6 +2874,21 @@ html.phone .bc-mk{top:64%;width:26px;height:26px;font-size:16px}html.phone .bc-m
 .bsh-sg{flex-wrap:wrap}
 .bs-vw{display:inline-flex;gap:4px;padding:3px;margin:2px 0 10px;border-radius:12px;background:rgba(4,8,20,.45);border:1px solid rgba(var(--lr),.2)}
 .bs-vw button{padding:6px 14px;border-radius:9px;border:0;background:none;color:var(--muted);font:inherit;font-size:13px;font-weight:600;cursor:pointer}.bs-vw button[aria-pressed="true"]{background:rgba(var(--tL),.22);color:var(--fg)}
+.bwi{display:flex;flex-direction:column;gap:10px}
+.bwi-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.bwi-sum>div{display:flex;flex-direction:column;align-items:center;gap:3px;padding:14px 8px;border-radius:14px;background:rgba(4,8,20,.4);border:1px solid rgba(var(--lr),.2);text-align:center}
+.bwi-sum small{font-size:12px;color:var(--muted);font-weight:600}.bwi-sum b{font-family:var(--mono);font-size:22px}.bwi-sum b.pos{color:#3ddc84}.bwi-sum em{font-style:normal;font-size:12px;color:var(--muted);margin-left:2px}
+.bwi-sv{border-color:rgba(61,220,132,.5)!important;background:linear-gradient(160deg,rgba(61,220,132,.18),rgba(4,8,20,.4))!important}.bwi-sv b{color:#3ddc84}.bwi-sv span{font-size:12px;color:#9be8bf}
+.bwi-hint{margin:2px 2px 0;font-size:12.5px;color:var(--muted)}
+.bwi-list{border:1px solid rgba(var(--lr),.22);border-radius:12px;overflow:hidden;max-height:calc(52px * 12);overflow-y:auto;overscroll-behavior:contain}
+.bwi-r{display:flex;align-items:center;gap:12px;width:100%;padding:10px 14px;border:0;border-top:1px solid rgba(var(--lr),.12);background:rgba(4,8,20,.3);color:inherit;font:inherit;text-align:left;cursor:pointer}.bwi-r:first-child{border-top:0}
+.bwi-n{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-weight:600}.bwi-n small{font-weight:400;font-size:12px;color:var(--muted)}.bwi-r>b{font-family:var(--mono)}
+.bwi-r>i{font-style:normal;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;border:1px solid rgba(61,220,132,.55);color:#3ddc84;background:rgba(61,220,132,.12);min-width:52px;text-align:center}
+.bwi-r.cut>i{border-color:rgba(255,94,108,.6);color:#ff8a95;background:rgba(255,77,94,.14)}.bwi-r.cut .bwi-n,.bwi-r.cut>b{text-decoration:line-through;text-decoration-thickness:2px;opacity:.55}
+.bwi-act{display:flex;gap:8px;flex-wrap:wrap}
+.bwi-goal{padding:14px;border-radius:14px;border:1px solid rgba(61,220,132,.45);background:rgba(61,220,132,.08);display:flex;flex-direction:column;gap:4px}.bwi-goal.slip{border-color:rgba(255,94,108,.5);background:rgba(255,77,94,.08)}.bwi-goal>span{font-size:13px;color:var(--muted)}
+.bwi-gs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}.bwi-gs>div{display:flex;flex-direction:column;gap:2px}.bwi-gs small{font-size:12px;color:var(--muted)}.bwi-gs b{font-family:var(--mono);font-size:18px}.bwi-gs .pos{color:#3ddc84}.bwi-gs .neg{color:#ff8a95}
+.bwi-ban{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;margin-bottom:10px;padding:10px 14px;border-radius:12px;border:1px solid rgba(61,220,132,.45);background:rgba(61,220,132,.1);color:inherit;font:inherit;font-size:13px;text-align:left;cursor:pointer}.bwi-ban b{font-family:var(--mono);color:#3ddc84;white-space:nowrap}.bwi-ban.slip{border-color:rgba(255,94,108,.5);background:rgba(255,77,94,.1)}.bwi-ban.slip b{color:#ff8a95}
+html.phone .bwi-sum b{font-size:16px}html.phone .bwi-sum small{font-size:10.5px}
 .bsg-list{display:flex;flex-direction:column;gap:8px}
 .bsg{border:1px solid rgba(var(--lr),.22);border-radius:12px;overflow:hidden;background:rgba(4,8,20,.35)}
 .bsg-h{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px 8px;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
@@ -5952,6 +5967,32 @@ function bAll(S,only,m){const b=B(),inc=m==="i",it=b.items.filter(i=>(inc?i.kind
       ${lim?`<div class="bk-bar"><i style="width:${Math.min(100,f*100)}%;background:${f>1?"#ff4d5e":f>.85?"#ffb648":c.c}"></i></div>`:""}
       ${!inc&&S.spCat[c.n]?`<button type="button" class="bk-sp" data-btab="spend">${bMoney(S.spCat[c.n])} spent this month</button>`:""}
       ${L.length||GS.length?`${loose.length?`<div class="bi-grid">${loose.map(bCard).join("")}</div>`:""}${GS.map(g=>{const G=L.filter(i=>i.grp===g);return `<div class="bk-g" data-bdg="${esc(JSON.stringify([c.n,g]))}"><button type="button" class="bk-gh" data-bgrp="${esc(JSON.stringify([c.n,g]))}"><span>${esc(g)}</span><i>${G.length}</i><b>${bMoney(G.filter(i=>!i.paused&&!i.muted).reduce((a,i)=>a+bMo(i),0))}/mo</b></button>${G.length?`<div class="bi-grid">${G.map(bCard).join("")}</div>`:`<div class="bk-gempty">${addB(c.n,g)}</div>`}</div>`}).join("")}<div class="bk-more">${addB(c.n)}<button type="button" data-bnewgrp="${esc(c.n)}">＋ Group</button></div>`:`<div class="bk-empty"><span>Nothing here yet</span>${addB(c.n)}<button type="button" data-bnewgrp="${esc(c.n)}">＋ Group</button></div>`}</section>`}).join("")}</div>`}
+/* "What if": pick the things you'd stop buying and see what the last 30 days would have cost; save it as a goal and track it */
+let bWhatCut=null;
+const bSpKey=s=>(s.note||"").trim().toLowerCase()||"\u0000";
+function bSp30(b){const x=bDate(today());x.setDate(x.getDate()-29);const f=ymd(x);return b.spends.filter(s=>s.d>=f&&s.d<=today())}
+function bSpendWhatIf(b){if(!bWhatCut)bWhatCut=new Set((b.spPlan&&b.spPlan.cut)||[]);const L=bSp30(b),M=new Map();
+  L.forEach(s=>{const k=bSpKey(s);const r=M.get(k)||{k,n:(s.note||"").trim()||"No description",cnt:0,t:0,sg:s.sg||""};r.cnt++;r.t+=bSpAmt(s);M.set(k,r)});
+  const R=[...M.values()].sort((a,z)=>z.t-a.t);if(!R.length)return `<p class="note" style="margin:10px 2px 0">Once you've logged some spending, pick what you'd stop buying here and see how much you'd save.</p>`;
+  const now=R.reduce((a,r)=>a+r.t,0),keep=R.filter(r=>!bWhatCut.has(r.k)).reduce((a,r)=>a+r.t,0),sav=now-keep,P=b.spPlan;
+  return `<div class="bwi">
+    <div class="bwi-sum"><div><small>Last 30 days</small><b>${bMoney(now)}</b></div><div><small>Only what you keep</small><b class="pos">${bMoney(keep)}</b></div><div class="bwi-sv"><small>You'd save</small><b>${bMoney(sav)}<em>/mo</em></b><span>${bMoney(sav*12)} a year</span></div></div>
+    <p class="bwi-hint">Tap what you'd stop buying.</p>
+    <div class="bwi-list">${R.map(r=>{const cut=bWhatCut.has(r.k);return `<button type="button" class="bwi-r${cut?" cut":""}" data-bwi="${esc(r.k)}" aria-pressed="${cut}"><span class="bwi-n">${esc(r.n)}<small>${r.cnt}× in 30 days${r.sg?` · ${esc(r.sg)}`:""}</small></span><b>${bMoney(r.t)}</b><i>${cut?"Cut":"Keep"}</i></button>`}).join("")}</div>
+    <div class="bwi-act">${bWhatCut.size?`<button type="button" class="btn" data-bwigoal>${P?"Update my goal":"Make this my goal"}</button>`:""}${P?`<button type="button" class="btn ghost" data-bwiclear>Clear goal</button>`:""}${bWhatCut.size?`<button type="button" class="btn ghost" data-bwireset>Reset</button>`:""}</div>
+    ${P?bPlanCard(b):""}</div>`}
+function bPlanStats(b){const P=b.spPlan;if(!P)return null;const C=new Set(P.cut),S=b.spends.filter(s=>s.d>P.since||(s.d===P.since&&(s.t||0)>(P.ts||0))),   /* only what was bought after the goal was set */days=Math.max(1,Math.round((bDate(today())-bDate(P.since))/864e5)+1);
+  const slip=S.filter(s=>C.has(bSpKey(s))).reduce((a,s)=>a+bSpAmt(s),0),saved=Math.max(0,P.rate/30*days-slip);return {days,slip,saved,names:P.names||[]}}
+function bPlanCard(b){const t=bPlanStats(b);if(!t)return "";return `<div class="bwi-goal${t.slip>0?" slip":""}"><b>Your goal · since ${bDate(b.spPlan.since).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</b><span>Not buying ${t.names.map(esc).join(", ")}</span>
+    <div class="bwi-gs"><div><small>Spent on them since</small><b class="${t.slip>0?"neg":"pos"}">${bMoney(t.slip)}</b></div><div><small>Saved so far</small><b class="pos">${bMoney(t.saved)}</b></div></div></div>`}
+function bPlanBanner(b){const t=bPlanStats(b);if(!t)return "";return `<button type="button" class="bwi-ban${t.slip>0?" slip":""}" data-bspv="what"><span>Goal: not buying ${t.names.slice(0,3).map(esc).join(", ")}${t.names.length>3?"…":""}</span><b>${t.slip>0?`${bMoney(t.slip)} slipped`:`${bMoney(t.saved)} saved`}</b></button>`}
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-bwi],[data-bwigoal],[data-bwiclear],[data-bwireset]");if(!t)return;e.preventDefault();e.stopImmediatePropagation();const b=B();
+  if(t.hasAttribute("data-bwi")){const k=t.dataset.bwi;bWhatCut.has(k)?bWhatCut.delete(k):bWhatCut.add(k);render();return}
+  if(t.hasAttribute("data-bwireset")){bWhatCut=new Set();render();return}
+  if(t.hasAttribute("data-bwiclear")){delete b.spPlan;bWhatCut=new Set();save();render();toast("Goal cleared");return}
+  if(t.hasAttribute("data-bwigoal")){const L=bSp30(b),cut=[...bWhatCut],rate=L.filter(s=>bWhatCut.has(bSpKey(s))).reduce((a,s)=>a+bSpAmt(s),0),
+      names=cut.map(k=>{const s=L.find(x=>bSpKey(x)===k);return s?((s.note||"").trim()||"No description"):k});
+    b.spPlan={cut,names,rate,since:today(),ts:Date.now()};save();render();toast("Goal saved. Stick to it!")}},true);
 /* spending, by group: one block per group with this month's total, count and share; tap to open its purchases */
 let bSgOpen=new Set(),bSgAll=new Set();   /* open group (only one at a time) / groups showing every purchase */
 const bSgCol=(b,g)=>{if(!g)return "#8a94aa";const P=(typeof CATPAL!=="undefined"&&CATPAL.length?CATPAL:["#3ddc84","#4cc9ff","#ffb648","#ff6fb5","#b48cff","#ff7a85","#ffd166","#7c8cff"]),i=bSgs(b).indexOf(g);return P[(i<0?0:i)%P.length]};
@@ -5968,8 +6009,10 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   const k=t.dataset.bsgo||"\u0000",was=bSgOpen.has(k);bSgOpen.clear();if(!was)bSgOpen.add(k);render()},true);   /* one group open at a time */
 function bSpend(S){const b=B(),L=b.spends.filter(s=>(s.d||"").slice(0,7)===today().slice(0,7)).sort((a,z)=>a.d<z.d?1:a.d>z.d?-1:0),G=[];L.forEach(s=>{let g=G.find(x=>x[0]===s.d);if(!g)G.push(g=[s.d,[]]);g[1].push(s)});
   return `<form class="bs-add" id="bsForm" autocomplete="off">${moneyIn("bsAmt",0,bAddCur&&BCUR.includes(bAddCur)?bAddCur:bHome(),true)}<input id="bsNote" placeholder="What for?" aria-label="What for">${`<select id="bsCat" aria-label="Group"><option value=""${!bAddSg?" selected":""}>No group</option>${bSgs(b).map(g=>`<option value="${esc(g)}"${g===bAddSg?" selected":""}>${esc(g)}</option>`).join("")}<option value="__new"${bSgNew?" selected":""}>＋ New group…</option></select>`}<!-- was: preset categories (Housing, Utilities, Food…) --><button class="btn" type="submit">Add</button>${bSgNew?`<div class="bs-ngrow"><span>New group</span><input id="bsNewG" aria-label="New group name" maxlength="30"><button type="button" class="bs-ngok" data-bsgadd aria-label="Create group" title="Create group"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="bs-ngx" data-bsgx aria-label="Cancel">×</button></div>`:""}</form>
-    <div class="bs-vw" role="group" aria-label="View">${[["grp","By group"],["day","By day"]].map(([k,n])=>`<button type="button" data-bspv="${k}" aria-pressed="${(b.spView||"grp")===k}">${n}</button>`).join("")}</div>
+    <div class="bs-vw" role="group" aria-label="View">${[["grp","By group"],["day","By day"],["what","What if"]].map(([k,n])=>`<button type="button" data-bspv="${k}" aria-pressed="${(b.spView||"grp")===k}">${n}</button>`).join("")}</div>
+    ${(b.spView||"grp")!=="what"?bPlanBanner(b):""}
     ${(b.spView||"grp")==="grp"?bSpendByGroup(b,L):""}
+    ${b.spView==="what"?bSpendWhatIf(b):""}
     ${(b.spView||"grp")!=="day"?"":G.length?G.map(([d,A])=>`<div class="bs-g"><div class="bs-gh"><span>${d===today()?"Today":bDate(d).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}</span><b>${bMoney(A.reduce((a,s)=>a+bSpAmt(s),0))}</b></div>${A.map(s=>`<button type="button" class="bs-r" data-bsedit="${s.id}" style="--cc:${bCol(s.cat)}"><i></i><span>${esc(s.note||s.sg||"Spent")}${s.sg?`<small>${esc(s.sg)}</small>`:""}</span><b>${bMoneyI(s)}</b></button>`).join("")}</div>`).join(""):`<p class="note" style="margin:10px 2px 0">Log what you spend day to day. It counts against this month and its category.</p>`}`}
 /* the Budget tab's top tiles stick to the top while you scroll, shrinking to a slim bar */
 let bStOn=false,bStH=0;
@@ -6328,7 +6371,7 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
 document.addEventListener("input",e=>{if(e.target.id!=="beCo")return;const ct=document.querySelector("#bSheet .bsh-ct");if(ct)ct.hidden=!e.target.value.trim()});
 document.addEventListener("change",e=>{if(e.target.dataset&&e.target.dataset.bhome!=null){B().home=e.target.value;render();save();toast("Totals now in "+e.target.value)}});
 document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.dataset&&e.target.dataset.bxt){e.preventDefault();e.stopPropagation();e.target.click();return}if(e.key==="Enter"&&e.target.id==="beNG"){e.preventDefault();const a=document.querySelector("[data-bngadd]");a&&a.click();return}if(e.key==="Enter"&&e.target.id==="beNC"){e.preventDefault();const a=document.querySelector("[data-bncadd]");a&&a.click()}else if(e.key==="Escape"&&bEdit){bEdit=null;bSheet()}});
-document.addEventListener("submit",e=>{if(e.target.id!=="bsForm")return;e.preventDefault();const b=B(),a=mnyVal("bsAmt"),cu=mnyCur("bsAmt");if(!a){toast("Enter an amount");$("#bsAmt").focus();return}{const sel=$("#bsCat");bAddSg=sel&&sel.value!=="__new"?sel.value:bAddSg}bAddCur=cu;{const nt=$("#bsNote").value.trim(),o={id:uid(),d:today(),amt:a,cur:cu,note:nt,cat:"Other",sg:bAddSg||""};if(kBuy&&nt===kBuy.note){o.src="kitchen";o.dish=kBuy.id}kBuy=null;b.spends.push(o)}toast(fmtC(a,cu)+" added");render();save();setTimeout(()=>{const i=$("#bsAmt");i&&i.focus()},50)},true);
+document.addEventListener("submit",e=>{if(e.target.id!=="bsForm")return;e.preventDefault();const b=B(),a=mnyVal("bsAmt"),cu=mnyCur("bsAmt");if(!a){toast("Enter an amount");$("#bsAmt").focus();return}{const sel=$("#bsCat");bAddSg=sel&&sel.value!=="__new"?sel.value:bAddSg}bAddCur=cu;{const nt=$("#bsNote").value.trim(),o={id:uid(),d:today(),t:Date.now(),amt:a,cur:cu,note:nt,cat:"Other",sg:bAddSg||""};if(kBuy&&nt===kBuy.note){o.src="kitchen";o.dish=kBuy.id}kBuy=null;b.spends.push(o)}toast(fmtC(a,cu)+" added");render();save();setTimeout(()=>{const i=$("#bsAmt");i&&i.focus()},50)},true);
 
 function vTrain(){
   const d=D(),u=d.goals.unit,T=trStats(d),F=fitLevel(d),dv=T.lastVol?Math.round((T.vol-T.lastVol)/T.lastVol*100):null,lastW=T.WO.length?T.WO[T.WO.length-1]:null;
@@ -8869,7 +8912,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="636",APPT="2026-11-23T22:22:12Z";   /* APPT: when this update was made */
+const APPV="637",APPT="2026-11-23T22:26:21Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
