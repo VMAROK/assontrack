@@ -2293,6 +2293,24 @@ html.phone .tk-save-x{display:none}
 .pcat-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.pcat-top>.cat-bar{flex:0 1 auto;min-width:0;margin-bottom:0!important}
 .pcat-btns{margin-left:auto;display:flex;gap:8px}.pcat-btns .btn{padding:8px 16px;margin:0}
 .pcatp>.cat-mgr{margin-top:12px}
+.tkd{position:relative;border-bottom:1px solid rgba(var(--lrd),.7)}.tkd>.r{border-bottom:0;padding-left:30px}
+.tkd-open{position:absolute;left:0;top:14px;width:26px;height:26px;display:grid;place-items:center;border:0;background:none;color:var(--muted);cursor:pointer;z-index:2;transition:transform .2s}
+.tkd.open .tkd-open{transform:rotate(180deg)}
+.tkd-view{display:grid;gap:10px;padding:2px 0 16px 30px}
+.tkd-theater{position:relative;aspect-ratio:16/9;background:#000;overflow:hidden;display:grid;grid-template-columns:1fr;gap:2px;box-shadow:0 14px 30px -14px rgba(0,0,0,.9)}
+.tkd-theater.two{grid-template-columns:1fr 1fr}
+.tkd-pane{position:relative;overflow:hidden;background:#000;min-width:0}
+.tkd-pane video,.tkd-pane img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transform-origin:center}
+.tkd-theater iframe{width:100%;height:100%;border:0}
+.tkd-cap{font-size:11.5px;color:var(--muted)}
+.tkd-ctl{display:flex;align-items:center;gap:6px;margin-top:-4px}.tkd-pp{min-width:34px;height:30px;border:0;background:rgba(255,255,255,.1);color:var(--fg);cursor:pointer;font-size:13px}
+.tkd-pane{cursor:pointer}
+.tkd-gal{display:flex;gap:3px;overflow-x:auto;scrollbar-width:none}.tkd-gal::-webkit-scrollbar{display:none}
+.tkd-th{all:unset;position:relative;flex:0 0 96px;aspect-ratio:16/9;background:#111;cursor:pointer;overflow:hidden}
+.tkd-th img,.tkd-th video{width:100%;height:100%;object-fit:cover;display:block}.tkd-th .att-play svg{width:16px;height:16px}.tkd-th .att-yt::after{display:none}
+.tkd-notes{display:grid;gap:3px}.tkd-notes span{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.tkd-notes p{margin:0;padding:7px 9px;border-left:2px solid rgba(var(--lr),.3);background:rgba(0,0,0,.15);font-size:13.5px;white-space:pre-wrap;color:var(--fg)}.tkd-notes em{color:var(--muted)}
+.tkd-ro{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}.tkd-none{margin:0;font-size:13px;color:var(--muted)}
 /* add + compare: one slim icon row */
 .att-tools{display:flex;align-items:center;gap:3px;margin-top:3px}
 .att-ic{position:relative;display:grid;place-items:center;width:40px;height:34px;padding:0;border:0;border-radius:0;cursor:pointer;color:var(--fg);background:rgba(var(--lr),.1);transition:background .15s}
@@ -6884,7 +6902,7 @@ const attFind=id=>{for(const p of data.passions||[])for(const tk of p.tasks||[])
 /* side bar + top bar wear the exact colour of the panels: copy it from a real panel on screen */
 function barsSync(){const h=document.documentElement;if(!h.classList.contains("tpl-bars-pan"))return;const pn=document.querySelector("#view .panel:not(.kpan):not(.holopanel):not(.wallp)")||document.querySelector("#view .panel");if(!pn)return;
   const c=getComputedStyle(pn),r=h.style;r.setProperty("--bar-bg",c.backgroundColor);r.setProperty("--bar-bi",c.backgroundImage==="none"?"none":c.backgroundImage);const bf=c.backdropFilter||c.webkitBackdropFilter||"none";r.setProperty("--bar-bf",bf)}
-function attHydrate(){barsSync();attStages();document.querySelectorAll("img[data-attposter]").forEach(el=>{if(el.src||el.dataset.pw)return;el.dataset.pw=1;const a=attFind(el.dataset.attposter);if(a)attPoster(a).then(u=>{if(u)el.src=u;else el.closest(".att-t")&&el.closest(".att-t").classList.add("noposter")})});document.querySelectorAll("[data-attsrc]").forEach(el=>{if(el.src)return;const id=el.dataset.attsrc;const t=[...document.querySelectorAll("[data-attview]")].length;
+function attHydrate(){barsSync();try{tkDoneHydrate()}catch(_){}attStages();document.querySelectorAll("img[data-attposter]").forEach(el=>{if(el.src||el.dataset.pw)return;el.dataset.pw=1;const a=attFind(el.dataset.attposter);if(a)attPoster(a).then(u=>{if(u)el.src=u;else el.closest(".att-t")&&el.closest(".att-t").classList.add("noposter")})});document.querySelectorAll("[data-attsrc]").forEach(el=>{if(el.src)return;const id=el.dataset.attsrc;const t=[...document.querySelectorAll("[data-attview]")].length;
   for(const p of data.passions||[])for(const tk of p.tasks||[]){const a=(tk.att||[]).find(x=>x.id===id);if(a){attURL(a).then(u=>{if(u){el.src=u+(a.kind==="vid"?"#t="+((a.t0||0)+0.1).toFixed(1):"")}else el.closest(".att-t")&&el.closest(".att-t").classList.add("missing")});return}}});
   if(attView){const [tid,aid]=attView.split(":"),t=findTaskAny(tid),a=t&&(t.att||[]).find(x=>x.id===aid);let v=document.getElementById("attViewer");
     if(!a){attView=null;v&&v.remove();return}
@@ -7301,7 +7319,7 @@ function taskView(d,p){
        if(fx&&!fx.parent&&kidsOf(fx).length)return sub(fx,act);
        return act.map(card).join("")})()}</div>
      <div class="ph tk-sec solo" style="margin-top:20px"><span>Completed</span><i>${tm.done} on time${tm.missed?` · ${tm.missed} missed`:""}</i></div>
-     <div class="rows">${fin.length?fin.map(frow).join(""):`<div class="empty" style="padding:16px">Nothing completed yet</div>`}</div></div>
+     <div class="rows">${fin.length?fin.map(t=>`<div class="tkd${tkDoneSet.has(t.id)?" open":""}"><button type="button" class="tkd-open" data-tkdview="${t.id}" aria-expanded="${tkDoneSet.has(t.id)}" aria-label="View ${esc(t.title)}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>${frow(t)}${tkDoneSet.has(t.id)?tkDoneView(t):""}</div>`).join(""):`<div class="empty" style="padding:16px">Nothing completed yet</div>`}</div></div>
 </div>`;
 }
 
@@ -7366,6 +7384,30 @@ document.addEventListener("click",e=>{if(e.target&&e.target.matches&&e.target.ma
 /* category color: tap a swatch (or pick any color) — saved right away */
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-catcol]");if(!b)return;e.preventDefault();e.stopPropagation();const [id,col]=b.dataset.catcol.split("|"),c=cats().find(x=>x.id===id);if(!c)return;c.color=col;save();render()},true);
 document.addEventListener("change",e=>{const i=e.target.closest&&e.target.closest("[data-catcolin]");if(!i)return;const c=cats().find(x=>x.id===i.dataset.catcolin);if(!c)return;c.color=i.value;save();render()});
+/* finished tasks can be opened to look back at them: read-only media, notes, and the comparison shown in the theater */
+const tkDoneSet=new Set();
+function tkDoneView(t){const A=(t.att||[]).filter(a=>a.kind!=="yt"||ytId(a.url)),V=A.filter(a=>a.kind!=="yt");
+  const pane=a=>{if(!a)return "";const v=a.view||{},tf=`translate(${(v.x||0)*100}%,${(v.y||0)*100}%) scale(${v.s||1}) scaleX(${v.m?-1:1})`;
+    return `<div class="tkd-pane">${a.kind==="vid"?`<video data-dvsrc="${a.id}" playsinline webkit-playsinline preload="metadata" style="transform:${tf}"></video>`:`<img data-dvsrc="${a.id}" alt="" style="transform:${tf}">`}</div>`};
+  const two=V.length>=2,one=!two&&A[0];
+  return `<div class="tkd-view">
+    ${A.length?`<div class="tkd-theater${two?" two":""}">${two?pane(V[0])+pane(V[1]):one.kind==="yt"?`<iframe src="https://www.youtube-nocookie.com/embed/${ytId(one.url)}?playsinline=1&rel=0" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="YouTube video"></iframe>`:pane(one)}</div>
+      ${V.length&&!(one&&one.kind==="yt")?`<div class="tkd-ctl"><button type="button" class="tkd-pp" data-tkdplay aria-label="Play">▶</button><button type="button" class="tkd-pp" data-tkdback aria-label="Back to start">⟲</button>${two?`<span class="tkd-cap">Side by side${V.some(a=>a.view)?" · as you lined them up":""}</span>`:""}</div>`:""}
+      <div class="tkd-gal">${A.map(a=>`<button type="button" class="tkd-th" data-attview="${t.id}:${a.id}" aria-label="Open">${attThumb(a)}${a.t1!=null||a.view?`<span class="att-bdgs">${a.t1!=null?`<i>${ICO_CUT}</i>`:""}${a.view?`<i>${ICO_MOVE}</i>`:""}</span>`:""}</button>`).join("")}</div>`:`<p class="tkd-none">No media on this task.</p>`}
+    <div class="tkd-notes"><span>Notes</span><p>${t.note?esc(t.note):"<em>No notes.</em>"}</p></div>
+    <div class="tkd-ro">${ICO_LOCK} Finished · view only. Tap Undo to edit it again.</div></div>`}
+function tkDoneHydrate(){document.querySelectorAll("[data-dvsrc]").forEach(el=>{if(el.dataset.dvok)return;el.dataset.dvok=1;const a=attFind(el.dataset.dvsrc);if(!a)return;
+  attURL(a).then(u=>{if(!u)return;if(el.tagName==="IMG"){el.src=u;return}attPoster(a).then(pu=>{if(pu)el.poster=pu});const so=document.createElement("source");so.src=u;so.type=a.type||"video/mp4";el.appendChild(so);
+    const v=a.view||{};el.addEventListener("loadedmetadata",()=>{try{el.currentTime=v.at!=null?v.at:(a.t0||0)}catch(_){}el.playbackRate=v.sp||1},{once:true});el.addEventListener("play",()=>{el.playbackRate=v.sp||1});
+    if(a.t1!=null)el.addEventListener("timeupdate",()=>{if(el.currentTime>=a.t1)el.currentTime=a.t0||0});el.load()})})}
+/* finished-task theater: one button plays/pauses both sides; tapping a side plays/pauses just that one */
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tkdplay],[data-tkdback],.tkd-pane");if(!b)return;const vw=b.closest(".tkd-view");if(!vw)return;e.preventDefault();e.stopPropagation();
+  const V=[...vw.querySelectorAll("video[data-dvsrc]")],pb=vw.querySelector("[data-tkdplay]");
+  if(b.matches(".tkd-pane")){const v=b.querySelector("video");if(v)v.paused?v.play().catch(()=>{}):v.pause()}
+  else if(b.dataset.tkdback!==undefined)V.forEach(v=>{const a=attFind(v.dataset.dvsrc)||{};try{v.currentTime=a.view&&a.view.at!=null?a.view.at:(a.t0||0)}catch(_){}});
+  else{const go=V.every(v=>v.paused);V.forEach(v=>go?v.play().catch(()=>{}):v.pause())}
+  setTimeout(()=>{if(pb)pb.textContent=V.some(v=>!v.paused)?"❚❚":"▶"},60)},true);
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tkdview]");if(!b)return;e.preventDefault();e.stopPropagation();const id=b.dataset.tkdview;tkDoneSet.has(id)?tkDoneSet.delete(id):tkDoneSet.add(id);render()},true);
 let tkNew=false,tkFilter="all",addingPrj=false,prjFocus=null,addingSub=null,tkLastOpen=null;const tkOpen=new Set();
 const projOf=(d,p)=>(d.projects||[]).filter(x=>x.pid===p.id).sort((a,b)=>(a.created||0)-(b.created||0));
 const PRJC=["#4cc9ff","#b38cff","#ffb648","#2ee6c5","#ff7eb6","#8fd8ff"];
@@ -8354,7 +8396,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="561",APPT="2026-11-23T03:52:20Z";   /* APPT: when this update was made */
+const APPV="562",APPT="2026-11-23T04:07:11Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
