@@ -1352,7 +1352,8 @@ button,[role=button],a,input,select,label{touch-action:manipulation}@media (poin
 .nw-row.gopen .nw-gate,.nw-d.sel .nw-gate{transform:translateY(calc(-100% - 12px))}
 .nw-gate.opening{animation:nwOpen .6s cubic-bezier(.65,0,.35,1) both}.nw-gate.closing{animation:nwClose .55s cubic-bezier(.65,0,.35,1) both}
 @keyframes nwOpen{from{transform:translateY(0)}to{transform:translateY(calc(-100% - 12px))}}@keyframes nwClose{from{transform:translateY(calc(-100% - 12px))}to{transform:translateY(0)}}
-.nw-gl{position:absolute;left:10%;right:10%;bottom:0;height:1.5px;border-radius:2px;background:linear-gradient(90deg,transparent,rgba(var(--tL),.9) 20%,#e9f8ff 50%,rgba(var(--tL),.9) 80%,transparent);box-shadow:0 0 6px rgba(var(--tL),.9),0 0 14px rgba(var(--tL),.5);opacity:.55}
+/* bottom edge of the door now matches its top edge (thin faint white line); was: .nw-gl{position:absolute;left:10%;right:10%;bottom:0;height:1.5px;border-radius:2px;background:linear-gradient(90deg,transparent,rgba(var(--tL),.9) 20%,#e9f8ff 50%,rgba(var(--tL),.9) 80%,transparent);box-shadow:0 0 6px rgba(var(--tL),.9),0 0 14px rgba(var(--tL),.5);opacity:.55} */
+.nw-gl{position:absolute;left:4px;right:4px;bottom:2px;height:1px;border-radius:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);box-shadow:none;opacity:1}
 .nw-gs{display:none}
 .nw-gate.slam{animation:nwSlam .78s both;animation-delay:calc(var(--i)*55ms + .15s)}.nw-gate.slam .nw-gl{animation:nwThud .78s both;animation-delay:calc(var(--i)*55ms + .15s)}
 @keyframes nwSlam{0%{transform:translateY(-101%);animation-timing-function:cubic-bezier(.55,0,1,.45)}50%{transform:translateY(0);animation-timing-function:cubic-bezier(0,.55,.45,1)}66%{transform:translateY(-9%);animation-timing-function:cubic-bezier(.55,0,1,.45)}80%{transform:translateY(0);animation-timing-function:cubic-bezier(0,.55,.45,1)}90%{transform:translateY(-2.5%);animation-timing-function:cubic-bezier(.55,0,1,.45)}100%{transform:translateY(0)}}
@@ -8758,7 +8759,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="621",APPT="2026-11-23T09:51:28Z";   /* APPT: when this update was made */
+const APPV="622",APPT="2026-11-23T09:56:19Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
