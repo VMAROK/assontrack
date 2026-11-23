@@ -6133,7 +6133,7 @@ function bSheet(){let o=document.getElementById("bSheet");if(!bEdit){if(o){o.cla
       <div class="tp-lab">Color<div class="bsh-sw">${BPAL.map(c=>`<button type="button" data-becol="${c}" aria-pressed="${v.c===c}" style="--cc:${c}" aria-label="Color ${c}"></button>`).join("")}</div></div>${!isNew&&cnt?`<p class="note" style="margin:0">${cnt} item${cnt===1?"":"s"} in this category. Deleting it moves them to ${v.inc?"Other income":"Other"}.</p>`:""}`}
   o.innerHTML=`<div class="wp-box panel bsh" role="dialog" aria-label="Edit"><div class="wp-h">${h}<button type="button" class="x wp-x" data-bclose aria-label="Close">×</button></div><div class="bsh-g">${body}</div><div class="bsh-acts">${acts}<span style="flex:1"></span><button type="button" class="btn ghost" data-bclose>Cancel</button><button type="button" class="btn" data-bsave>Save</button></div></div>`}
 function bRead(){const e=bEdit;if(!e)return;const g=id=>{const x=document.getElementById(id);return x?x.value:null},num=s=>parseFloat(String(s||"").replace(/[^0-9.]/g,""))||0,v=e.v;
-  if(e.t==="item"){if(g("beName")!=null)v.name=g("beName").trim();if(g("beCo")!=null)v.co=g("beCo").trim();v.amt=mnyVal("beAmt");v.cur=mnyCur("beAmt");v.start=g("beStart")||"";if(g("beGrace")!=null){const ge=g("beGrace")||"";if(ge&&v.start&&ge>v.start)v.graceEnd=ge;else delete v.graceEnd}}
+  if(e.t==="item"){if(g("beName")!=null)v.name=g("beName").trim();if(g("beCo")!=null)v.co=g("beCo").trim();v.amt=mnyVal("beAmt");v.cur=mnyCur("beAmt");v.start=g("beStart")||"";if(g("beGrace")!=null){const ge=g("beGrace")||"";if(ge)v.graceEnd=ge;else delete v.graceEnd}}   /* was: silently dropped unless it came after the next charge date */
   else if(e.t==="spend"){v.amt=mnyVal("beAmt");v.cur=mnyCur("beAmt");v.d=g("beStart")||today();v.note=(g("beName")||"").trim()}
   else if(e.t==="grp"){v.n=(g("beName")||"").trim()}
   else{if(g("beName")!=null&&e.orig!=="Other"&&e.orig!=="Other income")v.n=g("beName").trim();v.lim=v.inc?0:mnyVal("beAmt")}}
@@ -6236,7 +6236,9 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(d.bpause!=null){bRead();bEdit.v.paused=!bEdit.v.paused;bSheet();return}
   if(d.bmutes!=null){bRead();bEdit.v.muted=!bEdit.v.muted;if(!bEdit.v.muted)delete bEdit.v.muted;bSheet();return}
   if(d.bsave!=null){bRead();const e=bEdit,v=e.v;
-    if(e.t==="item"){if(!v.name&&v.co)v.name=v.co;if(!v.name)return toast("Give it a name");if(!v.co)delete v.coTitle;if(!v.amt)return toast("Enter an amount");const i=b.items.findIndex(x=>x.id===v.id);if(i>=0)b.items[i]=v;else b.items.push(v);toast(bTitle(v)+" saved")}
+    if(e.t==="item"){if(!v.name&&v.co)v.name=v.co;if(!v.name)return toast("Give it a name");if(!v.co)delete v.coTitle;if(!v.amt)return toast("Enter an amount");
+      if(v.graceEnd&&v.kind!=="inc"){if(!v.start)return toast("Set the next charge date first, then the grace period");if(!["mo","qtr","yr"].includes(v.cyc)&&v.graceEnd<=v.start)return toast("The grace period has to end after the next charge date")}
+      const i=b.items.findIndex(x=>x.id===v.id);if(i>=0)b.items[i]=v;else b.items.push(v);toast(bTitle(v)+" saved")}
     else if(e.t==="grp"){if(!v.n)return toast("Give the group a name");const c=bCat(v.cat);if(!c)return;c.groups=c.groups||[];if(v.n!==e.orig&&c.groups.includes(v.n))return toast(v.n+" already exists");if(e.isNew)c.groups.push(v.n);else{c.groups=c.groups.map(x=>x===e.orig?v.n:x);b.items.forEach(i=>{if(bItCat(i)===v.cat&&i.grp===e.orig)i.grp=v.n})}toast(v.n+" saved")}
     else if(e.t==="spend"){if(!v.amt)return toast("Enter an amount");const i=b.spends.findIndex(x=>x.id===v.id);if(i>=0)b.spends[i]=v;else b.spends.push(v);toast("Expense saved")}
     else{if(!v.n)return toast("Give it a name");if(v.n!==e.orig&&bCat(v.n))return toast(v.n+" already exists");if(e.isNew){v.own=true;b.cats.push(v);bTab="all";bFlash=v.n}else{if(bTab==="c:"+e.orig)bTab="c:"+v.n;const c=bCat(e.orig);Object.assign(c,v);if(v.n!==e.orig){b.items.forEach(i=>{if(i.cat===e.orig)i.cat=v.n});b.spends.forEach(s=>{if(s.cat===e.orig)s.cat=v.n})}}toast(v.n+" saved")}
@@ -8785,7 +8787,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="626",APPT="2026-11-23T10:59:54Z";   /* APPT: when this update was made */
+const APPV="627",APPT="2026-11-23T11:03:33Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
