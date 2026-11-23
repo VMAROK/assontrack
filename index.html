@@ -1397,8 +1397,8 @@ html.tpl-bd-light.tpl-bd-light .panel:not(.kpan){border:1px solid rgba(255,255,2
 html.tpl-bd-dark.tpl-bd-dark .panel:not(.kpan){border:1px solid rgba(0,0,0,.7)!important}
 html.tpl-bd-none .panel::before,html.tpl-bd-none .panel::after,html.tpl-bd-light .panel::before,html.tpl-bd-light .panel::after,html.tpl-bd-dark .panel::before,html.tpl-bd-dark .panel::after{display:none!important}
 /* side bar + top bar follow the panels: darker panels darken them too; "No color" lets the wallpaper show through (the phone's bottom tab bar keeps its color) */
-html.tpl-dpan aside,html.tpl-dpan .topbar{box-shadow:inset 0 0 0 100vmax rgba(0,0,0,.6)!important}
-html.tpl-dpan.tpl-spa aside,html.tpl-dpan.tpl-spa .topbar{box-shadow:inset 0 0 0 100vmax rgba(12,5,2,.66)!important}
+html.tpl-dpan.tpl-dpan aside,html.tpl-dpan.tpl-dpan .topbar{box-shadow:inset 0 0 0 100vmax rgba(0,0,0,.6)!important}
+html.tpl-dpan.tpl-dpan.tpl-spa aside,html.tpl-dpan.tpl-dpan.tpl-spa .topbar{box-shadow:inset 0 0 0 100vmax rgba(12,5,2,.66)!important}
 html.tpl-bars-pan.tpl-bars-pan aside,html.tpl-bars-pan.tpl-bars-pan .topbar{background-color:var(--bar-bg)!important;background-image:var(--bar-bi)!important;-webkit-backdrop-filter:var(--bar-bf)!important;backdrop-filter:var(--bar-bf)!important}
 html.tpl-bars-clear.tpl-bars-clear:not(.phone) aside,html.tpl-bars-clear.tpl-bars-clear .topbar{background:transparent!important;background-image:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important}
 html.tpl-dpan .panel:not(.kpan){box-shadow:inset 0 0 0 100vmax rgba(0,0,0,.6),0 10px 30px -12px rgba(0,0,0,.6)!important}
@@ -8102,7 +8102,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="540",APPT="2026-11-23T01:39:55Z";   /* APPT: when this update was made */
+const APPV="541",APPT="2026-11-23T01:41:29Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
