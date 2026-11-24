@@ -3030,6 +3030,9 @@ html.tablet.tablet .navbtn:is([data-tab="dash"],[data-tab="fuel"],[data-tab="bud
 #view.tab-in>*{animation:tabIn .5s cubic-bezier(.22,.8,.28,1) both}
 #view.tab-in>*:nth-child(2){animation-delay:.05s}#view.tab-in>*:nth-child(3){animation-delay:.1s}#view.tab-in>*:nth-child(4){animation-delay:.15s}#view.tab-in>*:nth-child(5){animation-delay:.2s}#view.tab-in>*:nth-child(n+6){animation-delay:.24s}
 @media (prefers-reduced-motion:reduce){#view.tab-in>*{animation:none}}
+/* iPad portrait Budget: tiles + Where it goes 100px in each side (on screen); the calendar panel is scaled down whole (not squeezed) to the same width */
+@media (max-width:1099px){html.tablet:not(.phone) #view[data-tab="budget"]>:is(.bstick,.bstick-s,.bwg-solo){margin-left:144px!important;margin-right:144px!important;max-width:none}
+html.tablet:not(.phone) #view[data-tab="budget"]>.bm-has{zoom:var(--calz,.74);margin-left:auto!important;margin-right:auto!important;max-width:none!important;box-sizing:border-box}}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9437,7 +9440,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="750",APPT="2026-11-24T05:16:02Z";   /* APPT: when this update was made */
+const APPV="751",APPT="2026-11-24T05:23:33Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -9585,5 +9588,9 @@ if("serviceWorker" in navigator&&location.protocol==="https:"){addEventListener(
 <script>/* side tabs: remember hidden/shown */
 (()=>{try{if(localStorage.getItem("aot-navmini")==="1")document.documentElement.classList.add("nav-mini")}catch(_){}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-navside]");if(!b)return;e.preventDefault();e.stopPropagation();const on=document.documentElement.classList.toggle("nav-mini");try{localStorage.setItem("aot-navmini",on?"1":"0")}catch(_){}},true)})();
+</script>
+<script>/* portrait Budget: work out how much to scale the calendar panel so it's exactly as wide as the tiles */
+(()=>{let t=0;const fit=()=>{t=0;const v=document.getElementById("view");if(!v||v.dataset.tab!=="budget"||!document.documentElement.classList.contains("tablet")||innerWidth>=1100)return;const c=v.querySelector(":scope>.bm-has"),r=v.querySelector(":scope>.bstick");if(!c||!r)return;const cs=getComputedStyle(v),full=v.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight),z=r.offsetWidth/full;if(z>0&&Math.abs((parseFloat(getComputedStyle(c).getPropertyValue("--calz"))||0)-z)>.002)c.style.setProperty("--calz",z.toFixed(4));const w=Math.round(full)+"px";if(c.style.width!==w)c.style.width=w};
+  new MutationObserver(()=>{if(!t)t=requestAnimationFrame(fit)}).observe(document.documentElement,{childList:true,subtree:true});addEventListener("resize",()=>{if(!t)t=requestAnimationFrame(fit)})})();
 </script>
 </body></html>
