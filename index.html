@@ -4044,7 +4044,7 @@ function dashStats(d,ds){
     Bu={k:"Budget",c:"#ffc533",d:"#b98a00",f:inc?out/inc:0,v:inc?[bMoney(out,0),bMoney(inc,0)]:"no income set",over:inc&&out>inc};
   return [N,P,Bu]}
 /* the ? next to each name: how that bar is worked out */
-const DPH={Nutrition:"Resets every day. Calories you ate that day against that day's calorie limit.",Passions:"Never resets: it keeps going for as long as your passions do. Every passion counts the same: time you logged against its goal.",Budget:"Worked out by the month: this month's spending against this month's income. It never resets: money carries on from month to month."};
+const DPH={Nutrition:"Today's calories vs. your daily limit. Starts fresh every morning.",Passions:"How close each passion is to its goal, averaged. Keeps counting — never resets.",Budget:"This month's spending vs. income. Money carries over month to month."};
 const DPQ=k=>`<button type="button" class="dp-q" data-dpq="${k}" aria-label="How ${k} is worked out">?</button>`;
 document.addEventListener("click",e=>{const q=e.target.closest&&e.target.closest("[data-dpq]"),old=document.querySelector(".dp-tip");if(!q){if(old&&!e.target.closest(".dp-tip"))old.remove();return}e.preventDefault();e.stopPropagation();const same=old&&old.dataset.k===q.dataset.dpq;old&&old.remove();if(same)return;
   const t=document.createElement("div");t.className="dp-tip";t.dataset.k=q.dataset.dpq;t.setAttribute("role","tooltip");t.innerHTML=`<b>${q.dataset.dpq}</b>${esc(DPH[q.dataset.dpq]||"")}`;document.body.appendChild(t);const r=q.getBoundingClientRect(),w=t.offsetWidth;let x=r.left-12,y=r.bottom+8;x=Math.max(10,Math.min(innerWidth-w-10,x));if(y+t.offsetHeight>innerHeight-10)y=r.top-t.offsetHeight-8;t.style.left=x+"px";t.style.top=y+"px"},true);
@@ -9278,7 +9278,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="701",APPT="2026-11-24T01:41:45Z";   /* APPT: when this update was made */
+const APPV="702",APPT="2026-11-24T01:43:41Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
