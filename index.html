@@ -6266,7 +6266,7 @@ function bDayPop(b,ds,SE,SS,T,inl){const H=bHome(),inc=SE.filter(i=>i.kind==="in
     <div class="bdw-h"><div><b>${bDate(ds).toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</b>${ds===T?"<small>Today</small>":""}</div>${inl?"":`<button type="button" class="bdw-x" data-bdwx aria-label="Close">×</button>`}</div>
     <!-- was four totals (In / Charged / Spent / Net): <div class="bdw-t"><div class="pos"><small>In</small><b>+${bMoney(inT)}</b></div><div class="neg"><small>Charged</small><b>−${bMoney(fxT)}</b></div><div class="neg"><small>Spent</small><b>−${bMoney(spT)}</b></div><div class="${net<0?"neg":"pos"}"><small>Net</small><b>${net<0?"−":"+"}${bMoney(Math.abs(net))}</b></div></div> -->
     ${(()=>{const t=bDayTot(b,ds,SE,SS);return `<div class="bdw-tot ${bSignC(t.now)}"><small>Total</small><b>${bSignM(t.now)}</b></div>`})()}
-    ${SE.length?`<p class="bdw-hint">${SE.some(i=>!bIsPaid(b,i,ds))?"Tap each one to cross it off once it's paid or received.":"All crossed off ✓ · tap one to undo"}</p>`:""}${SE.length||SS.length?sec("Income",inc,row)+sec("",out,row)/* "Charged" heading removed */+sec("Spent",SS,srow):`<p class="note" style="margin:14px 2px 4px">Nothing charged, paid in or spent this day.</p>`}
+    ${""/* hint caption removed (Budget + Dashboard) — the checkboxes say it */}${SE.length||SS.length?sec("Income",inc,row)+sec("",out,row)/* "Charged" heading removed */+sec("Spent",SS,srow):`<p class="note" style="margin:14px 2px 4px">Nothing charged, paid in or spent this day.</p>`}
     ${SE.length?(()=>{const t=bDayTot(b,ds,SE,SS);return `<div class="bdw-all ${bSignC(t.all)}"><small>Total when everything's paid</small><b>${bSignM(t.all)}</b></div>`})():""}
   </div>${inl?"":"</div>"}`}
 function bCard(it){const m=bMo(it),nx=it.paused?null:bNext(it),dd=nx?bDays(nx):null,c=bCol(bItCat(it)),cy=(BCYC.find(x=>x[0]===it.cyc)||BCYC[1])[1];
@@ -9305,7 +9305,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="709",APPT="2026-11-24T02:02:32Z";   /* APPT: when this update was made */
+const APPV="710",APPT="2026-11-24T02:04:01Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
