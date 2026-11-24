@@ -3077,8 +3077,8 @@ html body #view .bdn-leg>span{flex:none;white-space:nowrap}
 @media (min-width:1100px){html.tablet:not(.phone) .shell::after{display:none}}
 /* tab bar: hold a tab, then drag it to reorder */
 aside .navtog{order:-1}aside .side-foot{order:99}
-aside .navbtn.nav-drag{z-index:5;transform:scale(1.08);opacity:.92;box-shadow:0 0 0 2px rgba(var(--lr),.5),0 8px 22px rgba(0,0,0,.5);border-radius:10px;transition:transform .15s}
-aside.nav-dragging .navbtn:not(.nav-drag){transition:transform .2s}
+/* was lifted: aside .navbtn.nav-drag{z-index:5;transform:scale(1.08);opacity:.92;box-shadow:0 0 0 2px rgba(var(--lr),.5),0 8px 22px rgba(0,0,0,.5);border-radius:10px;transition:transform .15s} */
+aside .navbtn.nav-drag{position:relative;z-index:5;background:rgba(var(--tA),.35)!important;box-shadow:inset 0 0 0 1px rgba(var(--lr),.45);border-radius:10px}
 aside.nav-dragging{touch-action:none}
 aside>.navbtn{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}aside>.navbtn:is([data-tab="fuel"],[data-tab="pass"],[data-tab="budget"]){touch-action:none}
 /* Dashboard This week: coloured by tab, not by what's inside — Passions purple, Budget gold, events sky blue; done stays green, missed red */
@@ -9514,7 +9514,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="768",APPT="2026-11-24T06:34:52Z";   /* APPT: when this update was made */
+const APPV="769",APPT="2026-11-24T06:38:12Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -9681,12 +9681,17 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   let hold=0,drag=null,sx=0,sy=0,moved=false,justDragged=false;
   const vert=()=>{const L=cur();if(L.length<2)return false;const r0=L[0].getBoundingClientRect(),r1=L[1].getBoundingClientRect();return Math.abs(r1.left-r0.left)<Math.abs(r1.top-r0.top)};/* laid out top-to-bottom (iPad sidebar) or side by side (tab bar) */
   document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("aside>.navbtn");if(!b||!MOV.includes(b.dataset.tab))return;sx=e.clientX;sy=e.clientY;moved=false;clearTimeout(hold);
-    hold=setTimeout(()=>{drag={b,id:e.pointerId};b.classList.add("nav-drag");A().classList.add("nav-dragging");try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}},450)},true);
+    hold=setTimeout(()=>{const v=vert(),a=A(),ar=a.getBoundingClientRect(),k=(v?ar.height/(a.offsetHeight||1):ar.width/(a.offsetWidth||1))||1;const lp=v?(sy-ar.top)/k+a.scrollTop:(sx-ar.left)/k+a.scrollLeft;drag={b,id:e.pointerId,v,k,grab:lp-(v?b.offsetTop:b.offsetLeft)};b.style.transition="none";b.classList.add("nav-drag");a.classList.add("nav-dragging");try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}},450)},true);
   document.addEventListener("pointermove",e=>{if(!drag){if(hold&&Math.hypot(e.clientX-sx,e.clientY-sy)>8){clearTimeout(hold);hold=0}return}
-    e.preventDefault();moved=true;const v=vert(),p=v?e.clientY:e.clientX,L=cur();const others=L.filter(x=>x!==drag.b);
-    let idx=others.findIndex(x=>{const r=x.getBoundingClientRect();return p<(v?r.top+r.height/2:r.left+r.width/2)});if(idx<0)idx=others.length;
-    others.splice(idx,0,drag.b);others.forEach((x,i)=>x.style.order=10+i)},{capture:true,passive:false});
-  const end=()=>{clearTimeout(hold);hold=0;if(!drag)return;drag.b.classList.remove("nav-drag");A().classList.remove("nav-dragging");
+    /* smooth: the tab slides with the finger along the bar (not lifted); the others glide out of its way */
+    e.preventDefault();moved=true;const v=drag.v,a=A(),ar=a.getBoundingClientRect(),lp=v?(e.clientY-ar.top)/drag.k+a.scrollTop:(e.clientX-ar.left)/drag.k+a.scrollLeft,pos=x=>v?x.offsetTop:x.offsetLeft,sz=x=>v?x.offsetHeight:x.offsetWidth;
+    const L=cur(),others=L.filter(x=>x!==drag.b),c=lp-drag.grab+sz(drag.b)/2;
+    let idx=others.findIndex(x=>c<pos(x)+sz(x)/2);if(idx<0)idx=others.length;
+    const want=[...others];want.splice(idx,0,drag.b);
+    if(want.some((x,i)=>x!==L[i])){const before=new Map(others.map(x=>[x,pos(x)]));want.forEach((x,i)=>x.style.order=10+i);
+      others.forEach(x=>{const d=before.get(x)-pos(x);if(!d)return;x.style.transition="none";x.style.transform=v?`translateY(${d}px)`:`translateX(${d}px)`;void x.offsetWidth;x.style.transition="transform .22s cubic-bezier(.2,.8,.3,1)";x.style.transform=""})}
+    const off=lp-drag.grab-pos(drag.b);drag.b.style.transform=v?`translateY(${off}px)`:`translateX(${off}px)`},{capture:true,passive:false});
+  const end=()=>{clearTimeout(hold);hold=0;if(!drag)return;const db=drag.b;db.style.transition="transform .2s cubic-bezier(.2,.8,.3,1)";db.style.transform="";setTimeout(()=>{db.style.transition="";db.classList.remove("nav-drag")},220);A().classList.remove("nav-dragging");
     const o=cur().map(x=>x.dataset.tab);try{localStorage.setItem(K,JSON.stringify(o))}catch(_){}
     justDragged=true;setTimeout(()=>justDragged=false,350);drag=null};
   document.addEventListener("pointerup",end,true);document.addEventListener("pointercancel",end,true);
