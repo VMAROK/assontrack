@@ -2929,6 +2929,7 @@ html #view .bstrip,html #view .calhead.cal-c{border-bottom:0!important}   /* no 
 .wtr-sum>.wtr-hi{border-color:rgba(255,94,108,.7)!important;box-shadow:0 0 14px rgba(255,94,108,.45),inset 0 0 12px rgba(255,94,108,.15);animation:wtrPulse 2.4s ease-in-out infinite}.wtr-sum>.wtr-hi b{text-shadow:0 0 10px rgba(255,94,108,.7)}.wtr-sum>.wtr-hi em{color:#ff8a95!important}
 .wtr-sum>.wtr-lo{border-color:rgba(255,159,67,.7)!important;box-shadow:0 0 14px rgba(255,159,67,.4),inset 0 0 12px rgba(255,159,67,.12);animation:wtrPulse 2.4s ease-in-out infinite}.wtr-sum>.wtr-lo b{text-shadow:0 0 10px rgba(255,159,67,.7)}.wtr-sum>.wtr-lo em{color:#ffb878!important}
 @keyframes wtrPulse{50%{box-shadow:0 0 6px rgba(255,255,255,0),inset 0 0 6px rgba(255,255,255,0)}}
+.nmp .nm-prog{display:none!important}   /* calories bar above the meals removed — calories already shown elsewhere */
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9325,7 +9326,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="714",APPT="2026-11-24T02:15:55Z";   /* APPT: when this update was made */
+const APPV="715",APPT="2026-11-24T02:17:04Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
