@@ -3425,14 +3425,14 @@ html:is(.tpl-vt,.tpl-stipple):not(.x1):not(.x2):not(.x3) body #view .panel.hasSt
 html:is(.tpl-vt,.tpl-stipple):not(.tpl-bd-none):not(.tpl-bd-dark) body #view .panel.hasStrip::after{border-color:var(--vline)!important;border-top-color:var(--vline)!important;border-radius:var(--vr,14px)!important}
 html:is(.tpl-vt,.tpl-stipple).tpl-bd-dark body #view .panel.hasStrip::after{border-color:rgba(0,0,0,.7)!important}
 html.tpl-sharp:is(.tpl-vt,.tpl-stipple) body #view .panel.hasStrip::after{border-radius:0!important}
-/* visual templates matched to the mockups: panels are a faint lighter glass over the page (not darker), hairline borders in a soft neutral tone */
-html.tpl-stipple{--vlift:24,25,28;--vline:rgba(255,255,255,.1)}
-html.tpl-silk{--vlift:44,50,78;--vline:rgba(200,210,255,.09)}
-html.tpl-chrome{--vlift:60,61,61;--vline:rgba(255,255,255,.13)}
-html.tpl-pyramid{--vlift:60,50,44;--vline:rgba(255,220,180,.11)}
-html.tpl-bronze{--vlift:50,42,38;--vline:rgba(255,215,190,.1)}
-html.tpl-flow{--vlift:24,25,28;--vline:rgba(255,255,255,.1);--vr:2px}/* Threads panels = Stipple panels */
-html.tpl-flowmono{--vlift:24,25,28;--vline:rgba(255,255,255,.1);--vr:2px}
+/* visual templates matched to the mockups: panels are the mockups' own card colour, nearly solid (Chrome: frosted glass), hairline borders (v829 had them far too see-through) */
+html.tpl-stipple{--vlift:13,14,16;--vline:rgba(255,255,255,.12)}
+html.tpl-silk{--vlift:17,19,30;--vline:rgba(190,200,255,.14)}
+html.tpl-chrome{--vlift:34,35,36;--vline:rgba(255,255,255,.16)}
+html.tpl-pyramid{--vlift:27,23,20;--vline:rgba(255,215,170,.16)}
+html.tpl-bronze{--vlift:17,14,13;--vline:rgba(255,210,180,.14)}
+html.tpl-flow{--vlift:13,14,16;--vline:rgba(255,255,255,.12);--vr:2px}/* Threads panels = Stipple panels */
+html.tpl-flowmono{--vlift:13,14,16;--vline:rgba(255,255,255,.12);--vr:2px}
 html.tpl-vt.tpl-vt #view .panel,html.tpl-stipple.tpl-stipple #view .panel{background:color-mix(in srgb,color-mix(in srgb,rgb(var(--va,170,161,226)) var(--vtd,3%),rgb(var(--vlift))) calc(var(--vta,.15)*100%),transparent)!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
@@ -9526,13 +9526,13 @@ const TEMPLATES=[{id:"spa",name:"Spa",sub:"Warm orange ambience, soft glass, slo
   {id:"midnight",name:"Midnight",sub:"Flat deep navy, clean blue accents",look:{color:"blue",glass:0,tone:50},bg:true,plain:true},
   {id:"slate",name:"Slate",sub:"Soft grey-blue, low contrast, easy on the eyes",look:{color:"graphite",glass:0,tone:50},bg:true,plain:true},
   /* visual templates: a whole designed look (backdrop + surfaces + type); panels and layout stay the same */
-  {id:"stipple",name:"Stipple",sub:"Near-black, fine drifting dots, quiet lavender",look:{color:"graphite",glass:0,trans:85,tone:10},bg:true,plain:true,visual:true},
-  {id:"silk",name:"Violet Silk",sub:"Deep indigo, glowing violet silk waves",look:{color:"dream",glass:10,trans:84,tone:10},bg:true,plain:true,visual:true,vt:true},
-  {id:"chrome",name:"Liquid Chrome",sub:"Black and silver, slow molten chrome",look:{color:"graphite",glass:45,trans:55,tone:10},bg:true,plain:true,visual:true,vt:true},
-  {id:"bronze",name:"Bronze Ribbon",sub:"Warm black, glowing bronze silk",look:{color:"gold",glass:10,trans:80,tone:10},bg:true,plain:true,visual:true,vt:true},
-  {id:"pyramid",name:"Pyramids",sub:"Golden pyramids in moving light",look:{color:"gold",glass:10,trans:80,tone:10},bg:true,plain:true,visual:true,vt:true},
-  {id:"flow",name:"Threads",sub:"Faint silk threads flowing like wind",look:{color:"blue",glass:0,trans:85,tone:10},bg:true,plain:true,visual:true,vt:true},
-  {id:"flowmono",name:"Threads · Mono",sub:"White threads on deep black",look:{color:"graphite",glass:0,trans:85,tone:10},bg:true,plain:true,visual:true,vt:true}];
+  {id:"stipple",name:"Stipple",sub:"Near-black, fine drifting dots, quiet lavender",look:{color:"graphite",glass:0,trans:8,tone:10},bg:true,plain:true,visual:true},
+  {id:"silk",name:"Violet Silk",sub:"Deep indigo, glowing violet silk waves",look:{color:"dream",glass:10,trans:10,tone:10},bg:true,plain:true,visual:true,vt:true},
+  {id:"chrome",name:"Liquid Chrome",sub:"Black and silver, slow molten chrome",look:{color:"graphite",glass:70,trans:40,tone:10},bg:true,plain:true,visual:true,vt:true},
+  {id:"bronze",name:"Bronze Ribbon",sub:"Warm black, glowing bronze silk",look:{color:"gold",glass:10,trans:12,tone:10},bg:true,plain:true,visual:true,vt:true},
+  {id:"pyramid",name:"Pyramids",sub:"Golden pyramids in moving light",look:{color:"gold",glass:10,trans:12,tone:10},bg:true,plain:true,visual:true,vt:true},
+  {id:"flow",name:"Threads",sub:"Faint silk threads flowing like wind",look:{color:"blue",glass:0,trans:8,tone:10},bg:true,plain:true,visual:true,vt:true},
+  {id:"flowmono",name:"Threads · Mono",sub:"White threads on deep black",look:{color:"graphite",glass:0,trans:8,tone:10},bg:true,plain:true,visual:true,vt:true}];
 const tplOf=()=>{const t=(data.profile||{}).template;return TEMPLATES.find(x=>x.id===(t===undefined?"midnight":t))||null};/* never picked = Midnight (default for new visitors); "" = picked no template. was: TEMPLATES.find(t=>t.id===(data.profile||{}).template)||null */
 const tplBgOn=()=>{const t=tplOf();return !!(t&&t.bg&&(data.profile||{}).tplBg!==false)};
 const effLook=()=>{const g=lookOf(),pl=passLook()||{},T=tplOf();if(T)return T.visual?Object.assign({color:g.color,glass:g.glass,trans:g.trans,tone:g.tone??50},T.look,((data.profile||{}).vtLook||{})[T.id]||{})/* visual: its designed panels (from the mockups) + your tweaks for that template */:Object.assign({color:g.color,glass:g.glass,trans:g.trans,tone:g.tone??50},T.look,{glass:g.glass,trans:g.trans,tone:g.tone??50});/* your Blur / Transparency / Color depth stay the same on every template (no per-template defaults; was: T.look,(data.profile||{}).tplLook) *//* + your slider changes on top of the template (tplLook resets when you pick a template) */return {color:pl.color||g.color,glass:pl.glass??g.glass,trans:pl.trans??g.trans,tone:pl.tone??g.tone??50}};
@@ -9901,7 +9901,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="830",APPT="2026-11-24T17:45:32Z";   /* APPT: when this update was made */
+const APPV="831",APPT="2026-11-24T17:47:13Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
