@@ -3118,6 +3118,14 @@ html:not(.phone) body #view[data-tab="dash"]>.dcal-row>.cal-evp{width:auto!impor
 html.tpl-bd-none body #view[data-tab="dash"]>.dcal-row>.cal-evp{border-color:transparent!important}html.tpl-bd-dark body #view[data-tab="dash"]>.dcal-row>.cal-evp{border-color:rgba(0,0,0,.7)!important}
 html.tpl-sharp body #view[data-tab="dash"]>.dcal-row>.cal-evp{border-radius:0!important}
 html:not(.phone) body #view[data-tab="dash"]>.dcal-row>.cal-evp .f2{grid-template-columns:minmax(0,1fr)!important}}
+/* Dashboard calendar: a band across the top of every day, behind its number (part of the day box itself, so it can't drift when the iPad turns) */
+html body #view .mcal .mc:not(.mc-blank){position:relative}
+html body #view .mcal .mc:not(.mc-blank)::before{content:"";position:absolute;left:0;right:0;top:0;height:37px;background:rgba(0,0,0,.18);pointer-events:none;z-index:0}
+html.phone body #view .mcal .mc:not(.mc-blank)::before{height:35px}
+html body #view .mcal .mc:not(.mc-blank)>*{position:relative;z-index:1}
+/* the day's list gets a fixed box under the band (iPad Safari didn't give it a height, so it grew, got clipped and couldn't scroll) */
+html body #view .mcal .mc:not(.mc-blank)>.chips.chips{position:absolute!important;top:40px;left:7px;right:7px;bottom:4px;width:auto!important;margin:0!important;max-height:none!important}
+html.phone body #view .mcal .mc:not(.mc-blank)>.chips.chips{top:37px;left:3px;right:3px;bottom:3px}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9534,7 +9542,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="778",APPT="2026-11-24T06:59:51Z";   /* APPT: when this update was made */
+const APPV="779",APPT="2026-11-24T07:07:21Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
