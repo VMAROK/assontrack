@@ -3955,10 +3955,17 @@ let dpV=null;const dpView=()=>{if(dpV==null){try{dpV=localStorage.getItem("aot-d
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-dpv]");if(!b)return;e.preventDefault();e.stopPropagation();dpV=b.dataset.dpv;try{localStorage.setItem("aot-dpv",dpV)}catch(_){}const v=$("#view"),st=v?v.scrollTop:0;render();if(v)v.scrollTop=st},true);
 function dashStats(d,ds){
   const k=d.meals.filter(m=>m.d===ds).reduce((a,m)=>a+(+m.kcal||0),0),L=+kLim(ds)||0;
-  const done=d.sessions.filter(s=>s.d===ds&&!s.planned).reduce((a,s)=>a+(+s.mins||0),0);let plan=0;try{plan=slotsOn(d,ds).reduce((a,x)=>a+(+slotMins(x.slot)||0),0)}catch(_){}
+  const done=d.sessions.filter(s=>s.d===ds&&!s.planned).reduce((a,s)=>a+(+s.mins||0),0);
+  /* Passions with several passions: each passion that has something due counts the same (a 3-hour one can't drown out a 20-minute one).
+     A passion's progress = its time logged ÷ its goal, capped at 100%: day slots use that day's minutes; weekly/monthly goals use what's logged so far that week/month.
+     The Passions bar is the average of those. Nothing due but time logged → 100%. */
+  const PP=new Map(),add=(p,got,goal)=>{if(!goal)return;const o=PP.get(p.id)||{got:0,goal:0};o.got+=got;o.goal+=goal;PP.set(p.id,o)};
+  try{slotsOn(d,ds).forEach(x=>{const got=d.sessions.filter(s=>s.d===ds&&s.pid===x.p.id&&!s.planned).reduce((a,s)=>a+(+s.mins||0),0);add(x.p,Math.min(got,slotMins(x.slot)),+slotMins(x.slot)||0)})}catch(_){}
+  try{wkOn(d,ds).forEach(x=>add(x.p,Math.min(+x.lg||0,+x.slot.dur||0),+x.slot.dur||0))}catch(_){}
+  const PL=[...PP.values()],pf=PL.length?PL.reduce((a,o)=>a+Math.min(1,o.got/o.goal),0)/PL.length:done?1:0,pOk=PL.filter(o=>o.got>=o.goal).length;
   let out=0,inc=0;try{const S=bStats();out=S.subs+S.bills+S.spent;inc=S.inc}catch(_){}
   const N={k:"Nutrition",c:"#4cc9ff",d:"#1b86b8",f:L?k/L:0,v:L?`${n0(k)} / ${n0(L)} cal`:`${n0(k)} cal`,over:L&&k>L},
-    P={k:"Passions",c:"#ffb648",d:"#c9771a",f:plan?done/plan:done?1:0,v:plan?`${fmtH(done)} / ${fmtH(plan)}`:done?fmtH(done):"nothing planned",over:false},
+    P={k:"Passions",c:"#b99cff",d:"#7d5fd6",f:pf,v:PL.length?`${pOk} / ${PL.length} on goal`:done?fmtH(done)+" logged":"nothing planned",over:false},
     Bu={k:"Budget",c:"#ffc533",d:"#b98a00",f:inc?out/inc:0,v:inc?`${bMoney(out,0)} / ${bMoney(inc,0)}`:"no income set",over:inc&&out>inc};
   return [N,P,Bu]}
 function dashProg(d,ds){const A=dashStats(d,ds),cl=x=>Math.max(0,Math.min(1,x));
@@ -9174,7 +9181,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="677",APPT="2026-11-24T00:25:40Z";   /* APPT: when this update was made */
+const APPV="678",APPT="2026-11-24T00:26:53Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
