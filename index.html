@@ -3530,6 +3530,13 @@ html.tpl-stipple.tpl-stipple body #view .panel.panel.dtiles::after{border-left-c
 /* side panel: temporary review bells and green "done" checks removed (user, Nov 24) — badge rules above kept, buttons marked data-wasdone */
 .navbtn::before{content:none!important;display:none!important}
 .navbtn[data-tab="fuel"]::after,.navbtn[data-tab="budget"]::after{content:none!important;display:none!important}
+/* side panel: the top arrow is gone (it took a whole row). Close/open by swiping the panel left/right, or tapping the slim grip on its right edge */
+html.tablet.tablet aside .navtog{display:none!important}
+.navgrip{display:none}
+html.tablet aside{position:relative}
+html.tablet .navgrip{display:block;position:absolute;top:50%;right:3px;width:14px;height:56px;margin-top:-28px;padding:0;border:0;background:none;cursor:pointer;z-index:5;-webkit-tap-highlight-color:transparent}
+html.tablet .navgrip::after{content:"";position:absolute;left:5px;top:8px;width:4px;height:40px;border-radius:2px;background:rgba(255,255,255,.22);transition:background .2s,height .2s,top .2s}
+html.tablet .navgrip:hover::after,html.tablet .navgrip:active::after{background:rgba(255,255,255,.45);height:48px;top:4px}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9997,7 +10004,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="847",APPT="2026-11-24T23:15:49Z";   /* APPT: when this update was made */
+const APPV="848",APPT="2026-11-24T23:17:42Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -10375,5 +10382,10 @@ void main(){vec2 uv=gl_FragCoord.xy/R;float a=R.x/R.y;vec2 p=vec2(uv.x*a,uv.y);f
       for(const [p,v] of [[g.TEXTURE_MIN_FILTER,g.LINEAR],[g.TEXTURE_MAG_FILTER,g.LINEAR],[g.TEXTURE_WRAP_S,g.CLAMP_TO_EDGE],[g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE]])g.texParameteri(g.TEXTURE_2D,p,v);
       size();h.classList.add("vt-img");raf=requestAnimationFrame(loop)};im.src=VTIMG[want]};
   new MutationObserver(check).observe(document.documentElement,{attributes:true,attributeFilter:["class"]});addEventListener("resize",()=>{if(cur)size()});check()})();
+</script>
+<script>/* side panel grip + swipe (replaces the top arrow): tap the grip, or swipe the panel left to tuck it to icons and right to open it */
+(()=>{const add=()=>{const a=document.querySelector("aside");if(!a)return setTimeout(add,400);if(!a.querySelector(".navgrip")){const g=document.createElement("button");g.type="button";g.className="navgrip";g.setAttribute("data-navside","");g.setAttribute("aria-label","Hide or show the tabs");a.appendChild(g)}
+  let x0=null,y0=0;a.addEventListener("touchstart",e=>{const t=e.touches[0];x0=t.clientX;y0=t.clientY},{passive:true});
+  a.addEventListener("touchend",e=>{if(x0==null)return;const t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;x0=null;if(Math.abs(dx)<50||Math.abs(dx)<Math.abs(dy)*1.5)return;const h=document.documentElement;if(!h.classList.contains("tablet"))return;const mini=h.classList.contains("nav-mini");if((dx<0&&!mini)||(dx>0&&mini)){h.classList.toggle("nav-mini");try{localStorage.setItem("aot-navmini",mini?"0":"1")}catch(_){}}},{passive:true})};add()})();
 </script>
 </body></html>
