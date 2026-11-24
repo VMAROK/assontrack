@@ -143,7 +143,7 @@
 <!-- opening screen: five styles (Settings → Opening screen); drawn at the screen's full pixel density so it stays sharp -->
 <!-- was: a single "Specks" opening screen (v784) — its look is style 1 below -->
 <style>
-#aotSplash{position:fixed;inset:0;z-index:2147483000;overflow:hidden;background:#0a0f1e;transition:opacity .9s cubic-bezier(.4,0,.2,1),visibility 0s linear .9s;-webkit-user-select:none;user-select:none}
+#aotSplash{position:fixed;inset:0;bottom:auto;height:var(--apph,100%);z-index:2147483000;overflow:hidden;background:#0a0f1e;transition:opacity .9s cubic-bezier(.4,0,.2,1),visibility 0s linear .9s;-webkit-user-select:none;user-select:none}
 #aotSplash.out{opacity:0;visibility:hidden;pointer-events:none}
 #aotSplash canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 #aotSplash .sp-grain{position:absolute;inset:-50%;opacity:.06;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");animation:spGr 1s steps(4) infinite}
@@ -162,6 +162,11 @@
 #aotSplash .sp-mid.on .sp-line i{width:100%;transition:width 1.6s .1s cubic-bezier(.6,0,.2,1)}
 @media (prefers-reduced-motion:reduce){#aotSplash .sp-grain{animation:none}}
 </style>
+<script>/* home-screen app on iPhone/iPad: iOS reports a window that is short by the status bar (it leaves a band at the bottom).
+   If the gap between the screen and the window is that small, it is that bug (Safari's own bars leave a much bigger gap) — use the full screen height */
+window.aotFullH=()=>{const sw=screen.width,sh=screen.height,land=innerWidth>innerHeight,full=land?Math.min(sw,sh):Math.max(sw,sh),ih=innerHeight,ua=navigator.userAgent,ios=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1),sa=navigator.standalone===true||matchMedia("(display-mode: standalone)").matches||matchMedia("(display-mode: fullscreen)").matches;
+  if(!ios)return ih;const gap=full-ih;return (sa||(gap>0&&gap<=48))&&gap>0?full:ih};
+(()=>{const set=()=>{document.documentElement.style.setProperty("--apph",window.aotFullH()+"px")};set();addEventListener("resize",set);addEventListener("orientationchange",()=>setTimeout(set,300))})();</script>
 <script>/* opening sounds: made live in code (no audio files). iPhone/iPad only allow sound after a touch, so it plays on the first touch */
 (()=>{let ac=null;const ctx=()=>{if(!ac){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ac=new C()}if(ac.state==="suspended")ac.resume();return ac};
   const env=(g,t,a,h,r,v)=>{g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+a);g.gain.setValueAtTime(v,t+a+h);g.gain.exponentialRampToValueAtTime(.0001,t+a+h+r)};
@@ -274,7 +279,7 @@
           for(const p of S.p){const a=Math.sin(p.x*.0042+t*.12)*1.6+Math.cos(p.y*.0051-t*.09)*1.4+Math.sin((p.x+p.y)*.0017)*.8,nx0=Math.cos(a)*.9,ny0=Math.sin(a)*.9,mg=magStep(p,nx0,ny0),nx=p.x+mg[0],ny=p.y+mg[1];x.strokeStyle=`hsla(${(248+8*Math.sin(p.y*.004+t*.1))|0},10%,97%,.42)`;x.beginPath();x.moveTo(p.x,p.y);x.lineTo(nx,ny);x.stroke();p.x=nx;p.y=ny;if(--p.age<0||mg[2]||p.x<0||p.x>W||p.y<0||p.y>H){p.x=rnd(0,W);p.y=rnd(0,H);p.age=rnd(80,260)}}}}};
     const v=V[id];mid.style.top=(v.y*100)+"%";el.classList.toggle("sp-mono",!!v.mono);
     /* sharp on every screen: the canvas uses the device's real pixel density (up to 3×) */
-    const size=()=>{W=innerWidth;H=innerHeight;dpr=Math.min(3,window.devicePixelRatio||1);cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);x.setTransform(dpr,0,0,dpr,0,0);x.imageSmoothingQuality="high";S={};v.init()};
+    const size=()=>{W=innerWidth;H=window.aotFullH?window.aotFullH():innerHeight;dpr=Math.min(3,window.devicePixelRatio||1);cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);x.setTransform(dpr,0,0,dpr,0,0);x.imageSmoothingQuality="high";S={};v.init()};
     size();addEventListener("resize",size);
     let lastN=0;const loop=n=>{const ddt=Math.min(.05,lastN?(n-lastN)/1000:0);lastN=n;if(v.magnet){const tg=MAG.pts.length?1:0;MAG.k+=(tg-MAG.k)*(1-Math.pow(tg?.25:.08,ddt))}v.draw((n-t0)/1000);if(!R)raf=requestAnimationFrame(loop)};loop(performance.now());
     requestAnimationFrame(()=>requestAnimationFrame(()=>mid.classList.add("on")));
@@ -317,7 +322,7 @@
   --mono:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
   color-scheme:dark;
 }
-html,body{height:100%}
+html,body{height:100%}html,body{min-height:var(--apph,100%)}
 body{background:#000;color:var(--fg);font-family:var(--body);font-size:15px;overflow:hidden;-webkit-tap-highlight-color:transparent}
 .shell{position:relative;z-index:1;display:grid;grid-template-columns:236px minmax(0,1fr);height:100%}
 
@@ -9729,7 +9734,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="794",APPT="2026-11-24T08:37:05Z";   /* APPT: when this update was made */
+const APPV="795",APPT="2026-11-24T08:39:09Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -9827,10 +9832,10 @@ function fit(){const sh=$(".shell"),W=1180,de=document.documentElement,vw=de.cli
   if(vw<W){const k=vw/W,sa=navigator.standalone===true||matchMedia("(display-mode: standalone)").matches,
     /* installed iPhone app: the page reports a height short by the status bar, which left a black bar at the bottom — use the full screen */
     full=sa&&(de.classList.contains("phone")||de.classList.contains("tablet"))?(/* was: phone only — iPad installed app had the same short-by-the-status-bar band at the bottom */innerWidth>innerHeight?Math.min(screen.width,screen.height):Math.max(screen.width,screen.height)):0,
-    h=Math.max(de.clientHeight||0,innerHeight||0,full);if(de.classList.contains("phone")){/* phones: no shrink-then-zoom round trip (it made iOS paint 3× oversized layers) — lay out at the real screen width, same result */
+    h=Math.max(de.clientHeight||0,innerHeight||0,full,window.aotFullH?window.aotFullH():0);/* aotFullH also catches the iPad home-screen app (standalone check alone missed it) */if(de.classList.contains("phone")){/* phones: no shrink-then-zoom round trip (it made iOS paint 3× oversized layers) — lay out at the real screen width, same result */
       de.style.setProperty('--pz',1);de.style.setProperty('--az',k);sh.style.cssText=`position:fixed;left:0;top:0;width:${vw}px;height:${h}px`;return}
     de.style.setProperty('--pz',1/k);sh.style.cssText=`position:fixed;left:0;top:0;width:${W}px;height:${h/k}px;transform:scale(${k});transform-origin:0 0`}
-  else sh.style.cssText=""}
+  else{const fh=window.aotFullH?window.aotFullH():0;sh.style.cssText=fh>innerHeight+1?`position:fixed;left:0;top:0;width:100%;height:${fh}px`:""}/* was: else sh.style.cssText="" — landscape iPad home-screen app also needs the full height */}
 addEventListener("resize",fit);fit();
 
 /* the New task panel sits under My passions and is merged with Tasks & Projects into ONE glass shape:
