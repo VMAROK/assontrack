@@ -187,12 +187,12 @@ window.aotFullH=()=>{const sw=screen.width,sh=screen.height,land=innerWidth>inne
   /* was: played on the first pointerdown — iPhone/iPad don't count a touch-down as permission to start sound, so it stayed silent.
      Now: try on every kind of tap (finger lifted, click, key) until the sound actually starts, then stop listening */
   let done=false;const EV=["touchend","pointerup","click","keydown"];
-  const first=()=>{if(done)return;const k=pick();if(k==="off"){stop();return}const c=ctx();if(!c)return;
+  const first=e=>{if(done)return;if(e&&e.type!=="manual"){const sp=document.getElementById("aotSplash");if(sp&&!sp.classList.contains("out"))return}/* while the opening screen is up, only the tap that enters the app plays it */const k=pick();if(k==="off"){stop();return}const c=ctx();if(!c)return;
     try{const b=c.createBuffer(1,1,22050),src=c.createBufferSource();src.buffer=b;src.connect(c.destination);src.start(0)}catch(_){}
     const go=()=>{if(done||c.state!=="running")return;done=true;stop();play(k)};
     if(c.state==="running")go();else c.resume().then(go).catch(()=>{})};
   const stop=()=>{EV.forEach(e=>removeEventListener(e,first,true))};
-  EV.forEach(e=>addEventListener(e,first,true))})();</script>
+  EV.forEach(e=>addEventListener(e,first,true));window.aotSound.now=()=>first({type:"manual"})})();</script>
 <script>(()=>{
   const STY=["specks","aurora","orbit","ripple","threads","threadsmono","halftone"];
   const rnd=(a,b)=>a+Math.random()*(b-a);
@@ -296,7 +296,7 @@ window.aotFullH=()=>{const sw=screen.width,sh=screen.height,land=innerWidth>inne
     const size=()=>{W=innerWidth;H=window.aotFullH?window.aotFullH():innerHeight;dpr=Math.min(3,window.devicePixelRatio||1);cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);x.setTransform(dpr,0,0,dpr,0,0);x.imageSmoothingQuality="high";S={};v.init()};
     size();addEventListener("resize",size);
     let lastN=0;const loop=n=>{const ddt=Math.min(.05,lastN?(n-lastN)/1000:0);lastN=n;if(v.magnet){const tg=MAG.pts.length?1:0;MAG.k+=(tg-MAG.k)*(1-Math.pow(tg?.25:.08,ddt))}v.draw((n-t0)/1000);if(!R)raf=requestAnimationFrame(loop)};loop(performance.now());
-    let gate=false;try{gate=!manual&&!!window.aotSound&&window.aotSound.pick()!=="off"}catch(_){}/* "Tap to begin" is back: that tap starts the sound and the scene together; touching the scene afterwards makes no sound */
+    let gate=false;/* "Tap to begin" removed — one tap enters the app and that tap plays the sound (was: gate when a sound was picked) */
     if(gate){el.classList.add("sp-gate");el.insertAdjacentHTML("beforeend",'<div class="sp-begin">Tap to begin</div>')}requestAnimationFrame(()=>requestAnimationFrame(()=>mid.classList.add("on")));
     /* Halftone can be played with while the app loads: drag to spin, points push away from the finger; the screen waits while you play */
     let busy=0,moved=0;
@@ -318,7 +318,7 @@ window.aotFullH=()=>{const sw=screen.width,sh=screen.height,land=innerWidth>inne
     const ready=()=>setTimeout(done,Math.max(0,(R?400:min)-(performance.now()-t0)));
     /* stays until the user taps to enter (was: faded out by itself after ~2s — if(manual||document.readyState==="complete")ready();else addEventListener("load",ready,{once:true});setTimeout(done,max);) */
     const hint=()=>{if(gate){setTimeout(hint,400);return}el.classList.add("sp-ready")};if(document.readyState==="complete")setTimeout(hint,1600);else addEventListener("load",()=>setTimeout(hint,1200),{once:true});
-    el.addEventListener("click",()=>{if(gate){gate=false;el.classList.remove("sp-gate");return}if(!moved)done()});/* was: any click closed it — a drag on Halftone no longer does */
+    el.addEventListener("click",()=>{if(gate){gate=false;el.classList.remove("sp-gate");return}if(!moved){if(!manual&&window.aotSound)window.aotSound.now();done()}});/* was: any click closed it — a drag on Halftone no longer does */
   }
   window.aotSplash={STY,play};
   let pick="specks";try{pick=localStorage.getItem("aot-splash")||"specks"}catch(_){}
@@ -3332,7 +3332,7 @@ html.tpl-stipple.tpl-bg #tplbg{background:#09090c!important}
 #stipbg{display:none}html.tpl-stipple.tpl-bg #stipbg{display:block;position:fixed;inset:0;width:100%;height:var(--apph,100%);z-index:0;pointer-events:none}
 html.tpl-stipple .panel{background:var(--card)!important;border:1px solid var(--line)!important;border-radius:2px!important}
 /* panels a little see-through so the dots show faintly behind them (fixed by the template, not the Glass sliders); a light blur keeps them from distracting */
-html.tpl-stipple.tpl-stipple #view .panel{background:rgba(0,0,0,.15)!important;/* was .05 */-webkit-backdrop-filter:none!important;backdrop-filter:none!important}/* fully see-through (was .45 + 2px blur) *//* was .66 / 3px */
+html.tpl-stipple.tpl-stipple #view .panel{background:color-mix(in srgb,color-mix(in srgb,#aaa1e2 var(--vtd,15%),#000) calc(var(--vta,.15)*100%),transparent)!important;-webkit-backdrop-filter:blur(var(--vtb,0px))!important;backdrop-filter:blur(var(--vtb,0px))!important}/* follows the sliders (was fixed .15) *//* fully see-through (was .45 + 2px blur) *//* was .66 / 3px */
 html.tpl-stipple.tpl-stipple #view .panel .panel,html.tpl-stipple.tpl-stipple #view .panel .tile{background:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 html.tpl-stipple.tpl-stipple.tpl-stipple :is(aside,.topbar){background-color:rgba(9,9,12,.3)!important;background-image:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}/* no blur: the dots behind stay crisp */
 html.tpl-stipple :is(.nav,nav,aside,header,.topbar){background:rgba(9,9,12,.38)!important;border-color:var(--line)!important}
@@ -3358,7 +3358,7 @@ html.tpl-pyramid{--vbg:#0c0a07;--vbg2:#1e1810;--va:205,166,92;--vfg:#f3ece0;--vm
 html.tpl-vt{--bg0:var(--vbg);--card:rgba(0,0,0,.15);--card2:rgba(var(--va),.12);--line:var(--vline);--fg:var(--vfg);--muted:var(--vmut);--accent:rgb(var(--va));--cyan:rgb(var(--va));--lr:var(--va)}
 html.tpl-vt body,html.tpl-vt.tpl-bg #tplbg{background:radial-gradient(120% 90% at 70% 10%,var(--vbg2),var(--vbg) 60%)!important}
 #vtbg{display:none}html.tpl-vt.tpl-bg #vtbg{display:block;position:fixed;inset:0;width:100%;height:var(--apph,100%);z-index:0;pointer-events:none}
-html.tpl-vt.tpl-vt #view .panel{background:rgba(0,0,0,.15)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:1px solid var(--vline)!important;border-radius:var(--vr)!important;box-shadow:none!important}
+html.tpl-vt.tpl-vt #view .panel{background:color-mix(in srgb,color-mix(in srgb,rgb(var(--va)) var(--vtd,15%),#000) calc(var(--vta,.15)*100%),transparent)!important;-webkit-backdrop-filter:blur(var(--vtb,0px))!important;backdrop-filter:blur(var(--vtb,0px))!important;border:1px solid var(--vline)!important;border-radius:var(--vr)!important;box-shadow:none!important}
 html.tpl-vt.tpl-vt #view .panel .panel,html.tpl-vt.tpl-vt #view .panel .tile{background:transparent!important}
 html.tpl-vt.tpl-vt.tpl-vt :is(aside,.topbar){background-color:rgba(0,0,0,.28)!important;background-image:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-color:var(--vline)!important}
 html.tpl-vt .topbar :is(h1,.clock,.logo),html.tpl-vt .side-foot{text-shadow:0 0 8px rgba(0,0,0,.85),0 0 2px rgba(0,0,0,.9)!important}
@@ -9476,17 +9476,17 @@ const TEMPLATES=[{id:"spa",name:"Spa",sub:"Warm orange ambience, soft glass, slo
   {id:"midnight",name:"Midnight",sub:"Flat deep navy, clean blue accents",look:{color:"blue",glass:0,tone:50},bg:true,plain:true},
   {id:"slate",name:"Slate",sub:"Soft grey-blue, low contrast, easy on the eyes",look:{color:"graphite",glass:0,tone:50},bg:true,plain:true},
   /* visual templates: a whole designed look (backdrop + surfaces + type); panels and layout stay the same */
-  {id:"stipple",name:"Stipple",sub:"Near-black, fine drifting dots, quiet lavender",look:{color:"graphite",glass:0,tone:50},bg:true,plain:true,visual:true},
-  {id:"silk",name:"Violet Silk",sub:"Deep indigo, glowing violet silk waves",look:{color:"dream",glass:0,tone:50},bg:true,plain:true,visual:true,vt:true},
-  {id:"chrome",name:"Liquid Chrome",sub:"Black and silver, slow molten chrome",look:{color:"graphite",glass:0,tone:50},bg:true,plain:true,visual:true,vt:true},
-  {id:"bronze",name:"Bronze Ribbon",sub:"Warm black, glowing bronze silk",look:{color:"gold",glass:0,tone:50},bg:true,plain:true,visual:true,vt:true},
-  {id:"pyramid",name:"Pyramids",sub:"Golden pyramids in moving light",look:{color:"gold",glass:0,tone:50},bg:true,plain:true,visual:true,vt:true},
-  {id:"flow",name:"Threads",sub:"Faint silk threads flowing like wind",look:{color:"blue",glass:0,tone:50},bg:true,plain:true,visual:true,vt:true},
-  {id:"flowmono",name:"Threads · Mono",sub:"White threads on deep black",look:{color:"graphite",glass:0,tone:50},bg:true,plain:true,visual:true,vt:true}];
+  {id:"stipple",name:"Stipple",sub:"Near-black, fine drifting dots, quiet lavender",look:{color:"graphite",glass:0,trans:85,tone:50},bg:true,plain:true,visual:true},
+  {id:"silk",name:"Violet Silk",sub:"Deep indigo, glowing violet silk waves",look:{color:"dream",glass:0,trans:85,tone:50},bg:true,plain:true,visual:true,vt:true},
+  {id:"chrome",name:"Liquid Chrome",sub:"Black and silver, slow molten chrome",look:{color:"graphite",glass:0,trans:85,tone:50},bg:true,plain:true,visual:true,vt:true},
+  {id:"bronze",name:"Bronze Ribbon",sub:"Warm black, glowing bronze silk",look:{color:"gold",glass:0,trans:85,tone:50},bg:true,plain:true,visual:true,vt:true},
+  {id:"pyramid",name:"Pyramids",sub:"Golden pyramids in moving light",look:{color:"gold",glass:0,trans:85,tone:50},bg:true,plain:true,visual:true,vt:true},
+  {id:"flow",name:"Threads",sub:"Faint silk threads flowing like wind",look:{color:"blue",glass:0,trans:85,tone:50},bg:true,plain:true,visual:true,vt:true},
+  {id:"flowmono",name:"Threads · Mono",sub:"White threads on deep black",look:{color:"graphite",glass:0,trans:85,tone:50},bg:true,plain:true,visual:true,vt:true}];
 const tplOf=()=>{const t=(data.profile||{}).template;return TEMPLATES.find(x=>x.id===(t===undefined?"midnight":t))||null};/* never picked = Midnight (default for new visitors); "" = picked no template. was: TEMPLATES.find(t=>t.id===(data.profile||{}).template)||null */
 const tplBgOn=()=>{const t=tplOf();return !!(t&&t.bg&&(data.profile||{}).tplBg!==false)};
-const effLook=()=>{const g=lookOf(),pl=passLook()||{},T=tplOf();if(T)return Object.assign({color:g.color,glass:g.glass,trans:g.trans,tone:g.tone??50},T.look);return {color:pl.color||g.color,glass:pl.glass??g.glass,trans:pl.trans??g.trans,tone:pl.tone??g.tone??50}};
-function applyLook(tmp){tmp=typeof tmp==="number"?{glass:tmp}:(tmp||{});const L=effLook(),g=(tmp.glass??L.glass)/100,t=(tmp.trans??L.trans)/100,r=document.documentElement.style;toneNow=(tmp.tone??L.tone)/100;r.setProperty("--go",(1-t*.88).toFixed(3));r.setProperty("--gb",(4+g*24).toFixed(1)+"px");
+const effLook=()=>{const g=lookOf(),pl=passLook()||{},T=tplOf();if(T)return Object.assign({color:g.color,glass:g.glass,trans:g.trans,tone:g.tone??50},T.look,(data.profile||{}).tplLook||{});/* + your slider changes on top of the template (tplLook resets when you pick a template) */return {color:pl.color||g.color,glass:pl.glass??g.glass,trans:pl.trans??g.trans,tone:pl.tone??g.tone??50}};
+function applyLook(tmp){tmp=typeof tmp==="number"?{glass:tmp}:(tmp||{});const L=effLook(),g=(tmp.glass??L.glass)/100,t=(tmp.trans??L.trans)/100,r=document.documentElement.style;toneNow=(tmp.tone??L.tone)/100;r.setProperty("--go",(1-t*.88).toFixed(3));r.setProperty("--vta",(1-t).toFixed(3));r.setProperty("--vtb",(g*24).toFixed(1)+"px");r.setProperty("--vtd",Math.round(toneNow*30)+"%");/* visual templates: tint = 100% − transparency, blur, color depth tints toward the template colour */r.setProperty("--gb",(4+g*24).toFixed(1)+"px");
   if(L.color==="auto"){const w=passWall()||wallOf();sampleColor(w.src).then(c=>{if(effLook().color==="auto"&&(passWall()||wallOf()).src===w.src)setTint(c.h,c.s)})}else{const P=LOOKS.find(x=>x.id===L.color)||LOOKS[0];setTint(P.h,P.s,P.l)}document.documentElement.classList.toggle("lk-orange",L.color==="orange");{const T=tplOf(),h=document.documentElement;TEMPLATES.forEach(x=>h.classList.toggle("tpl-"+x.id,!!T&&T.id===x.id));h.classList.toggle("tpl-vt",!!T&&!!T.vt);h.classList.toggle("tpl-plain",!!T&&!!T.plain);h.classList.toggle("tpl-bg",tplBgOn());/* these looks now work with or without a template (your own wallpaper too) */
     /* default setup for anyone who never picked a theme: Midnight, plain backdrop, light panels, light borders, 15px spacing, sharp corners, bars in the panel colour */
     if(!data.profile)data.profile={};if(data.profile.template===undefined){Object.assign(data.profile,{template:"midnight",tplSharp:true,gapIn:15,gapOut:15,gapLink:true});delete data.profile.tplPan;delete data.profile.tplBd;delete data.profile.tplBg;delete data.profile.tplBars}
@@ -9516,16 +9516,16 @@ function tplPanel(){const T=tplOf();return `<div class="panel tplp" style="margi
       ${lk?row("all","Gap &amp; margins",gi,0,40):row("in","Gap",gi,0,40)+row("out","Margins",go,0,48)}
       <button type="button" class="gap-reset" data-gapreset>Reset</button></div></div>`})()}
   <div class="tpl-opt"><span>Corners</span><div class="seg2" role="group" aria-label="Panel corners"><button type="button" data-tplsharp="0" aria-pressed="${(data.profile||{}).tplSharp!==true}">Rounded</button><button type="button" data-tplsharp="1" aria-pressed="${(data.profile||{}).tplSharp===true}">Sharp</button></div></div>
-  <div class="tpl-opt"><span>Side &amp; top bars</span><div class="seg2" role="group" aria-label="Side and top bars">${T?"":`<button type="button" data-tplbars="" aria-pressed="${!(data.profile||{}).tplBars}">Original</button>`}<button type="button" data-tplbars="panel" aria-pressed="${T?(data.profile||{}).tplBars!=="clear":(data.profile||{}).tplBars==="panel"}">Panel color</button><button type="button" data-tplbars="clear" aria-pressed="${(data.profile||{}).tplBars==="clear"}">No color</button></div></div>${T&&T.visual?"":lookSliders()}`:""}</div>`}
+  <div class="tpl-opt"><span>Side &amp; top bars</span><div class="seg2" role="group" aria-label="Side and top bars">${T?"":`<button type="button" data-tplbars="" aria-pressed="${!(data.profile||{}).tplBars}">Original</button>`}<button type="button" data-tplbars="panel" aria-pressed="${T?(data.profile||{}).tplBars!=="clear":(data.profile||{}).tplBars==="panel"}">Panel color</button><button type="button" data-tplbars="clear" aria-pressed="${(data.profile||{}).tplBars==="clear"}">No color</button></div></div>${lookSliders()}`:""}</div>`}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tpl],[data-tplbg],[data-tplpan],[data-tplbd],[data-tplbars],[data-tplsharp],[data-gapreset]");if(!b)return;e.preventDefault();e.stopPropagation();data.profile=data.profile||{};
   if(b.dataset.gapreset!==undefined){delete data.profile.gapIn;delete data.profile.gapOut;applyLook()}
   else if(b.dataset.tplsharp!=null){if(b.dataset.tplsharp==="1")data.profile.tplSharp=true;else delete data.profile.tplSharp;applyLook()}
   else if(b.dataset.tplbars!=null){if(b.dataset.tplbars)data.profile.tplBars=b.dataset.tplbars;else delete data.profile.tplBars;applyLook()}
   else if(b.dataset.tplbd!=null){if(b.dataset.tplbd)data.profile.tplBd=b.dataset.tplbd;else delete data.profile.tplBd;applyLook()}
-  else if(b.dataset.tplpan){data.profile.tplPan=b.dataset.tplpan;applyLook()}else if(b.dataset.tplbg!=null){data.profile.tplBg=b.dataset.tplbg==="1"}else{const id=b.dataset.tpl;if(id)data.profile.template=id;else data.profile.template="";/* was: delete data.profile.template — "" keeps "no template" from falling back to the Midnight default */toast(id?(TEMPLATES.find(t=>t.id===id)||{}).name+" template on":"Back to your own setup")}
+  else if(b.dataset.tplpan){data.profile.tplPan=b.dataset.tplpan;applyLook()}else if(b.dataset.tplbg!=null){data.profile.tplBg=b.dataset.tplbg==="1"}else{const id=b.dataset.tpl;delete data.profile.tplLook;/* picking a template starts from its defaults (visual: 15% panels, no blur) */if(id)data.profile.template=id;else data.profile.template="";/* was: delete data.profile.template — "" keeps "no template" from falling back to the Midnight default */toast(id?(TEMPLATES.find(t=>t.id===id)||{}).name+" template on":"Back to your own setup")}
   render();save()},true);
 /* Blur, Transparency and Color depth — shown under Fine-tune with Corners etc. (regular templates and your own setup; visual templates keep their designed glass) */
-function lookSliders(){const L=lookOf();return `<div class="tpl-opt tpl-opt-col lk-in-tpl">
+function lookSliders(){const L=tplOf()?effLook():lookOf();return `<div class="tpl-opt tpl-opt-col lk-in-tpl">
   <div class="lk-label" style="margin-top:12px">Blur</div>
   <div class="glass-row"><span>Solid</span><input type="range" id="glassIn" min="0" max="100" step="1" value="${L.glass}" aria-label="Blur"><span>Blur</span><b id="glassVal">${L.glass}%</b><button type="button" class="slall" data-slall="main:glass" title="Use this for all categories and passions" aria-label="Apply Blur to all">All</button></div>
   <div class="lk-label" style="margin-top:18px">Transparency</div>
@@ -9699,15 +9699,15 @@ document.addEventListener("change",e=>{const t=e.target;if(!t.dataset||!t.datase
 document.addEventListener("focusout",e=>{if(e.target.id==="slH"||e.target.id==="seH"){const m=parseHM(e.target.value);if(m!=null)e.target.value=String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&renaming&&e.target.id==="rnIn"){renaming=null;render()}});
 document.addEventListener("input",e=>{const id=e.target.id;if(id!=="toneIn"&&id!=="pTone"&&id!=="cTone")return;const v=+e.target.value;applyLook({tone:v});const o=$("#"+id+"Val");if(o)o.textContent=v+"%"});
-document.addEventListener("change",e=>{const id=e.target.id,v=+e.target.value;if(id==="toneIn"){data.profile=Object.assign({},data.profile,{look:Object.assign(lookOf(),{tone:v})});save()}
+document.addEventListener("change",e=>{const id=e.target.id,v=+e.target.value;if(id==="toneIn"){if(tplOf()){data.profile.tplLook=Object.assign({},data.profile.tplLook,{tone:v});applyLook()}else data.profile=Object.assign({},data.profile,{look:Object.assign(lookOf(),{tone:v})});save()}
   else if(id==="pTone"){const p=data.passions.find(x=>x.id===selP);if(p){p.look=Object.assign({},p.look,{tone:v});render();save()}}
   else if(id==="cTone"){const c=cats().find(x=>x.id===passCat);if(c){c.look=Object.assign({},c.look,{tone:v});render();save()}}});
 document.addEventListener("change",e=>{if(e.target.id==="cGlass"||e.target.id==="cTrans"){const c=cats().find(x=>x.id===passCat);if(c){c.look=Object.assign({},c.look,{[e.target.id==="cGlass"?"glass":"trans"]:+e.target.value});render();save()}return}
-  if(e.target.id==="transIn"){data.profile=Object.assign({},data.profile,{look:Object.assign(lookOf(),{trans:+e.target.value})});save();return}
+  if(e.target.id==="transIn"){if(tplOf()){data.profile.tplLook=Object.assign({},data.profile.tplLook,{trans:+e.target.value});applyLook()}else data.profile=Object.assign({},data.profile,{look:Object.assign(lookOf(),{trans:+e.target.value})});save();return}
   if(e.target.id==="pTrans"){const p=data.passions.find(x=>x.id===selP);if(p){p.look=Object.assign({},p.look,{trans:+e.target.value});render();save()}return}
   if(e.target.id==="pGlass"){const p=data.passions.find(x=>x.id===selP);if(p){p.look=Object.assign({},p.look,{glass:+e.target.value});render();save()}return}
   if(e.target.id==="pcatSel"){const p=data.passions.find(x=>x.id===selP);if(p){if(e.target.value)p.cat=e.target.value;else delete p.cat;render();save();toast(p.cat?p.name+" → "+catName(p.cat):p.name+" has no category")}return}
-  if(e.target.id==="glassIn"){data.profile=Object.assign({},data.profile,{look:Object.assign(lookOf(),{glass:+e.target.value})});save();return}
+  if(e.target.id==="glassIn"){if(tplOf()){data.profile.tplLook=Object.assign({},data.profile.tplLook,{glass:+e.target.value});applyLook()}else data.profile=Object.assign({},data.profile,{look:Object.assign(lookOf(),{glass:+e.target.value})});save();return}
   if(e.target.id==="slB"){const f=e.target.closest("form"),r=f.querySelector(".kr");if(r)r.hidden=e.target.value!=="dow"}
   if(e.target.id==="slK"||e.target.id==="seK"){const f=e.target.closest("form"),d=e.target.value==="dur";f.querySelectorAll(".kt").forEach(l=>l.hidden=d);f.querySelectorAll(".kd").forEach(l=>l.hidden=!d);{const r=f.querySelector(".kr"),bs=f.querySelector("#slB");if(r)r.hidden=d&&bs&&bs.value!=="dow"}if(d){const i=f.querySelector(".kd input");i&&i.focus()}}
   if(e.target.id==="slR"){const dd=$("#slD"),lb=dd&&dd.closest("label");if(lb){dd.disabled=e.target.value!=="weekly";lb.classList.toggle("dim",dd.disabled)}}});
@@ -9836,7 +9836,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="815",APPT="2026-11-24T16:43:46Z";   /* APPT: when this update was made */
+const APPV="816",APPT="2026-11-24T16:48:13Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
