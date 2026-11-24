@@ -235,9 +235,10 @@
         draw(t){x.fillStyle="rgba(9,13,28,.1)";x.fillRect(0,0,W,H);x.lineWidth=.7;
           for(const p of S.p){const a=Math.sin(p.x*.0042+t*.12)*1.6+Math.cos(p.y*.0051-t*.09)*1.4+Math.sin((p.x+p.y)*.0017)*.8,nx=p.x+Math.cos(a)*.9,ny=p.y+Math.sin(a)*.9;x.strokeStyle=`hsla(${(228+22*Math.sin(p.y*.004+t*.1))|0},85%,80%,.22)`;x.beginPath();x.moveTo(p.x,p.y);x.lineTo(nx,ny);x.stroke();p.x=nx;p.y=ny;if(--p.age<0||p.x<0||p.x>W||p.y<0||p.y>H){p.x=rnd(0,W);p.y=rnd(0,H);p.age=rnd(80,260)}}}},
       /* threads in the mockup colours: near-black with soft grey-lavender threads */
-      threadsmono:{y:.5,mono:1,init(){const n=Math.round(Math.min(1400,W*H/400));S.p=[...Array(n)].map(()=>({x:rnd(0,W),y:rnd(0,H),age:rnd(0,200)}));x.fillStyle="#0b0b0f";x.fillRect(0,0,W,H)},
-        draw(t){x.fillStyle="rgba(11,11,15,.1)";x.fillRect(0,0,W,H);x.lineWidth=.7;
-          for(const p of S.p){const a=Math.sin(p.x*.0042+t*.12)*1.6+Math.cos(p.y*.0051-t*.09)*1.4+Math.sin((p.x+p.y)*.0017)*.8,nx=p.x+Math.cos(a)*.9,ny=p.y+Math.sin(a)*.9;x.strokeStyle=`hsla(${(248+8*Math.sin(p.y*.004+t*.1))|0},22%,86%,.28)`;x.beginPath();x.moveTo(p.x,p.y);x.lineTo(nx,ny);x.stroke();p.x=nx;p.y=ny;if(--p.age<0||p.x<0||p.x>W||p.y<0||p.y>H){p.x=rnd(0,W);p.y=rnd(0,H);p.age=rnd(80,260)}}}}};
+/* was: bg #0b0b0f, threads 22% sat 86% light .28 alpha — now darker and whiter for contrast */
+      threadsmono:{y:.5,mono:1,init(){const n=Math.round(Math.min(1400,W*H/400));S.p=[...Array(n)].map(()=>({x:rnd(0,W),y:rnd(0,H),age:rnd(0,200)}));x.fillStyle="#040405";x.fillRect(0,0,W,H)},
+        draw(t){x.fillStyle="rgba(4,4,5,.1)";x.fillRect(0,0,W,H);x.lineWidth=.7;
+          for(const p of S.p){const a=Math.sin(p.x*.0042+t*.12)*1.6+Math.cos(p.y*.0051-t*.09)*1.4+Math.sin((p.x+p.y)*.0017)*.8,nx=p.x+Math.cos(a)*.9,ny=p.y+Math.sin(a)*.9;x.strokeStyle=`hsla(${(248+8*Math.sin(p.y*.004+t*.1))|0},10%,97%,.42)`;x.beginPath();x.moveTo(p.x,p.y);x.lineTo(nx,ny);x.stroke();p.x=nx;p.y=ny;if(--p.age<0||p.x<0||p.x>W||p.y<0||p.y>H){p.x=rnd(0,W);p.y=rnd(0,H);p.age=rnd(80,260)}}}}};
     const v=V[id];mid.style.top=(v.y*100)+"%";el.classList.toggle("sp-mono",!!v.mono);
     /* sharp on every screen: the canvas uses the device's real pixel density (up to 3×) */
     const size=()=>{W=innerWidth;H=innerHeight;dpr=Math.min(3,window.devicePixelRatio||1);cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);x.setTransform(dpr,0,0,dpr,0,0);x.imageSmoothingQuality="high";S={};v.init()};
@@ -9674,7 +9675,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="788",APPT="2026-11-24T08:09:04Z";   /* APPT: when this update was made */
+const APPV="789",APPT="2026-11-24T08:12:52Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
