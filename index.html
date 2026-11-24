@@ -2895,6 +2895,13 @@ html #view .bstrip b,html #view .dashtop .holopanel>.ph.bstrip>span{font-family:
 /* phone: strips run edge to edge and sit flush at the top of their panel */
 html.phone #view :is(.holopanel,.dtiles,.bdown,.wahead).bstrip-p,html.phone #view .dtiles{padding-top:0!important}
 html.phone #view :is(.holopanel,.bdown)>.bstrip,html.phone #view .dtiles>.dt-strip{margin:0 -11px 12px!important}html.phone #view .wahead>.bstrip{margin:0 0 12px!important}html.phone #view .dtiles.dt-prog>.dt-strip{margin:0!important}
+/* calendar: the month + arrows (+ view switch) sit in a title strip like the other panels */
+html #view .panel:has(>.calhead.cal-c){padding-top:0!important;overflow:hidden}
+html #view .calhead.cal-c{margin:0 -18px 14px!important;padding:8px 18px!important;background:linear-gradient(rgba(0,0,0,.28),rgba(0,0,0,.28)),rgba(var(--tX),.72);border-bottom:1px solid rgba(var(--lr),.18)}
+html #view .calhead.cal-c h2{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",system-ui,sans-serif!important;font-size:15px!important;font-weight:600!important;letter-spacing:.01em;color:#e9eef8}
+html #view .calhead.cal-c .calnav{width:28px;height:28px;padding:0!important;display:grid;place-items:center;font-size:15px}
+html #view .calhead.cal-c .cal-vsw{right:12px}
+html.phone #view .calhead.cal-c{margin:0 -2px 12px!important;flex-wrap:nowrap}html.phone #view .calhead.cal-c::after{display:none}html.phone #view .calhead.cal-c .cal-vsw{position:absolute;right:8px;top:50%;transform:translateY(-50%);margin:0}html.phone #view .calhead.cal-c h2{font-size:15px!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9287,7 +9294,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="703",APPT="2026-11-24T01:48:55Z";   /* APPT: when this update was made */
+const APPV="704",APPT="2026-11-24T01:51:15Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
