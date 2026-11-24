@@ -2909,6 +2909,7 @@ html.phone #view .calhead.cal-c{margin:0 -2px 12px!important;flex-wrap:nowrap}ht
 .dpx-ck svg{width:14px;height:14px}.dpx:hover .dpx-ck{border-style:solid}
 .dpx.done .dpx-ck{background:var(--cc);border:1.5px solid var(--cc);color:#0b0f1a;transform:scale(1.05)}
 .dpx em{color:#b99cff!important}.dpx-hint{margin:4px 2px 2px;font-size:12px;color:var(--muted)}
+.dov .bdw-s+.bdw-s{margin-top:14px;padding-top:14px;border-top:2px solid rgba(var(--lr),.28)}   /* divider between Events / Passions / Budget in the day window */
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4021,7 +4022,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&dashDay){dashDay=nu
 function dashDayOv(d,ds){const it=dayItems(d,ds),T=today(),b=B(),SE=calBud(ds),SS=(b.spends||[]).filter(x=>x.d===ds),PL=it.logs.filter(l=>l.p),anim=dashDayShown!==ds;dashDayShown=ds;
   const sec=(t,c,L)=>L?`<div class="bdw-s"><div class="bdw-sh" style="color:${c}">${t}</div>${L}</div>`:"";
   const evs=it.ev.map(e=>`<div class="bdw-r" style="--cc:var(--cyan)"><i></i><span><b>${esc(e.title)}</b><small>${e.time?fmtTime(e.time):"All day"}</small></span>${del("events",e.id)}</div>`).join("");
-  const PX=(data.passX=data.passX||{}),ps=PL.map(l=>{const k=ds+"|"+l.t+"|"+l.s,on=!!PX[k];return `<button type="button" class="bdw-r dpx${on?" done":""}" data-dpx="${esc(k)}" aria-pressed="${on}" style="--cc:${l.c}" title="${on?"Tap to undo":"Tap to cross off"}"><i></i><span><b>${esc(l.t)}</b><small>${esc(l.s)}</small></span><em>${l.v}</em><span class="dpx-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>`}).join("")+(PL.length?`<p class="dpx-hint">${PL.every(l=>PX[ds+"|"+l.t+"|"+l.s])?"All crossed off ✓":"Tap a passion to cross it off"}</p>`:"");
+  const PX=(data.passX=data.passX||{}),ps=PL.map(l=>{const k=ds+"|"+l.t+"|"+l.s,on=!!PX[k];return `<button type="button" class="bdw-r dpx${on?" done":""}" data-dpx="${esc(k)}" aria-pressed="${on}" style="--cc:${l.c}" title="${on?"Tap to undo":"Tap to cross off"}"><i></i><span><b>${esc(l.t)}</b><small>${esc(l.s)}</small></span><em>${l.v}</em><span class="dpx-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>`}).join("")/* caption removed — the dashed ring says it */;
   const money=SE.length||SS.length?`<div class="dov-bud">${bDayPop(b,ds,SE,SS,T,true)}</div>`:"";
   return `<div class="bdw dov" data-ddbg><div class="bdw-p panel" role="dialog" aria-modal="true" aria-label="Day overview"><div class="bdw-h"><div><b>${new Date(ds+"T12:00").toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</b>${ds===T?"<small>Today</small>":""}</div><button type="button" class="bdw-x" data-ddx aria-label="Close">×</button></div>
     ${evs||ps||money?sec("Events","#4cc9ff",evs)+sec("Passions","#b99cff",ps)+(money?`<div class="bdw-s"><div class="bdw-sh" style="color:#ffc533">Budget</div>${money}</div>`:""):`<p class="note" style="margin:10px 2px 4px">Nothing on this day.</p>`}</div></div>`}
@@ -9302,7 +9303,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="706",APPT="2026-11-24T01:58:45Z";   /* APPT: when this update was made */
+const APPV="707",APPT="2026-11-24T01:59:48Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
