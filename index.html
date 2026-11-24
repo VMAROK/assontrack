@@ -2851,9 +2851,17 @@ html.phone #view .dtiles.dt-prog{padding:40px 14px 14px!important}
 .bdn-all{display:flex;height:10px;border-radius:99px;background:rgba(150,180,240,.14);overflow:hidden}.bdn-all i{display:block;height:100%;background:var(--c)}.bdn-all i+i{box-shadow:inset 2px 0 0 rgba(0,0,0,.55)}
 .bdn-leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--muted);margin-top:-4px}.bdn-leg span{display:inline-flex;align-items:center;gap:5px}.bdn-leg i{width:8px;height:8px;border-radius:2px;background:var(--c)}.bdn-leg em{font-style:normal;font-family:var(--mono);font-size:11px}
 .mc.mc-blank{pointer-events:none;background:none!important;box-shadow:none!important}
-.bdn-main{display:grid;gap:6px}.bdn-main .dp-t{height:10px}.bdn-main b{font-family:var(--mono);font-size:12.5px;color:var(--c);font-weight:700}
+.bdn-main{display:grid;gap:8px}.bdn-hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.bdn-hd h4{margin:0;font-size:14px;color:var(--c)}.bdn-main .dp-t{height:10px}.bdn-main b{font-family:var(--mono);font-size:12.5px;color:var(--c);font-weight:700}
 /* Dashboard calendar: this month's day boxes darker, in the theme's own colour */
-html #view .mcal .mc:not(.mc-blank):not(.today):not(.sel){background:linear-gradient(rgba(0,0,0,.42),rgba(0,0,0,.42)),rgba(var(--tX),.75)}
+/* v690 mistake: darkened this month's days — html #view .mcal .mc:not(.mc-blank):not(.today):not(.pick){background:linear-gradient(rgba(0,0,0,.42),rgba(0,0,0,.42)),rgba(var(--tX),.75)} */
+html #view .mcal .mc.mc-blank{background:linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.5)),rgba(var(--tX),.8)!important}   /* the empty boxes (other months) darker, in the theme colour */
+/* Dashboard calendar: month centred between its arrows; days aren't highlighted on hover/tap — only the day whose overview is open gets a faint white glow (same on every theme) */
+.calhead.cal-c{justify-content:center;gap:18px}.calhead.cal-c h2{text-align:center;min-width:0}
+html #view .mcal .mc:not(.mc-blank):not(.pick):hover{background:rgba(6,14,36,.6)}html #view .mcal .mc.sel{box-shadow:none}
+html #view .mcal .mc.pick{position:relative;z-index:1;animation:mcPick .45s ease-out both}
+@keyframes mcPick{from{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,0),0 0 0 rgba(255,255,255,0);background-color:rgba(255,255,255,0)}to{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55),0 0 18px rgba(255,255,255,.28);background-color:rgba(255,255,255,.07)}}
+html #view .mcal .mc.pick:not(.today){background:rgba(255,255,255,.07)}
+.bc-day.dov{margin-top:14px}.dov .bdw-sh{font-weight:700}.dov-bud .bdw-in{padding:0;border:0;background:none;box-shadow:none}.dov-bud .bdw-h{display:none}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -3951,7 +3959,15 @@ function vDash(){
   const P=d.passions,woT=d.workouts.filter(w=>w.d===t).length;
   return banner()+/* Today strip removed: todayStrip(d)+ */dashTop(d)+bigCal(d)+breakdownPanel(d);   /* was "Today's targets" (calories, protein, passion hours, date, workout note) */
 }
-let calMonth=null,calSel=null;
+let calMonth=null,calSel=null,dashDay=null,dashDayShown=null;
+/* the day overview (like Budget's): events, passions and money for that day */
+function dashDayOv(d,ds){const it=dayItems(d,ds),T=today(),b=B(),SE=calBud(ds),SS=(b.spends||[]).filter(x=>x.d===ds),PL=it.logs.filter(l=>l.p),anim=dashDayShown!==ds;dashDayShown=ds;
+  const sec=(t,c,L)=>L?`<div class="bdw-s"><div class="bdw-sh" style="color:${c}">${t}</div>${L}</div>`:"";
+  const evs=it.ev.map(e=>`<div class="bdw-r" style="--cc:var(--cyan)"><i></i><span><b>${esc(e.title)}</b><small>${e.time?fmtTime(e.time):"All day"}</small></span>${del("events",e.id)}</div>`).join("");
+  const ps=PL.map(l=>`<div class="bdw-r" style="--cc:${l.c}"><i></i><span><b>${esc(l.t)}</b><small>${esc(l.s)}</small></span><em>${l.v}</em></div>`).join("");
+  const money=SE.length||SS.length?`<div class="dov-bud">${bDayPop(b,ds,SE,SS,T,true)}</div>`:"";
+  return `<div class="bc-day dov${anim?" bdw-open":""}"><div class="bdw-in"><div class="bdw-h"><div><b>${new Date(ds+"T12:00").toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</b>${ds===T?"<small>Today</small>":""}</div></div>
+    ${evs||ps||money?sec("Events","#4cc9ff",evs)+sec("Passions","#b99cff",ps)+(money?`<div class="bdw-s"><div class="bdw-sh" style="color:#ffc533">Budget</div>${money}</div>`:""):`<p class="note" style="margin:10px 2px 4px">Nothing on this day.</p>`}</div></div>`}
 const fmtTime=t=>{const [h,m]=String(t).split(":").map(Number);return new Date(2000,0,1,h||0,m||0).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})};
 /* budget items (paydays, bills, subscriptions) that land on a day, worked out once per calendar view */
 let calBudK="",calBudM={};function calBud(ds){try{const b=B(),k=calMonth?ymd(calMonth):"";if(k!==calBudK||!calBudM.__t||Date.now()-calBudM.__t>2000){const x=calMonth||new Date(),f=new Date(x.getFullYear(),x.getMonth(),-7),t=new Date(x.getFullYear(),x.getMonth()+1,14);calBudM=bEvMap(b,ymd(f),ymd(t),today());calBudM.__t=Date.now();calBudK=k}return Array.isArray(calBudM[ds])?calBudM[ds]:[]}catch(_){return []}}
@@ -3968,10 +3984,10 @@ function dayItems(d,ds){
     ...calBud(ds).map(i=>({c:i.kind==="inc"?"#3ddc84":"#ffc533",t:(i.kind==="inc"?"+":"")+bMoney(+i.amt||0,0)+" "+bTitle(i)}))];
   const logs=[...meals.map(m=>({c:"var(--magenta)",t:m.name,s:m.type,v:n0(m.kcal)+" kcal"})),
     ...wo.map(w=>({c:"var(--lime)",t:w.name,s:"Training",v:`${w.sets}×${w.reps}`})),
-    ...ss.map(x=>({c:"var(--amber)",t:pn(x.pid),s:x.planned?"Planned session"+(x.time?" · "+fmtTime(x.time):""):(x.slotId?"Scheduled session · done":"Passion session"),v:fmtH(x.mins)})),
-    ...tasksDue(d,ds).map(x=>({c:x.st==="overdue"||x.st==="late"?"var(--red)":x.st==="mastered"?"#3ddc84":"var(--cyan)",t:x.t.title,s:x.p.name+" · "+(x.st==="starts"?"task starts today":x.st==="mastered"?"done before the deadline":x.st==="overdue"||x.st==="late"?"deadline missed":"deadline "+clock(x.t.due)),v:fmtH(Math.round(taskMs(x.t)/6e4))})),
-    ...slotsOn(d,ds).map(x=>({c:x.state==="missed"?"var(--red)":"var(--amber)",t:x.p.name,s:(x.state==="missed"?"Missed · ":x.state==="open"?"Log now · ":"Scheduled · ")+(x.slot.dur?"Any time today":fmtTime(x.slot.start)+"–"+fmtTime(x.slot.end)),v:fmtH(slotMins(x.slot))})),
-    ...wkOn(d,ds).map(x=>({c:wkCol(x),t:x.p.name,s:"Every "+pw(x.slot)+" · "+(x.state==="missed"?"missed, ":/^done/.test(x.state)?"done, ":"")+fmtH(x.lg)+" of "+fmtH(x.slot.dur)+" that "+pw(x.slot),v:fmtH(x.slot.dur)})),
+    ...ss.map(x=>({p:1,c:"var(--amber)",t:pn(x.pid),s:x.planned?"Planned session"+(x.time?" · "+fmtTime(x.time):""):(x.slotId?"Scheduled session · done":"Passion session"),v:fmtH(x.mins)})),
+    ...tasksDue(d,ds).map(x=>({p:1,c:x.st==="overdue"||x.st==="late"?"var(--red)":x.st==="mastered"?"#3ddc84":"var(--cyan)",t:x.t.title,s:x.p.name+" · "+(x.st==="starts"?"task starts today":x.st==="mastered"?"done before the deadline":x.st==="overdue"||x.st==="late"?"deadline missed":"deadline "+clock(x.t.due)),v:fmtH(Math.round(taskMs(x.t)/6e4))})),
+    ...slotsOn(d,ds).map(x=>({p:1,c:x.state==="missed"?"var(--red)":"var(--amber)",t:x.p.name,s:(x.state==="missed"?"Missed · ":x.state==="open"?"Log now · ":"Scheduled · ")+(x.slot.dur?"Any time today":fmtTime(x.slot.start)+"–"+fmtTime(x.slot.end)),v:fmtH(slotMins(x.slot))})),
+    ...wkOn(d,ds).map(x=>({p:1,c:wkCol(x),t:x.p.name,s:"Every "+pw(x.slot)+" · "+(x.state==="missed"?"missed, ":/^done/.test(x.state)?"done, ":"")+fmtH(x.lg)+" of "+fmtH(x.slot.dur)+" that "+pw(x.slot),v:fmtH(x.slot.dur)})),
     ...(wt?[{c:"var(--violet)",t:"Weigh-in",s:"Body",v:wt.v+" "+d.goals.unit}]:[])];
   return {ev,chips,logs};
 }
@@ -4012,14 +4028,14 @@ function bigCal(d){
   const start=new Date(y,m,1-off),endOff=6-last.getDay(),end=new Date(y,m,last.getDate()+endOff);
   const cells=[];
   for(let x=new Date(start);x<=end;x.setDate(x.getDate()+1)){const ds=ymd(x),out=x.getMonth()!==m;if(out){cells.push(`<div class="mc out mc-blank" aria-hidden="true"></div>`);continue}   /* days from the next/previous month: left blank */
-    const it=dayItems(d,ds);cells.push(`<button class="mc${out?" out":""}${ds===today()?" today":""}${ds===calSel?" sel":""}" data-day="${ds}"><span class="mn">${x.getDate()}</span><div class="chips">${it.chips.slice(0,3).map(c=>`<em style="--c:${c.c}">${esc(c.t)}</em>`).join("")}${it.chips.length>3?`<small>+${it.chips.length-3} more</small>`:""}</div></button>`)}
+    const it=dayItems(d,ds);cells.push(`<button class="mc${out?" out":""}${ds===today()?" today":""}${ds===dashDay?" pick":""}" data-day="${ds}"><span class="mn">${x.getDate()}</span><div class="chips">${it.chips.slice(0,3).map(c=>`<em style="--c:${c.c}">${esc(c.t)}</em>`).join("")}${it.chips.length>3?`<small>+${it.chips.length-3} more</small>`:""}</div></button>`)}
   const it=dayItems(d,calSel);
   return `<div class="panel">
-    <div class="calhead"><h2>${calMonth.toLocaleDateString(undefined,{month:"long",year:"numeric"})}</h2>
-      <div style="display:flex;gap:8px"><button class="pill calnav" data-cal="-1" aria-label="Previous month">‹</button><button class="pill calnav" data-cal="0">Today</button><button class="pill calnav" data-cal="1" aria-label="Next month">›</button></div></div>
+    <div class="calhead cal-c">${""/* was: month on the left, ‹ Today › on the right */}<button class="pill calnav" data-cal="-1" aria-label="Previous month">‹</button><h2>${calMonth.toLocaleDateString(undefined,{month:"long",year:"numeric"})}</h2><button class="pill calnav" data-cal="1" aria-label="Next month">›</button></div>
     <div class="mcal">${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(w=>`<div class="cw">${w}</div>`).join("")}${cells.join("")}</div>
-    <div class="dayview${it.ev.length?"":" solo"}">
-    ${""/* v684: the progress (Nutrition / Passions / Budget) lived here with a Bar/Donut switch — moved to the top panel. Under the calendar: just your events + Add an event */}${it.ev.length?`<div><div class="ph"><span>${new Date(calSel+"T12:00").toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</span></div><div class="rows">${it.ev.map(e=>`<div class="r" style="--c:var(--cyan)"><span class="dot"></span><div class="m"><div>${esc(e.title)}</div><small>${e.time?fmtTime(e.time):"All day"}</small></div>${del("events",e.id)}</div>`).join("")}</div></div>`:""}
+    ${dashDay?dashDayOv(d,dashDay):""}
+    <div class="dayview solo">
+    ${""/* v684: the progress (Nutrition / Passions / Budget) lived here with a Bar/Donut switch — moved to the top panel. Under the calendar: just your events + Add an event */}${""/* events list moved into the day overview */}
       <form class="f" id="evForm"><div class="ph" style="margin-bottom:2px"><span>Add an event</span></div>
         <label>Event<input id="evT" required placeholder="Dance class" autocomplete="off"></label>
         <div class="f2"><label>Date<input id="evD" type="date" value="${calSel}" required></label><label>Time<input id="evTm" type="time"></label></div>
@@ -4031,16 +4047,16 @@ const BDPAL=["#b99cff","#f27fb2","#4cc9ff","#ffb648","#3ddc84","#ff7a59","#9ad0f
 function bdMulti(parts){const t=parts.reduce((a,x)=>a+x.v,0);return `<div class="bdn-all">${t?parts.filter(x=>x.v>0).map(x=>`<i data-akf="bd:${esc(x.k)}" style="flex:${x.v};--c:${x.c}" title="${esc(x.n)}"></i>`).join(""):""}</div><div class="bdn-leg">${parts.map(x=>`<span style="--c:${x.c}"><i></i>${esc(x.n)}<em>${t?Math.round(x.v/t*100):0}%</em></span>`).join("")}</div>`}
 function bdMeter(n,v,goal,txt,c,k){const f=goal?Math.min(1,v/goal):0;return `<div class="meter" style="--c:${c}"><div class="meter-top"><span>${esc(n)}</span><b>${txt}</b></div><div class="track"><i data-akw="bd:m${esc(k||n)}" style="width:${(f*100).toFixed(1)}%"></i></div></div>`}
 /* the section's own progress bar (same as the top panel's): colour fills to the limit, the heavier shade comes in on the right when over; numbers under the bar */
-function bdMain(x){const cl=v=>Math.max(0,Math.min(1,v)),ov=x.over?Math.min(100,(x.f-1)*100):0,num=Array.isArray(x.v)?`<span${x.over?` style="color:${x.d}"`:""}>${x.v[0]}</span>${x.v.length>1?` / ${x.v[1]}`:""}`:esc(x.v);
-  return `<div class="bdn-main" style="--c:${x.c}"><div class="dp-t${ov?" ov":""}">${ov?`<i data-akw="bd:M${x.k}" style="width:${(100-ov).toFixed(1)}%;--c:${x.c}"></i><i data-akw="bd:O${x.k}" style="width:${ov.toFixed(1)}%;--c:${x.d}"></i>`:`<i data-akw="bd:M${x.k}" style="width:${(cl(x.f)*100).toFixed(1)}%"></i>`}</div><b>${num}</b></div>`}
+function bdMain(x,h){const cl=v=>Math.max(0,Math.min(1,v)),ov=x.over?Math.min(100,(x.f-1)*100):0,num=Array.isArray(x.v)?`<span${x.over?` style="color:${x.d}"`:""}>${x.v[0]}</span>${x.v.length>1?` / ${x.v[1]}`:""}`:esc(x.v);
+  return `<div class="bdn-main" style="--c:${x.c}"><div class="dp-t${ov?" ov":""}">${ov?`<i data-akw="bd:M${x.k}" style="width:${(100-ov).toFixed(1)}%;--c:${x.c}"></i><i data-akw="bd:O${x.k}" style="width:${ov.toFixed(1)}%;--c:${x.d}"></i>`:`<i data-akw="bd:M${x.k}" style="width:${(cl(x.f)*100).toFixed(1)}%"></i>`}</div></div>`.replace('<div class="dp-t',`<div class="bdn-hd"><h4>${h}</h4><b>${num}</b></div><div class="dp-t`)}   /* numbers top-right, across from the name (was under the bar) */
 function breakdownPanel(d){const DS=dashStats(d,today()),t=today(),tm=d.meals.filter(m=>m.d===t),sum=k=>tm.reduce((a,m)=>a+(+m[k]||0),0);
   const MK=[["Carbs","carbs","#f27fb2"],["Protein","protein","#a688f2"],["Fiber","fiber","#b8875f"],["Fat","fat","#f2c14e"]],mv=MK.map(([n,k,c])=>({n,k,c,v:sum(k),g:mgGoal(k)}));
   const P=d.passions.map((p,i)=>({n:p.name,k:p.id,c:BDPAL[i%BDPAL.length],v:d.sessions.filter(x=>x.pid===p.id&&!x.planned).reduce((a,x)=>a+(+x.mins||0),0),g:(+p.goal||0)*60}));
   let out=0,inc=0;try{const S=bStats();out=S.subs+S.bills+S.spent;inc=S.inc}catch(_){}
   return `<div class="panel bdown" style="margin-top:18px" data-akg="bd"><div class="ph"><span>Breakdown</span></div><div class="tgrid">
-    <section class="bdn-sec"><h4 style="--c:#4cc9ff">Nutrition</h4>${bdMain(DS[0])}${bdMulti(mv)}${mv.map(x=>bdMeter(x.n,x.v,x.g,`${n0(x.v)}${x.g?" / "+n0(x.g):""} g`,x.c,x.k)).join("")}</section>
-    <section class="bdn-sec"><h4 style="--c:#b99cff">Passions</h4>${bdMain(DS[1])}${P.length?bdMulti(P)+P.map(x=>bdMeter(x.n,x.v,x.g,x.g?`${fmtH(x.v)} / ${fmtH(x.g)}`:fmtH(x.v),x.c,x.k)).join(""):`<p class="note" style="margin:0">No passions yet</p>`}</section>
-    <section class="bdn-sec"><h4 style="--c:#ffc533">Budget</h4>${bdMain(DS[2])}${""/* was: separate "Spent this month" meter (pushed the bars out of line) — the gold bar above is that */}</section>
+    <section class="bdn-sec">${bdMain(DS[0],"Nutrition")}${bdMulti(mv)}${mv.map(x=>bdMeter(x.n,x.v,x.g,`${n0(x.v)}${x.g?" / "+n0(x.g):""} g`,x.c,x.k)).join("")}</section>
+    <section class="bdn-sec">${bdMain(DS[1],"Passions")}${P.length?bdMulti(P)+P.map(x=>bdMeter(x.n,x.v,x.g,x.g?`${fmtH(x.v)} / ${fmtH(x.g)}`:fmtH(x.v),x.c,x.k)).join(""):`<p class="note" style="margin:0">No passions yet</p>`}</section>
+    <section class="bdn-sec">${bdMain(DS[2],"Budget")}${""/* was: separate "Spent this month" meter (pushed the bars out of line) — the gold bar above is that */}</section>
   </div></div>`}
 function meter(label,v,goal,u,c){const p=goal?Math.min(v/goal,1):0;
   return `<div class="meter" style="--c:${c}"><div class="meter-top"><span>${esc(label)}</span><b>${typeof v==="number"?n0(v):v} / ${n0(goal)} ${u}</b></div><div class="track"><i style="width:${p*100}%"></i></div></div>`}
@@ -9212,8 +9228,8 @@ document.addEventListener("click",e=>{if(e.target.closest("select"))return;
   else if(b.dataset.modeldel!==undefined){if(!mdlDelArm){mdlDelArm=true;render();return}mdlDelArm=false;const a=avatarOf();if(a.model&&a.model.path!=="local"&&sbOn())sb.storage.from("models").remove([a.model.path]);delete a.model;a.useModel=false;data.profile=Object.assign({},data.profile,{avatar:a});render();save();toast("3D model removed")}
   else if(b.dataset.avcmode){const a=avatarOf();a.cmode=b.dataset.avcmode;delete a.blend;delete a.glass;data.profile=Object.assign({},data.profile,{avatar:a});render();save()}
   else if(b.dataset.avset){const[k,v]=b.dataset.avset.split(":");const a=avatarOf();a[k]=v;data.profile=Object.assign({},data.profile,{avatar:a,figure:a.body});render();save()}
-  else if(b.dataset.day){calSel=b.dataset.day;const x=new Date(calSel+"T12:00");calMonth=new Date(x.getFullYear(),x.getMonth(),1);render()}
-  else if(b.dataset.cal!==undefined){const k=+b.dataset.cal;if(!k){const n=new Date();calMonth=new Date(n.getFullYear(),n.getMonth(),1);calSel=today()}else calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+k,1);render()}
+  else if(b.dataset.day){/* tap a day: open its overview under the calendar; tap it again to close */const ds=b.dataset.day;dashDay=dashDay===ds?null:ds;calSel=ds;const v=$("#view"),st=v?v.scrollTop:0;render();if(v)v.scrollTop=st}
+  else if(b.dataset.cal!==undefined){const k=+b.dataset.cal;dashDay=null;if(!k){const n=new Date();calMonth=new Date(n.getFullYear(),n.getMonth(),1);calSel=today()}else calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+k,1);render()}
   else if(b.hasAttribute("data-demo-off")){demoOff=true;try{localStorage.setItem("aot-demo-off","1")}catch(e){}render();toast("Demo data cleared")}
   else if(b.hasAttribute("data-demo-on")){demoOff=false;try{localStorage.removeItem("aot-demo-off")}catch(e){}render()}
   else if(b.dataset.del){const[k,id]=b.dataset.del.split(":");data[k]=data[k].filter(x=>x.id!==id);if(k==="meals")data.mealsGone=[...(data.mealsGone||[]),id].slice(-500);render();save();toast("Entry deleted")}
@@ -9226,7 +9242,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="690",APPT="2026-11-24T00:57:51Z";   /* APPT: when this update was made */
+const APPV="691",APPT="2026-11-24T01:02:55Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
