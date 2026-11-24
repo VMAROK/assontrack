@@ -2870,7 +2870,8 @@ html #view .cal-tab.open{color:var(--muted)}
 html #view .dtiles{grid-template-rows:auto minmax(0,1fr);height:auto!important;min-height:var(--dph)}html #view .dtiles>.dt-strip{grid-column:1/-1;margin:0!important;padding:9px 18px}html #view .dt-strip .dt-vsw{position:absolute;top:50%;right:12px;transform:translateY(-50%)}
 html #view .dtiles.dt-prog{padding:0!important;justify-content:flex-start}html #view .dt-prog>.dt-pb{flex:1;display:flex;flex-direction:column;justify-content:center;padding:10px 18px 12px}html.phone #view .dtiles.dt-prog{padding:0!important}
 html #view .dtiles:not(.dt-prog)>.dtile{padding-top:8px!important}
-html #view .dashtop>.dstack{row-gap:inherit!important;gap:inherit!important}   /* Overview ↔ This week gap = the gap beside the figure panel */
+/* v696 guess (wrong): html #view .dashtop>.dstack{gap:inherit} */
+html.gap-in #view .dstack>.panel{margin-top:0!important}html body #view .dashtop>.dstack.dstack{row-gap:inherit!important}   /* with your gap setting, This week got the gap twice (the stack's gap + its own top margin) */
 .bwg-solo{display:none}@media (max-width:1100px){#view .bwg-solo{display:block}#view .bm-has>.bm-sep,#view .bm-has>.bm-r{display:none!important}}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
@@ -9261,7 +9262,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="697",APPT="2026-11-24T01:16:14Z";   /* APPT: when this update was made */
+const APPV="698",APPT="2026-11-24T01:21:47Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
