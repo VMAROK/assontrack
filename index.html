@@ -2863,8 +2863,8 @@ html #view .mcal .mc.pick{position:relative;z-index:1;animation:mcPick .45s ease
 html #view .mcal .mc.pick:not(.today){background:rgba(255,255,255,.07)}
 .bc-day.dov{margin-top:14px}.dov .bdw-sh{font-weight:700}.dov-bud .bdw-in{padding:0;border:0;background:none;box-shadow:none}.dov-bud .bdw-h{display:none}
 /* "Add event" tab hanging off the bottom of the calendar panel (same panel look, so it follows the theme) */
-html #view .panel:has(+.cal-tab){border-bottom-left-radius:var(--pr,14px);border-bottom-right-radius:var(--pr,14px);position:relative;z-index:1}
-html #view .cal-tab{display:block;width:min(560px,100%);margin:-1px auto 0!important;padding:14px 22px 18px!important;border-top:0!important;border-top-left-radius:0!important;border-top-right-radius:0!important;position:relative;z-index:0}html #view .cal-evp .dayview{margin-top:0}
+html #view .panel:has(+.cal-tab){position:relative;z-index:0}
+html #view .cal-tab{display:block;width:min(560px,100%);margin:-2px auto 0!important;box-shadow:none!important;padding:16px 22px 18px!important;border-top:0!important;border-top-left-radius:0!important;border-top-right-radius:0!important;position:relative;z-index:1}   /* sits over the calendar panel's bottom edge, so there's no line between them: one shape */html #view .cal-evp .dayview{margin-top:0}
 html #view .cal-tab.open{color:var(--muted)}
 .ev-drawer{animation:evDrop .32s cubic-bezier(.25,.8,.3,1) both;overflow:hidden}@keyframes evDrop{from{opacity:0;max-height:0;margin-top:0}to{opacity:1;max-height:420px}}
 html #view .dtiles{grid-template-rows:auto minmax(0,1fr);height:auto!important;min-height:var(--dph)}html #view .dtiles>.dt-strip{grid-column:1/-1;margin:0!important;padding:9px 18px}html #view .dt-strip .dt-vsw{position:absolute;top:50%;right:12px;transform:translateY(-50%)}
@@ -3971,12 +3971,15 @@ function vDash(){
 let calMonth=null,calSel=null,dashDay=null,dashDayShown=null,evOpen=false;
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-evtab]");if(!b)return;e.preventDefault();e.stopPropagation();evOpen=!evOpen;const v=$("#view"),st=v?v.scrollTop:0;render();if(v)v.scrollTop=st;if(evOpen)setTimeout(()=>{const i=document.getElementById("evT");i&&i.focus({preventScroll:true})},60)},true);
 /* the day overview (like Budget's): events, passions and money for that day */
+function ddPaint(){let h=document.getElementById("ddHost");if(!dashDay||tab!=="dash"){if(h)h.remove();return}if(!h){h=document.createElement("div");h.id="ddHost";document.body.appendChild(h)}h.innerHTML=dashDayOv(D(),dashDay)}
+document.addEventListener("click",e=>{const t=e.target;if(!t.closest)return;const x=t.closest("[data-ddx]"),bg=t.matches&&t.matches("[data-ddbg]"),nav=t.closest(".navbtn");if(!x&&!bg&&!nav)return;if(nav){if(dashDay){dashDay=null;ddPaint()}return}e.preventDefault();e.stopPropagation();dashDay=null;ddPaint();const v=$("#view"),st=v?v.scrollTop:0;render();if(v)v.scrollTop=st},true);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&dashDay){dashDay=null;ddPaint();render()}});
 function dashDayOv(d,ds){const it=dayItems(d,ds),T=today(),b=B(),SE=calBud(ds),SS=(b.spends||[]).filter(x=>x.d===ds),PL=it.logs.filter(l=>l.p),anim=dashDayShown!==ds;dashDayShown=ds;
   const sec=(t,c,L)=>L?`<div class="bdw-s"><div class="bdw-sh" style="color:${c}">${t}</div>${L}</div>`:"";
   const evs=it.ev.map(e=>`<div class="bdw-r" style="--cc:var(--cyan)"><i></i><span><b>${esc(e.title)}</b><small>${e.time?fmtTime(e.time):"All day"}</small></span>${del("events",e.id)}</div>`).join("");
   const ps=PL.map(l=>`<div class="bdw-r" style="--cc:${l.c}"><i></i><span><b>${esc(l.t)}</b><small>${esc(l.s)}</small></span><em>${l.v}</em></div>`).join("");
   const money=SE.length||SS.length?`<div class="dov-bud">${bDayPop(b,ds,SE,SS,T,true)}</div>`:"";
-  return `<div class="bc-day dov${anim?" bdw-open":""}"><div class="bdw-in"><div class="bdw-h"><div><b>${new Date(ds+"T12:00").toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</b>${ds===T?"<small>Today</small>":""}</div></div>
+  return `<div class="bdw dov" data-ddbg><div class="bdw-p panel" role="dialog" aria-modal="true" aria-label="Day overview"><div class="bdw-h"><div><b>${new Date(ds+"T12:00").toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</b>${ds===T?"<small>Today</small>":""}</div><button type="button" class="bdw-x" data-ddx aria-label="Close">×</button></div>
     ${evs||ps||money?sec("Events","#4cc9ff",evs)+sec("Passions","#b99cff",ps)+(money?`<div class="bdw-s"><div class="bdw-sh" style="color:#ffc533">Budget</div>${money}</div>`:""):`<p class="note" style="margin:10px 2px 4px">Nothing on this day.</p>`}</div></div>`}
 const fmtTime=t=>{const [h,m]=String(t).split(":").map(Number);return new Date(2000,0,1,h||0,m||0).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})};
 /* budget items (paydays, bills, subscriptions) that land on a day, worked out once per calendar view */
@@ -4043,7 +4046,7 @@ function bigCal(d){
   return `<div class="panel">
     <div class="calhead cal-c">${""/* was: month on the left, ‹ Today › on the right */}<button class="pill calnav" data-cal="-1" aria-label="Previous month">‹</button><h2>${calMonth.toLocaleDateString(undefined,{month:"long",year:"numeric"})}</h2><button class="pill calnav" data-cal="1" aria-label="Next month">›</button></div>
     <div class="mcal">${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(w=>`<div class="cw">${w}</div>`).join("")}${cells.join("")}</div>
-    ${dashDay?dashDayOv(d,dashDay):""}
+    ${""/* v691 showed the day overview under the calendar; now it opens as a window like Budget's */}${(setTimeout(ddPaint,0),"")}
     ${""/* was: the Add an event form always showing here — now it hides behind the "Add event" tab under the panel */}${""/* v692 had a ＋ Add event toggle tab; now the form always shows, in a narrower tab-shaped part of the panel under the calendar */}</div><div class="panel cal-tab cal-evp"><div class="dayview solo">
     ${""/* v684: the progress (Nutrition / Passions / Budget) lived here with a Bar/Donut switch — moved to the top panel. Under the calendar: just your events + Add an event */}${""/* events list moved into the day overview */}
       <form class="f" id="evForm"><div class="ph" style="margin-bottom:2px"><span>Add an event</span></div>
@@ -9252,7 +9255,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="694",APPT="2026-11-24T01:10:26Z";   /* APPT: when this update was made */
+const APPV="695",APPT="2026-11-24T01:12:54Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
