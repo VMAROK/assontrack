@@ -2974,7 +2974,7 @@ html.tpl-sharp #view .panel.hasStrip::after,html.phone #view .panel.hasStrip::af
 #view[data-tab="budget"] :is(.bs-budg,.bs-addg)[aria-pressed="true"]{background:rgba(var(--tL),.22)!important;border-color:rgba(var(--tL),.6)!important}
 #view[data-tab="budget"] .bsg{border-color:transparent!important;background:rgba(var(--tD),.45)!important;box-shadow:none!important}
 @media (min-width:1100px){html:not(.phone) #view[data-tab="budget"]>:is(.bco,.panel:has(.bstrip-amt)){max-width:860px}}   /* Income & expenses: 10px narrower on each side in landscape */
-@media (max-width:1099px){html.tablet:not(.phone) #view[data-tab="budget"]>:is(.bco,.panel:has(.bstrip-amt)){max-width:none;margin-left:144px!important;margin-right:144px!important}}   /* 144 layout px = ~100 on screen (the iPad view is scaled ~0.7) */   /* iPad portrait: Income & expenses and Extras 100px in from each side */
+@media (max-width:1099px){html.tablet:not(.phone) #view[data-tab="budget"]>:is(.bco,.panel:has(.bstrip-amt)){max-width:none;margin-left:252px!important;margin-right:252px!important}}   /* 144 layout px = ~100 on screen (the iPad view is scaled ~0.7) */   /* iPad portrait: Income & expenses and Extras 100px in from each side */
 /* 10:30 list, done while away:
    1) wide screens: Usuals and the Add food results list sit in a narrower centred column */
 @media (min-width:1100px){html:not(.phone) #view[data-tab="fuel"] .usp{max-width:900px;margin-left:auto!important;margin-right:auto!important}html:not(.phone) #view[data-tab="fuel"] .flogp .fd-inline #fdOut,html:not(.phone) #view[data-tab="fuel"] .flogp .fd-inline>.fd-btns{max-width:820px;margin-left:auto;margin-right:auto;width:100%}}
@@ -9437,7 +9437,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="747",APPT="2026-11-24T04:12:57Z";   /* APPT: when this update was made */
+const APPV="748",APPT="2026-11-24T05:12:54Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
