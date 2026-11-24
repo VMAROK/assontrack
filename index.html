@@ -2911,7 +2911,12 @@ html.phone #view .calhead.cal-c{margin:0 -2px 12px!important;flex-wrap:nowrap}ht
 .dpx em{color:#b99cff!important}.dpx-hint{margin:4px 2px 2px;font-size:12px;color:var(--muted)}
 .dov .bdw-s+.bdw-s{margin-top:14px;padding-top:14px;border-top:2px solid rgba(var(--lr),.28)}   /* divider between Events / Passions / Budget in the day window */
 .mc-x{width:10px;height:10px;margin-right:5px;vertical-align:-1px;flex:none;filter:drop-shadow(0 0 3px rgba(255,77,94,.55))}
-#view .mcal:not(.cal-dots) .mc .chips em:nth-of-type(n+4){display:none!important}#view .mcal.cal-dots .mc .chips small{display:none!important}   /* Dots: every item gets a dot; Details: first 3 + "+N more" */
+/* every item shows; a day with too many scrolls inside its box (no "+N more") */
+#view .mcal .mc .chips small{display:none!important}
+html #view .mcal .mc:not(.mc-blank){height:108px;overflow:hidden}html.phone #view .mcal .mc:not(.mc-blank){height:58px}
+#view .mcal .mc .chips{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}#view .mcal .mc .chips::-webkit-scrollbar{display:none}
+#view .mcal .mc .chips{-webkit-mask-image:linear-gradient(#000 calc(100% - 10px),transparent);mask-image:linear-gradient(#000 calc(100% - 10px),transparent)}
+.mc-ok{filter:drop-shadow(0 0 3px rgba(61,220,132,.6))}   /* Dots: every item gets a dot; Details: first 3 + "+N more" */
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4037,12 +4042,12 @@ function dayItems(d,ds){
   const meals=d.meals.filter(m=>m.d===ds),wo=d.workouts.filter(w=>w.d===ds),ss=d.sessions.filter(s=>s.d===ds),wt=d.weights.find(w=>w.d===ds);
   /* calendar colours = the tab colours: events sky blue, passions lavender (missed red), bills gold, paydays green */
   const PCL="#b99cff",chips=[...ev.map(e=>({c:"#4cc9ff",t:(e.time?fmtTime(e.time)+" ":"")+e.title})),
-    ...ss.map(s=>({c:PCL,t:pn(s.pid)})),   /* calendar chips: just the name (was time + duration) */
-    ...slotsOn(d,ds).map(x=>({c:x.state==="missed"?"var(--red)":PCL,t:(x.state==="missed"?"✕ ":"")+x.p.name})),
+    ...ss.map(s=>({c:PCL,t:(Object.keys(d.passX||{}).some(k=>k.startsWith(ds+"|"+pn(s.pid)+"|"))?"✓ ":"")+pn(s.pid)})),   /* calendar chips: just the name (was time + duration) */
+    ...slotsOn(d,ds).map(x=>({c:x.state==="missed"?"var(--red)":PCL,t:(x.state==="missed"?"✕ ":Object.keys(d.passX||{}).some(k=>k.startsWith(ds+"|"+x.p.name+"|"))?"✓ ":"")+x.p.name})),
     ...wkOn(d,ds).map(x=>({c:x.state==="missed"?"var(--red)":PCL,t:(x.state==="missed"?"✕ ":/^done/.test(x.state)?"✓ ":"")+x.p.name})),
     ...tasksDue(d,ds).map(x=>({c:x.st==="overdue"||x.st==="late"?"var(--red)":PCL,t:(x.st==="mastered"?"✓ ":x.st==="overdue"||x.st==="late"?"✕ ":"")+x.t.title})),
     /* was: exercises / meals / weigh-in counts — the calendar is only for things on a schedule: events, passions, and paydays / bills */
-    ...calBud(ds).map(i=>({c:i.kind==="inc"?"#3ddc84":"#ffc533",t:bTitle(i)}))];   /* name only (was amount + name) */
+    ...calBud(ds).map(i=>({c:i.kind==="inc"?"#3ddc84":"#ffc533",t:(bIsPaid(B(),i,ds)?"✓ ":"")+bTitle(i)}))];   /* name only (was amount + name) */
   const logs=[...meals.map(m=>({c:"var(--magenta)",t:m.name,s:m.type,v:n0(m.kcal)+" kcal"})),
     ...wo.map(w=>({c:"var(--lime)",t:w.name,s:"Training",v:`${w.sets}×${w.reps}`})),
     ...ss.map(x=>({p:1,c:"var(--amber)",t:pn(x.pid),s:x.planned?"Planned session"+(x.time?" · "+fmtTime(x.time):""):(x.slotId?"Scheduled session · done":"Passion session"),v:fmtH(x.mins)})),
@@ -4089,7 +4094,7 @@ function bigCal(d){
   const start=new Date(y,m,1-off),end=new Date(y,m,1-off+41);   /* always 6 rows (42 boxes) so the calendar never changes height; extra blank boxes go at the bottom. was: endOff=6-last.getDay(),end=new Date(y,m,last.getDate()+endOff) */
   const cells=[];
   for(let x=new Date(start);x<=end;x.setDate(x.getDate()+1)){const ds=ymd(x),out=x.getMonth()!==m;if(out){cells.push(`<div class="mc out mc-blank" aria-hidden="true"></div>`);continue}   /* days from the next/previous month: left blank */
-    const it=dayItems(d,ds);cells.push(`<button class="mc${out?" out":""}${ds===today()?" today":""}${ds===dashDay?" pick":""}" data-day="${ds}"><span class="mn">${x.getDate()}</span><div class="chips">${it.chips.map(c=>{const m=/^✕ /.test(c.t);return `<em style="--c:${c.c}">${m?'<svg class="mc-x" viewBox="0 0 12 12" aria-label="Missed"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="#ff4d5e" stroke-width="2.4" stroke-linecap="round"/></svg>':""}${esc(m?c.t.slice(2):c.t)}</em>`}).join("")}${it.chips.length>3?`<small>+${it.chips.length-3} more</small>`:""}</div></button>`)}
+    const it=dayItems(d,ds);cells.push(`<button class="mc${out?" out":""}${ds===today()?" today":""}${ds===dashDay?" pick":""}" data-day="${ds}"><span class="mn">${x.getDate()}</span><div class="chips">${it.chips.map(c=>{const m=/^✕ /.test(c.t);const ok=/^✓ /.test(c.t);return `<em style="--c:${c.c}">${m?'<svg class="mc-x" viewBox="0 0 12 12" aria-label="Missed"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="#ff4d5e" stroke-width="2.4" stroke-linecap="round"/></svg>':ok?'<svg class="mc-x mc-ok" viewBox="0 0 12 12" aria-label="Done"><path d="M2 6.5l2.6 2.6L10 3.5" fill="none" stroke="#3ddc84" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>':""}${esc(m||ok?c.t.slice(2):c.t)}</em>`}).join("")}${it.chips.length>3?`<small>+${it.chips.length-3} more</small>`:""}</div></button>`)}
   const it=dayItems(d,calSel);
   return `<div class="panel">
     <div class="calhead cal-c">${""/* was: month on the left, ‹ Today › on the right */}<div class="cal-vsw" role="group" aria-label="Show as"><button type="button" data-cview="dots" aria-pressed="${calView()!=="list"}" title="Dots" aria-label="Dots"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><circle cx="6" cy="12" r="2.6"/><circle cx="12" cy="12" r="2.6"/><circle cx="18" cy="12" r="2.6"/></svg></button><button type="button" data-cview="list" aria-pressed="${calView()==="list"}" title="Details" aria-label="Details"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button></div><button class="pill calnav" data-cal="-1" aria-label="Previous month">‹</button><h2>${calMonth.toLocaleDateString(undefined,{month:"long",year:"numeric"})}</h2><button class="pill calnav" data-cal="1" aria-label="Next month">›</button></div>
@@ -9305,7 +9310,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="710",APPT="2026-11-24T02:04:01Z";   /* APPT: when this update was made */
+const APPV="711",APPT="2026-11-24T02:06:09Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
