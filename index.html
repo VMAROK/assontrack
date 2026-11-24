@@ -2831,6 +2831,7 @@ html.phone .dp-d{grid-template-columns:minmax(0,1fr);justify-items:center}html.p
 /* TEMP review badges: how many 10:30 PM review reminders each tab has, old-Facebook style red bubble with a bell (remove before launch) */
 .navbtn[data-tab="budget"]::before,.navbtn[data-tab="fuel"]::before{position:absolute;top:2px;left:calc(50% + 6px);z-index:3;pointer-events:none;display:inline-flex;align-items:center;gap:2px;height:18px;padding:0 6px 0 18px;border-radius:9px;background:#e41e3f url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 16V11a6 6 0 0112 0v5l1.5 2h-15z M10 20a2 2 0 004 0' fill='%23fff'/%3E%3C/svg%3E") 5px 50%/11px no-repeat;color:#fff;font:700 11px/18px system-ui,-apple-system,sans-serif;box-shadow:0 0 0 2px rgba(0,0,0,.55),0 2px 6px rgba(0,0,0,.4)}
 .navbtn[data-tab="budget"]::before{content:"3"}.navbtn[data-tab="fuel"]::before{content:"1"}
+.dp-rows{display:grid;grid-template-columns:auto minmax(0,1fr) max-content;align-items:center;gap:12px 12px}.dp-rows>.dp-r{display:contents}.dp-rows .dp-r b{text-align:left}   /* bars all the same length; numbers lined up on the left of their column */
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -3964,17 +3965,17 @@ function dashStats(d,ds){
   try{wkOn(d,ds).forEach(x=>add(x.p,Math.min(+x.lg||0,+x.slot.dur||0),+x.slot.dur||0))}catch(_){}
   const PL=[...PP.values()],pf=PL.length?PL.reduce((a,o)=>a+Math.min(1,o.got/o.goal),0)/PL.length:done?1:0,pOk=PL.filter(o=>o.got>=o.goal).length;
   let out=0,inc=0;try{const S=bStats();out=S.subs+S.bills+S.spent;inc=S.inc}catch(_){}
-  const N={k:"Nutrition",c:"#4cc9ff",d:"#1b86b8",f:L?k/L:0,v:L?`${n0(k)} / ${n0(L)} cal`:`${n0(k)} cal`,over:L&&k>L},
-    P={k:"Passions",c:"#b99cff",d:"#7d5fd6",f:pf,v:PL.length?`${pOk} / ${PL.length} on goal`:done?fmtH(done)+" logged":"nothing planned",over:false},
-    Bu={k:"Budget",c:"#ffc533",d:"#b98a00",f:inc?out/inc:0,v:inc?`${bMoney(out,0)} / ${bMoney(inc,0)}`:"no income set",over:inc&&out>inc};
+  const N={k:"Nutrition",c:"#4cc9ff",d:"#1b86b8",f:L?k/L:0,v:L?[n0(k),n0(L)]:[n0(k)],over:L&&k>L},
+    P={k:"Passions",c:"#b99cff",d:"#7d5fd6",f:pf,v:PL.length?[pOk,PL.length]:done?fmtH(done)+" logged":"nothing planned",over:false},
+    Bu={k:"Budget",c:"#ffc533",d:"#b98a00",f:inc?out/inc:0,v:inc?[bMoney(out,0),bMoney(inc,0)]:"no income set",over:inc&&out>inc};
   return [N,P,Bu]}
-function dashProg(d,ds){const A=dashStats(d,ds),cl=x=>Math.max(0,Math.min(1,x));
+function dashProg(d,ds){const A=dashStats(d,ds),cl=x=>Math.max(0,Math.min(1,x)),V=x=>Array.isArray(x.v)?`<span${x.over?` style="color:${x.d}"`:""}>${x.v[0]}</span>${x.v.length>1?` / ${x.v[1]}`:""}`:esc(x.v);   /* number only; over the limit → the top number in the heavier shade */
   if(dpView()==="donut"){/* three rings, touching, outlined — like the week strip */const R=[44,32,20],SW=12;
     const ring=(x,i)=>{const r=R[i],C=2*Math.PI*r,f=cl(x.f),ov=x.over?Math.min(.999,x.f-1):0;return `<circle cx="60" cy="60" r="${r}" fill="none" stroke="rgba(150,180,240,.12)" stroke-width="${SW}"/>${f?`<circle data-ak="dp:${x.k}" cx="60" cy="60" r="${r}" fill="none" stroke="${x.c}" stroke-width="${SW}" stroke-dasharray="${(C*f).toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="0" transform="rotate(-90 60 60)"/>`:""}${ov?`<circle data-ak="dp:${x.k}o" cx="60" cy="60" r="${r}" fill="none" stroke="${x.d}" stroke-width="${SW}" stroke-dasharray="${(C*ov).toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="0" transform="rotate(-90 60 60)"/>`:""}`};
-    return `<div class="dp dp-d" data-akg="dp"><svg class="dp-svg" data-akg="dpr" viewBox="0 0 120 120" aria-hidden="true">${A.map(ring).join("")}${[R[0]+SW/2,R[0]-SW/2,R[1]-SW/2,R[2]-SW/2].map(r=>`<circle cx="60" cy="60" r="${r}" fill="none" stroke="#000" stroke-width="1.2"/>`).join("")}</svg><div class="dp-leg">${A.map(x=>`<div style="--c:${x.c}"><i></i><span>${x.k}</span><b>${x.v}</b><em>${Math.round(x.f*100)}%</em></div>`).join("")}</div></div>`}
+    return `<div class="dp dp-d" data-akg="dp"><svg class="dp-svg" data-akg="dpr" viewBox="0 0 120 120" aria-hidden="true">${A.map(ring).join("")}${[R[0]+SW/2,R[0]-SW/2,R[1]-SW/2,R[2]-SW/2].map(r=>`<circle cx="60" cy="60" r="${r}" fill="none" stroke="#000" stroke-width="1.2"/>`).join("")}</svg><div class="dp-leg">${A.map(x=>`<div style="--c:${x.c}"><i></i><span>${x.k}</span><b>${V(x)}</b><em>${Math.round(x.f*100)}%</em></div>`).join("")}</div></div>`}
   /* bar view: one multicolour bar (each area fills its third), then a bar each */
   return `<div class="dp" data-akg="dp"><div class="dp-all">${A.map(x=>`<i data-akw="dp:a${x.k}" style="width:${(cl(x.f)*100/3).toFixed(2)}%;--c:${x.c}"></i>`).join("")}</div>
-    ${A.map(x=>{const ov=x.over?Math.min(100,(x.f-1)*100):0;return `<div class="dp-r" style="--c:${x.c}"><span>${x.k}</span><div class="dp-t${ov?" ov":""}">${ov?`<i data-akw="dp:g${x.k}" style="width:${(100-ov).toFixed(1)}%;--c:${x.c}"></i><i data-akw="dp:r${x.k}" style="width:${ov.toFixed(1)}%;--c:${x.d}"></i>`:`<i data-akw="dp:g${x.k}" style="width:${(cl(x.f)*100).toFixed(1)}%"></i>`}</div><b>${x.v}</b></div>`}).join("")}</div>`}
+    <div class="dp-rows">${A.map(x=>{const ov=x.over?Math.min(100,(x.f-1)*100):0;return `<div class="dp-r" style="--c:${x.c}"><span>${x.k}</span><div class="dp-t${ov?" ov":""}">${ov?`<i data-akw="dp:g${x.k}" style="width:${(100-ov).toFixed(1)}%;--c:${x.c}"></i><i data-akw="dp:r${x.k}" style="width:${ov.toFixed(1)}%;--c:${x.d}"></i>`:`<i data-akw="dp:g${x.k}" style="width:${(cl(x.f)*100).toFixed(1)}%"></i>`}</div><b>${V(x)}</b></div>`}).join("")}</div></div>`}
 function bigCal(d){
   const now=new Date();if(!calMonth)calMonth=new Date(now.getFullYear(),now.getMonth(),1);if(!calSel)calSel=today();
   const y=calMonth.getFullYear(),m=calMonth.getMonth(),off=new Date(y,m,1).getDay(),last=new Date(y,m+1,0);
@@ -9181,7 +9182,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="678",APPT="2026-11-24T00:26:53Z";   /* APPT: when this update was made */
+const APPV="679",APPT="2026-11-24T00:30:49Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
