@@ -3400,6 +3400,9 @@ html:is(.tpl-vt,.tpl-stipple).tpl-bars-clear.tpl-bars-clear.tpl-bars-clear :is(a
 .wtab{flex:none;font:inherit;font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:99px;border:1px solid rgba(var(--lr),.2);background:none;color:var(--muted);cursor:pointer;white-space:nowrap}
 .wtab[aria-selected="true"]{background:rgba(var(--tL),.22);border-color:rgba(var(--tL),.6);color:#fff}
 html.tpl-sharp .wtab{border-radius:0}
+/* Settings: the empty spot where Goals was — a small dancing light figure, same on every theme (no panel, no border) */
+.set-art{position:relative;min-height:300px;background:none!important;border:0!important;box-shadow:none!important;overflow:hidden}
+.set-art canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9649,12 +9652,8 @@ document.addEventListener("DOMContentLoaded",()=>eUnitFix(document.body));setTim
 function vSet(){
   const g=data.goals;
   return banner()+wallPanel()+tplPanel()+themePanel()+splashPanel()+soundPanel()+displayPanel()+/* Wallpaper above Templates, Saved themes right under them (was: tplPanel()+wallPanel()+… themePanel() further down) */affPanel()+lookPanel()+hkPanel()+`<div class="grid cols2" style="margin-top:18px">
-   <div class="panel"><div class="ph"><span>Goals</span><i>Goals</i></div>
-    <form class="f" id="gForm"><div class="f2"><label>Daily calories<input id="gK" type="number" inputmode="numeric" min="0" value="${g.kcal}"></label><label>Daily protein (g)<input id="gP" type="number" inputmode="numeric" min="0" value="${g.protein}"></label></div>
-    <label>Goal weight (${g.unit})<input id="gW" type="number" step="0.1" inputmode="decimal" value="${g.weight??""}" placeholder="Optional"></label>
-    <div class="f2"><label>Weight unit<select id="gU"><option ${g.unit==="lb"?"selected":""}>lb</option><option ${g.unit==="kg"?"selected":""}>kg</option></select></label><label>Length unit<select id="gL"><option ${g.len==="in"?"selected":""}>in</option><option ${g.len==="cm"?"selected":""}>cm</option></select></label></div>
-    
-    <button class="btn">Save goals</button></form></div>
+   <!-- Goals panel removed from Settings (moving to Nutrition: daily intake from weight etc.). Its old markup is in git history. The space stays, with a little animation -->
+   <div class="set-art" aria-hidden="true"><canvas></canvas></div>
    <div class="panel"><div class="ph"><span>Account &amp; sync</span><i>${sbUser?"Synced":"This device"}</i></div>
     ${sb?(sbUser?`<p class="note" style="margin-top:0">Signed in as <b style="color:var(--fg)">${esc(sbUser.email||"")}</b>. Your logs sync between your devices.</p><div class="stack" style="margin-top:14px;gap:10px">${pwOpen?`<form class="f pwform" id="pwForm"><label>Current password<input id="pwCur" type="password" autocomplete="current-password" required></label><label>New password<input id="pwNew" type="password" autocomplete="new-password" required minlength="6"></label><label>Confirm new password<input id="pwNew2" type="password" autocomplete="new-password" required minlength="6"></label><p id="pwMatch2" class="pw-match" aria-live="polite"></p><p id="pwMsg" class="auth-msg" role="alert"></p><div class="pw-btns"><button class="btn" id="pwGo">Save new password</button><button type="button" class="mv" id="pwCancel">Cancel</button></div></form>`:`<button class="btn mag" id="pwBtn">Change password</button>`}<button class="btn" id="signOutBtn">Sign out</button></div>`
       :`<p class="note" style="margin-top:0">You're saving on this device only. Sign in to keep your logs safe and synced between your phone and computer.</p><div class="stack" style="margin-top:14px;gap:10px"><button class="btn" id="signInBtn">Sign in or create account</button></div>`)
@@ -9854,7 +9853,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="819",APPT="2026-11-24T17:06:07Z";   /* APPT: when this update was made */
+const APPV="820",APPT="2026-11-24T17:12:22Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -10121,5 +10120,22 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   const check=()=>{const h=document.documentElement;let want=null;if(h.classList.contains("tpl-bg"))for(const k in R)if(h.classList.contains("tpl-"+k))want=k;
     if(want!==cur){cancelAnimationFrame(raf);cur=want;S={};x.clearRect(0,0,W,H);if(cur){size();raf=requestAnimationFrame(loop)}}};
   new MutationObserver(check).observe(document.documentElement,{attributes:true,attributeFilter:["class"]});addEventListener("resize",()=>{if(cur){S={};size()}});check()})();
+</script>
+<script>/* Settings art: a ribbon of ~900 glowing points tracing a slow 3D knot that sways, breathes and shifts colour — runs only while it's on screen */
+(()=>{let cv=null,x=null,W=0,H=0,raf=0,last=0;const N=2200,P=[...Array(N)].map((_,i)=>({u:Math.random(),o:Math.random()*6.28,j:(Math.random()-.5)*.08,a:Math.random()*6.28,r:Math.sqrt(Math.random())*.09}));
+  const size=()=>{const d=Math.min(2.5,devicePixelRatio||1),r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=Math.max(1,Math.round(W*d));cv.height=Math.max(1,Math.round(H*d));x.setTransform(d,0,0,d,0,0)};
+  const draw=t=>{x.clearRect(0,0,W,H);const S=Math.min(W,H)*.3,cx=W/2,cy=H/2,ry=t*.25,rx=.5+.25*Math.sin(t*.31),cR=Math.cos(ry),sR=Math.sin(ry),cX=Math.cos(rx),sX=Math.sin(rx),br=1+.06*Math.sin(t*1.3),hb=(t*12)%360;
+    {const g=x.createRadialGradient(cx,cy,0,cx,cy,S*1.3);g.addColorStop(0,`hsla(${hb},80%,60%,.10)`);g.addColorStop(1,"hsla(0,0%,0%,0)");x.fillStyle=g;x.fillRect(0,0,W,H)}
+    x.globalCompositeOperation="lighter";
+    for(const p of P){const a=p.u*6.2832*2,sw=.25*Math.sin(t*.9+p.u*12.6);
+      /* trefoil knot that sways */let X=(Math.sin(a/2*3)+2*Math.sin(a))*.36,Y=(Math.cos(a/2*3)-2*Math.cos(a))*.36+sw*.3,Z=(-Math.sin(a*1.5))*.55+p.j;const tr=p.r*(1+.4*Math.sin(t*1.7+p.u*20));X+=Math.cos(p.a+t*.6)*tr;Y+=Math.sin(p.a+t*.6)*tr;/* points spread around the line, so it reads as a soft glowing ribbon */
+      X*=br;Y*=br;const x1=X*cR+Z*sR,z1=-X*sR+Z*cR,y2=Y*cX-z1*sX,z2=Y*sX+z1*cX,pr=1/(1.6-z2*.5),px=cx+x1*S*pr,py=cy+y2*S*pr;
+      const tw=.5+.5*Math.sin(t*2.2+p.o),al=(.18+.45*(z2*.5+.5))*(.45+.55*tw),r=(.5+1.1*(z2*.5+.5))*pr;
+      x.fillStyle=`hsla(${(hb+p.u*140)%360},85%,${62+18*tw}%,${al.toFixed(3)})`;x.beginPath();x.arc(px,py,r,0,6.2832);x.fill()}
+    x.globalCompositeOperation="source-over"};
+  const loop=n=>{raf=requestAnimationFrame(loop);if(!cv||!cv.isConnected){stop();return}if(document.hidden||n-last<33)return;last=n;draw(n/1000)};
+  const stop=()=>{cancelAnimationFrame(raf);raf=0;cv=null};
+  const check=()=>{const c=document.querySelector(".set-art canvas");if(c&&c!==cv){cv=c;x=c.getContext("2d");size();if(!raf)raf=requestAnimationFrame(loop)}else if(!c&&cv)stop()};
+  new MutationObserver(check).observe(document.body,{childList:true,subtree:true});addEventListener("resize",()=>{if(cv)size()});check()})();
 </script>
 </body></html>
