@@ -2874,6 +2874,11 @@ html #view .dtiles:not(.dt-prog)>.dtile{padding-top:8px!important}
 html.gap-in #view .dstack>.panel{margin-top:0!important}html body #view .dashtop>.dstack.dstack{row-gap:inherit!important}   /* with your gap setting, This week got the gap twice (the stack's gap + its own top margin) */
 .bwg-solo{display:none}@media (max-width:1100px){#view .bwg-solo{display:block}#view .bm-has>.bm-sep,#view .bm-has>.bm-r{display:none!important}}
 html body #view .panel.cal-tab{margin-top:-2px!important}   /* stays joined to the calendar even with a custom gap setting */
+/* calendar + Add an event as ONE shape: the calendar's bottom edge is drawn only where the event part isn't, so there's no line between them */
+html body #view .panel:has(+.cal-tab){border-bottom-color:transparent!important}
+html body #view .panel:has(+.cal-tab)::after{content:""!important;display:block!important;position:absolute!important;left:var(--pr0,12px)!important;right:var(--pr0,12px)!important;bottom:-1px!important;top:auto!important;width:auto!important;height:1px!important;border:0!important;opacity:1!important;border-radius:0!important;pointer-events:none;background:linear-gradient(90deg,rgba(var(--lr),.24) 0,rgba(var(--lr),.24) calc(50% - min(280px,50%) + var(--pr0,12px)),transparent calc(50% - min(280px,50%) + var(--pr0,12px)),transparent calc(50% + min(280px,50%) - var(--pr0,12px)),rgba(var(--lr),.24) calc(50% + min(280px,50%) - var(--pr0,12px)))!important}
+html.tpl-sharp body #view .panel:has(+.cal-tab)::after,html.phone body #view .panel:has(+.cal-tab)::after{--pr0:0px}
+html body #view .panel.cal-tab{margin-top:-1px!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9263,7 +9268,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="699",APPT="2026-11-24T01:25:00Z";   /* APPT: when this update was made */
+const APPV="700",APPT="2026-11-24T01:27:35Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
