@@ -2956,7 +2956,7 @@ html.tpl-sharp #view .panel.hasStrip::after,html.phone #view .panel.hasStrip::af
 /* Where it goes list: no box around it, the lines between rows stay */
 #view[data-tab="budget"] .bd-leg{border:0!important;border-radius:0!important}#view[data-tab="budget"] .bd-leg button{border-top:0!important;border-bottom:1px solid rgba(var(--lr),.18)!important;background:none!important}
 /* Budget on wide screens: the whole page sits in one centred column so every panel shares the same edges */
-@media (min-width:1100px){html:not(.phone) #view[data-tab="budget"]>*{max-width:1000px;margin-left:auto!important;margin-right:auto!important}}
+@media (min-width:1100px){html:not(.phone) #view[data-tab="budget"]>*{max-width:980px;margin-left:auto!important;margin-right:auto!important}}
 /* Savings tile (was Left this month): emerald, money bag, today / month / year by swiping */
 .tile.bsav{cursor:pointer;touch-action:pan-y}.tile.bsav>svg{color:var(--c);filter:drop-shadow(0 0 6px color-mix(in srgb,var(--c) 60%,transparent))}.tile.bsav>b{text-shadow:0 0 14px color-mix(in srgb,var(--c) 55%,transparent)}
 .bsav-dots{display:flex;gap:5px;justify-content:center;margin-top:2px}.bsav-dots i{width:6px;height:6px;border-radius:50%;background:rgba(var(--lr),.3)}.bsav-dots i.on{background:var(--c);box-shadow:0 0 6px var(--c)}
@@ -2964,7 +2964,7 @@ html.tpl-sharp #view .panel.hasStrip::after,html.phone #view .panel.hasStrip::af
 /* Income & expenses (list): group rows darker like a strip; no box around Income / Expenses; tap a group name to rename/recolour it */
 #view[data-tab="budget"] .bco-sec{border:0!important;border-radius:0!important}
 #view[data-tab="budget"] .bco-sec:not(:has(>.bco-h.neg)) .bco-c{background:rgba(var(--tD),.5)!important}   /* darker group rows: Income only — Expenses keeps its own colour (reverted) */
-.bco-cn{display:inline-flex;align-items:center;gap:6px;padding:0;border:0;background:none;font:inherit;color:inherit;cursor:pointer}.bco-cn>i{width:8px;height:8px;border-radius:50%;background:var(--cc);display:inline-block}.bco-pen{opacity:.45;transition:opacity .2s}.bco-cn:hover .bco-pen{opacity:1}
+.bco-cn{display:inline-flex;align-items:center;gap:6px;padding:0;border:0;background:none;font:inherit;color:inherit;cursor:pointer}.bco-cn>i{width:8px;height:8px;border-radius:50%;background:var(--cc);display:inline-block}.bco-pen{opacity:1;color:var(--cc)}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9364,7 +9364,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="725",APPT="2026-11-24T02:49:42Z";   /* APPT: when this update was made */
+const APPV="726",APPT="2026-11-24T02:51:37Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
