@@ -159,6 +159,22 @@
 #aotSplash .sp-mid.on .sp-line i{width:100%;transition:width 1.6s .1s cubic-bezier(.6,0,.2,1)}
 @media (prefers-reduced-motion:reduce){#aotSplash .sp-grain{animation:none}}
 </style>
+<script>/* opening sounds: made live in code (no audio files). iPhone/iPad only allow sound after a touch, so it plays on the first touch */
+(()=>{let ac=null;const ctx=()=>{if(!ac){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ac=new C()}if(ac.state==="suspended")ac.resume();return ac};
+  const env=(g,t,a,h,r,v)=>{g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+a);g.gain.setValueAtTime(v,t+a+h);g.gain.exponentialRampToValueAtTime(.0001,t+a+h+r)};
+  const verb=(c)=>{const len=c.sampleRate*3.2,b=c.createBuffer(2,len,c.sampleRate);for(let ch=0;ch<2;ch++){const d=b.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.6)}const v=c.createConvolver();v.buffer=b;return v};
+  const SND={
+    pad(c,o,t){[220,277.18,329.63,440,554.37].forEach((f,i)=>{const g=c.createGain(),lp=c.createBiquadFilter();lp.type="lowpass";lp.frequency.setValueAtTime(400,t);lp.frequency.linearRampToValueAtTime(1800,t+1.6);for(const det of [-6,6]){const s=c.createOscillator();s.type="sawtooth";s.frequency.value=f;s.detune.value=det;s.connect(lp);s.start(t+i*.05);s.stop(t+4.6)}lp.connect(g);g.connect(o);env(g,t+i*.05,1.4,.8,2.2,.022)})},
+    hum(c,o,t){[55,110,165.5].forEach((f,i)=>{const s=c.createOscillator(),g=c.createGain();s.type="sine";s.frequency.value=f;s.connect(g);g.connect(o);env(g,t,1.2,1,2.4,[.16,.08,.03][i]);s.start(t);s.stop(t+4.8)});[1318.5,1975.5].forEach((f,i)=>{const s=c.createOscillator(),g=c.createGain();s.type="sine";s.frequency.value=f;s.connect(g);g.connect(o);env(g,t+.9+i*.35,.5,.2,2,.012);s.start(t+.9);s.stop(t+4.8)})},
+    chime(c,o,t){[[659.25,0],[987.77,.28],[1318.5,.56],[1174.66,.9]].forEach(([f,d])=>{[1,2.76,5.4].forEach((m,j)=>{const s=c.createOscillator(),g=c.createGain();s.type="sine";s.frequency.value=f*m;s.connect(g);g.connect(o);env(g,t+d,.005,0,j?1.1:2.6,[.09,.025,.01][j]);s.start(t+d);s.stop(t+d+3)})})},
+    breath(c,o,t){const len=c.sampleRate*4,b=c.createBuffer(1,len,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<len;i++)d[i]=Math.random()*2-1;const n=c.createBufferSource();n.buffer=b;const bp=c.createBiquadFilter();bp.type="bandpass";bp.Q.value=1.2;bp.frequency.setValueAtTime(300,t);bp.frequency.exponentialRampToValueAtTime(1400,t+1.6);bp.frequency.exponentialRampToValueAtTime(500,t+3.6);const g=c.createGain();n.connect(bp);bp.connect(g);g.connect(o);env(g,t,1.5,.2,2.1,.22);n.start(t);n.stop(t+4);const s=c.createOscillator(),g2=c.createGain();s.type="sine";s.frequency.value=392;s.connect(g2);g2.connect(o);env(g2,t+.6,1,.4,1.8,.03);s.start(t+.6);s.stop(t+4)},
+    glass(c,o,t){[1567.98,2093,2349.32,3135.96,2637.02,3520].forEach((f,i)=>{const d=i*.17+Math.random()*.05,s=c.createOscillator(),g=c.createGain(),p=c.createStereoPanner?c.createStereoPanner():null;s.type="sine";s.frequency.value=f;s.connect(g);if(p){p.pan.value=(i%2?1:-1)*.5;g.connect(p);p.connect(o)}else g.connect(o);env(g,t+d,.004,0,1.6,.035);s.start(t+d);s.stop(t+d+2)})}};
+  const play=id=>{if(!SND[id])return;const c=ctx();if(!c)return;try{if(window.applyAudioSession)applyAudioSession()}catch(_){}const t=c.currentTime+.03,o=c.createGain(),dry=c.createGain(),wet=c.createGain(),v=verb(c);o.gain.value=.9;dry.gain.value=.75;wet.gain.value=.45;o.connect(dry);o.connect(v);v.connect(wet);dry.connect(c.destination);wet.connect(c.destination);SND[id](c,o,t)};
+  const pick=()=>{try{return localStorage.getItem("aot-sound")||"off"}catch(_){return "off"}};
+  window.aotSound={play,pick,list:Object.keys(SND)};
+  /* once per opening: the first touch anywhere plays the chosen sound */
+  let done=false;const first=()=>{if(done)return;done=true;const k=pick();if(k!=="off")play(k)};
+  addEventListener("pointerdown",first,{capture:true,once:true})})();</script>
 <script>(()=>{
   const STY=["specks","aurora","orbit","ripple","threads","threadsmono","halftone"];
   const rnd=(a,b)=>a+Math.random()*(b-a);
@@ -253,7 +269,7 @@
     let busy=0,moved=0;
     if(v.touch){let d=null;el.style.touchAction="none";el.style.cursor="grab";
       el.addEventListener("pointerdown",e=>{d={x:e.clientX,y:e.clientY,t:performance.now()};moved=0;busy=performance.now()+1500;el.style.cursor="grabbing";try{el.setPointerCapture(e.pointerId)}catch(_){}});
-      el.addEventListener("pointermove",e=>{S.px=e.clientX;S.py=e.clientY;if(!d)return;const n=performance.now(),dx=e.clientX-d.x,dy=e.clientY-d.y,dtm=Math.max(8,n-d.t)/1000;if(Math.abs(dx)+Math.abs(dy)>3)moved=1;S.ur+=dx*.008;S.uv=S.uv*.4+(dx*.008/dtm)*.6;S.ux=Math.max(-.6,Math.min(.6,S.ux+dy*.004));S.spill=Math.min(1.4,S.spill+Math.hypot(dx,dy)*.0025);d={x:e.clientX,y:e.clientY,t:n};busy=n+1500});
+      el.addEventListener("pointermove",e=>{S.px=e.clientX;S.py=e.clientY;if(!d)return;const n=performance.now(),dx=e.clientX-d.x,dy=e.clientY-d.y,dtm=Math.max(8,n-d.t)/1000;if(Math.abs(dx)+Math.abs(dy)>3)moved=1;S.ur+=dx*.008;S.uv=S.uv*.4+(dx*.008/dtm)*.6;S.ux=Math.max(-.6,Math.min(.6,S.ux-dy*.004))/* was +dy: swiping down tipped it up */;S.spill=Math.min(1.4,S.spill+Math.hypot(dx,dy)*.0025);d={x:e.clientX,y:e.clientY,t:n};busy=n+1500});
       const up=()=>{d=null;el.style.cursor="grab";busy=performance.now()+1200};el.addEventListener("pointerup",up);el.addEventListener("pointercancel",up);el.addEventListener("pointerleave",()=>{S.px=-1e4;S.py=-1e4})}
     let gone=false;const done=()=>{if(gone)return;if(performance.now()<busy){setTimeout(done,300);return}gone=true;el.classList.add("out");setTimeout(()=>{cancelAnimationFrame(raf);removeEventListener("resize",size);el.remove()},1000)};
     const ready=()=>setTimeout(done,Math.max(0,(R?400:min)-(performance.now()-t0)));
@@ -9354,6 +9370,10 @@ function applyLook(tmp){tmp=typeof tmp==="number"?{glass:tmp}:(tmp||{});const L=
 /* Settings → Opening screen: pick one of five styles (or off); tap again to preview */
 const SPL=[["specks","Specks","Drifting specks, breathing glow"],["aurora","Aurora","Soft colour clouds, film grain"],["orbit","Orbit","Fine rings turning, lights riding them"],["ripple","Ripple","Dots with a slow wave from the centre"],["threads","Threads","Faint silk threads in the wind"],["threadsmono","Threads · Mono","The same threads in grey and lavender"],["halftone","Halftone","A figure of fine points that turns and reshapes"],["off","Off","Open straight into the app"]];
 const splashNow=()=>{try{return localStorage.getItem("aot-splash")||"specks"}catch(_){return "specks"}};
+const SNDL=[["off","Off","No sound"],["pad","Pad","A warm chord that swells in"],["hum","Hum","Low drone with a faint shimmer"],["chime","Chime","Four soft bell notes"],["breath","Breath","An airy swell, like a breath"],["glass","Glass","Light glass sparkles"]];
+const soundNow=()=>{try{return localStorage.getItem("aot-sound")||"off"}catch(_){return "off"}};
+function soundPanel(){const cur=soundNow();return `<div class="panel splp" style="margin-top:18px"><div class="ph"><span>Opening sound</span><i>Plays on your first touch</i></div><div class="spl-row">${SNDL.map(([k,n,d])=>`<button type="button" class="spl-c" data-osound="${k}" aria-pressed="${cur===k}"><b>${n}</b><small>${d}</small></button>`).join("")}</div><p class="note" style="margin:10px 2px 0">iPhone and iPad only allow sound after a touch, so it plays the moment you first touch the screen. Turn the ringer on to hear it.</p></div>`}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-osound]");if(!b)return;e.preventDefault();const k=b.dataset.osound;try{localStorage.setItem("aot-sound",k)}catch(_){}document.querySelectorAll("[data-osound]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.osound===k));if(k!=="off"&&window.aotSound)window.aotSound.play(k)},true);
 function splashPanel(){const cur=splashNow();return `<div class="panel splp" style="margin-top:18px"><div class="ph"><span>Opening screen</span><i>Shown when the app opens</i></div><div class="spl-row">${SPL.map(([k,n,d])=>`<button type="button" class="spl-c spl-${k}" data-splash="${k}" aria-pressed="${cur===k}"><b>${n}</b><small>${d}</small></button>`).join("")}</div><p class="note" style="margin:10px 2px 0">Tap one to choose it and see it play.</p></div>`}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-splash]");if(!b)return;e.preventDefault();const k=b.dataset.splash;try{localStorage.setItem("aot-splash",k)}catch(_){}document.querySelectorAll("[data-splash]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.splash===k));if(k!=="off"&&window.aotSplash)window.aotSplash.play(k,{min:2600,manual:true})},true);
 function tplPanel(){const T=tplOf();return `<div class="panel tplp" style="margin-top:18px"><div class="ph"><span>Templates</span><i>${T?esc(T.name)+" is on":"Whole-page looks"}</i></div>
@@ -9479,7 +9499,7 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener("DOMContentLoaded",()=>eUnitFix(document.body));setTimeout(()=>eUnitFix(document.body),0);
 function vSet(){
   const g=data.goals;
-  return banner()+tplPanel()+splashPanel()+wallPanel()+affPanel()+lookPanel()+themePanel()+hkPanel()+`<div class="grid cols2" style="margin-top:18px">
+  return banner()+tplPanel()+splashPanel()+soundPanel()+wallPanel()+affPanel()+lookPanel()+themePanel()+hkPanel()+`<div class="grid cols2" style="margin-top:18px">
    <div class="panel"><div class="ph"><span>Goals</span><i>Goals</i></div>
     <form class="f" id="gForm"><div class="f2"><label>Daily calories<input id="gK" type="number" inputmode="numeric" min="0" value="${g.kcal}"></label><label>Daily protein (g)<input id="gP" type="number" inputmode="numeric" min="0" value="${g.protein}"></label></div>
     <label>Goal weight (${g.unit})<input id="gW" type="number" step="0.1" inputmode="decimal" value="${g.weight??""}" placeholder="Optional"></label>
@@ -9685,7 +9705,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="790",APPT="2026-11-24T08:15:40Z";   /* APPT: when this update was made */
+const APPV="791",APPT="2026-11-24T08:21:49Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
