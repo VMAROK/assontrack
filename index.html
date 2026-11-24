@@ -3102,6 +3102,9 @@ html body #view .bdown .bd-lv[data-lvl="Priority"]{color:#ff5d6c;background:rgba
 html body #view .panel.hasStrip,html body #view .panel.bstrip-p{border-width:0!important;border-color:transparent!important;box-shadow:0 0 24px rgba(30,110,255,.08)!important}
 /* panels with a title strip: the border under the strip follows the Borders setting (Dark = black, Light = default line, No border = none); it sits flush now that the panel has no rim */
 html:not(.tpl-bd-none) body #view .panel.hasStrip::after{left:0!important;right:0!important;bottom:0!important}
+/* the Borders setting goes all the way round, title strip included (was: border started under the strip) */
+html:not(.tpl-bd-none) body #view .panel.hasStrip::after{top:0!important;border-top:1px solid rgba(85,132,252,.24)!important;border-radius:var(--psr,14px)!important;z-index:3;pointer-events:none}
+html.tpl-bd-dark body #view .panel.hasStrip::after{border-top-color:rgba(0,0,0,.7)!important}
 html.tpl-bd-dark body #view .panel.hasStrip::after{border-color:rgba(0,0,0,.7)!important;opacity:1!important}
 html.tpl-bd-none body #view .panel.hasStrip::after{display:none!important}
 /* launch build: hidden tabs */
@@ -9518,7 +9521,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="770",APPT="2026-11-24T06:40:37Z";   /* APPT: when this update was made */
+const APPV="771",APPT="2026-11-24T06:43:56Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
