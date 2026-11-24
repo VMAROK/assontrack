@@ -3486,6 +3486,16 @@ html:is(.tpl-silk,.tpl-pyramid,.tpl-bronze,.tpl-chrome) .navbtn[aria-selected="t
 html.tpl-sharp:is(.tpl-silk,.tpl-pyramid,.tpl-bronze,.tpl-chrome) .navbtn[aria-selected="true"]{border-radius:0!important}
 /* Bronze Ribbon: the sidebar is see-through like the mockup, so the copper ribbon shows behind the tabs (top bar untouched) */
 html.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze aside{background-color:rgba(10,8,7,.3)!important;background-image:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+/* ===== visual templates: titles and title rows like the mockups — title sits top-left on the panel (no strip, no centring), extra controls go to the right; calendar month title left, arrows right ===== */
+html:is(.tpl-vt,.tpl-stipple):is(.tpl-vt,.tpl-stipple) body #view :is(.bstrip,.calhead.cal-c,.bc-h,.panel>.ph:first-child){justify-content:flex-start!important;text-align:left!important;padding-left:20px!important;padding-right:16px!important;border-bottom-color:transparent!important;box-shadow:none!important}
+html:is(.tpl-vt,.tpl-stipple):is(.tpl-vt,.tpl-stipple) body #view .bstrip>b,html:is(.tpl-vt,.tpl-stipple):is(.tpl-vt,.tpl-stipple) body #view .panel>.ph:first-child>span:first-child{margin-right:auto;text-align:left}
+html:is(.tpl-vt,.tpl-stipple):is(.tpl-vt,.tpl-stipple) body #view .bc-h>b{order:-1;margin-right:auto!important;font-size:17px!important}
+html:is(.tpl-vt,.tpl-stipple):is(.tpl-vt,.tpl-stipple) body #view .bc-h>.bc-nav{order:1}
+html:is(.tpl-vt,.tpl-stipple):is(.tpl-vt,.tpl-stipple) body #view .calhead.cal-c>:is(h2,b){order:-1;margin-right:auto!important;font-size:17px!important}
+html:is(.tpl-chrome,.tpl-silk) body #view :is(.bstrip>b,.bc-h>b,.calhead.cal-c>h2,.panel>.ph:first-child>span:first-child,.panel .ph:first-child>span:first-child:not(:only-child)){font-size:17px!important;font-weight:600!important;color:#f3f3f7!important;letter-spacing:-.005em!important;text-transform:none!important}
+html.tpl-pyramid body #view :is(.bstrip>b,.bc-h>b,.calhead.cal-c>h2,.panel>.ph:first-child>span:first-child,.panel .ph:first-child>span:first-child:not(:only-child)){font-size:14px!important;font-weight:500!important;color:#d8ad72!important;letter-spacing:.22em!important;text-transform:uppercase!important}
+html.tpl-bronze body #view :is(.bstrip>b,.bc-h>b,.calhead.cal-c>h2,.panel>.ph:first-child>span:first-child,.panel .ph:first-child>span:first-child:not(:only-child)){font-size:13.5px!important;font-weight:600!important;color:#ece2d8!important;letter-spacing:.22em!important;text-transform:uppercase!important}
+html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono) body #view :is(.bstrip>b,.bc-h>b,.calhead.cal-c>h2,.panel>.ph:first-child>span:first-child,.panel .ph:first-child>span:first-child:not(:only-child)){font-size:12px!important;font-weight:600!important;color:#dcd9e8!important;letter-spacing:.24em!important;text-transform:uppercase!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9953,7 +9963,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="835",APPT="2026-11-24T18:17:34Z";   /* APPT: when this update was made */
+const APPV="836",APPT="2026-11-24T18:21:49Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
