@@ -3407,6 +3407,11 @@ html.tpl-sharp .wtab{border-radius:0}
 /* while you play with the Settings figure nothing on the page gets selected */
 html.art-busy,html.art-busy *{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}
 .set-art,.set-art *{-webkit-user-select:none;user-select:none}
+/* Side & top bars (all templates, visual ones too): "Panel color" = the side tab bar and the top bar look exactly like a panel (same color, transparency, blur); "No color" = nothing at all */
+html.tpl-bars-pan.tpl-bars-pan.tpl-bars-pan.tpl-bars-pan :is(aside,.topbar){background-color:var(--bar-bg)!important;background-image:var(--bar-bi)!important;-webkit-backdrop-filter:var(--bar-bf)!important;backdrop-filter:var(--bar-bf)!important}
+html.tpl-bars-clear.tpl-bars-clear.tpl-bars-clear.tpl-bars-clear :is(aside,.topbar){background:transparent!important;background-image:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important}
+/* regular templates (Midnight etc.) now follow Blur and Transparency too — they were stuck solid (tpl-plain set a fixed colour and no blur) */
+html.tpl-plain:not(.tpl-vt):not(.tpl-stipple) #view .panel{background:color-mix(in srgb,var(--card) calc(var(--go,1)*100%),transparent)!important;-webkit-backdrop-filter:blur(var(--vtb,0px))!important;backdrop-filter:blur(var(--vtb,0px))!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -8291,6 +8296,8 @@ function attPoster(a){const k=a.id+":p"+(a.t0||0);if(attPosters.has(k))return at
   attPosters.set(k,pr);pr.then(u=>{if(!u)attPosters.delete(k)});return pr}
 const attFind=id=>{for(const p of data.passions||[])for(const tk of p.tasks||[]){const a=(tk.att||[]).find(x=>x.id===id);if(a)return a}return null};
 /* side bar + top bar wear the exact colour of the panels: copy it from a real panel on screen */
+/* keep the bars matched to the panels whenever the look changes (sliders, template, borders…) — was only refreshed now and then */
+new MutationObserver(()=>{cancelAnimationFrame(window.__bsR);window.__bsR=requestAnimationFrame(()=>barsSync())}).observe(document.documentElement,{attributes:true,attributeFilter:["class","style"]});
 function barsSync(){const h=document.documentElement;if(!h.classList.contains("tpl-bars-pan"))return;const pn=document.querySelector("#view .panel:not(.kpan):not(.holopanel):not(.wallp)")||document.querySelector("#view .panel");if(!pn)return;
   const c=getComputedStyle(pn),r=h.style;r.setProperty("--bar-bg",c.backgroundColor);r.setProperty("--bar-bi",c.backgroundImage==="none"?"none":c.backgroundImage);const bf=c.backdropFilter||c.webkitBackdropFilter||"none";r.setProperty("--bar-bf",bf)}
 /* safety net: files saved on this device that no task points to any more (e.g. after a sync replaced the task list) */
@@ -9862,7 +9869,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="826",APPT="2026-11-24T17:31:27Z";   /* APPT: when this update was made */
+const APPV="827",APPT="2026-11-24T17:34:13Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
