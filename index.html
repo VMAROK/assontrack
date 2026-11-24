@@ -3068,6 +3068,19 @@ html body #view .mcal:not(.cal-dots) .mc .chips em .mc-x{width:8px;height:8px;ma
 html body #view .mcal .mc .chips em.mc-done{color:#d9fbe8!important}
 /* Dashboard: calendar now under Breakdown — same gap as between the other panels */
 html:not(.phone) body #view[data-tab="dash"]>.panel:has(.mcal){margin-top:18px!important}
+/* Dashboard Breakdown legend: one row, swipe sideways for the rest */
+html body #view .bdn-leg{display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;touch-action:pan-x pan-y;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 18px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 18px),transparent);padding-right:18px}
+html body #view .bdn-leg::-webkit-scrollbar{display:none}
+html body #view .bdn-leg>span{flex:none;white-space:nowrap}
+/* bottom tab bar: anything below it (iPad/iPhone home-screen app gap) is filled with the tab bar's own colour */
+:is(html.phone,html.tablet) .shell::after{content:"";position:absolute;left:0;right:0;top:100%;height:400px;background:var(--navbg,rgb(4,6,22));pointer-events:none}
+@media (min-width:1100px){html.tablet:not(.phone) .shell::after{display:none}}
+/* tab bar: hold a tab, then drag it to reorder */
+aside .navtog{order:-1}aside .side-foot{order:99}
+aside .navbtn.nav-drag{z-index:5;transform:scale(1.08);opacity:.92;box-shadow:0 0 0 2px rgba(var(--lr),.5),0 8px 22px rgba(0,0,0,.5);border-radius:10px;transition:transform .15s}
+aside.nav-dragging .navbtn:not(.nav-drag){transition:transform .2s}
+aside.nav-dragging{touch-action:none}
+aside>.navbtn{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4115,7 +4128,7 @@ function budgetManage(d){const o=budgetInfo(d),B=d.budget||{};
     ${o.ex.length?`<div class="bud-list">${o.ex.slice().sort((a,b)=>(b.at||0)-(a.at||0)).slice(0,12).map(x=>`<div class="bud-it"><span>${esc(x.note||"Expense")}<small>${fmtDate(x.d)}</small></span><b>${money(+x.amt||0)}</b><button class="x" data-expdel="${x.id}" aria-label="Remove expense">×</button></div>`).join("")}</div>`:`<p class="note" style="margin:0">No expenses this month yet.</p>`}</div>`}
 function dashAnim(key){const now=performance.now();if(key!==dashShown){if(dashShown)sfx("whoosh");dashShown=key;dashAt=now}const el=now-dashAt;return el<450?` slide" style="animation-delay:-${Math.round(el)}ms`:""}
 /* top tiles: rings or thin bars */
-let dtV=null,dtRingH=0;const dtView=()=>{if(dtV==null){try{dtV=localStorage.getItem("aot-dtv")||"ring"}catch(_){dtV="ring"}}return dtV};
+let dtV=null,dtRingH=0;const dtView=()=>"ring";/* progress-bar view removed, donuts only — was: {if(dtV==null){try{dtV=localStorage.getItem("aot-dtv")||"ring"}catch(_){dtV="ring"}}return dtV} */
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-dtv]");if(!b)return;e.preventDefault();e.stopPropagation();dtV=b.dataset.dtv;try{localStorage.setItem("aot-dtv",dtV)}catch(_){}const v=$("#view"),st=v?v.scrollTop:0;dashShown="tiles";render();if(v)v.scrollTop=st},true);
 function progressPanel(d){const wk=weekKey(today()),I={pass:passInfo(d),fit:fitInfo(d),diet:dietInfo(d),budget:budgetInfo(d)},HAS={pass:I.pass.pct!=null,fit:d.workouts.length>0||d.weights.length>0,diet:d.meals.some(m=>m.d===today()),budget:I.budget.pct!=null&&I.budget.has};
   if(dashOpen&&DCARDS[dashOpen]){const o=I[dashOpen],full=`<div class="panel dcomp"><div class="dc-main">${miniRing(o.pct,o.col,HAS[dashOpen])}<div class="dc-txt"><small>${o.small}</small><b style="color:${o.col}">${o.label}</b><p title="${esc(o.text)}">${o.text}</p></div></div><div class="dc-stats">${o.stats.map(([v,l,c])=>`<div><b style="${c?`color:${c};`:""}${String(v).length>7?"font-size:12.5px":String(v).length>5?"font-size:14px":""}">${v}</b><small>${l}</small></div>`).join("")}</div></div>`;
@@ -4123,7 +4136,7 @@ function progressPanel(d){const wk=weekKey(today()),I={pass:passInfo(d),fit:fitI
   /* v681 rings/thin-bars toggle on these tiles — reverted (not what was asked) */
   /* two views in this panel: the rings (Passions / Fitness / Diet / Budget) or the progress bars (Nutrition / Passions / Budget, today) */
   const dsw=`<div class="dt-vsw" role="group" aria-label="Show as"><button type="button" data-dtv="ring" aria-pressed="${dtView()!=="bar"}" aria-label="Donuts" title="Donuts"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><circle cx="12" cy="12" r="7.5"/></svg></button><button type="button" data-dtv="bar" aria-pressed="${dtView()==="bar"}" aria-label="Progress bars" title="Progress bars"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h11M4 17h14"/></svg></button></div>`;
-  const strip=`<div class="bstrip dt-strip"><b>Overview</b>${dsw}</div>`;   /* titled strip like the Budget panels; the view switch lives in it */
+  const strip=`<div class="bstrip dt-strip"><b>Overview</b></div>`;/* view switch removed (donuts only) — was: <b>Overview</b>${dsw} */   /* titled strip like the Budget panels; the view switch lives in it */
   /* both views keep the donut view's height (measured each time the donuts show) */
   if(dtView()!=="bar")setTimeout(()=>{const p=document.querySelector(".dtiles:not(.dt-prog)");if(p&&p.offsetHeight)dtRingH=p.offsetHeight},0);
   if(dtView()==="bar")return `<div class="panel dtiles dt-prog${dashAnim("tiles")}" style="height:${dtRingH||184}px!important;min-height:${dtRingH||184}px">${strip}<div class="dt-pb">${dashProg(d,today(),true)}</div></div>`;
@@ -4266,7 +4279,7 @@ function bdMulti(parts){const t=parts.reduce((a,x)=>a+x.v,0);return `<div class=
 function bdMeter(n,v,goal,txt,c,k){const f=goal?Math.min(1,v/goal):0;return `<div class="meter" style="--c:${c}"><div class="meter-top"><span>${esc(n)}</span><b>${txt}</b></div><div class="track"><i data-akw="bd:m${esc(k||n)}" style="width:${(f*100).toFixed(1)}%"></i></div></div>`}
 /* the section's own progress bar (same as the top panel's): colour fills to the limit, the heavier shade comes in on the right when over; numbers under the bar */
 function bdMain(x,h){const cl=v=>Math.max(0,Math.min(1,v)),ov=x.over?Math.min(100,(x.f-1)*100):0,num=Array.isArray(x.v)?`<span${x.over?` style="color:${x.d}"`:""}>${x.v[0]}</span>${x.v.length>1?` / ${x.v[1]}`:""}`:esc(x.v);
-  return `<div class="bdn-main" style="--c:${x.c}"><div class="dp-t${ov?" ov":""}">${ov?`<i data-akw="bd:M${x.k}" style="width:${(100-ov).toFixed(1)}%;--c:${x.c}"></i><i data-akw="bd:O${x.k}" style="width:${ov.toFixed(1)}%;--c:${x.d}"></i>`:`<i data-akw="bd:M${x.k}" style="width:${(cl(x.f)*100).toFixed(1)}%"></i>`}</div></div>`.replace('<div class="dp-t',`<div class="bdn-hd"><h4>${h}</h4><b>${num}</b></div><div class="dp-t`)}   /* numbers top-right, across from the name (was under the bar) */
+  return `<div class="bdn-main" style="--c:${x.c}"><div class="dp-t${ov?" ov":""}">${ov?`<i data-akw="bd:M${x.k}" style="width:${(100-ov).toFixed(1)}%;--c:${x.c}"></i><i data-akw="bd:O${x.k}" style="width:${ov.toFixed(1)}%;--c:${x.d}"></i>`:`<i data-akw="bd:M${x.k}" style="width:${(cl(x.f)*100).toFixed(1)}%"></i>`}</div></div>`.replace('<div class="dp-t',`<div class="bdn-hd"><h4>${DPQ(h)}${h}</h4><b>${num}</b></div><div class="dp-t`)}   /* numbers top-right, across from the name (was under the bar) */
 function breakdownPanel(d){const DS=dashStats(d,today()),t=today(),tm=d.meals.filter(m=>m.d===t),sum=k=>tm.reduce((a,m)=>a+(+m[k]||0),0);
   const MK=[["Carbs","carbs","#f27fb2"],["Protein","protein","#a688f2"],["Fiber","fiber","#b8875f"],["Fat","fat","#f2c14e"]],mv=MK.map(([n,k,c])=>({n,k,c,v:sum(k),g:mgGoal(k)}));
   const P=d.passions.map((p,i)=>({n:p.name,k:p.id,c:BDPAL[i%BDPAL.length],v:d.sessions.filter(x=>x.pid===p.id&&!x.planned).reduce((a,x)=>a+(+x.mins||0),0),g:(+p.goal||0)*60}));
@@ -6505,6 +6518,7 @@ function bSpendGroupsEdit(b){const L=bSgs(b),M=today().slice(0,7),cnt=g=>b.spend
     const sw=(o,before)=>{d.r.style.transform="";const t0=d.r.getBoundingClientRect().top;o.parentNode.insertBefore(d.r,before?o:o.nextSibling);d.rows.splice(i,1);d.rows.splice(d.rows.indexOf(o)+(before?0:1),0,d.r);d.y0+=d.r.getBoundingClientRect().top-t0;d.r.style.transform=`translateY(${e.clientY-d.y0}px)`};
     const up=d.rows[i-1],dn=d.rows[i+1];if(up){const q=up.getBoundingClientRect();if(m<q.top+q.height/2){sw(up,true);return}}if(dn){const q=dn.getBoundingClientRect();if(m>q.top+q.height/2)sw(dn,false)}},{capture:true,passive:false});
   const end=()=>{if(!d)return;const q=d;d=null;document.body.classList.remove("bdragging");q.r.classList.remove("bge-drag");q.r.style.transform="";const b=B(),L=bSgs(b),nw=q.rows.map(x=>L[+x.dataset.bgei]).filter(Boolean);if(nw.length===L.length){b.spGrps=nw;save()}render()};
+  document.addEventListener("touchmove",e=>{if(drag)e.preventDefault()},{capture:true,passive:false});
   document.addEventListener("pointerup",end,true);document.addEventListener("pointercancel",end,true);
   document.addEventListener("touchmove",e=>{if(d)e.preventDefault()},{passive:false})})();
 function bGeRename(i,n){const b=B(),L=bSgs(b),old=L[i];n=(n||"").trim();if(!old||!n||n===old)return;if(L.some((x,j)=>j!==i&&x.toLowerCase()===n.toLowerCase())){toast("There's already a group called "+n);render();return}
@@ -9475,7 +9489,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="759",APPT="2026-11-24T06:03:54Z";   /* APPT: when this update was made */
+const APPV="760",APPT="2026-11-24T06:08:39Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -9627,5 +9641,29 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 <script>/* portrait Budget: work out how much to scale the calendar panel so it's exactly as wide as the tiles */
 (()=>{let t=0;const fit=()=>{t=0;const v=document.getElementById("view");if(!v||v.dataset.tab!=="budget"||!document.documentElement.classList.contains("tablet")||innerWidth>=1100)return;const c=v.querySelector(":scope>.bm-has"),r=v.querySelector(":scope>.bstick");if(!c||!r)return;const cs=getComputedStyle(v),full=v.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight),z=r.offsetWidth/full;if(z>0&&Math.abs((parseFloat(getComputedStyle(c).getPropertyValue("--calz"))||0)-z)>.002)c.style.setProperty("--calz",z.toFixed(4));const w=Math.round(full)+"px";if(c.style.width!==w)c.style.width=w};
   new MutationObserver(()=>{if(!t)t=requestAnimationFrame(fit)}).observe(document.documentElement,{childList:true,subtree:true});addEventListener("resize",()=>{if(!t)t=requestAnimationFrame(fit)})})();
+</script>
+<script>/* tab bar: hold a tab ~0.45s, then drag it left/right (or up/down in the iPad sidebar) to put the tabs in any order; the order is remembered */
+(()=>{const K="aot-navord";const A=()=>document.querySelector("aside");
+  const tabs=()=>[...A().querySelectorAll(":scope>.navbtn")];
+  const apply=o=>{tabs().forEach(b=>{const i=o.indexOf(b.dataset.tab);b.style.order=i<0?50:i})};
+  const cur=()=>tabs().filter(b=>b.offsetParent).sort((a,z)=>(+a.style.order||0)-(+z.style.order||0)||0);
+  let saved=null;try{saved=JSON.parse(localStorage.getItem(K)||"null")}catch(_){}
+  const init=()=>{if(!A())return;if(Array.isArray(saved))apply(saved);else tabs().forEach((b,i)=>b.style.order=i);
+    const nb=()=>{try{const c=getComputedStyle(A());document.documentElement.style.setProperty("--navbg",c.backgroundImage&&c.backgroundImage!=="none"?c.backgroundImage+","+(c.backgroundColor||"transparent"):c.backgroundColor)}catch(_){}};nb();setTimeout(nb,1500)};
+  let hold=0,drag=null,sx=0,sy=0,moved=false,justDragged=false;
+  const vert=()=>{const L=cur();if(L.length<2)return false;const r0=L[0].getBoundingClientRect(),r1=L[1].getBoundingClientRect();return Math.abs(r1.left-r0.left)<Math.abs(r1.top-r0.top)};/* laid out top-to-bottom (iPad sidebar) or side by side (tab bar) */
+  document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("aside>.navbtn");if(!b)return;sx=e.clientX;sy=e.clientY;moved=false;clearTimeout(hold);
+    hold=setTimeout(()=>{drag={b,id:e.pointerId};b.classList.add("nav-drag");A().classList.add("nav-dragging");try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}},450)},true);
+  document.addEventListener("pointermove",e=>{if(!drag){if(hold&&Math.hypot(e.clientX-sx,e.clientY-sy)>8){clearTimeout(hold);hold=0}return}
+    e.preventDefault();moved=true;const v=vert(),p=v?e.clientY:e.clientX,L=cur();const others=L.filter(x=>x!==drag.b);
+    let idx=others.findIndex(x=>{const r=x.getBoundingClientRect();return p<(v?r.top+r.height/2:r.left+r.width/2)});if(idx<0)idx=others.length;
+    others.splice(idx,0,drag.b);others.forEach((x,i)=>x.style.order=i)},{capture:true,passive:false});
+  const end=()=>{clearTimeout(hold);hold=0;if(!drag)return;drag.b.classList.remove("nav-drag");A().classList.remove("nav-dragging");
+    const o=[...cur().map(x=>x.dataset.tab),...tabs().filter(x=>!x.offsetParent).map(x=>x.dataset.tab)];try{localStorage.setItem(K,JSON.stringify(o))}catch(_){}
+    justDragged=true;setTimeout(()=>justDragged=false,350);drag=null};
+  document.addEventListener("pointerup",end,true);document.addEventListener("pointercancel",end,true);
+  document.addEventListener("click",e=>{if(justDragged&&e.target.closest&&e.target.closest("aside")){e.stopPropagation();e.preventDefault()}},true);
+  document.addEventListener("contextmenu",e=>{if(e.target.closest&&e.target.closest("aside>.navbtn"))e.preventDefault()},true);
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init()})();
 </script>
 </body></html>
