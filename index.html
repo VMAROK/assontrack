@@ -2955,6 +2955,8 @@ html.tpl-sharp #view .panel.hasStrip::after,html.phone #view .panel.hasStrip::af
 @media (max-width:1100px){#view[data-tab="budget"] .bm-has>.bc>.bc-h{margin-right:calc(-1*var(--bp))!important}}
 /* Where it goes list: no box around it, the lines between rows stay */
 #view[data-tab="budget"] .bd-leg{border:0!important;border-radius:0!important}#view[data-tab="budget"] .bd-leg button{border-top:0!important;border-bottom:1px solid rgba(var(--lr),.18)!important;background:none!important}
+/* Budget on wide screens: the whole page sits in one centred column so every panel shares the same edges */
+@media (min-width:1100px){html:not(.phone) #view[data-tab="budget"]>*{max-width:1000px;margin-left:auto!important;margin-right:auto!important}}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -6657,8 +6659,8 @@ function vBudget(){fxLoad();const b=B();b.mode="comb";const S=bStats(),out=S.sub
   /* measure the top tiles again once the page has settled (measuring too early left no gap above the calendar until you tapped the tab again) */
   setTimeout(bStickInit,0);setTimeout(bStickInit,150);setTimeout(bStickInit,500);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>setTimeout(bStickInit,0));
   return bModeIn(b,`<div class="bstick-s" id="bStickS"></div><div class="bstick${bStOn?" stuck":""}" id="bStick"${bStOn&&bStH?` style="height:${bStH}px"`:""}><div class="grid tiles">
-    <div class="panel tile" style="--c:var(--lime)">${ic("bolt")}<small>Income</small><b>${bMoney(S.inc,0)}</b><em>per month</em></div>
-    <div class="panel tile" style="--c:#6ea8ff">${ic("star")}<small>Expenses</small><b>${bMoney(S.subs+S.bills,0)}</b><em>${bMoney(S.subs,0)} subs · ${bMoney(S.bills,0)} bills<i class="bx-was"${S.mutedN?"":' style="visibility:hidden"'}>was ${bMoney(S.subs+S.bills+S.muted,0)} · −${bMoney(S.muted,0)} excluded</i></em></div>
+    <div class="panel tile" style="--c:#ffd54a">${ic("bolt")}<small>Income</small><b>${bMoney(S.inc,0)}</b><em>per month</em></div>
+    <div class="panel tile" style="--c:#e3a82b">${ic("star")}<small>Expenses</small><b>${bMoney(S.subs+S.bills,0)}</b><em>${bMoney(S.subs,0)} subs · ${bMoney(S.bills,0)} bills<i class="bx-was"${S.mutedN?"":' style="visibility:hidden"'}>was ${bMoney(S.subs+S.bills+S.muted,0)} · −${bMoney(S.muted,0)} excluded</i></em></div>
     <div class="panel tile" style="--c:${S.left<0?"#ff5e6c":"#3ddc84"}">${ic("fire")}<small>Spent this month</small><b>${bMoney(S.spent,0)}</b><em>${S.sp.length} expense${S.sp.length===1?"":"s"}</em></div>
     <div class="panel tile tdn" style="--c:var(--cyan)"><small>Left this month</small>${ring}<em style="${S.left<0?"color:#ff8a95":""}">${bMoney(S.left,0)} ${S.left<0?"over":"left"}<i class="bmu-was"${S.mutedN?"":' style="visibility:hidden"'}>${bMoney(S.left-S.muted,0)} with everything</i></em></div></div></div>
   ${(()=>{const WG=`<div class="ph"><span>Where it goes</span><label class="bhome" title="Currency for totals">Totals in<select data-bhome aria-label="Currency for totals">${BCUR.map(c=>`<option value="${c}"${c===b.home?" selected":""}>${c} ${curSym(c)}</option>`).join("")}</select></label></div>${bDonut(S)}${bExtrasMix(b)}`;
@@ -9351,7 +9353,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="721",APPT="2026-11-24T02:36:11Z";   /* APPT: when this update was made */
+const APPV="722",APPT="2026-11-24T02:39:01Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
