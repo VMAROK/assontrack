@@ -9992,7 +9992,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="844",APPT="2026-11-24T23:02:53Z";   /* APPT: when this update was made */
+const APPV="845",APPT="2026-11-24T23:08:06Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -10348,13 +10348,13 @@ void main(){vec2 uv=gl_FragCoord.xy/R;float a=R.x/R.y;vec2 p=vec2(uv.x*a,uv.y);f
 (()=>{const go=()=>{try{if(typeof data!=="object"||!data||!data.profile)return setTimeout(go,300);const P=data.profile;if(P.vtV4)return;P.vtV4=1;P.vtV3=1;/* was vtV3 */P.chromeV2=1;delete P.vtLook;const _T=typeof tplOf==="function"&&tplOf();if(_T&&_T.visual&&typeof fineLoad==="function")fineLoad(VTFINE(_T.id));/* was: chromeV2 — Chrome only */if(typeof save==="function")save();if(typeof applyLook==="function")applyLook();if(typeof render==="function")render()}catch(e){}};setTimeout(go,600)})();
 </script>
 <script>/* Animated wallpaper images for the visual templates: the picture stays exactly as designed; it breathes with a very slow drift and zoom, the folds ripple gently, and a soft sheen of light slides across the highlights. Add a template by putting its image in VTIMG. */
-(()=>{const VTIMG={chrome:"wp/vt/chrome.jpg",silk:"wp/vt/silk.jpg",pyramid:"wp/vt/pyramid.jpg",bronze:"wp/vt/bronze.jpg",stipple:"wp/vt/stipple.jpg"},FOC={chrome:.5,silk:.66,pyramid:.18,bronze:.78,stipple:.5};/* FOC = which side of the picture to keep when the screen is narrower (portrait) */
+(()=>{const VTIMG={chrome:"wp/vt/chrome.jpg",silk:"wp/vt/silk.jpg",pyramid:"wp/vt/pyramid.jpg",bronze:"wp/vt/bronze.jpg",stipple:"wp/vt/stipple.jpg"},FOC={chrome:.5,silk:.66,pyramid:.18,bronze:.78,stipple:.5};/* (unused while fitted) FOC = which side of the picture to keep when the screen is narrower (portrait) */
   const cv=document.getElementById("vtimg");if(!cv)return;let g=null,pr=null,tex=null,cur=null,img=null,raf=0,last=0,U={};const t0=performance.now()/1000;
   const FS=`precision mediump float;uniform vec2 R;uniform float T;uniform sampler2D TX;uniform vec2 IS;uniform float FX;
-  void main(){vec2 uv=gl_FragCoord.xy/R;uv.y=1.-uv.y;float ra=R.x/R.y,ia=IS.x/IS.y;vec2 s=ra>ia?vec2(1.,ia/ra):vec2(ra/ia,1.);
-    float z=1.09+.045*sin(T*.11);float cx=clamp(FX,.5*s.x/z+.03,1.-.5*s.x/z-.03);vec2 q=(uv-.5)*s/z+vec2(cx,.5)+vec2(.022*sin(T*.07),.016*cos(T*.06));/* was zoom 1.05±.02, drift .008 — made clearly visible */
+  void main(){vec2 uv=gl_FragCoord.xy/R;uv.y=1.-uv.y;float ra=R.x/R.y,ia=IS.x/IS.y;vec2 s=vec2(1.);/* STRETCHED to fill the screen exactly, whole picture, nothing cut (user) — was cover-crop: ra>ia?vec2(1.,ia/ra):vec2(ra/ia,1.) + zoom 1.09±.045; then letterbox fit: ra>ia?vec2(ra/ia,1.):vec2(1.,ia/ra) */
+    float z=1.02+.015*sin(T*.11);/* stays slightly zoomed so the drift never shows an edge */vec2 q=(uv-.5)*s/z+.5+vec2(.006*sin(T*.07),.005*cos(T*.06));
     q+=vec2(sin(q.y*5.+T*.55)*.007+sin(q.y*9.-T*.38)*.0035,cos(q.x*4.-T*.47)*.006+sin(q.x*8.+T*.33)*.003);
-    vec3 c=texture2D(TX,clamp(q,.001,.999)).rgb;float l=dot(c,vec3(.299,.587,.114));
+    vec2 o=max(max(-q,q-1.),0.);vec3 c=texture2D(TX,clamp(q,.001,.999)).rgb*(1.-smoothstep(0.,.12,max(o.x,o.y)));/* beyond the picture: its own edge, fading to black, so there are no hard bars */float l=dot(c,vec3(.299,.587,.114));
     float b=(q.x*.85+q.y*.55)-(fract(T*.06)*2.6-.5);float band=exp(-b*b*22.);
     c+=c*smoothstep(.08,.5,l)*band*.7;gl_FragColor=vec4(c,1.);}`;
   const init=()=>{g=cv.getContext("webgl",{antialias:false,alpha:false});if(!g)return false;const sh=(ty,src)=>{const o=g.createShader(ty);g.shaderSource(o,src);g.compileShader(o);return o};
