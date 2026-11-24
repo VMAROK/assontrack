@@ -2931,6 +2931,18 @@ html #view .bstrip,html #view .calhead.cal-c{border-bottom:0!important}   /* no 
 @keyframes wtrPulse{50%{box-shadow:0 0 6px rgba(255,255,255,0),inset 0 0 6px rgba(255,255,255,0)}}
 .nmp .nm-prog{display:none!important}   /* calories bar above the meals removed — calories already shown elsewhere */
 .nwp .mviews>.mv:first-child{border:0!important;box-shadow:none!important;background:none!important}   /* no box around the macro bars; the line above Carbs stays */
+/* panels with a title strip: no border around the strip — the panel's outline starts under it (drawn by ::after from the strip's bottom down) */
+html:not(.tpl-bd-none) #view .panel.hasStrip{border-color:transparent!important}
+html:not(.tpl-bd-none) #view .panel.hasStrip::after{content:""!important;display:block!important;position:absolute!important;left:-1px!important;right:-1px!important;bottom:-1px!important;top:var(--sh,0px)!important;width:auto!important;height:auto!important;border:1px solid rgba(var(--lr),.24)!important;border-top:0!important;border-radius:0 0 var(--psr,14px) var(--psr,14px)!important;opacity:1!important;pointer-events:none!important;z-index:3;background:none!important;box-shadow:none!important}
+html.tpl-sharp #view .panel.hasStrip::after,html.phone #view .panel.hasStrip::after{--psr:0px}
+@media (max-width:1100px){#view[data-tab="fuel"] .nwp .bm-r>.ph:first-child{margin-left:calc(-1*var(--sp2))!important;margin-right:calc(-1*var(--sp2))!important;margin-top:0!important}}   /* stacked (iPad portrait, phone): Macronutrients strip runs edge to edge */
+/* Nutrition week: no outline around the days (inside lines stay); week + arrows become a title strip, centred, the two buttons on the right */
+#view[data-tab="fuel"] .nwp .nw-tix{border-color:transparent!important;box-shadow:none!important}
+#view[data-tab="fuel"] .nwp{padding-top:0!important}
+#view[data-tab="fuel"] .nwp>.bc>.bc-h{position:relative;justify-content:center;gap:12px;margin:0 -16px 14px calc(-1*var(--sp2))!important;padding:8px var(--sp2)!important;min-height:44px;box-sizing:border-box;background:rgba(var(--tD),.5);border:0!important}
+#view[data-tab="fuel"] .nwp>.bc>.bc-h>.bc-eye{position:absolute;top:50%;transform:translateY(-50%)}#view[data-tab="fuel"] .nwp>.bc>.bc-h>.bc-cal{right:calc(var(--sp2) + 44px)}#view[data-tab="fuel"] .nwp>.bc>.bc-h>.bc-eye:not(.bc-cal){right:var(--sp2)}
+#view[data-tab="fuel"] .nwp .bm-r>.ph:first-child{margin-top:0!important}
+@media (max-width:1100px){#view[data-tab="fuel"] .nwp>.bc>.bc-h{margin-right:calc(-1*var(--sp2))!important}}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9327,7 +9339,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="717",APPT="2026-11-24T02:23:53Z";   /* APPT: when this update was made */
+const APPV="718",APPT="2026-11-24T02:28:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -9467,5 +9479,9 @@ if("serviceWorker" in navigator&&location.protocol==="https:"){addEventListener(
     gs.forEach(g=>{const gk=g.dataset.akg,had=G.has(gk),seen=new Set();G.add(gk);g.querySelectorAll("[data-ak]").forEach(el=>seen.add(el.dataset.ak));g.querySelectorAll("[data-akw],[data-akf]").forEach(el=>{const w=el.dataset.akw,k=w||el.dataset.akf;seen.add(k);const v=w?el.style.width:el.style.flexGrow,p=P.get(k)||(had?{v:w?"0%":"0"}:null);P.set(k,{v});if(!p||p.v==null||p.v===v||!el.animate)return;try{el.animate(w?[{width:p.v},{width:v}]:[{flexGrow:p.v},{flexGrow:v}],{duration:350,easing:"cubic-bezier(.25,.8,.3,1)"})}catch(_){}});for(const k of [...P.keys()])if(k.startsWith(gk+":")&&!seen.has(k))P.delete(k);g.querySelectorAll("[data-ak]").forEach(el=>{const k=el.dataset.ak,da=el.getAttribute("stroke-dasharray")||"0",of=el.getAttribute("stroke-dashoffset")||"0",tot=(da.split(/[\s,]+/)[1]||"0"),p=P.get(k)||(had?{da:"0 "+tot,of}:null);P.set(k,{da,of});
       if(!p||(p.da===da&&p.of===of)||!el.animate)return;try{el.animate([{strokeDasharray:px(p.da),strokeDashoffset:px(p.of)},{strokeDasharray:px(da),strokeDashoffset:px(of)}],{duration:350,easing:"cubic-bezier(.25,.8,.3,1)"})}catch(_){}})})};
   new MutationObserver(ms=>{for(const m of ms)m.addedNodes.forEach(n=>{if(n.nodeType===1)run(n)})}).observe(document.documentElement,{childList:true,subtree:true})})();
+</script>
+<script>/* mark panels whose first thing is a title strip, and where the strip ends (for the borderless strip) */
+(()=>{let t=0;const run=()=>{t=0;document.querySelectorAll('#view .bstrip,#view .calhead.cal-c,#view[data-tab="fuel"] :is(.holopanel,.flogp,.nmp,.usp,.wtr)>.ph:first-child').forEach(st=>{const p=st.closest('.panel');if(!p||st.offsetTop>4)return;p.classList.add('hasStrip');p.style.setProperty('--sh',(st.offsetTop+st.offsetHeight)+'px')})};
+  new MutationObserver(()=>{if(!t)t=requestAnimationFrame(run)}).observe(document.documentElement,{childList:true,subtree:true});addEventListener('resize',()=>{if(!t)t=requestAnimationFrame(run)})})();
 </script>
 </body></html>
