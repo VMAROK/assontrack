@@ -3504,6 +3504,13 @@ html.tpl-silk.tpl-silk.tpl-silk.tpl-silk.tpl-silk.tpl-silk aside{background-colo
 html.tpl-pyramid.tpl-pyramid.tpl-pyramid.tpl-pyramid.tpl-pyramid.tpl-pyramid aside{background-color:rgba(12,10,8,.28)!important;background-image:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 html.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bg aside{background:#0c0907 url(wp/vt/bronze-side.jpg) 50% 60%/auto 112% no-repeat!important;animation:bzSide 26s ease-in-out infinite}
 @keyframes bzSide{0%,100%{background-position:50% 60%;filter:brightness(1)}50%{background-position:44% 40%;filter:brightness(1.12)}}
+/* panels measured against the mockups pixel by pixel (v839): near-solid like the mockups (Chrome stays frosted), each template's exact fill steps top -> middle -> bottom and its exact border brightness */
+html.tpl-chrome{--p1:31,31,32;--p2:20,20,21;--p3:20,21,21;--pbd:rgba(255,255,255,.17);--pbt:rgba(255,255,255,.14);--pin:rgba(255,255,255,.06)}
+html.tpl-silk{--p1:19,20,29;--p2:16,17,25;--p3:12,13,20;--pbd:rgba(195,200,235,.16);--pbt:rgba(210,212,235,.13);--pin:rgba(190,190,255,.06)}
+html.tpl-pyramid{--p1:29,26,23;--p2:22,20,18;--p3:18,16,15;--pbd:rgba(255,225,195,.09);--pbt:rgba(255,225,200,.13);--pin:rgba(255,225,190,.05)}
+html.tpl-bronze{--p1:19,16,14;--p2:16,13,12;--p3:15,13,11;--pbd:rgba(255,210,185,.115);--pbt:rgba(255,210,185,.12);--pin:rgba(255,220,195,.04)}
+html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono){--p1:12,13,15;--p2:12,13,15;--p3:12,13,15;--pbd:rgba(255,255,255,.135);--pbt:rgba(255,255,255,.13);--pin:rgba(255,255,255,.025)}
+html:is(.tpl-vt,.tpl-stipple):is(.tpl-vt,.tpl-stipple) body #view .panel.panel{background:linear-gradient(180deg,rgba(var(--p1),var(--vta,.95)) 0%,rgba(var(--p2),var(--vta,.95)) 45%,rgba(var(--p3),var(--vta,.95)) 100%)!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9596,13 +9603,13 @@ const TEMPLATES=[{id:"spa",name:"Spa",sub:"Warm orange ambience, soft glass, slo
   {id:"midnight",name:"Midnight",sub:"Flat deep navy, clean blue accents",look:{color:"blue",glass:0,tone:50},bg:true,plain:true},
   {id:"slate",name:"Slate",sub:"Soft grey-blue, low contrast, easy on the eyes",look:{color:"graphite",glass:0,tone:50},bg:true,plain:true},
   /* visual templates: a whole designed look (backdrop + surfaces + type); panels and layout stay the same */
-  {id:"stipple",name:"Stipple",sub:"Near-black, fine drifting dots, quiet lavender",look:{color:"graphite",glass:0,trans:8,tone:10},bg:true,plain:true,visual:true},
-  {id:"silk",name:"Violet Silk",sub:"Deep indigo, glowing violet silk waves",look:{color:"dream",glass:10,trans:10,tone:10},bg:true,plain:true,visual:true,vt:true},
-  {id:"chrome",name:"Liquid Chrome",sub:"Black and silver, slow molten chrome",look:{color:"graphite",glass:80,trans:15,tone:10}/* was glass 70, trans 40 */,bg:true,plain:true,visual:true,vt:true},
-  {id:"bronze",name:"Bronze Ribbon",sub:"Warm black, glowing bronze silk",look:{color:"gold",glass:10,trans:12,tone:10},bg:true,plain:true,visual:true,vt:true},
-  {id:"pyramid",name:"Pyramids",sub:"Golden pyramids in moving light",look:{color:"gold",glass:10,trans:12,tone:10},bg:true,plain:true,visual:true,vt:true},
-  {id:"flow",name:"Threads",sub:"Faint silk threads flowing like wind",look:{color:"blue",glass:0,trans:8,tone:10},bg:true,plain:true,visual:true,vt:true},
-  {id:"flowmono",name:"Threads · Mono",sub:"White threads on deep black",look:{color:"graphite",glass:0,trans:8,tone:10},bg:true,plain:true,visual:true,vt:true}];
+  {id:"stipple",name:"Stipple",sub:"Near-black, fine drifting dots, quiet lavender",look:{color:"graphite",glass:0,trans:3,tone:10},bg:true,plain:true,visual:true},
+  {id:"silk",name:"Violet Silk",sub:"Deep indigo, glowing violet silk waves",look:{color:"dream",glass:16,trans:4,tone:10},bg:true,plain:true,visual:true,vt:true},
+  {id:"chrome",name:"Liquid Chrome",sub:"Black and silver, slow molten chrome",look:{color:"graphite",glass:80,trans:10,tone:10}/* was glass 70, trans 40 */,bg:true,plain:true,visual:true,vt:true},
+  {id:"bronze",name:"Bronze Ribbon",sub:"Warm black, glowing bronze silk",look:{color:"gold",glass:10,trans:3,tone:10},bg:true,plain:true,visual:true,vt:true},
+  {id:"pyramid",name:"Pyramids",sub:"Golden pyramids in moving light",look:{color:"gold",glass:10,trans:4,tone:10},bg:true,plain:true,visual:true,vt:true},
+  {id:"flow",name:"Threads",sub:"Faint silk threads flowing like wind",look:{color:"blue",glass:0,trans:3,tone:10},bg:true,plain:true,visual:true,vt:true},
+  {id:"flowmono",name:"Threads · Mono",sub:"White threads on deep black",look:{color:"graphite",glass:0,trans:3,tone:10},bg:true,plain:true,visual:true,vt:true}];
 const tplOf=()=>{const t=(data.profile||{}).template;return TEMPLATES.find(x=>x.id===(t===undefined?"midnight":t))||null};/* never picked = Midnight (default for new visitors); "" = picked no template. was: TEMPLATES.find(t=>t.id===(data.profile||{}).template)||null */
 const tplBgOn=()=>{const t=tplOf();return !!(t&&t.bg&&(data.profile||{}).tplBg!==false)};
 const effLook=()=>{const g=lookOf(),pl=passLook()||{},T=tplOf();if(T)return T.visual?Object.assign({color:g.color,glass:g.glass,trans:g.trans,tone:g.tone??50},T.look,((data.profile||{}).vtLook||{})[T.id]||{})/* visual: its designed panels (from the mockups) + your tweaks for that template */:Object.assign({color:g.color,glass:g.glass,trans:g.trans,tone:g.tone??50},T.look,{glass:g.glass,trans:g.trans,tone:g.tone??50});/* your Blur / Transparency / Color depth stay the same on every template (no per-template defaults; was: T.look,(data.profile||{}).tplLook) *//* + your slider changes on top of the template (tplLook resets when you pick a template) */return {color:pl.color||g.color,glass:pl.glass??g.glass,trans:pl.trans??g.trans,tone:pl.tone??g.tone??50}};
@@ -9971,7 +9978,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="838",APPT="2026-11-24T18:27:49Z";   /* APPT: when this update was made */
+const APPV="839",APPT="2026-11-24T18:31:45Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -10324,7 +10331,7 @@ void main(){vec2 uv=gl_FragCoord.xy/R;float a=R.x/R.y;vec2 p=vec2(uv.x*a,uv.y);f
     if(want&&!on){if(!draw&&!init())return;on=true;size();raf=requestAnimationFrame(loop)}else if(!want&&on){on=false;cancelAnimationFrame(raf)}};
   new MutationObserver(check).observe(document.documentElement,{attributes:true,attributeFilter:["class"]});addEventListener("resize",()=>{if(on)size()});check()})();
 /* one-time: Liquid Chrome was redone to match its mockup — drop old Chrome slider/fine-tune tweaks so the new look shows */
-(()=>{const go=()=>{try{if(typeof data!=="object"||!data||!data.profile)return setTimeout(go,300);const P=data.profile;if(P.vtV3)return;P.vtV3=1;P.chromeV2=1;delete P.vtLook;const _T=typeof tplOf==="function"&&tplOf();if(_T&&_T.visual&&typeof fineLoad==="function")fineLoad(VTFINE(_T.id));/* was: chromeV2 — Chrome only */if(typeof save==="function")save();if(typeof applyLook==="function")applyLook();if(typeof render==="function")render()}catch(e){}};setTimeout(go,600)})();
+(()=>{const go=()=>{try{if(typeof data!=="object"||!data||!data.profile)return setTimeout(go,300);const P=data.profile;if(P.vtV4)return;P.vtV4=1;P.vtV3=1;/* was vtV3 */P.chromeV2=1;delete P.vtLook;const _T=typeof tplOf==="function"&&tplOf();if(_T&&_T.visual&&typeof fineLoad==="function")fineLoad(VTFINE(_T.id));/* was: chromeV2 — Chrome only */if(typeof save==="function")save();if(typeof applyLook==="function")applyLook();if(typeof render==="function")render()}catch(e){}};setTimeout(go,600)})();
 </script>
 <script>/* Animated wallpaper images for the visual templates: the picture stays exactly as designed; it breathes with a very slow drift and zoom, the folds ripple gently, and a soft sheen of light slides across the highlights. Add a template by putting its image in VTIMG. */
 (()=>{const VTIMG={chrome:"wp/vt/chrome.jpg",silk:"wp/vt/silk.jpg",pyramid:"wp/vt/pyramid.jpg",bronze:"wp/vt/bronze.jpg"},FOC={chrome:.5,silk:.66,pyramid:.18,bronze:.78};/* FOC = which side of the picture to keep when the screen is narrower (portrait) */
