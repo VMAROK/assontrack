@@ -3045,6 +3045,11 @@ html body #view .nwp .nw-tix>.nw-d{justify-content:flex-start!important;gap:0!im
 html body #view .nwp .nw-tix>.nw-d>:is(.nw-k,.nw-l,.nw-ml){display:none!important}
 html body #view .nwp .nw-tix>.nw-d>.nw-ring{flex:none!important;width:min(72px,calc(100cqw / 7 - 12px))!important;height:min(72px,calc(100cqw / 7 - 12px))!important;margin:auto!important;top:0!important;position:relative}
 html.phone body #view .nwp .nw-tix>.nw-d>.nw-t{flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:3px;padding:0 2px!important;font-size:9px}
+/* Budget top tiles: line up icon/label/amount across all four (was centered, so taller/shorter content drifted) */
+html body #view[data-tab="budget"] .bstick:not(.stuck) .tile{justify-content:flex-start!important}
+html body #view[data-tab="budget"] .bstick:not(.stuck) .tile>svg:first-child{width:21px!important;height:21px!important;flex:none}
+/* Budget Income/Expenses grid view: same flush background as the list view */
+html body #view .bco .bco-cards{background:rgba(var(--tD),.25)}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -6429,7 +6434,7 @@ function bList(S,m){const b=B(),it=b.items.filter(i=>(m==="i"?i.kind==="inc":i.k
 let bAllF=null;   /* when set, bAll only shows items in one group of the combined panel */
 function bAll(S,only,m){const b=B(),inc=m==="i",it=b.items.filter(i=>(inc?i.kind==="inc":i.kind!=="inc")&&(!bAllF||bAllF(i)));const cs=bCatsShown(S,m).filter(c=>!only||c.n===only);
   if(!cs.length)return `<div class="bi-grid">${inc?bAddCard("inc"):bAddCard("sub")+bAddCard("bill")}</div>`;
-  const addB=(cn,g)=>{const a=`data-bnc-cat="${esc(cn)}"${g?` data-bnc-grp="${esc(g)}"`:""}`;return inc?`<button type="button" data-bnew="inc" ${a}>＋ Income</button>`:`<button type="button" data-bnew="sub" ${a}>＋ Subscription</button><button type="button" data-bnew="bill" ${a}>＋ Bill</button>`};
+  const addB=(cn,g)=>{const a=`data-bnc-cat="${esc(cn)}"${g?` data-bnc-grp="${esc(g)}"`:""}`;return inc?`<button type="button" data-bnew="inc" ${a}>＋ Item</button>`:`<button type="button" data-bnew="exp" ${a}>＋ Item</button>`};/* was: ＋ Income / ＋ Subscription + ＋ Bill */
   const srt=(a,z)=>((a.ord??1e9)-(z.ord??1e9))||(bLvR(a.lvl)-bLvR(z.lvl))||(bMo(z)-bMo(a));
   return `<div class="bk-cats${only?" one":""}">${cs.map(c=>{const L=it.filter(i=>bItCat(i)===c.n).sort(srt),GS=bGroups(c.n),loose=L.filter(i=>!i.grp||!GS.includes(i.grp)),used=inc?L.filter(i=>!i.paused).reduce((a,i)=>a+bMo(i),0):(S.fixCat[c.n]||0)+(S.spCat[c.n]||0),lim=inc?0:+c.lim||0,f=lim?used/lim:0;
     return `<section class="bk-cat${bFlash===c.n?" flash":""}" data-bkcat="${esc(c.n)}" style="--cc:${c.c}"><button type="button" class="bk-h" data-bcat="${esc(c.n)}"><span class="bk-t"><i></i>${esc(c.n)}</span><span class="bk-v">${bMoney(used,0)}${inc?"/mo":""}${lim?`<em> / ${bMoney(lim,0)}</em>`:""}</span></button>
@@ -9452,7 +9457,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="753",APPT="2026-11-24T05:36:02Z";   /* APPT: when this update was made */
+const APPV="754",APPT="2026-11-24T05:41:53Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
