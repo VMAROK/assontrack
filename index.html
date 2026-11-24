@@ -9768,7 +9768,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="803",APPT="2026-11-24T09:03:30Z";   /* APPT: when this update was made */
+const APPV="804",APPT="2026-11-24T09:12:16Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -9963,14 +9963,28 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   const q=()=>{clearTimeout(t);t=setTimeout(go,300)};addEventListener("resize",q);addEventListener("orientationchange",q)})();
 </script>
 <script>/* (v798–v799 halftone "cloths" version is in git history — reverted to this one) Stipple backdrop: two slow ribbons of fine dots, top-right and bottom-left, drawn only while the Stipple template is on */
-(()=>{const c=document.getElementById("stipbg");if(!c)return;const x=c.getContext("2d");let W=0,H=0,raf=0,last=0,on=false,R=[];
+(()=>{const c=document.getElementById("stipbg");if(!c)return;const x=c.getContext("2d");let W=0,H=0,raf=0,last=0,on=false,R=[],R2=[],G=[];
   const size=()=>{const d=Math.min(2.5,devicePixelRatio||1);W=innerWidth;H=(window.aotFullH?aotFullH():innerHeight);c.width=Math.round(W*d);c.height=Math.round(H*d);x.setTransform(d,0,0,d,0,0);
-    R=[];const cols=Math.round(Math.min(220,Math.max(120,W/6))),rows=44;for(const side of [0,1])for(let i=0;i<cols;i++)for(let j=0;j<rows;j++)R.push([side,i/(cols-1),j/(rows-1),Math.random()*6.28])};
+    R=[];const cols=Math.round(Math.min(220,Math.max(120,W/6))),rows=44;for(const side of [0,1])for(let i=0;i<cols;i++)for(let j=0;j<rows;j++)R.push([side,i/(cols-1),j/(rows-1),Math.random()*6.28]);
+    /* added: two smaller ribbons in the other corners, and a big faint dotted globe with a ring in the centre (the two above are unchanged) */
+    R2=[];const c2=Math.round(cols*.6),r2=32;for(const k of [0,1])for(let i=0;i<c2;i++)for(let j=0;j<r2;j++)R2.push([k,i/(c2-1),j/(r2-1)]);
+    G=[];const n=1700,ga=Math.PI*(3-Math.sqrt(5));for(let i=0;i<n;i++){const y=1-2*(i+.5)/n,r=Math.sqrt(1-y*y),a=i*ga;G.push([Math.cos(a)*r,y,Math.sin(a)*r])}
+    for(let i=0;i<620;i++){const a=Math.random()*6.2832,r=1.32+Math.pow(Math.random(),1.5)*.38;G.push([Math.cos(a)*r,(Math.random()-.5)*.02,Math.sin(a)*r,1])}};
   const draw=t=>{x.clearRect(0,0,W,H);const M=Math.min(W,H);
     for(const [side,s0,w,ph] of R){const s=side?1-s0:s0,bx=side?W*1.02:-W*.04,by=side?-H*.04:H*1.02,ex=side?W*.42:W*.42,ey=side?H*.3:H*.5;
       const px=bx+(ex-bx)*s+Math.sin(s*4+t*.22+side)*M*.06,py=by+(ey-by)*s+Math.cos(s*3.3-t*.18+side*2)*M*.055,th=(M*.2+M*.1*Math.sin(s*2.6+t*.26+side))*(1-s*.5),ang=Math.atan2(ey-by,ex-bx)+1.5708,off=(w-.5)*th*2+Math.sin(w*8+s*6+t*.45)*7;
       const X=px+Math.cos(ang)*off,Y=py+Math.sin(ang)*off;if(X<-4||X>W+4||Y<-4||Y>H+4)continue;const den=.5+.5*Math.sin(w*9.4+s*8-t*.4+ph*.15),al=Math.min(.95,Math.pow(1-s,.9)*(.25+.75*den)*(.15+1.1*Math.pow(1-Math.abs(w-.5)*2,1.1)));if(al<.03)continue;
-      x.fillStyle=`rgba(208,205,226,${al.toFixed(3)})`;const z=.9+1.3*den*Math.pow(1-s,1.2);x.fillRect(X-z/2,Y-z/2,z,z)}};
+      x.fillStyle=`rgba(208,205,226,${al.toFixed(3)})`;const z=.9+1.3*den*Math.pow(1-s,1.2);x.fillRect(X-z/2,Y-z/2,z,z)}
+    /* top-left and bottom-right ribbons */
+    for(const [k,s0,w] of R2){const s=s0,bx=k?W*1.04:-W*.05,by=k?H*1.04:-H*.05,ex=k?W*.66:W*.3,ey=k?H*.7:H*.26;
+      const px=bx+(ex-bx)*s+Math.sin(s*3.6+t*.2+k*3)*M*.05,py=by+(ey-by)*s+Math.cos(s*3-t*.16+k)*M*.05,th=(M*.13+M*.07*Math.sin(s*2.4+t*.24+k))*(1-s*.5),ang=Math.atan2(ey-by,ex-bx)+1.5708,off=(w-.5)*th*2+Math.sin(w*8+s*6+t*.4+k)*6;
+      const X=px+Math.cos(ang)*off,Y=py+Math.sin(ang)*off;if(X<-4||X>W+4||Y<-4||Y>H+4)continue;const den=.5+.5*Math.sin(w*9+s*7-t*.36+k*2),al=Math.min(.8,.8*Math.pow(1-s,.9)*(.25+.75*den)*(.15+1.1*Math.pow(1-Math.abs(w-.5)*2,1.1)));if(al<.03)continue;
+      x.fillStyle=`rgba(208,205,226,${al.toFixed(3)})`;const z=.8+1.1*den*Math.pow(1-s,1.2);x.fillRect(X-z/2,Y-z/2,z,z)}
+    /* centre globe: slowly turning, lit from the upper left, kept faint so the panels stay readable */
+    {const cx=W*.55,cy=H*.52,rad=M*.26,ry=t*.12,rx=.38,cR=Math.cos(ry),sR=Math.sin(ry),cX=Math.cos(rx),sX=Math.sin(rx),L=[-.55,.55,-.63];
+      for(const g of G){const ring=g.length>3,px=g[0],py=g[1],pz=g[2];const x1=px*cR+pz*sR,z1=-px*sR+pz*cR,y2=py*cX-z1*sX,z2=py*sX+z1*cX;
+        let lit;if(ring)lit=.45+.35*Math.sin(Math.atan2(z1,x1)*1+t*.3);else{lit=Math.max(0,x1*L[0]+y2*L[1]+z2*L[2]);if(z2>.25&&!ring)lit*=.25}
+        const al=(ring?.2:.06)+(ring?.25:.42)*lit;if(al<.04)continue;const z=.7+1.1*lit;x.fillStyle=`rgba(208,205,226,${(al*.85).toFixed(3)})`;x.fillRect(cx+x1*rad-z/2,cy-y2*rad-z/2,z,z)}}};
   /* slow and light: about 24 frames a second, paused when the app is hidden */
   const loop=n=>{raf=requestAnimationFrame(loop);if(document.hidden||n-last<41)return;last=n;draw(n/1000)};
   const check=()=>{const h=document.documentElement,want=h.classList.contains("tpl-stipple")&&h.classList.contains("tpl-bg");if(want&&!on){on=true;size();raf=requestAnimationFrame(loop)}else if(!want&&on){on=false;cancelAnimationFrame(raf);x.clearRect(0,0,W,H)}};
