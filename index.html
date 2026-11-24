@@ -2890,18 +2890,25 @@ html.phone #view .cal-vsw{position:static;transform:none;order:9;margin:6px auto
 html #view .dashtop .holopanel>.ph.bstrip{display:flex;flex-direction:row;justify-content:center;margin:0 -18px 14px!important}html #view .dashtop .holopanel>.ph.bstrip>span{font-family:"Sora",var(--display);font-size:17px;font-weight:700;letter-spacing:.04em;background:linear-gradient(90deg,#eef3ff,rgb(var(--tL)) 120%);-webkit-background-clip:text;background-clip:text;color:transparent}html #view .dashtop .holopanel>.ph.bstrip>button{position:absolute;right:10px;top:50%;transform:translateY(-50%);margin:0}
 html #view .dtiles>.dt-strip,html #view .wahead>.bstrip,html #view .bdown>.bstrip{padding:9px 18px}html #view .wahead>.bstrip,html #view .bdown>.bstrip{margin:0 -18px 14px}
 /* title strips, all tabs: dark tint of the theme (not black), plain professional type, one solid colour (no gradient text) */
-html #view .bstrip{background:linear-gradient(rgba(0,0,0,.28),rgba(0,0,0,.28)),rgba(var(--tX),.72)!important;border-bottom:1px solid rgba(var(--lr),.18)!important}
+html #view .bstrip,html #view .mcal .cw{background:rgba(var(--tA),.32)!important;border-bottom:1px solid rgba(var(--lr),.18)!important}
 html #view .bstrip b,html #view .dashtop .holopanel>.ph.bstrip>span{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",system-ui,sans-serif!important;font-size:15px!important;font-weight:600!important;letter-spacing:.01em!important;background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;color:#e9eef8!important;-webkit-text-fill-color:#e9eef8!important}
 /* phone: strips run edge to edge and sit flush at the top of their panel */
 html.phone #view :is(.holopanel,.dtiles,.bdown,.wahead).bstrip-p,html.phone #view .dtiles{padding-top:0!important}
 html.phone #view :is(.holopanel,.bdown)>.bstrip,html.phone #view .dtiles>.dt-strip{margin:0 -11px 12px!important}html.phone #view .wahead>.bstrip{margin:0 0 12px!important}html.phone #view .dtiles.dt-prog>.dt-strip{margin:0!important}
 /* calendar: the month + arrows (+ view switch) sit in a title strip like the other panels */
 html #view .panel:has(>.calhead.cal-c){padding-top:0!important;overflow:hidden}
-html #view .calhead.cal-c{margin:0 -18px 14px!important;padding:8px 18px!important;background:linear-gradient(rgba(0,0,0,.28),rgba(0,0,0,.28)),rgba(var(--tX),.72);border-bottom:1px solid rgba(var(--lr),.18)}
-html #view .calhead.cal-c h2{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",system-ui,sans-serif!important;font-size:15px!important;font-weight:600!important;letter-spacing:.01em;color:#e9eef8}
-html #view .calhead.cal-c .calnav{width:28px;height:28px;padding:0!important;display:grid;place-items:center;font-size:15px}
+html #view .calhead.cal-c{margin:0 -18px 14px!important;padding:8px 18px!important;background:rgba(var(--tA),.32);border-bottom:1px solid rgba(var(--lr),.18)}
+/* (removed: v704 shrank the month title and arrows — only the strip background was asked for) */
 html #view .calhead.cal-c .cal-vsw{right:12px}
-html.phone #view .calhead.cal-c{margin:0 -2px 12px!important;flex-wrap:nowrap}html.phone #view .calhead.cal-c::after{display:none}html.phone #view .calhead.cal-c .cal-vsw{position:absolute;right:8px;top:50%;transform:translateY(-50%);margin:0}html.phone #view .calhead.cal-c h2{font-size:15px!important}
+html.phone #view .calhead.cal-c{margin:0 -2px 12px!important;flex-wrap:nowrap}html.phone #view .calhead.cal-c::after{display:none}html.phone #view .calhead.cal-c .cal-vsw{position:absolute;right:8px;top:50%;transform:translateY(-50%);margin:0}
+/* day window: passions cross off with a tap — a hollow ring on the right says "tap me"; tapped, a line strikes through and the ring fills with a check */
+.dov .bdw-r.dpx{display:grid!important;grid-template-columns:auto minmax(0,1fr) auto 22px!important;align-items:center;column-gap:10px}.dpx{--cc:#b99cff!important;width:100%;text-align:left;font:inherit;color:inherit;background:none;border:0;cursor:pointer;position:relative}
+.dpx b{display:inline;text-decoration:line-through;text-decoration-color:transparent;text-decoration-thickness:1.5px;transition:text-decoration-color .3s,opacity .3s}
+.dpx.done b{text-decoration-color:currentColor;opacity:.55}.dpx.done small,.dpx.done em{opacity:.45}
+.dpx-ck{flex:none;width:22px;height:22px;margin:0;border-radius:50%;border:1.5px dashed color-mix(in srgb,var(--cc) 70%,transparent);display:grid;place-items:center;color:transparent;transition:background .25s,border-color .25s,color .25s,transform .25s}
+.dpx-ck svg{width:14px;height:14px}.dpx:hover .dpx-ck{border-style:solid}
+.dpx.done .dpx-ck{background:var(--cc);border:1.5px solid var(--cc);color:#0b0f1a;transform:scale(1.05)}
+.dpx em{color:#b99cff!important}.dpx-hint{margin:4px 2px 2px;font-size:12px;color:var(--muted)}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4007,13 +4014,14 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 let calMonth=null,calSel=null,dashDay=null,dashDayShown=null,evOpen=false;
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-evtab]");if(!b)return;e.preventDefault();e.stopPropagation();evOpen=!evOpen;const v=$("#view"),st=v?v.scrollTop:0;render();if(v)v.scrollTop=st;if(evOpen)setTimeout(()=>{const i=document.getElementById("evT");i&&i.focus({preventScroll:true})},60)},true);
 /* the day overview (like Budget's): events, passions and money for that day */
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-dpx]");if(!b)return;e.preventDefault();e.stopPropagation();const X=(data.passX=data.passX||{}),k=b.dataset.dpx;if(X[k])delete X[k];else X[k]=Date.now();save();try{navigator.vibrate&&navigator.vibrate(10)}catch(_){}ddPaint()},true);
 function ddPaint(){let h=document.getElementById("ddHost");if(!dashDay||tab!=="dash"){if(h)h.remove();return}if(!h){h=document.createElement("div");h.id="ddHost";document.body.appendChild(h)}h.innerHTML=dashDayOv(D(),dashDay)}
 document.addEventListener("click",e=>{const t=e.target;if(!t.closest)return;const x=t.closest("[data-ddx]"),bg=t.matches&&t.matches("[data-ddbg]"),nav=t.closest(".navbtn");if(!x&&!bg&&!nav)return;if(nav){if(dashDay){dashDay=null;ddPaint()}return}e.preventDefault();e.stopPropagation();dashDay=null;ddPaint();const v=$("#view"),st=v?v.scrollTop:0;render();if(v)v.scrollTop=st},true);
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&dashDay){dashDay=null;ddPaint();render()}});
 function dashDayOv(d,ds){const it=dayItems(d,ds),T=today(),b=B(),SE=calBud(ds),SS=(b.spends||[]).filter(x=>x.d===ds),PL=it.logs.filter(l=>l.p),anim=dashDayShown!==ds;dashDayShown=ds;
   const sec=(t,c,L)=>L?`<div class="bdw-s"><div class="bdw-sh" style="color:${c}">${t}</div>${L}</div>`:"";
   const evs=it.ev.map(e=>`<div class="bdw-r" style="--cc:var(--cyan)"><i></i><span><b>${esc(e.title)}</b><small>${e.time?fmtTime(e.time):"All day"}</small></span>${del("events",e.id)}</div>`).join("");
-  const ps=PL.map(l=>`<div class="bdw-r" style="--cc:${l.c}"><i></i><span><b>${esc(l.t)}</b><small>${esc(l.s)}</small></span><em>${l.v}</em></div>`).join("");
+  const PX=(data.passX=data.passX||{}),ps=PL.map(l=>{const k=ds+"|"+l.t+"|"+l.s,on=!!PX[k];return `<button type="button" class="bdw-r dpx${on?" done":""}" data-dpx="${esc(k)}" aria-pressed="${on}" style="--cc:${l.c}" title="${on?"Tap to undo":"Tap to cross off"}"><i></i><span><b>${esc(l.t)}</b><small>${esc(l.s)}</small></span><em>${l.v}</em><span class="dpx-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>`}).join("")+(PL.length?`<p class="dpx-hint">${PL.every(l=>PX[ds+"|"+l.t+"|"+l.s])?"All crossed off ✓":"Tap a passion to cross it off"}</p>`:"");
   const money=SE.length||SS.length?`<div class="dov-bud">${bDayPop(b,ds,SE,SS,T,true)}</div>`:"";
   return `<div class="bdw dov" data-ddbg><div class="bdw-p panel" role="dialog" aria-modal="true" aria-label="Day overview"><div class="bdw-h"><div><b>${new Date(ds+"T12:00").toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</b>${ds===T?"<small>Today</small>":""}</div><button type="button" class="bdw-x" data-ddx aria-label="Close">×</button></div>
     ${evs||ps||money?sec("Events","#4cc9ff",evs)+sec("Passions","#b99cff",ps)+(money?`<div class="bdw-s"><div class="bdw-sh" style="color:#ffc533">Budget</div>${money}</div>`:""):`<p class="note" style="margin:10px 2px 4px">Nothing on this day.</p>`}</div></div>`}
@@ -9294,7 +9302,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="704",APPT="2026-11-24T01:51:15Z";   /* APPT: when this update was made */
+const APPV="705",APPT="2026-11-24T01:54:46Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
