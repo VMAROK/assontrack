@@ -159,7 +159,7 @@
 @media (prefers-reduced-motion:reduce){#aotSplash .sp-grain{animation:none}}
 </style>
 <script>(()=>{
-  const STY=["specks","aurora","orbit","ripple","threads"];
+  const STY=["specks","aurora","orbit","ripple","threads","halftone"];
   const rnd=(a,b)=>a+Math.random()*(b-a);
   function play(id,{min=2200,max=4000,manual=false}={}){
     const old=document.getElementById("aotSplash");if(old)old.remove();
@@ -192,6 +192,13 @@
         draw(t){bg("#121a30","#070a14");const cx=W/2,cy=H*.46,M=Math.hypot(W,H)*.6;
           for(const [px,py] of S.g){const d=Math.hypot(px-cx,py-cy),w=Math.max(0,Math.sin(d*.028-t*1.3)),e=Math.max(0,1-d/M),a=(.12+.7*w*w)*e;if(a<.03)continue;x.fillStyle=`rgba(${150+60*w|0},${185+40*w|0},255,${a.toFixed(3)})`;dot(px,py,.7+1.3*w*w*w*e)}
           const g=x.createRadialGradient(cx,cy,0,cx,cy,Math.min(W,H)*.3);g.addColorStop(0,"rgba(80,140,255,.14)");g.addColorStop(1,"rgba(80,140,255,0)");x.fillStyle=g;x.fillRect(0,0,W,H)}},
+      /* halftone: a grid of dots on near-black, growing and brightening toward a slow-moving light */
+      halftone:{y:.5,init(){const gap=Math.max(20,Math.round(Math.min(W,H)/15));S.gap=gap;S.g=[];for(let yy=gap/2;yy<H+gap;yy+=gap)for(let xx=gap/2;xx<W+gap;xx+=gap)S.g.push([xx,yy])},
+        draw(t){x.fillStyle="#05060b";x.fillRect(0,0,W,H);const M=Math.hypot(W,H),lx=W*(.72+.16*Math.sin(t*.32)),ly=H*(.68+.14*Math.cos(t*.26)),rmax=S.gap*.19;
+          for(const [px,py] of S.g){const d=Math.hypot(px-lx,py-ly)/M,k=Math.max(0,1-d*1.55),e=k*k*(3-2*k),wave=.06*Math.sin(t*1.1-d*9);const f=Math.max(0,Math.min(1,e+wave*e));if(f<.015){x.fillStyle="rgba(60,80,170,.16)";dot(px,py,.7);continue}
+            x.fillStyle=`rgba(${(48+28*f)|0},${(78+30*f)|0},${(180+40*f)|0},${(.22+.78*f).toFixed(3)})`;dot(px,py,.7+rmax*f)}
+          /* quiet pocket behind the name so the dots never cross the letters */
+          const cy=H*.5-20,g=x.createRadialGradient(W/2,cy,0,W/2,cy,Math.min(W*.62,260));g.addColorStop(0,"rgba(5,6,11,.94)");g.addColorStop(.55,"rgba(5,6,11,.7)");g.addColorStop(1,"rgba(5,6,11,0)");x.save();x.translate(W/2,cy);x.scale(1,.42);x.translate(-W/2,-cy);x.fillStyle=g;x.fillRect(0,0,W,H);x.restore()}},
       threads:{y:.5,init(){const n=Math.round(Math.min(1400,W*H/400));S.p=[...Array(n)].map(()=>({x:rnd(0,W),y:rnd(0,H),age:rnd(0,200)}));x.fillStyle="#090d1c";x.fillRect(0,0,W,H)},
         draw(t){x.fillStyle="rgba(9,13,28,.1)";x.fillRect(0,0,W,H);x.lineWidth=.7;
           for(const p of S.p){const a=Math.sin(p.x*.0042+t*.12)*1.6+Math.cos(p.y*.0051-t*.09)*1.4+Math.sin((p.x+p.y)*.0017)*.8,nx=p.x+Math.cos(a)*.9,ny=p.y+Math.sin(a)*.9;x.strokeStyle=`hsla(${(228+22*Math.sin(p.y*.004+t*.1))|0},85%,80%,.22)`;x.beginPath();x.moveTo(p.x,p.y);x.lineTo(nx,ny);x.stroke();p.x=nx;p.y=ny;if(--p.age<0||p.x<0||p.x>W||p.y<0||p.y>H){p.x=rnd(0,W);p.y=rnd(0,H);p.age=rnd(80,260)}}}}};
@@ -9298,7 +9305,7 @@ function applyLook(tmp){tmp=typeof tmp==="number"?{glass:tmp}:(tmp||{});const L=
     const PF=data.profile||{};h.classList.toggle("tpl-dpan",PF.tplPan==="dark");["none","dark"].forEach(k=>h.classList.toggle("tpl-bd-"+k,PF.tplBd===k));h.classList.toggle("tpl-sharp",PF.tplSharp===true);/* spacing sliders (replace the old Comfortable / Compact / Tight buttons) */
     const gi=PF.gapIn,go=PF.gapOut;h.classList.toggle("gap-in",gi!=null);h.classList.toggle("gap-out",go!=null);if(gi!=null)h.style.setProperty("--gin",gi+"px");if(go!=null)h.style.setProperty("--gout",go+"px");h.classList.toggle("tpl-bars-clear",PF.tplBars==="clear");h.classList.toggle("tpl-bars-pan",T?PF.tplBars!=="clear":PF.tplBars==="panel");setTimeout(barsSync,0);h.classList.remove("tpl-bd-light");spaFx.stop()/* lines off for now; was: if(tplBgOn())spaFx.run() */}}
 /* Settings → Opening screen: pick one of five styles (or off); tap again to preview */
-const SPL=[["specks","Specks","Drifting specks, breathing glow"],["aurora","Aurora","Soft colour clouds, film grain"],["orbit","Orbit","Fine rings turning, lights riding them"],["ripple","Ripple","Dots with a slow wave from the centre"],["threads","Threads","Faint silk threads in the wind"],["off","Off","Open straight into the app"]];
+const SPL=[["specks","Specks","Drifting specks, breathing glow"],["aurora","Aurora","Soft colour clouds, film grain"],["orbit","Orbit","Fine rings turning, lights riding them"],["ripple","Ripple","Dots with a slow wave from the centre"],["threads","Threads","Faint silk threads in the wind"],["halftone","Halftone","Dots that grow toward a drifting light"],["off","Off","Open straight into the app"]];
 const splashNow=()=>{try{return localStorage.getItem("aot-splash")||"specks"}catch(_){return "specks"}};
 function splashPanel(){const cur=splashNow();return `<div class="panel splp" style="margin-top:18px"><div class="ph"><span>Opening screen</span><i>Shown when the app opens</i></div><div class="spl-row">${SPL.map(([k,n,d])=>`<button type="button" class="spl-c spl-${k}" data-splash="${k}" aria-pressed="${cur===k}"><b>${n}</b><small>${d}</small></button>`).join("")}</div><p class="note" style="margin:10px 2px 0">Tap one to choose it and see it play.</p></div>`}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-splash]");if(!b)return;e.preventDefault();const k=b.dataset.splash;try{localStorage.setItem("aot-splash",k)}catch(_){}document.querySelectorAll("[data-splash]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.splash===k));if(k!=="off"&&window.aotSplash)window.aotSplash.play(k,{min:2600,manual:true})},true);
@@ -9631,7 +9638,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="785",APPT="2026-11-24T07:54:55Z";   /* APPT: when this update was made */
+const APPV="786",APPT="2026-11-24T07:57:21Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
