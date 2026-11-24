@@ -3401,7 +3401,7 @@ html:is(.tpl-vt,.tpl-stipple).tpl-bars-clear.tpl-bars-clear.tpl-bars-clear :is(a
 .wtab[aria-selected="true"]{background:rgba(var(--tL),.22);border-color:rgba(var(--tL),.6);color:#fff}
 html.tpl-sharp .wtab{border-radius:0}
 /* Settings: the empty spot where Goals was — a small dancing light figure, same on every theme (no panel, no border) */
-.set-art{position:relative;min-height:300px;background:radial-gradient(closest-side,rgba(3,5,10,.72),rgba(3,5,10,.45) 55%,rgba(3,5,10,0))!important;/* soft shadow behind the figure so the wallpaper stays out of the way (was: background:none) */border:0!important;box-shadow:none!important;overflow:hidden}
+.set-art{position:relative;z-index:1;min-height:300px;background:radial-gradient(farthest-side,rgba(3,5,10,.82),rgba(3,5,10,.66) 50%,rgba(3,5,10,.3) 78%,rgba(3,5,10,0))!important;/* soft shadow behind the figure so the wallpaper stays out of the way (was: background:none) */border:0!important;box-shadow:none!important;overflow:hidden}
 .set-art canvas{position:absolute;inset:0;width:100%;height:100%;display:block;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
@@ -9858,7 +9858,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="822",APPT="2026-11-24T17:21:00Z";   /* APPT: when this update was made */
+const APPV="823",APPT="2026-11-24T17:24:36Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
