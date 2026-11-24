@@ -3046,7 +3046,11 @@ html body #view .nwp .nw-tix>.nw-d>:is(.nw-k,.nw-l,.nw-ml){display:none!importan
 html body #view .nwp .nw-tix>.nw-d>.nw-ring{flex:none!important;width:min(72px,calc(100cqw / 7 - 12px))!important;height:min(72px,calc(100cqw / 7 - 12px))!important;margin:auto!important;top:0!important;position:relative}
 html.phone body #view .nwp .nw-tix>.nw-d>.nw-t{flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:3px;padding:0 2px!important;font-size:9px}
 /* Budget top tiles: line up icon/label/amount across all four (was centered, so taller/shorter content drifted) */
-html body #view[data-tab="budget"] .bstick:not(.stuck) .tile{justify-content:flex-start!important}
+/* was top-aligned: html body #view[data-tab="budget"] .bstick:not(.stuck) .tile{justify-content:flex-start!important} — now centered, with every row a fixed height so all four still line up */
+html body #view[data-tab="budget"] .bstick:not(.stuck) .tile{justify-content:center!important}
+html body #view[data-tab="budget"] .bstick:not(.stuck) .tile>:is(em,.bsav-dots){height:26px!important;margin-top:0;flex:none;box-sizing:border-box}
+html body #view[data-tab="budget"] .bstick:not(.stuck) .tile>em{display:block!important;text-align:center}
+html body #view[data-tab="budget"] .bstick:not(.stuck) .tile>.bsav-dots{padding-top:6px}
 html body #view[data-tab="budget"] .bstick:not(.stuck) .tile>svg:first-child{width:21px!important;height:21px!important;flex:none}
 /* Budget Income/Expenses grid view: same flush background as the list view */
 html body #view .bco .bco-cards{background:rgba(var(--tD),.25)}
@@ -9469,7 +9473,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="757",APPT="2026-11-24T05:59:06Z";   /* APPT: when this update was made */
+const APPV="758",APPT="2026-11-24T06:01:02Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
