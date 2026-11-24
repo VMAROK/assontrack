@@ -159,6 +159,9 @@
 #aotSplash .sp-tap{position:absolute;left:0;right:0;bottom:max(34px,calc(env(safe-area-inset-bottom) + 22px));text-align:center;font:400 10px/1 -apple-system,"SF Pro Text","Inter",system-ui,sans-serif;letter-spacing:.34em;margin-right:-.34em;text-transform:uppercase;color:rgba(200,210,230,.5);opacity:0;transition:opacity 1.6s ease;pointer-events:none}
 #aotSplash.sp-ready .sp-tap{opacity:1;animation:spTap 3.6s 1.6s ease-in-out infinite}
 @keyframes spTap{0%,100%{opacity:1}50%{opacity:.35}}
+#aotSplash canvas{transition:opacity 1.6s ease}#aotSplash.sp-gate canvas{opacity:0}
+#aotSplash .sp-begin{position:absolute;inset:0;display:grid;place-items:center;font:300 12px/1 -apple-system,"SF Pro Text","Inter",system-ui,sans-serif;letter-spacing:.42em;margin-right:-.42em;text-transform:uppercase;color:rgba(220,225,240,.7);transition:opacity .8s ease;animation:spTap 3.2s ease-in-out infinite;pointer-events:none}
+#aotSplash:not(.sp-gate) .sp-begin{opacity:0;animation:none}
 #aotSplash .sp-mid.on .sp-line i{width:100%;transition:width 1.6s .1s cubic-bezier(.6,0,.2,1)}
 @media (prefers-reduced-motion:reduce){#aotSplash .sp-grain{animation:none}}
 </style>
@@ -293,7 +296,8 @@ window.aotFullH=()=>{const sw=screen.width,sh=screen.height,land=innerWidth>inne
     const size=()=>{W=innerWidth;H=window.aotFullH?window.aotFullH():innerHeight;dpr=Math.min(3,window.devicePixelRatio||1);cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);x.setTransform(dpr,0,0,dpr,0,0);x.imageSmoothingQuality="high";S={};v.init()};
     size();addEventListener("resize",size);
     let lastN=0;const loop=n=>{const ddt=Math.min(.05,lastN?(n-lastN)/1000:0);lastN=n;if(v.magnet){const tg=MAG.pts.length?1:0;MAG.k+=(tg-MAG.k)*(1-Math.pow(tg?.25:.08,ddt))}v.draw((n-t0)/1000);if(!R)raf=requestAnimationFrame(loop)};loop(performance.now());
-    requestAnimationFrame(()=>requestAnimationFrame(()=>mid.classList.add("on")));
+    let gate=false;try{gate=!manual&&!!window.aotSound&&window.aotSound.pick()!=="off"}catch(_){}
+    if(gate){el.classList.add("sp-gate");el.insertAdjacentHTML("beforeend",'<div class="sp-begin">Tap to begin</div>')}else requestAnimationFrame(()=>requestAnimationFrame(()=>mid.classList.add("on")));
     /* Halftone can be played with while the app loads: drag to spin, points push away from the finger; the screen waits while you play */
     let busy=0,moved=0;
     /* was: one-finger drag only, fast spins allowed (full code in git history, v790) */
@@ -313,8 +317,8 @@ window.aotFullH=()=>{const sw=screen.width,sh=screen.height,land=innerWidth>inne
     let gone=false;const done=()=>{if(gone)return;gone=true;/* closes only on a tap now, so no wait-while-playing check */el.classList.add("out");setTimeout(()=>{cancelAnimationFrame(raf);removeEventListener("resize",size);el.remove()},1000)};
     const ready=()=>setTimeout(done,Math.max(0,(R?400:min)-(performance.now()-t0)));
     /* stays until the user taps to enter (was: faded out by itself after ~2s — if(manual||document.readyState==="complete")ready();else addEventListener("load",ready,{once:true});setTimeout(done,max);) */
-    const hint=()=>el.classList.add("sp-ready");if(document.readyState==="complete")setTimeout(hint,1600);else addEventListener("load",()=>setTimeout(hint,1200),{once:true});
-    el.addEventListener("click",()=>{if(!moved)done()});/* was: any click closed it — a drag on Halftone no longer does */
+    const hint=()=>{if(gate){setTimeout(hint,400);return}el.classList.add("sp-ready")};if(document.readyState==="complete")setTimeout(hint,1600);else addEventListener("load",()=>setTimeout(hint,1200),{once:true});
+    el.addEventListener("click",()=>{if(gate){gate=false;el.classList.remove("sp-gate");mid.classList.add("on");t0=performance.now();return}if(!moved)done()});/* was: any click closed it — a drag on Halftone no longer does */
   }
   window.aotSplash={STY,play};
   let pick="specks";try{pick=localStorage.getItem("aot-splash")||"specks"}catch(_){}
@@ -9827,7 +9831,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="810",APPT="2026-11-24T16:22:55Z";   /* APPT: when this update was made */
+const APPV="811",APPT="2026-11-24T16:29:35Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
