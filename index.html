@@ -3080,7 +3080,7 @@ aside .navtog{order:-1}aside .side-foot{order:99}
 aside .navbtn.nav-drag{z-index:5;transform:scale(1.08);opacity:.92;box-shadow:0 0 0 2px rgba(var(--lr),.5),0 8px 22px rgba(0,0,0,.5);border-radius:10px;transition:transform .15s}
 aside.nav-dragging .navbtn:not(.nav-drag){transition:transform .2s}
 aside.nav-dragging{touch-action:none}
-aside>.navbtn{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+aside>.navbtn{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}aside>.navbtn:is([data-tab="fuel"],[data-tab="pass"],[data-tab="budget"]){touch-action:none}
 /* Dashboard This week: coloured by tab, not by what's inside — Passions purple, Budget gold, events sky blue; done stays green, missed red */
 html body #view .wahead .wa-it.src-p{--wc:#b99cff}html body #view .wahead .wa-it.src-b{--wc:#ffc533}html body #view .wahead .wa-it.src-e{--wc:#4cc9ff}
 html body #view .wahead .wa-it{border-left-color:var(--wc)!important;background:color-mix(in srgb,var(--wc) 16%,transparent)!important}
@@ -3093,7 +3093,8 @@ html body #view .bdown .bdn-scroll::-webkit-scrollbar{display:none}
 /* Breakdown calories over: two pieces side by side in the track */
 html body #view .bdown .bd-kov .track{display:flex}html body #view .bdown .bd-kov .track>i{flex:none;border-radius:0}html body #view .bdown .bd-kov .track>i:first-child{border-radius:99px 0 0 99px}html body #view .bdown .bd-kov .track>i:last-child{border-radius:0 99px 99px 0}
 /* Breakdown main bars, over the goal: keep the heavy shade and lay red over it (test) */
-html body #view .bdown .bdn-main .dp-t.ov>i:last-child{background-image:linear-gradient(rgba(255,60,80,.55),rgba(255,60,80,.55))!important}
+/* red overlay test dropped: html body #view .bdown .bdn-main .dp-t.ov>i:last-child{background-image:linear-gradient(rgba(255,60,80,.55),rgba(255,60,80,.55))!important} */
+html body #view .bdown .bdn-main .dp-t.ov>i:last-child{background:#ff4d5e!important}
 /* Breakdown Passions: level tag beside each name */
 html body #view .bdown .bd-lv{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.02em;margin-left:7px;padding:1px 6px;border-radius:99px;vertical-align:1px}
 html body #view .bdown .bd-lv[data-lvl="Priority"]{color:#ff5d6c;background:rgba(255,93,108,.14)}html body #view .bdown .bd-lv[data-lvl="Moderate"]{color:#ffb648;background:rgba(255,182,72,.14)}html body #view .bdown .bd-lv[data-lvl="Bonus"]{color:#2ee6c5;background:rgba(46,230,197,.14)}
@@ -4164,7 +4165,7 @@ function weekAhead(d){const mon=monday(0);const days=WKO.map(i=>{const dn=DAYS[i
     calBud(ds).forEach(i=>{const pd=bIsPaid(B(),i,ds);it.push({k:"95",t:i.kind==="inc"?(pd?"Paid in":"Payday"):(pd?"Paid":"Due"),n:bTitle(i),st:pd?"done":"bill",src:"b"})});   /* budget items in This week too (Nutrition stays out) */
     (d.events||[]).filter(e=>e.d===ds).forEach(e=>it.push({k:e.time||"97",t:e.time?fmtTime(e.time).replace(/\s+/," "):"",n:e.title,st:"event",src:"e"}));
     it.sort((a,b)=>a.k<b.k?-1:1);
-    return `<div class="wa-day${ds===today()?" now":""}${ds<today()?" past":""}"><div class="wa-h">${dn}<small>${dt.getDate()}</small></div>${it.length?it.map(x=>`<div class="wa-it st-${x.st==="donelocked"?"done":x.st} src-${x.src||"p"}${x.go?" tap":""}" title="${esc(x.n)}"${x.go?` data-waslot="${x.go}" role="button" tabindex="0"`:""}><small>${x.t}</small><span>${x.st==="missed"?'<svg class="wa-x" viewBox="0 0 12 12" aria-label="Missed"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="#ff4d5e" stroke-width="2.4" stroke-linecap="round"/></svg>':""}${esc(x.n)}</span></div>`).join(""):`<div class="wa-none">Free</div>`}</div>`});
+    return `<div class="wa-day${ds===today()?" now":""}${ds<today()?" past":""}"><div class="wa-h">${dn}<small>${dt.getDate()}</small></div>${it.length?it.map(x=>`<div class="wa-it st-${x.st==="donelocked"?"done":x.st} src-${x.src||"p"}${x.go?" tap":""}" title="${esc(x.n)}"${x.go?` data-waslot="${x.go}" role="button" tabindex="0"`:""}><small>${x.t}</small><span>${x.st==="missed"?'<svg class="wa-x" viewBox="0 0 12 12" aria-label="Missed"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="#ff4d5e" stroke-width="2.4" stroke-linecap="round"/></svg>':x.st==="done"||x.st==="donelocked"?'<svg class="wa-x" viewBox="0 0 12 12" aria-label="Done"><path d="M2 6.5l2.6 2.6L10 3.5" fill="none" stroke="#3ddc84" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>':""}${esc(x.n)}</span></div>`).join(""):`<div class="wa-none">Free</div>`}</div>`});
   return `<div class="panel wahead bstrip-p"><div class="bstrip"><b>This week</b><i>${fmtDate(ymd(mon))} – ${fmtDate(ymd(new Date(mon.getTime()+6*864e5)))}</i></div>${""/* was: weekly-goal strip above the days ("Xh of 5h this week" chips) — removed; the days now take that space */}<div class="wa-grid">${days.join("")}</div></div>`}
 function dashTop(d){return `<div class="passtop dashtop">${figurePanel().replace('<div class="panel holopanel"><div class="ph"><span>','<div class="panel holopanel bstrip-p"><div class="ph bstrip"><span>')}<div class="stack dstack">${progressPanel(d)}${weekAhead(d)}</div></div>`}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-dopen],[data-expdel]");if(!b)return;
@@ -4295,7 +4296,7 @@ const BDPAL=["#b99cff","#f27fb2","#4cc9ff","#ffb648","#3ddc84","#ff7a59","#9ad0f
 function bdMulti(parts){const t=parts.reduce((a,x)=>a+x.v,0);return `<div class="bdn-all">${t?parts.filter(x=>x.v>0).map(x=>`<i data-akf="bd:${esc(x.k)}" style="flex:${x.v};--c:${x.c}" title="${esc(x.n)}"></i>`).join(""):""}</div><div class="bdn-leg">${parts.map(x=>`<span style="--c:${x.c}"><i></i>${esc(x.n)}<em>${t?Math.round(x.v/t*100):0}%</em></span>`).join("")}</div>`}
 /* Breakdown calories: under the limit = whole bar orange; over = green up to the limit, red for the part over */
 function bdKcal(v,L){const over=L&&v>L,txt=`${n0(v)}${L?" / "+n0(L):""}`;if(!over)return bdMeter("Calories",v,L,txt,"#ff9f43","kcal");const ov=Math.min(99.9,(v-L)/v*100);
-  return `<div class="meter bd-kov" style="--c:#3ddc84"><div class="meter-top"><span>Calories</span><b style="color:#ff4d5e">${txt}</b></div><div class="track"><i data-akw="bd:mkcal" style="width:${(100-ov).toFixed(1)}%;background:#3ddc84"></i><i data-akw="bd:mkcalo" style="width:${ov.toFixed(1)}%;background:#ff4d5e"></i></div></div>`}
+  return `<div class="meter bd-kov" style="--c:#3ddc84"><div class="meter-top"><span>Calories</span><b><span style="color:#ff4d5e">${n0(v)}</span>${L?" / "+n0(L):""}</b></div><div class="track"><i data-akw="bd:mkcal" style="width:${(100-ov).toFixed(1)}%;background:#3ddc84"></i><i data-akw="bd:mkcalo" style="width:${ov.toFixed(1)}%;background:#ff4d5e"></i></div></div>`}
 function bdMeter(n,v,goal,txt,c,k){const f=goal?Math.min(1,v/goal):0;return `<div class="meter" style="--c:${c}"><div class="meter-top"><span>${esc(n)}</span><b>${txt}</b></div><div class="track"><i data-akw="bd:m${esc(k||n)}" style="width:${(f*100).toFixed(1)}%"></i></div></div>`}
 /* the section's own progress bar (same as the top panel's): colour fills to the limit, the heavier shade comes in on the right when over; numbers under the bar */
 function bdMain(x,h){const cl=v=>Math.max(0,Math.min(1,v)),ov=x.over?Math.min(100,(x.f-1)*100):0,num=Array.isArray(x.v)?`<span${x.over?` style="color:${x.d}"`:""}>${x.v[0]}</span>${x.v.length>1?` / ${x.v[1]}`:""}`:esc(x.v);
@@ -9511,7 +9512,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="765",APPT="2026-11-24T06:26:39Z";   /* APPT: when this update was made */
+const APPV="766",APPT="2026-11-24T06:31:15Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -9666,26 +9667,38 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 </script>
 <script>/* tab bar: hold a tab ~0.45s, then drag it left/right (or up/down in the iPad sidebar) to put the tabs in any order; the order is remembered */
 (()=>{const K="aot-navord";const A=()=>document.querySelector("aside");
-  const tabs=()=>[...A().querySelectorAll(":scope>.navbtn")];
-  const apply=o=>{tabs().forEach(b=>{const i=o.indexOf(b.dataset.tab);b.style.order=i<0?50:i})};
+  /* only Nutrition, Passions and Budget move; Dashboard stays first, Settings stays last (was: every tab could move) */
+  const MOV=["fuel","pass","budget"];
+  const tabs=()=>[...A().querySelectorAll(":scope>.navbtn")].filter(b=>MOV.includes(b.dataset.tab));
+  const fixEnds=()=>{A().querySelectorAll(":scope>.navbtn").forEach(b=>{if(!MOV.includes(b.dataset.tab))b.style.order=b.dataset.tab==="dash"?0:b.dataset.tab==="set"?90:50})};
+  const apply=o=>{fixEnds();const L=o.filter(t=>MOV.includes(t));MOV.forEach(t=>{if(!L.includes(t))L.push(t)});tabs().forEach(b=>{b.style.order=10+L.indexOf(b.dataset.tab)})};
   const cur=()=>tabs().filter(b=>b.offsetParent).sort((a,z)=>(+a.style.order||0)-(+z.style.order||0)||0);
   let saved=null;try{saved=JSON.parse(localStorage.getItem(K)||"null")}catch(_){}
-  const init=()=>{if(!A())return;if(Array.isArray(saved))apply(saved);else tabs().forEach((b,i)=>b.style.order=i);
+  const init=()=>{if(!A())return;apply(Array.isArray(saved)?saved:MOV);
     const nb=()=>{try{const c=getComputedStyle(A());document.documentElement.style.setProperty("--navbg",c.backgroundImage&&c.backgroundImage!=="none"?c.backgroundImage+","+(c.backgroundColor||"transparent"):c.backgroundColor)}catch(_){}};nb();setTimeout(nb,1500)};
   let hold=0,drag=null,sx=0,sy=0,moved=false,justDragged=false;
   const vert=()=>{const L=cur();if(L.length<2)return false;const r0=L[0].getBoundingClientRect(),r1=L[1].getBoundingClientRect();return Math.abs(r1.left-r0.left)<Math.abs(r1.top-r0.top)};/* laid out top-to-bottom (iPad sidebar) or side by side (tab bar) */
-  document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("aside>.navbtn");if(!b)return;sx=e.clientX;sy=e.clientY;moved=false;clearTimeout(hold);
+  document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("aside>.navbtn");if(!b||!MOV.includes(b.dataset.tab))return;sx=e.clientX;sy=e.clientY;moved=false;clearTimeout(hold);
     hold=setTimeout(()=>{drag={b,id:e.pointerId};b.classList.add("nav-drag");A().classList.add("nav-dragging");try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}},450)},true);
   document.addEventListener("pointermove",e=>{if(!drag){if(hold&&Math.hypot(e.clientX-sx,e.clientY-sy)>8){clearTimeout(hold);hold=0}return}
     e.preventDefault();moved=true;const v=vert(),p=v?e.clientY:e.clientX,L=cur();const others=L.filter(x=>x!==drag.b);
     let idx=others.findIndex(x=>{const r=x.getBoundingClientRect();return p<(v?r.top+r.height/2:r.left+r.width/2)});if(idx<0)idx=others.length;
-    others.splice(idx,0,drag.b);others.forEach((x,i)=>x.style.order=i)},{capture:true,passive:false});
+    others.splice(idx,0,drag.b);others.forEach((x,i)=>x.style.order=10+i)},{capture:true,passive:false});
   const end=()=>{clearTimeout(hold);hold=0;if(!drag)return;drag.b.classList.remove("nav-drag");A().classList.remove("nav-dragging");
-    const o=[...cur().map(x=>x.dataset.tab),...tabs().filter(x=>!x.offsetParent).map(x=>x.dataset.tab)];try{localStorage.setItem(K,JSON.stringify(o))}catch(_){}
+    const o=cur().map(x=>x.dataset.tab);try{localStorage.setItem(K,JSON.stringify(o))}catch(_){}
     justDragged=true;setTimeout(()=>justDragged=false,350);drag=null};
   document.addEventListener("pointerup",end,true);document.addEventListener("pointercancel",end,true);
   document.addEventListener("click",e=>{if(justDragged&&e.target.closest&&e.target.closest("aside")){e.stopPropagation();e.preventDefault()}},true);
   document.addEventListener("contextmenu",e=>{if(e.target.closest&&e.target.closest("aside>.navbtn"))e.preventDefault()},true);
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init()})();
+</script>
+<script>/* Dashboard calendar: slide a day's list with a finger (the iPad, scaled in portrait, would not scroll it by itself); a slide is not a tap */
+(()=>{let s=null,moved=0;
+  document.addEventListener("touchstart",e=>{const c=e.target.closest&&e.target.closest("#view .mcal .mc .chips");if(!c||e.touches.length!==1){s=null;return}s={c,y:e.touches[0].clientY,t:c.scrollTop,k:(c.getBoundingClientRect().height/(c.offsetHeight||1))||1};moved=0},{capture:true,passive:true});
+  document.addEventListener("touchmove",e=>{if(!s)return;const c=s.c,dy=e.touches[0].clientY-s.y;if(Math.abs(dy)>5)moved=1;const max=c.scrollHeight-c.clientHeight;if(max<=0)return;const nt=Math.max(0,Math.min(max,s.t-dy/s.k));if(nt!==c.scrollTop||(nt>0&&nt<max)){c.scrollTop=nt;if(e.cancelable)e.preventDefault()}},{capture:true,passive:false});
+  document.addEventListener("touchend",()=>{if(s&&moved){const until=Date.now()+350;const stop=ev=>{if(Date.now()<until&&ev.target.closest&&ev.target.closest("#view .mcal")){ev.stopPropagation();ev.preventDefault()}document.removeEventListener("click",stop,true)};document.addEventListener("click",stop,true)}s=null},true)})();
+/* Dashboard: after turning the iPad (or resizing), draw the tab again so the calendar days line up with their boxes */
+(()=>{let t=0,w=innerWidth,h=innerHeight;const go=()=>{t=0;if(innerWidth===w&&innerHeight===h)return;w=innerWidth;h=innerHeight;const v=document.getElementById("view");if(!v||v.dataset.tab!=="dash"||typeof render!=="function")return;const st=v.scrollTop;render();requestAnimationFrame(()=>{v.scrollTop=st})};
+  const q=()=>{clearTimeout(t);t=setTimeout(go,300)};addEventListener("resize",q);addEventListener("orientationchange",q)})();
 </script>
 </body></html>
