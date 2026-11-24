@@ -2993,8 +2993,18 @@ html body #view .panel.hasStrip::before{display:none!important}   /* the top-lef
 .us2-tick{display:flex;align-items:center;justify-content:center;gap:10px;animation:usTick 4s ease both}
 @keyframes usTick{0%{opacity:0;transform:translateY(6px)}6%{opacity:1;transform:none}70%{opacity:1}100%{opacity:0}}
 .us2-undo{padding:3px 10px;border-radius:8px;background:rgba(11,16,32,.85);color:#fff;font-weight:700;font-size:12px;cursor:pointer}
-.us2-log{display:block;margin-top:8px;padding:7px 0;border-radius:9px;text-align:center;font-weight:700;font-size:13px;color:#0b1020;background:var(--cc);cursor:pointer}.us2-log:active{filter:brightness(.9)}
+.us2-log{display:block;margin-top:8px;padding:7px 0;border-radius:9px;text-align:center;font-weight:700;font-size:13px;color:#e6ebf5;background:rgba(160,170,190,.22);border:1px solid rgba(200,210,230,.18);cursor:pointer}.us2-log:active{filter:brightness(.9)}
 @media (min-width:1100px){html:not(.phone) #view[data-tab="fuel"]>:is(.nmp,.usp,.wtr).panel{margin-left:300px!important;margin-right:300px!important}}   /* Meals, Usuals, Calories trend: 100px narrower than the rest (50 each side) */
+/* Usuals cards: square — width = height, contents tightened to fit */
+#view .us2-shelf>.us2-c{width:176px!important;min-width:176px!important;flex:0 0 176px!important;height:176px!important;aspect-ratio:1/1;box-sizing:border-box;padding:9px!important;display:flex!important;flex-direction:column;overflow:hidden}
+#view .us2-shelf>.us2-c .us2-pic{height:52px!important;font-size:30px!important;margin-bottom:5px!important;flex:none}
+#view .us2-shelf>.us2-c .us2-pic img{max-height:44px}
+#view .us2-shelf>.us2-c .us2-k{font-size:17px!important;margin:3px 0 4px!important}
+#view .us2-shelf>.us2-c .nm-mc{display:none}
+#view .us2-shelf>.us2-c .us2-log{margin-top:auto;padding:5px 0;font-size:12.5px}
+#view .us2-shelf>.us2-c .us2-b{font-size:10px}
+#view .us2-shelf>.us2-add .us2-pic{height:100px!important}
+@media (min-width:1100px){html:not(.phone) #view[data-tab="budget"]>:is(.bco,.panel:has(.bstrip-amt)).panel{max-width:none!important;margin-left:300px!important;margin-right:300px!important}}   /* landscape: Income & expenses and Extras = same width as Nutrition's Meals / Usuals / Calories trend */
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4308,6 +4318,7 @@ function usPanel(){const G=US().groups,t=fType||mealNow();
 /* usuals, new look: picture cards on a shelf, a macro colour strip, how often you've logged each, ★ favourites first,
    and a header with the group's macro ring, which meal it logs to, and Log all. Tap the group name to rename it or pick its colour. */
 let usFlash=null;
+function usKeepRender(){/* re-draw without the page or a shelf jumping */const v=$("#view"),st=v?v.scrollTop:0,sh=[...document.querySelectorAll(".us2-shelf")].map(e=>e.scrollLeft);render();if(v)v.scrollTop=st;document.querySelectorAll(".us2-shelf").forEach((e,i)=>{if(sh[i]!=null)e.scrollLeft=sh[i]})}
 const usCount=x=>{const k=(x.name||"").toLowerCase();return D().meals.filter(m=>(m.name||"").toLowerCase()===k).length};
 const usMeal=g=>g.meal||fType||mealNow();
 function usRing(I){const v=[I.reduce((a,x)=>a+(+x.carbs||0),0),I.reduce((a,x)=>a+(+x.protein||0),0),I.reduce((a,x)=>a+(+x.fiber||0),0),I.reduce((a,x)=>a+(+x.fat||0),0)],t=v[0]+v[1]+v[2]+v[3],R=15,C=2*Math.PI*R;let o=0;
@@ -4398,8 +4409,8 @@ window.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("
   if(d.usdup){/* copy the usual right after the original, in the same group */const [g,it]=usFind(d.usdup);if(!it)return;const c=JSON.parse(JSON.stringify(it));c.id=uid();c.fav=false;c.name=(it.name||"Food")+" (copy)";const k=g.items.indexOf(it);g.items.splice(k+1,0,c);usEdit={t:"i",id:c.id};usSheet();render();save();toast("Duplicated — rename it here");setTimeout(()=>{const i=$("#usName");i&&(i.focus(),i.select())},60);return}
   if(d.usdupg){/* copy a whole group with all its usuals */const G=US().groups,g=G.find(x=>x.id===d.usdupg);if(!g)return;const c=JSON.parse(JSON.stringify(g));c.id=uid();c.n=(g.n||"Group")+" (copy)";(c.items||[]).forEach(x=>{x.id=uid()});G.splice(G.indexOf(g)+1,0,c);usEdit=null;usSheet();render();save();toast("Group duplicated");return}
   if(d.usecp){const [g,it]=usFind(d.usecp);const cpv=it&&(it.cp||cpParse(it.name));if(!cpv)return;usEdit=null;usSheet();fChain="Chipotle";fCat=null;fq="";fSel=null;fForm=null;fBuild=Object.assign(JSON.parse(JSON.stringify(cpv)),{usEdit:it.id});fBuild.lvl=fBuild.lvl||{};fBuild.pick=fBuild.pick||{};render();setTimeout(()=>{const p=document.querySelector(".flogp");p&&p.scrollIntoView({behavior:"smooth",block:"start"})},60);return}
-  if(d.uslog){/* the card's Log button logs it; tapping the card itself opens the edit window */const [g,it]=usFind(d.uslog);if(!it)return;const ty=usMeal(g||{}),lg=usLog(it,ty);sfx("blip");usFlash={id:it.id,meal:ty,ids:[lg.id],until:Date.now()+4000};setTimeout(()=>{if(usFlash&&Date.now()>=usFlash.until){usFlash=null;render()}},4050);toast(it.name.split(" · ")[0]+" logged to "+ty.toLowerCase());render();save();return}
-  if(d.usundo!=null){/* take back what was just logged */const f=usFlash;if(!f||!f.ids)return;data.meals=data.meals.filter(m=>!f.ids.includes(m.id));data.mealsGone=[...(data.mealsGone||[]),...f.ids].slice(-500);usFlash=null;toast("Undone");render();save();return}
+  if(d.uslog){e.preventDefault();/* the card's Log button logs it; tapping the card itself opens the edit window */const [g,it]=usFind(d.uslog);if(!it)return;const ty=usMeal(g||{}),lg=usLog(it,ty);sfx("blip");usFlash={id:it.id,meal:ty,ids:[lg.id],until:Date.now()+4000};setTimeout(()=>{if(usFlash&&Date.now()>=usFlash.until){usFlash=null;usKeepRender()}},4050);toast(it.name.split(" · ")[0]+" logged to "+ty.toLowerCase());usKeepRender();save();return}
+  if(d.usundo!=null){/* take back what was just logged */const f=usFlash;if(!f||!f.ids)return;data.meals=data.meals.filter(m=>!f.ids.includes(m.id));data.mealsGone=[...(data.mealsGone||[]),...f.ids].slice(-500);usFlash=null;toast("Undone");usKeepRender();save();return}
   if(d.usclose!=null){usPick=null;usEdit=null;usAdd=null;usSheet();return}
   if(d.uscol){usEdit.c=d.uscol;const n=$("#usName"),v=n&&n.value;usSheet();const n2=$("#usName");if(n2&&v!=null)n2.value=v;return}
   if(d.ussaveg!=null){const n=(($("#usName")||{}).value||"").trim();if(!n){toast("Name the group");return}let g=US().groups.find(x=>x.id===usEdit.id);if(!g){g={id:usEdit.id,n,c:usEdit.c,items:[]};US().groups.push(g)}else{g.n=n;if(usEdit.c)g.c=usEdit.c}usEdit=null;usSheet();render();save();return}
@@ -9400,7 +9411,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="743",APPT="2026-11-24T04:00:48Z";   /* APPT: when this update was made */
+const APPV="744",APPT="2026-11-24T04:04:18Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
