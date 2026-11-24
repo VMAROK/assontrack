@@ -2886,6 +2886,15 @@ html body #view .panel.cal-tab{margin-top:-1px!important}
 html.phone #view .cal-vsw{position:static;transform:none;order:9;margin:6px auto 0}html.phone #view .calhead.cal-c{justify-content:center;flex-wrap:wrap}html.phone #view .calhead.cal-c>.cal-vsw{flex-basis:auto}html.phone #view .calhead.cal-c::after{content:"";order:8;flex-basis:100%;height:0}
 /* wide screens (iPad landscape, desktop): calendar + Add an event and Breakdown sit in a centred column, like reading apps; tiles and side-by-side panels stay full width */
 @media (min-width:1100px){html:not(.phone) #view .panel:has(>.calhead){max-width:900px;margin-left:auto!important;margin-right:auto!important}html:not(.phone) #view .bdown{max-width:900px;margin-left:auto!important;margin-right:auto!important}}
+/* Dashboard: every panel gets the same dark title strip as Overview */
+html #view .dashtop .holopanel>.ph.bstrip{display:flex;flex-direction:row;justify-content:center;margin:0 -18px 14px!important}html #view .dashtop .holopanel>.ph.bstrip>span{font-family:"Sora",var(--display);font-size:17px;font-weight:700;letter-spacing:.04em;background:linear-gradient(90deg,#eef3ff,rgb(var(--tL)) 120%);-webkit-background-clip:text;background-clip:text;color:transparent}html #view .dashtop .holopanel>.ph.bstrip>button{position:absolute;right:10px;top:50%;transform:translateY(-50%);margin:0}
+html #view .dtiles>.dt-strip,html #view .wahead>.bstrip,html #view .bdown>.bstrip{padding:9px 18px}html #view .wahead>.bstrip,html #view .bdown>.bstrip{margin:0 -18px 14px}
+/* title strips, all tabs: dark tint of the theme (not black), plain professional type, one solid colour (no gradient text) */
+html #view .bstrip{background:linear-gradient(rgba(0,0,0,.28),rgba(0,0,0,.28)),rgba(var(--tX),.72)!important;border-bottom:1px solid rgba(var(--lr),.18)!important}
+html #view .bstrip b,html #view .dashtop .holopanel>.ph.bstrip>span{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",system-ui,sans-serif!important;font-size:15px!important;font-weight:600!important;letter-spacing:.01em!important;background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;color:#e9eef8!important;-webkit-text-fill-color:#e9eef8!important}
+/* phone: strips run edge to edge and sit flush at the top of their panel */
+html.phone #view :is(.holopanel,.dtiles,.bdown,.wahead).bstrip-p,html.phone #view .dtiles{padding-top:0!important}
+html.phone #view :is(.holopanel,.bdown)>.bstrip,html.phone #view .dtiles>.dt-strip{margin:0 -11px 12px!important}html.phone #view .wahead>.bstrip{margin:0 0 12px!important}html.phone #view .dtiles.dt-prog>.dt-strip{margin:0!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -3952,8 +3961,8 @@ function weekAhead(d){const mon=monday(0);const days=WKO.map(i=>{const dn=DAYS[i
     (d.events||[]).filter(e=>e.d===ds).forEach(e=>it.push({k:e.time||"97",t:e.time?fmtTime(e.time).replace(/\s+/," "):"",n:e.title,st:"event"}));
     it.sort((a,b)=>a.k<b.k?-1:1);
     return `<div class="wa-day${ds===today()?" now":""}${ds<today()?" past":""}"><div class="wa-h">${dn}<small>${dt.getDate()}</small></div>${it.length?it.map(x=>`<div class="wa-it st-${x.st==="donelocked"?"done":x.st}${x.go?" tap":""}" title="${esc(x.n)}"${x.go?` data-waslot="${x.go}" role="button" tabindex="0"`:""}><small>${x.t}</small><span>${esc(x.n)}</span></div>`).join(""):`<div class="wa-none">Free</div>`}</div>`});
-  return `<div class="panel wahead"><div class="ph"><span>This week</span><i>${fmtDate(ymd(mon))} – ${fmtDate(ymd(new Date(mon.getTime()+6*864e5)))}</i></div>${""/* was: weekly-goal strip above the days ("Xh of 5h this week" chips) — removed; the days now take that space */}<div class="wa-grid">${days.join("")}</div></div>`}
-function dashTop(d){return `<div class="passtop dashtop">${figurePanel()}<div class="stack dstack">${progressPanel(d)}${weekAhead(d)}</div></div>`}
+  return `<div class="panel wahead bstrip-p"><div class="bstrip"><b>This week</b><i>${fmtDate(ymd(mon))} – ${fmtDate(ymd(new Date(mon.getTime()+6*864e5)))}</i></div>${""/* was: weekly-goal strip above the days ("Xh of 5h this week" chips) — removed; the days now take that space */}<div class="wa-grid">${days.join("")}</div></div>`}
+function dashTop(d){return `<div class="passtop dashtop">${figurePanel().replace('<div class="panel holopanel"><div class="ph"><span>','<div class="panel holopanel bstrip-p"><div class="ph bstrip"><span>')}<div class="stack dstack">${progressPanel(d)}${weekAhead(d)}</div></div>`}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-dopen],[data-expdel]");if(!b)return;
   if(b.dataset.expdel){data.expenses=(data.expenses||[]).filter(x=>x.id!==b.dataset.expdel);render();save();return}
   const k=b.dataset.dopen||null;if(k===dashOpen)return;dashGo(k,k?1:-1)});
@@ -4044,7 +4053,7 @@ function dashStats(d,ds){
     Bu={k:"Budget",c:"#ffc533",d:"#b98a00",f:inc?out/inc:0,v:inc?[bMoney(out,0),bMoney(inc,0)]:"no income set",over:inc&&out>inc};
   return [N,P,Bu]}
 /* the ? next to each name: how that bar is worked out */
-const DPH={Nutrition:"Today's calories vs. your daily limit. Starts fresh every morning.",Passions:"How close each passion is to its goal, averaged. Keeps counting — never resets.",Budget:"This month's spending vs. income. Money carries over month to month."};
+const DPH={Nutrition:"Resets daily.",Passions:"Indefinite measure of your progress.",Budget:"Indefinite overview of your overall finances."};   /* captions written by the user */
 const DPQ=k=>`<button type="button" class="dp-q" data-dpq="${k}" aria-label="How ${k} is worked out">?</button>`;
 document.addEventListener("click",e=>{const q=e.target.closest&&e.target.closest("[data-dpq]"),old=document.querySelector(".dp-tip");if(!q){if(old&&!e.target.closest(".dp-tip"))old.remove();return}e.preventDefault();e.stopPropagation();const same=old&&old.dataset.k===q.dataset.dpq;old&&old.remove();if(same)return;
   const t=document.createElement("div");t.className="dp-tip";t.dataset.k=q.dataset.dpq;t.setAttribute("role","tooltip");t.innerHTML=`<b>${q.dataset.dpq}</b>${esc(DPH[q.dataset.dpq]||"")}`;document.body.appendChild(t);const r=q.getBoundingClientRect(),w=t.offsetWidth;let x=r.left-12,y=r.bottom+8;x=Math.max(10,Math.min(innerWidth-w-10,x));if(y+t.offsetHeight>innerHeight-10)y=r.top-t.offsetHeight-8;t.style.left=x+"px";t.style.top=y+"px"},true);
@@ -4087,7 +4096,7 @@ function breakdownPanel(d){const DS=dashStats(d,today()),t=today(),tm=d.meals.fi
   const MK=[["Carbs","carbs","#f27fb2"],["Protein","protein","#a688f2"],["Fiber","fiber","#b8875f"],["Fat","fat","#f2c14e"]],mv=MK.map(([n,k,c])=>({n,k,c,v:sum(k),g:mgGoal(k)}));
   const P=d.passions.map((p,i)=>({n:p.name,k:p.id,c:BDPAL[i%BDPAL.length],v:d.sessions.filter(x=>x.pid===p.id&&!x.planned).reduce((a,x)=>a+(+x.mins||0),0),g:(+p.goal||0)*60}));
   let out=0,inc=0;try{const S=bStats();out=S.subs+S.bills+S.spent;inc=S.inc}catch(_){}
-  return `<div class="panel bdown" style="margin-top:18px" data-akg="bd"><div class="ph"><span>Breakdown</span></div><div class="tgrid">
+  return `<div class="panel bdown bstrip-p" style="margin-top:18px" data-akg="bd"><div class="bstrip"><b>Breakdown</b></div><div class="tgrid">
     <section class="bdn-sec">${bdMain(DS[0],"Nutrition")}${bdMulti(mv)}${mv.map(x=>bdMeter(x.n,x.v,x.g,`${n0(x.v)}${x.g?" / "+n0(x.g):""} g`,x.c,x.k)).join("")}</section>
     <section class="bdn-sec">${bdMain(DS[1],"Passions")}${P.length?bdMulti(P)+P.map(x=>bdMeter(x.n,x.v,x.g,x.g?`${fmtH(x.v)} / ${fmtH(x.g)}`:fmtH(x.v),x.c,x.k)).join(""):`<p class="note" style="margin:0">No passions yet</p>`}</section>
     <section class="bdn-sec">${bdMain(DS[2],"Budget")}${""/* was: separate "Spent this month" meter (pushed the bars out of line) — the gold bar above is that */}</section>
@@ -9090,7 +9099,7 @@ function vSet(){
   </div>`;
 }
 
-const TITLES={dash:["Dashboard","Calendar and today's targets"],fuel:["Nutrition","Meals and macros"],kitchen:["Kitchen","Your dishes and recipes"],body:["Body","Weight and measurements"],train:["Training","Workouts"],pass:["Passions","Hours and goals"],budget:["Budget","Subscriptions, bills and spending"],rem:["Reminders","Everything you need to remember"],set:["Settings","Goals and data"]};
+const TITLES={dash:["Dashboard","Calendar and breakdown"],fuel:["Nutrition","Meals and macros"],kitchen:["Kitchen","Your dishes and recipes"],body:["Body","Weight and measurements"],train:["Training","Workouts"],pass:["Passions","Hours and goals"],budget:["Budget","Subscriptions, bills and spending"],rem:["Reminders","Everything you need to remember"],set:["Settings","Goals and data"]};
 const typing=()=>{const a=document.activeElement;return !!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&a.type!=="range"&&a.type!=="checkbox"&&a.type!=="radio"&&a.type!=="file")};
 let renderWait=false;function softRender(){if(typing()){renderWait=true;return}renderWait=false;render()}
 document.addEventListener("focusout",()=>setTimeout(()=>{if(renderWait&&!typing()){renderWait=false;render()}},600));
@@ -9278,7 +9287,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="702",APPT="2026-11-24T01:43:41Z";   /* APPT: when this update was made */
+const APPV="703",APPT="2026-11-24T01:48:55Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
