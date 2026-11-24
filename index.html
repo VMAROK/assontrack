@@ -3949,6 +3949,8 @@ function vDash(){
 }
 let calMonth=null,calSel=null;
 const fmtTime=t=>{const [h,m]=String(t).split(":").map(Number);return new Date(2000,0,1,h||0,m||0).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})};
+/* budget items (paydays, bills, subscriptions) that land on a day, worked out once per calendar view */
+let calBudK="",calBudM={};function calBud(ds){try{const b=B(),k=calMonth?ymd(calMonth):"";if(k!==calBudK||!calBudM.__t||Date.now()-calBudM.__t>2000){const x=calMonth||new Date(),f=new Date(x.getFullYear(),x.getMonth(),-7),t=new Date(x.getFullYear(),x.getMonth()+1,14);calBudM=bEvMap(b,ymd(f),ymd(t),today());calBudM.__t=Date.now();calBudK=k}return Array.isArray(calBudM[ds])?calBudM[ds]:[]}catch(_){return []}}
 function dayItems(d,ds){
   const pn=id=>(d.passions.find(p=>p.id===id)||{name:"Passion"}).name;
   const ev=(d.events||[]).filter(e=>e.d===ds).sort((a,b)=>(a.time||"99")<(b.time||"99")?-1:1);
@@ -3958,9 +3960,8 @@ function dayItems(d,ds){
     ...slotsOn(d,ds).map(x=>({c:x.state==="missed"?"var(--red)":"var(--amber)",t:(x.state==="missed"?"Missed · ":"")+(x.slot.dur?fmtH(x.slot.dur)+(x.slot.grp?"/day":""):fmtTime(x.slot.start))+" "+x.p.name})),
     ...wkOn(d,ds).map(x=>({c:wkCol(x),t:(x.state==="missed"?"Missed · ":/^done/.test(x.state)?"✓ ":"")+fmtH(x.slot.dur)+(isMo(x.slot)?"/mo ":"/wk ")+x.p.name})),
     ...tasksDue(d,ds).map(x=>({c:x.st==="overdue"||x.st==="late"?"var(--red)":x.st==="mastered"?"#3ddc84":"var(--cyan)",t:(x.st==="starts"?"Starts · ":x.st==="mastered"?"Done · ":x.st==="overdue"||x.st==="late"?"Missed · ":"Due "+clock(x.t.due)+" · ")+x.t.title})),
-    ...(wo.length?[{c:"var(--lime)",t:wo.length+" exercise"+(wo.length>1?"s":"")}]:[]),
-    ...(meals.length?[{c:"var(--magenta)",t:meals.length+" meal"+(meals.length>1?"s":"")}]:[]),
-    ...(wt?[{c:"var(--violet)",t:"Weigh-in · "+wt.v}]:[])];
+    /* was: exercises / meals / weigh-in counts — the calendar is only for things on a schedule: events, passions, and paydays / bills */
+    ...calBud(ds).map(i=>({c:i.kind==="inc"?"#3ddc84":"#ffc533",t:(i.kind==="inc"?"+":"")+bMoney(+i.amt||0,0)+" "+bTitle(i)}))];
   const logs=[...meals.map(m=>({c:"var(--magenta)",t:m.name,s:m.type,v:n0(m.kcal)+" kcal"})),
     ...wo.map(w=>({c:"var(--lime)",t:w.name,s:"Training",v:`${w.sets}×${w.reps}`})),
     ...ss.map(x=>({c:"var(--amber)",t:pn(x.pid),s:x.planned?"Planned session"+(x.time?" · "+fmtTime(x.time):""):(x.slotId?"Scheduled session · done":"Passion session"),v:fmtH(x.mins)})),
@@ -9218,7 +9219,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="686",APPT="2026-11-24T00:51:42Z";   /* APPT: when this update was made */
+const APPV="687",APPT="2026-11-24T00:53:07Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
