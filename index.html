@@ -2881,7 +2881,7 @@ html.tpl-sharp body #view .panel:has(+.cal-tab)::after,html.phone body #view .pa
 html body #view .panel.cal-tab{margin-top:-1px!important}
 /* Dashboard calendar: Dots (default) or Details; details chips are dark gray with a coloured edge */
 .calhead.cal-c{position:relative}.cal-vsw{position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex;gap:2px;padding:2px;border-radius:9px;background:rgba(0,0,0,.3);border:1px solid rgba(var(--lr),.18)}.cal-vsw button{width:30px;height:24px;display:grid;place-items:center;border:0;border-radius:7px;background:none;color:var(--muted);cursor:pointer;padding:0}.cal-vsw button[aria-pressed="true"]{background:rgba(var(--tL),.35);color:#fff}
-#view .mcal .mc .chips em{background:rgba(255,255,255,.06)!important;color:#cdd5e5!important;box-shadow:inset 2px 0 0 var(--c)!important;border:0!important}
+#view .mcal .mc .chips em{position:relative;background:color-mix(in srgb,var(--c) 18%,transparent)!important;color:#e6ebf5!important;box-shadow:none!important;border:0!important;padding-left:9px!important;overflow:visible!important}#view .mcal:not(.cal-dots) .mc .chips em::before{content:"";position:absolute;left:0;top:2px;bottom:2px;width:3px;border-radius:2px;background:var(--c);box-shadow:0 0 6px var(--c),0 0 12px var(--c)}   /* whole chip tinted, glowing edge */
 #view .mcal.cal-dots .mc .chips{display:flex!important;flex-wrap:wrap;gap:5px;align-items:center;margin-top:6px}#view .mcal.cal-dots .mc .chips em{font-size:0!important;width:8px;height:8px;min-width:0;padding:0!important;border-radius:50%!important;background:var(--c)!important;box-shadow:0 0 6px var(--c)!important}#view .mcal.cal-dots .mc .chips small{font-size:11px!important;color:#8b95a8!important;margin:0!important}
 html.phone #view .cal-vsw{position:static;transform:none;order:9;margin:6px auto 0}html.phone #view .calhead.cal-c{justify-content:center;flex-wrap:wrap}html.phone #view .calhead.cal-c>.cal-vsw{flex-basis:auto}html.phone #view .calhead.cal-c::after{content:"";order:8;flex-basis:100%;height:0}
 /* wide screens (iPad landscape, desktop): calendar + Add an event and Breakdown sit in a centred column, like reading apps; tiles and side-by-side panels stay full width */
@@ -2890,14 +2890,14 @@ html.phone #view .cal-vsw{position:static;transform:none;order:9;margin:6px auto
 html #view .dashtop .holopanel>.ph.bstrip{display:flex;flex-direction:row;justify-content:center;margin:0 -18px 14px!important}html #view .dashtop .holopanel>.ph.bstrip>span{font-family:"Sora",var(--display);font-size:17px;font-weight:700;letter-spacing:.04em;background:linear-gradient(90deg,#eef3ff,rgb(var(--tL)) 120%);-webkit-background-clip:text;background-clip:text;color:transparent}html #view .dashtop .holopanel>.ph.bstrip>button{position:absolute;right:10px;top:50%;transform:translateY(-50%);margin:0}
 html #view .dtiles>.dt-strip,html #view .wahead>.bstrip,html #view .bdown>.bstrip{padding:9px 18px}html #view .wahead>.bstrip,html #view .bdown>.bstrip{margin:0 -18px 14px}
 /* title strips, all tabs: dark tint of the theme (not black), plain professional type, one solid colour (no gradient text) */
-html #view .bstrip,html #view .mcal .cw{background:rgba(var(--tA),.32)!important;border-bottom:1px solid rgba(var(--lr),.18)!important}
+html #view .bstrip,html #view .mcal .cw{background:rgba(var(--tD),.5)!important;border-bottom:1px solid rgba(var(--lr),.18)!important}
 html #view .bstrip b,html #view .dashtop .holopanel>.ph.bstrip>span{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",system-ui,sans-serif!important;font-size:15px!important;font-weight:600!important;letter-spacing:.01em!important;background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;color:#e9eef8!important;-webkit-text-fill-color:#e9eef8!important}
 /* phone: strips run edge to edge and sit flush at the top of their panel */
 html.phone #view :is(.holopanel,.dtiles,.bdown,.wahead).bstrip-p,html.phone #view .dtiles{padding-top:0!important}
 html.phone #view :is(.holopanel,.bdown)>.bstrip,html.phone #view .dtiles>.dt-strip{margin:0 -11px 12px!important}html.phone #view .wahead>.bstrip{margin:0 0 12px!important}html.phone #view .dtiles.dt-prog>.dt-strip{margin:0!important}
 /* calendar: the month + arrows (+ view switch) sit in a title strip like the other panels */
 html #view .panel:has(>.calhead.cal-c){padding-top:0!important;overflow:hidden}
-html #view .calhead.cal-c{margin:0 -18px 14px!important;padding:8px 18px!important;background:rgba(var(--tA),.32);border-bottom:1px solid rgba(var(--lr),.18)}
+html #view .calhead.cal-c{margin:0 -18px 14px!important;padding:8px 18px!important;background:rgba(var(--tD),.5);border-bottom:1px solid rgba(var(--lr),.18)}
 /* (removed: v704 shrank the month title and arrows — only the strip background was asked for) */
 html #view .calhead.cal-c .cal-vsw{right:12px}
 html.phone #view .calhead.cal-c{margin:0 -2px 12px!important;flex-wrap:nowrap}html.phone #view .calhead.cal-c::after{display:none}html.phone #view .calhead.cal-c .cal-vsw{position:absolute;right:8px;top:50%;transform:translateY(-50%);margin:0}
@@ -4034,12 +4034,12 @@ function dayItems(d,ds){
   const meals=d.meals.filter(m=>m.d===ds),wo=d.workouts.filter(w=>w.d===ds),ss=d.sessions.filter(s=>s.d===ds),wt=d.weights.find(w=>w.d===ds);
   /* calendar colours = the tab colours: events sky blue, passions lavender (missed red), bills gold, paydays green */
   const PCL="#b99cff",chips=[...ev.map(e=>({c:"#4cc9ff",t:(e.time?fmtTime(e.time)+" ":"")+e.title})),
-    ...ss.map(s=>({c:PCL,t:(s.time?fmtTime(s.time)+" ":"")+pn(s.pid)+(s.planned?" (planned)":" · "+fmtH(s.mins))})),
-    ...slotsOn(d,ds).map(x=>({c:x.state==="missed"?"var(--red)":PCL,t:(x.state==="missed"?"Missed · ":"")+(x.slot.dur?fmtH(x.slot.dur)+(x.slot.grp?"/day":""):fmtTime(x.slot.start))+" "+x.p.name})),
-    ...wkOn(d,ds).map(x=>({c:x.state==="missed"?"var(--red)":PCL,t:(x.state==="missed"?"Missed · ":/^done/.test(x.state)?"✓ ":"")+fmtH(x.slot.dur)+(isMo(x.slot)?"/mo ":"/wk ")+x.p.name})),
-    ...tasksDue(d,ds).map(x=>({c:x.st==="overdue"||x.st==="late"?"var(--red)":PCL,t:(x.st==="starts"?"Starts · ":x.st==="mastered"?"Done · ":x.st==="overdue"||x.st==="late"?"Missed · ":"Due "+clock(x.t.due)+" · ")+x.t.title})),
+    ...ss.map(s=>({c:PCL,t:pn(s.pid)})),   /* calendar chips: just the name (was time + duration) */
+    ...slotsOn(d,ds).map(x=>({c:x.state==="missed"?"var(--red)":PCL,t:(x.state==="missed"?"✕ ":"")+x.p.name})),
+    ...wkOn(d,ds).map(x=>({c:x.state==="missed"?"var(--red)":PCL,t:(x.state==="missed"?"✕ ":/^done/.test(x.state)?"✓ ":"")+x.p.name})),
+    ...tasksDue(d,ds).map(x=>({c:x.st==="overdue"||x.st==="late"?"var(--red)":PCL,t:(x.st==="mastered"?"✓ ":x.st==="overdue"||x.st==="late"?"✕ ":"")+x.t.title})),
     /* was: exercises / meals / weigh-in counts — the calendar is only for things on a schedule: events, passions, and paydays / bills */
-    ...calBud(ds).map(i=>({c:i.kind==="inc"?"#3ddc84":"#ffc533",t:(i.kind==="inc"?"+":"")+bMoney(+i.amt||0,0)+" "+bTitle(i)}))];
+    ...calBud(ds).map(i=>({c:i.kind==="inc"?"#3ddc84":"#ffc533",t:bTitle(i)}))];   /* name only (was amount + name) */
   const logs=[...meals.map(m=>({c:"var(--magenta)",t:m.name,s:m.type,v:n0(m.kcal)+" kcal"})),
     ...wo.map(w=>({c:"var(--lime)",t:w.name,s:"Training",v:`${w.sets}×${w.reps}`})),
     ...ss.map(x=>({p:1,c:"var(--amber)",t:pn(x.pid),s:x.planned?"Planned session"+(x.time?" · "+fmtTime(x.time):""):(x.slotId?"Scheduled session · done":"Passion session"),v:fmtH(x.mins)})),
@@ -9302,7 +9302,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="705",APPT="2026-11-24T01:54:46Z";   /* APPT: when this update was made */
+const APPV="706",APPT="2026-11-24T01:58:45Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
