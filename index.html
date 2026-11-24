@@ -2851,6 +2851,7 @@ html.phone #view .dtiles.dt-prog{padding:40px 14px 14px!important}
 .bdn-all{display:flex;height:10px;border-radius:99px;background:rgba(150,180,240,.14);overflow:hidden}.bdn-all i{display:block;height:100%;background:var(--c)}.bdn-all i+i{box-shadow:inset 2px 0 0 rgba(0,0,0,.55)}
 .bdn-leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--muted);margin-top:-4px}.bdn-leg span{display:inline-flex;align-items:center;gap:5px}.bdn-leg i{width:8px;height:8px;border-radius:2px;background:var(--c)}.bdn-leg em{font-style:normal;font-family:var(--mono);font-size:11px}
 .mc.mc-blank{pointer-events:none;background:none!important;box-shadow:none!important}
+.bdn-main{display:grid;gap:6px}.bdn-main .dp-t{height:10px}.bdn-main b{font-family:var(--mono);font-size:12.5px;color:var(--c);font-weight:700}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4027,14 +4028,17 @@ function bigCal(d){
 const BDPAL=["#b99cff","#f27fb2","#4cc9ff","#ffb648","#3ddc84","#ff7a59","#9ad0ff","#e6c35c"];
 function bdMulti(parts){const t=parts.reduce((a,x)=>a+x.v,0);return `<div class="bdn-all">${t?parts.filter(x=>x.v>0).map(x=>`<i data-akf="bd:${esc(x.k)}" style="flex:${x.v};--c:${x.c}" title="${esc(x.n)}"></i>`).join(""):""}</div><div class="bdn-leg">${parts.map(x=>`<span style="--c:${x.c}"><i></i>${esc(x.n)}<em>${t?Math.round(x.v/t*100):0}%</em></span>`).join("")}</div>`}
 function bdMeter(n,v,goal,txt,c,k){const f=goal?Math.min(1,v/goal):0;return `<div class="meter" style="--c:${c}"><div class="meter-top"><span>${esc(n)}</span><b>${txt}</b></div><div class="track"><i data-akw="bd:m${esc(k||n)}" style="width:${(f*100).toFixed(1)}%"></i></div></div>`}
-function breakdownPanel(d){const t=today(),tm=d.meals.filter(m=>m.d===t),sum=k=>tm.reduce((a,m)=>a+(+m[k]||0),0);
+/* the section's own progress bar (same as the top panel's): colour fills to the limit, the heavier shade comes in on the right when over; numbers under the bar */
+function bdMain(x){const cl=v=>Math.max(0,Math.min(1,v)),ov=x.over?Math.min(100,(x.f-1)*100):0,num=Array.isArray(x.v)?`<span${x.over?` style="color:${x.d}"`:""}>${x.v[0]}</span>${x.v.length>1?` / ${x.v[1]}`:""}`:esc(x.v);
+  return `<div class="bdn-main" style="--c:${x.c}"><div class="dp-t${ov?" ov":""}">${ov?`<i data-akw="bd:M${x.k}" style="width:${(100-ov).toFixed(1)}%;--c:${x.c}"></i><i data-akw="bd:O${x.k}" style="width:${ov.toFixed(1)}%;--c:${x.d}"></i>`:`<i data-akw="bd:M${x.k}" style="width:${(cl(x.f)*100).toFixed(1)}%"></i>`}</div><b>${num}</b></div>`}
+function breakdownPanel(d){const DS=dashStats(d,today()),t=today(),tm=d.meals.filter(m=>m.d===t),sum=k=>tm.reduce((a,m)=>a+(+m[k]||0),0);
   const MK=[["Carbs","carbs","#f27fb2"],["Protein","protein","#a688f2"],["Fiber","fiber","#b8875f"],["Fat","fat","#f2c14e"]],mv=MK.map(([n,k,c])=>({n,k,c,v:sum(k),g:mgGoal(k)}));
   const P=d.passions.map((p,i)=>({n:p.name,k:p.id,c:BDPAL[i%BDPAL.length],v:d.sessions.filter(x=>x.pid===p.id&&!x.planned).reduce((a,x)=>a+(+x.mins||0),0),g:(+p.goal||0)*60}));
   let out=0,inc=0;try{const S=bStats();out=S.subs+S.bills+S.spent;inc=S.inc}catch(_){}
   return `<div class="panel bdown" style="margin-top:18px" data-akg="bd"><div class="ph"><span>Breakdown</span></div><div class="tgrid">
-    <section class="bdn-sec"><h4 style="--c:#4cc9ff">Nutrition</h4>${bdMulti(mv)}${mv.map(x=>bdMeter(x.n,x.v,x.g,`${n0(x.v)}${x.g?" / "+n0(x.g):""} g`,x.c,x.k)).join("")}</section>
-    <section class="bdn-sec"><h4 style="--c:#b99cff">Passions</h4>${P.length?bdMulti(P)+P.map(x=>bdMeter(x.n,x.v,x.g,x.g?`${fmtH(x.v)} / ${fmtH(x.g)}`:fmtH(x.v),x.c,x.k)).join(""):`<p class="note" style="margin:0">No passions yet</p>`}</section>
-    <section class="bdn-sec"><h4 style="--c:#ffc533">Budget</h4>${bdMeter("Spent this month",out,inc,inc?`${bMoney(out,0)} / ${bMoney(inc,0)}`:"no income set","#ffc533","budget")}</section>
+    <section class="bdn-sec"><h4 style="--c:#4cc9ff">Nutrition</h4>${bdMain(DS[0])}${bdMulti(mv)}${mv.map(x=>bdMeter(x.n,x.v,x.g,`${n0(x.v)}${x.g?" / "+n0(x.g):""} g`,x.c,x.k)).join("")}</section>
+    <section class="bdn-sec"><h4 style="--c:#b99cff">Passions</h4>${bdMain(DS[1])}${P.length?bdMulti(P)+P.map(x=>bdMeter(x.n,x.v,x.g,x.g?`${fmtH(x.v)} / ${fmtH(x.g)}`:fmtH(x.v),x.c,x.k)).join(""):`<p class="note" style="margin:0">No passions yet</p>`}</section>
+    <section class="bdn-sec"><h4 style="--c:#ffc533">Budget</h4>${bdMain(DS[2])}${""/* was: separate "Spent this month" meter (pushed the bars out of line) — the gold bar above is that */}</section>
   </div></div>`}
 function meter(label,v,goal,u,c){const p=goal?Math.min(v/goal,1):0;
   return `<div class="meter" style="--c:${c}"><div class="meter-top"><span>${esc(label)}</span><b>${typeof v==="number"?n0(v):v} / ${n0(goal)} ${u}</b></div><div class="track"><i style="width:${p*100}%"></i></div></div>`}
@@ -9220,7 +9224,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="688",APPT="2026-11-24T00:54:21Z";   /* APPT: when this update was made */
+const APPV="689",APPT="2026-11-24T00:56:33Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
