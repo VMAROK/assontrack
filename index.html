@@ -140,6 +140,35 @@
 .us2-edit:hover{background:color-mix(in srgb,var(--cc) 22%,transparent)}
 </style>
 </head><body>
+<!-- opening screen: quiet, spacious, drifting specks; fades away once the app is ready -->
+<style>
+#aotSplash{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;overflow:hidden;background:radial-gradient(120% 90% at 50% 42%,#18233f 0%,#0d1426 48%,#070a14 100%);transition:opacity .9s cubic-bezier(.4,0,.2,1),visibility 0s linear .9s;-webkit-user-select:none;user-select:none}
+#aotSplash.out{opacity:0;visibility:hidden;pointer-events:none}
+#aotSplash canvas{position:absolute;inset:0;width:100%;height:100%}
+#aotSplash .sp-orb{position:absolute;left:50%;top:46%;width:min(70vmin,520px);height:min(70vmin,520px);margin:calc(min(70vmin,520px)/-2) 0 0 calc(min(70vmin,520px)/-2);border-radius:50%;background:radial-gradient(circle at 50% 50%,rgba(91,157,255,.20),rgba(120,110,255,.08) 38%,transparent 66%);filter:blur(18px);animation:spBreathe 5.5s ease-in-out infinite}
+#aotSplash .sp-ring{position:absolute;left:50%;top:46%;width:min(38vmin,280px);height:min(38vmin,280px);margin:calc(min(38vmin,280px)/-2) 0 0 calc(min(38vmin,280px)/-2);border-radius:50%;border:1px solid rgba(160,190,255,.10);animation:spSpin 24s linear infinite}
+#aotSplash .sp-ring::after{content:"";position:absolute;top:-2px;left:50%;width:3px;height:3px;margin-left:-1.5px;border-radius:50%;background:#cfe0ff;box-shadow:0 0 10px 2px rgba(150,190,255,.7)}
+#aotSplash .sp-mid{position:relative;display:grid;justify-items:center;gap:18px;transform:translateY(-3vh);opacity:0;animation:spIn 1.4s .15s cubic-bezier(.2,.7,.2,1) forwards}
+#aotSplash .sp-word{font:300 15px/1 -apple-system,"SF Pro Display","Inter",system-ui,sans-serif;letter-spacing:.48em;margin-right:-.48em;text-transform:uppercase;color:rgba(232,238,250,.88)}
+#aotSplash .sp-word b{font-weight:500;color:#9cc2ff}
+#aotSplash .sp-sub{font:400 10.5px/1 -apple-system,"SF Pro Text","Inter",system-ui,sans-serif;letter-spacing:.32em;margin-right:-.32em;text-transform:uppercase;color:rgba(170,184,210,.45)}
+#aotSplash .sp-line{width:120px;height:1px;background:rgba(160,190,255,.14);overflow:hidden;border-radius:1px}
+#aotSplash .sp-line i{display:block;height:100%;width:0;background:linear-gradient(90deg,transparent,#9cc2ff);animation:spFill 1.5s .3s cubic-bezier(.6,0,.2,1) forwards}
+@keyframes spBreathe{0%,100%{transform:scale(.92);opacity:.75}50%{transform:scale(1.06);opacity:1}}
+@keyframes spSpin{to{transform:rotate(360deg)}}
+@keyframes spIn{to{opacity:1;transform:none}}
+@keyframes spFill{to{width:100%}}
+@media (prefers-reduced-motion:reduce){#aotSplash .sp-orb,#aotSplash .sp-ring,#aotSplash .sp-mid,#aotSplash .sp-line i{animation:none!important;opacity:1;transform:none;width:100%}}
+</style>
+<div id="aotSplash" aria-hidden="true"><canvas></canvas><div class="sp-orb"></div><div class="sp-ring"></div>
+  <div class="sp-mid"><div class="sp-word">Ass<b>On</b>Track</div><div class="sp-line"><i></i></div><div class="sp-sub">one quiet step at a time</div></div></div>
+<script>(()=>{const el=document.getElementById("aotSplash");if(!el)return;const cv=el.querySelector("canvas"),x=cv.getContext("2d"),R=matchMedia("(prefers-reduced-motion:reduce)").matches;let W=0,H=0,dpr=Math.min(2,window.devicePixelRatio||1),P=[],raf=0,t0=performance.now();
+  const size=()=>{W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;x.setTransform(dpr,0,0,dpr,0,0)};size();addEventListener("resize",size);
+  const N=Math.round(Math.min(220,Math.max(90,W*H/7000)));for(let i=0;i<N;i++)P.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()<.85?.35+Math.random()*.7:.9+Math.random()*.9,v:.06+Math.random()*.22,ph:Math.random()*6.28,tw:.4+Math.random()*1.4,hue:Math.random()<.2?260:215});
+  const draw=n=>{const t=(n-t0)/1000;x.clearRect(0,0,W,H);for(const p of P){p.y-=p.v;p.x+=Math.sin(t*.35+p.ph)*.08;if(p.y<-4){p.y=H+4;p.x=Math.random()*W}const a=.18+.5*(.5+.5*Math.sin(t*p.tw+p.ph));x.beginPath();x.arc(p.x,p.y,p.r,0,6.283);x.fillStyle=`hsla(${p.hue},90%,86%,${a.toFixed(3)})`;x.fill()}if(!R)raf=requestAnimationFrame(draw)};draw(performance.now());
+  let gone=false;const done=()=>{if(gone)return;gone=true;el.classList.add("out");setTimeout(()=>{cancelAnimationFrame(raf);el.remove()},1000)};
+  const minT=R?400:2200,ready=()=>{const w=Math.max(0,minT-(performance.now()-t0));setTimeout(done,w)};
+  if(document.readyState==="complete")ready();else addEventListener("load",ready,{once:true});setTimeout(done,4000)})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap">
 <style>
@@ -9550,7 +9579,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="783",APPT="2026-11-24T07:24:33Z";   /* APPT: when this update was made */
+const APPV="784",APPT="2026-11-24T07:27:04Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
