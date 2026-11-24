@@ -2870,6 +2870,7 @@ html #view .cal-tab.open{color:var(--muted)}
 html #view .dtiles{grid-template-rows:auto minmax(0,1fr);height:auto!important;min-height:var(--dph)}html #view .dtiles>.dt-strip{grid-column:1/-1;margin:0!important;padding:9px 18px}html #view .dt-strip .dt-vsw{position:absolute;top:50%;right:12px;transform:translateY(-50%)}
 html #view .dtiles.dt-prog{padding:0!important;justify-content:flex-start}html #view .dt-prog>.dt-pb{flex:1;display:flex;flex-direction:column;justify-content:center;padding:10px 18px 12px}html.phone #view .dtiles.dt-prog{padding:0!important}
 html #view .dtiles:not(.dt-prog)>.dtile{padding-top:8px!important}
+html #view .dashtop>.dstack{row-gap:inherit!important;gap:inherit!important}   /* Overview ↔ This week gap = the gap beside the figure panel */
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -3916,7 +3917,7 @@ function budgetManage(d){const o=budgetInfo(d),B=d.budget||{};
     ${o.ex.length?`<div class="bud-list">${o.ex.slice().sort((a,b)=>(b.at||0)-(a.at||0)).slice(0,12).map(x=>`<div class="bud-it"><span>${esc(x.note||"Expense")}<small>${fmtDate(x.d)}</small></span><b>${money(+x.amt||0)}</b><button class="x" data-expdel="${x.id}" aria-label="Remove expense">×</button></div>`).join("")}</div>`:`<p class="note" style="margin:0">No expenses this month yet.</p>`}</div>`}
 function dashAnim(key){const now=performance.now();if(key!==dashShown){if(dashShown)sfx("whoosh");dashShown=key;dashAt=now}const el=now-dashAt;return el<450?` slide" style="animation-delay:-${Math.round(el)}ms`:""}
 /* top tiles: rings or thin bars */
-let dtV=null;const dtView=()=>{if(dtV==null){try{dtV=localStorage.getItem("aot-dtv")||"ring"}catch(_){dtV="ring"}}return dtV};
+let dtV=null,dtRingH=0;const dtView=()=>{if(dtV==null){try{dtV=localStorage.getItem("aot-dtv")||"ring"}catch(_){dtV="ring"}}return dtV};
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-dtv]");if(!b)return;e.preventDefault();e.stopPropagation();dtV=b.dataset.dtv;try{localStorage.setItem("aot-dtv",dtV)}catch(_){}const v=$("#view"),st=v?v.scrollTop:0;dashShown="tiles";render();if(v)v.scrollTop=st},true);
 function progressPanel(d){const wk=weekKey(today()),I={pass:passInfo(d),fit:fitInfo(d),diet:dietInfo(d),budget:budgetInfo(d)},HAS={pass:I.pass.pct!=null,fit:d.workouts.length>0||d.weights.length>0,diet:d.meals.some(m=>m.d===today()),budget:I.budget.pct!=null&&I.budget.has};
   if(dashOpen&&DCARDS[dashOpen]){const o=I[dashOpen],full=`<div class="panel dcomp"><div class="dc-main">${miniRing(o.pct,o.col,HAS[dashOpen])}<div class="dc-txt"><small>${o.small}</small><b style="color:${o.col}">${o.label}</b><p title="${esc(o.text)}">${o.text}</p></div></div><div class="dc-stats">${o.stats.map(([v,l,c])=>`<div><b style="${c?`color:${c};`:""}${String(v).length>7?"font-size:12.5px":String(v).length>5?"font-size:14px":""}">${v}</b><small>${l}</small></div>`).join("")}</div></div>`;
@@ -3925,7 +3926,9 @@ function progressPanel(d){const wk=weekKey(today()),I={pass:passInfo(d),fit:fitI
   /* two views in this panel: the rings (Passions / Fitness / Diet / Budget) or the progress bars (Nutrition / Passions / Budget, today) */
   const dsw=`<div class="dt-vsw" role="group" aria-label="Show as"><button type="button" data-dtv="ring" aria-pressed="${dtView()!=="bar"}" aria-label="Donuts" title="Donuts"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><circle cx="12" cy="12" r="7.5"/></svg></button><button type="button" data-dtv="bar" aria-pressed="${dtView()==="bar"}" aria-label="Progress bars" title="Progress bars"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h11M4 17h14"/></svg></button></div>`;
   const strip=`<div class="bstrip dt-strip"><b>Overview</b>${dsw}</div>`;   /* titled strip like the Budget panels; the view switch lives in it */
-  if(dtView()==="bar")return `<div class="panel dtiles dt-prog${dashAnim("tiles")}">${strip}<div class="dt-pb">${dashProg(d,today(),true)}</div></div>`;
+  /* both views keep the donut view's height (measured each time the donuts show) */
+  if(dtView()!=="bar")setTimeout(()=>{const p=document.querySelector(".dtiles:not(.dt-prog)");if(p&&p.offsetHeight)dtRingH=p.offsetHeight},0);
+  if(dtView()==="bar")return `<div class="panel dtiles dt-prog${dashAnim("tiles")}" style="height:${dtRingH||184}px!important;min-height:${dtRingH||184}px">${strip}<div class="dt-pb">${dashProg(d,today(),true)}</div></div>`;
   return `<div class="panel dtiles${dashAnim("tiles")}">${strip}${Object.keys(DCARDS).map(k=>`<div class="dtile">${miniRing(I[k].pct,I[k].col,HAS[k])}<b>${DCARDS[k]}</b><small style="color:${I[k].col}">${I[k].label}</small><button class="dview" data-dopen="${k}" aria-label="View ${DCARDS[k]} breakdown">View</button></div>`).join("")}</div>`}
 function weekAhead(d){const mon=monday(0);const days=WKO.map(i=>{const dn=DAYS[i];const dt=new Date(mon);dt.setDate(dt.getDate()+wkD(i));const ds=ymd(dt),it=[];
     d.passions.forEach(p=>{if(!modesOf(p).includes("schedule"))return;(p.slots||[]).forEach(sl=>{if(isWk(sl)||sl.day!==i)return;const st=slotState(d,p,sl,ds);if(st==="none")return;it.push({k:sl.start||"99",t:sl.dur?slFreq(sl)+" · "+fmtH(sl.dur):fmtTime(sl.start).replace(/\s+/," "),n:p.name,st,go:p.id+":"+sl.id+":"+ds})})});
@@ -9255,7 +9258,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="695",APPT="2026-11-24T01:12:54Z";   /* APPT: when this update was made */
+const APPV="696",APPT="2026-11-24T01:14:38Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
