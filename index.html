@@ -155,18 +155,19 @@
 #aotSplash .sp-sub{font:400 10.5px/1 -apple-system,"SF Pro Text","Inter",system-ui,sans-serif;letter-spacing:.32em;margin-right:-.32em;text-transform:uppercase;color:rgba(170,184,210,.5);-webkit-font-smoothing:antialiased}
 #aotSplash .sp-line{width:120px;height:1px;background:rgba(160,190,255,.14);overflow:hidden}
 #aotSplash .sp-line i{display:block;height:100%;width:0;background:linear-gradient(90deg,transparent,#9cc2ff)}
+#aotSplash.sp-mono .sp-word b{color:#c9c5ee}#aotSplash.sp-mono .sp-line{background:rgba(220,218,240,.12)}#aotSplash.sp-mono .sp-line i{background:linear-gradient(90deg,transparent,#d8d5f2)}#aotSplash.sp-mono .sp-sub{color:rgba(200,198,220,.45)}
 #aotSplash .sp-mid.on .sp-line i{width:100%;transition:width 1.6s .1s cubic-bezier(.6,0,.2,1)}
 @media (prefers-reduced-motion:reduce){#aotSplash .sp-grain{animation:none}}
 </style>
 <script>(()=>{
-  const STY=["specks","aurora","orbit","ripple","threads","halftone"];
+  const STY=["specks","aurora","orbit","ripple","threads","threadsmono","halftone"];
   const rnd=(a,b)=>a+Math.random()*(b-a);
   function play(id,{min=2200,max=4000,manual=false}={}){
     const old=document.getElementById("aotSplash");if(old)old.remove();
     if(STY.indexOf(id)<0)id="specks";
     const R=matchMedia("(prefers-reduced-motion:reduce)").matches;
     const el=document.createElement("div");el.id="aotSplash";el.setAttribute("aria-hidden","true");
-    el.innerHTML='<canvas></canvas>'+(id==="aurora"||id==="threads"?'<div class="sp-grain"></div>':'')+'<div class="sp-mid"><div class="sp-word">Ass<b>On</b>Track</div><div class="sp-line"><i></i></div><div class="sp-sub">one quiet step at a time</div></div>';
+    el.innerHTML='<canvas></canvas>'+(id==="aurora"||id==="threads"||id==="threadsmono"?'<div class="sp-grain"></div>':'')+'<div class="sp-mid"><div class="sp-word">Ass<b>On</b>Track</div><div class="sp-line"><i></i></div><div class="sp-sub">one quiet step at a time</div></div>';
     (document.body||document.documentElement).appendChild(el);
     const cv=el.querySelector("canvas"),x=cv.getContext("2d",{alpha:false}),mid=el.querySelector(".sp-mid");
     let W=0,H=0,dpr=1,raf=0,S={},t0=performance.now();
@@ -193,27 +194,51 @@
           for(const [px,py] of S.g){const d=Math.hypot(px-cx,py-cy),w=Math.max(0,Math.sin(d*.028-t*1.3)),e=Math.max(0,1-d/M),a=(.12+.7*w*w)*e;if(a<.03)continue;x.fillStyle=`rgba(${150+60*w|0},${185+40*w|0},255,${a.toFixed(3)})`;dot(px,py,.7+1.3*w*w*w*e)}
           const g=x.createRadialGradient(cx,cy,0,cx,cy,Math.min(W,H)*.3);g.addColorStop(0,"rgba(80,140,255,.14)");g.addColorStop(1,"rgba(80,140,255,0)");x.fillStyle=g;x.fillRect(0,0,W,H)}},
       /* was (v786): flat halftone toward a drifting light —       /* halftone: a grid of dots on near-black, growing and… (full code in git history) */
-      /* halftone: a slowly turning 3D shape drawn only with dots — dot size = how lit that spot is; morphs sphere → pyramid → hat → ring */
-      halftone:{y:.76,init(){const gap=Math.max(9,Math.round(Math.min(W,H)/40));S.gap=gap;S.g=[];for(let yy=gap/2;yy<H+gap;yy+=gap)for(let xx=gap/2;xx<W+gap;xx+=gap)S.g.push([xx,yy]);S.k0=Math.floor(Math.random()*4)},
-        draw(t){x.fillStyle="#05060b";x.fillRect(0,0,W,H);
-          const sc=Math.min(W,H)*.34,cx=W/2,cy=H*.42,ry=t*.45,rx=-.42+.08*Math.sin(t*.3),cyc=7,ph=Math.max(0,t)/cyc+S.k0,i0=((Math.floor(ph)%4)+4)%4,i1=(i0+1)%4,fr=ph-Math.floor(ph),m=fr<.78?0:(fr-.78)/.22,mm=m*m*(3-2*m);
-          const cR=Math.cos(ry),sR=Math.sin(ry),cX=Math.cos(rx),sX=Math.sin(rx),L=[-.52,.6,-.61],rmax=S.gap*.46;
-          const sph=(x0,y0,z0)=>Math.hypot(x0,y0,z0)-.78;
-          const tor=(x0,y0,z0)=>Math.hypot(Math.hypot(x0,z0)-.62,y0)-.24;
-          const pyr=(x0,y0,z0)=>{y0+=.55;const h=1.35,m2=h*h+.25;let px=Math.abs(x0)/1.15,pz=Math.abs(z0)/1.15,py=y0/1.15;if(pz>px){const q=px;px=pz;pz=q}px-=.5;pz-=.5;const qx=pz,qy=h*py-.5*px,qz=h*px+.5*py,s2=Math.max(-qx,0),tt=Math.max(0,Math.min(1,(qy-.5*pz)/(m2+.25))),aa=m2*(qx+s2)**2+qy*qy,bb=m2*(qx+.5*tt)**2+(qy-m2*tt)**2,d2=Math.min(qy,-qx*m2-qy*.5)>0?0:Math.min(aa,bb);return Math.sqrt((d2+qz*qz)/m2)*Math.sign(Math.max(qz,-py))*1.15};
-          const cyl=(x0,y0,z0,r,h)=>{const dx=Math.hypot(x0,z0)-r,dy=Math.abs(y0)-h;return Math.min(Math.max(dx,dy),0)+Math.hypot(Math.max(dx,0),Math.max(dy,0))};
-          const hat=(x0,y0,z0)=>Math.min(cyl(x0,y0+.28,z0,.98,.035)-.02,cyl(x0,y0-.1,z0,.5,.36)-.06);
-          const F=[sph,pyr,hat,tor];
-          const sdf=(px,py,pz)=>{/* rotate the point into the shape's turning frame */const y1=py*cX-pz*sX,z1=py*sX+pz*cX,x2=px*cR+z1*sR,z2=-px*sR+z1*cR;const a=F[i0](x2,y1,z2);return mm?a+(F[i1](x2,y1,z2)-a)*mm:a};
-          for(const [gx,gy] of S.g){const u=(gx-cx)/sc,v=-(gy-cy)/sc;let f=0;
-            if(u*u+v*v<2.6){let z=-2.2,hit=false;for(let k=0;k<44;k++){const d=sdf(u,v,z);if(d<.002){hit=true;break}z+=d;if(z>2.2)break}
-              if(hit){const e=.004,nx=sdf(u+e,v,z)-sdf(u-e,v,z),ny=sdf(u,v+e,z)-sdf(u,v-e,z),nz=sdf(u,v,z+e)-sdf(u,v,z-e),nl=Math.hypot(nx,ny,nz)||1;const dif=Math.max(0,(nx*L[0]+ny*L[1]+nz*L[2])/nl),rim=Math.pow(1-Math.abs(nz/nl),2.2);f=Math.min(1,.05+.92*Math.pow(dif,1.25)+.22*rim)}}
-            if(f<.02){x.fillStyle="rgba(60,80,170,.14)";dot(gx,gy,.6);continue}
-            x.fillStyle=`rgba(${(60+40*f)|0},${(95+50*f)|0},${(200+45*f)|0},${(.3+.7*f).toFixed(3)})`;dot(gx,gy,.6+rmax*Math.pow(f,1.4))}}},
+      /* was (v787): halftone grid of round dots shaded by ray-marching a turning sphere / pyramid / hat / ring — in git history */
+      /* halftone (stipple): thousands of fine points shaped into a turning figure that morphs into a sphere, pyramid, hat and ring,
+         with two slow flowing ribbons of dots sweeping through the corners — monochrome, quiet */
+      halftone:{y:.8,mono:1,init(){const N=Math.round(Math.min(8000,Math.max(5000,W*H/70))),M=[];
+          const P=(n,f)=>{const o=[];let g=0;while(o.length<n&&g++<n*40){const r=f();if(r)o.push(r)}while(o.length<n)o.push(o[o.length%Math.max(1,o.length)]||[0,0,0,0,1,0]);return o};
+          const U=()=>Math.random(),nrm=(a,b,c)=>{const l=Math.hypot(a,b,c)||1;return[a/l,b/l,c/l]};
+          const onEll=(cx,cy,cz,rx,ry,rz)=>{let a=U()*2-1,t=U()*6.2832,q=Math.sqrt(1-a*a),ux=q*Math.cos(t),uy=a,uz=q*Math.sin(t);const n=nrm(ux/rx,uy/ry,uz/rz);return[cx+ux*rx,cy+uy*ry,cz+uz*rz,...n]};
+          const inEll=(p,cx,cy,cz,rx,ry,rz)=>((p[0]-cx)/rx)**2+((p[1]-cy)/ry)**2+((p[2]-cz)/rz)**2<1;
+          /* figure: head, neck, shoulders — a bust like "Your figure" */
+          /* figure: one smooth bust (head, neck, shoulders sloping into arms) — points are pulled onto its surface */
+          const smin=(a,b,k)=>{const h=Math.max(k-Math.abs(a-b),0)/k;return Math.min(a,b)-h*h*k*.25};
+          const ell=(px,py,pz,cx,cy,cz,rx,ry,rz)=>{const qx=(px-cx)/rx,qy=(py-cy)/ry,qz=(pz-cz)/rz,k0=Math.hypot(qx,qy,qz),k1=Math.hypot(qx/rx,qy/ry,qz/rz)||1e-6;return k0*(k0-1)/k1};
+          const cap=(px,py,pz,ax,ay,az,bx,by,bz,r)=>{const pax=px-ax,pay=py-ay,paz=pz-az,bax=bx-ax,bay=by-ay,baz=bz-az,h=Math.max(0,Math.min(1,(pax*bax+pay*bay+paz*baz)/(bax*bax+bay*bay+baz*baz)));return Math.hypot(pax-bax*h,pay-bay*h,paz-baz*h)-r};
+          const bust=(px,py,pz)=>{let d=ell(px,py,pz,0,.64,.03,.2,.26,.23);d=smin(d,cap(px,py,pz,0,.22,-.01,0,.48,.01,.1),.1);
+            let t=ell(px,py,pz,0,-.38,0,.56,.56,.28);t=smin(t,ell(px,py,pz,0,.04,-.01,.74,.17,.25),.22);
+            t=smin(t,cap(px,py,pz,.6,-.02,0,.7,-.78,.03,.15),.16);t=smin(t,cap(px,py,pz,-.6,-.02,0,-.7,-.78,.03,.15),.16);
+            d=smin(d,t,.12);return Math.max(d,-(py+.86))};
+          const fig=P(N,()=>{let p=[U()*2-1,U()*1.8-.9,U()*.8-.4];for(let it=0;it<8;it++){const d=bust(p[0],p[1],p[2]),e=.003,gx=bust(p[0]+e,p[1],p[2])-d,gy=bust(p[0],p[1]+e,p[2])-d,gz=bust(p[0],p[1],p[2]+e)-d,gl=Math.hypot(gx,gy,gz)||1;p[0]-=d*gx/gl;p[1]-=d*gy/gl;p[2]-=d*gz/gl;if(Math.abs(d)<.002&&it>1){if(p[1]<-.855)return null;return[p[0],p[1],p[2],gx/gl,gy/gl,gz/gl]}}return null});
+          const sph=P(N,()=>onEll(0,0,0,.8,.8,.8));
+          const pyr=P(N,()=>{const f=Math.floor(U()*5),a=U(),b=U(),h=1.5,y0=-.62,s=.82;if(f===4){if(U()<.6)return null;return[(a*2-1)*s,y0,(b*2-1)*s,0,-1,0]}let u=a,v=b;if(u+v>1){u=1-u;v=1-v}const C=[[s,s],[-s,s],[-s,-s],[s,-s]],A=C[f],B=C[(f+1)%4],x0=A[0]*(1-u-v)+B[0]*u,z0=A[1]*(1-u-v)+B[1]*u,yy=y0+h*v,X=x0*(1-v)+0,Z=z0*(1-v);const mx=(A[0]+B[0])/2,mz=(A[1]+B[1])/2;return[x0*(1),yy,z0,...nrm(mx,s/h*.9,mz)]});
+          const hat=P(N,()=>{const k=U(),t=U()*6.2832,c=Math.cos(t),sn=Math.sin(t);if(k<.42){const y=-.22+U()*.62;return[c*.5,y,sn*.5,c,0,sn]}if(k<.56){const r=Math.sqrt(U())*.5;return[c*r,.4,sn*r,0,1,0]}const r=Math.sqrt(.25+U()*(1.02-.25));const top=k<.8;return[c*r,top?-.22:-.25,sn*r,0,top?1:-1,0]});
+          const tor=P(N,()=>{const u=U()*6.2832,v=U()*6.2832,R=.62,r=.25;if(U()>(R+r*Math.cos(v))/(R+r))return null;const cx=Math.cos(u),sx=Math.sin(u);return[(R+r*Math.cos(v))*cx,r*Math.sin(v),(R+r*Math.cos(v))*sx,Math.cos(v)*cx,Math.sin(v),Math.cos(v)*sx]});
+          S.sh=[fig,sph,pyr,hat,tor].map(a=>a.sort((p,q)=>p[1]-q[1]||Math.atan2(p[2],p[0])-Math.atan2(q[2],q[0])));S.N=N;S.k0=0;
+          /* two ribbons of dots, bottom-left and top-right */
+          S.rb=[];const cols=Math.round(Math.min(190,W/3.2)),rows=48;for(const side of [0,1])for(let i=0;i<cols;i++)for(let j=0;j<rows;j++)S.rb.push([side,i/(cols-1),j/(rows-1),U()*6.2832])},
+        draw(t){x.fillStyle="#0b0b0f";x.fillRect(0,0,W,H);const T=Math.max(0,t);
+          /* ribbons */
+          for(const [side,s0,w,ph] of S.rb){const s=side?1-s0:s0,bx=side?W*1.05:-W*.05,by=side?-H*.05:H*1.02,ex=side?W*.42:W*.62,ey=side?H*.34:H*.58;
+            const px=bx+(ex-bx)*s+Math.sin(s*5+T*.35+side)*26,py=by+(ey-by)*s+Math.cos(s*4-T*.3+side*2)*22,th=(Math.min(W,H)*.16+Math.min(W,H)*.09*Math.sin(s*3+T*.4))*(1-s*.5),ang=Math.atan2(ey-by,ex-bx)+1.5708,off=(w-.5)*th*2.2+Math.sin(w*9+s*7+T*.8)*4;
+            const X=px+Math.cos(ang)*off,Y=py+Math.sin(ang)*off,den=.5+.5*Math.sin(w*6.2832*1.5+s*9-T*.6),al=Math.pow(1-s,1.2)*(.25+.75*den)*(.1+.62*Math.pow(1-Math.abs(w-.5)*2,1.2));if(al<.02)continue;x.fillStyle=`rgba(214,212,234,${al.toFixed(3)})`;x.fillRect(X,Y,1.2,1.2)}
+          /* the shape */
+          const cyc=7.5,ph=T/cyc,i0=Math.floor(ph)%5,i1=(i0+1)%5,fr=ph-Math.floor(ph),m=fr<.72?0:(fr-.72)/.28,mm=m*m*(3-2*m),A=S.sh[i0],B=S.sh[i1];
+          const sc=Math.min(W,H)*.31,cx=W/2,cy=H*.4,ry=T*.4+(i0===0?Math.sin(T*.5)*.35-T*.4+.35:0),rx=-.18,cR=Math.cos(ry),sR=Math.sin(ry),cX=Math.cos(rx),sX=Math.sin(rx),L=[-.5,.55,-.67];
+          for(let i=0;i<S.N;i++){const a=A[i],b=B[i];let px=a[0],py=a[1],pz=a[2],nx=a[3],ny=a[4],nz=a[5];if(mm){px+=(b[0]-px)*mm;py+=(b[1]-py)*mm;pz+=(b[2]-pz)*mm;nx+=(b[3]-nx)*mm;ny+=(b[4]-ny)*mm;nz+=(b[5]-nz)*mm}
+            const x1=px*cR+pz*sR,z1=-px*sR+pz*cR,y2=py*cX-z1*sX,z2=py*sX+z1*cX,nx1=nx*cR+nz*sR,nz1=-nx*sR+nz*cR,ny2=ny*cX-nz1*sX,nz2=ny*sX+nz1*cX;
+            const dif=Math.max(0,nx1*L[0]+ny2*L[1]+nz2*L[2]),back=nz2>0.12,b2=back?.05+.08*dif:.07+.93*Math.pow(dif,1.3),pr=1/(1+z2*.18);
+            x.fillStyle=`rgba(${(205+30*dif)|0},${(205+28*dif)|0},${(228+20*dif)|0},${Math.min(1,b2).toFixed(3)})`;const sz=back?.7:.85+.65*dif;x.fillRect(cx+x1*sc*pr-sz/2,cy-y2*sc*pr-sz/2,sz,sz)}}},
       threads:{y:.5,init(){const n=Math.round(Math.min(1400,W*H/400));S.p=[...Array(n)].map(()=>({x:rnd(0,W),y:rnd(0,H),age:rnd(0,200)}));x.fillStyle="#090d1c";x.fillRect(0,0,W,H)},
         draw(t){x.fillStyle="rgba(9,13,28,.1)";x.fillRect(0,0,W,H);x.lineWidth=.7;
-          for(const p of S.p){const a=Math.sin(p.x*.0042+t*.12)*1.6+Math.cos(p.y*.0051-t*.09)*1.4+Math.sin((p.x+p.y)*.0017)*.8,nx=p.x+Math.cos(a)*.9,ny=p.y+Math.sin(a)*.9;x.strokeStyle=`hsla(${(228+22*Math.sin(p.y*.004+t*.1))|0},85%,80%,.22)`;x.beginPath();x.moveTo(p.x,p.y);x.lineTo(nx,ny);x.stroke();p.x=nx;p.y=ny;if(--p.age<0||p.x<0||p.x>W||p.y<0||p.y>H){p.x=rnd(0,W);p.y=rnd(0,H);p.age=rnd(80,260)}}}}};
-    const v=V[id];mid.style.top=(v.y*100)+"%";
+          for(const p of S.p){const a=Math.sin(p.x*.0042+t*.12)*1.6+Math.cos(p.y*.0051-t*.09)*1.4+Math.sin((p.x+p.y)*.0017)*.8,nx=p.x+Math.cos(a)*.9,ny=p.y+Math.sin(a)*.9;x.strokeStyle=`hsla(${(228+22*Math.sin(p.y*.004+t*.1))|0},85%,80%,.22)`;x.beginPath();x.moveTo(p.x,p.y);x.lineTo(nx,ny);x.stroke();p.x=nx;p.y=ny;if(--p.age<0||p.x<0||p.x>W||p.y<0||p.y>H){p.x=rnd(0,W);p.y=rnd(0,H);p.age=rnd(80,260)}}}},
+      /* threads in the mockup colours: near-black with soft grey-lavender threads */
+      threadsmono:{y:.5,mono:1,init(){const n=Math.round(Math.min(1400,W*H/400));S.p=[...Array(n)].map(()=>({x:rnd(0,W),y:rnd(0,H),age:rnd(0,200)}));x.fillStyle="#0b0b0f";x.fillRect(0,0,W,H)},
+        draw(t){x.fillStyle="rgba(11,11,15,.1)";x.fillRect(0,0,W,H);x.lineWidth=.7;
+          for(const p of S.p){const a=Math.sin(p.x*.0042+t*.12)*1.6+Math.cos(p.y*.0051-t*.09)*1.4+Math.sin((p.x+p.y)*.0017)*.8,nx=p.x+Math.cos(a)*.9,ny=p.y+Math.sin(a)*.9;x.strokeStyle=`hsla(${(248+8*Math.sin(p.y*.004+t*.1))|0},22%,86%,.28)`;x.beginPath();x.moveTo(p.x,p.y);x.lineTo(nx,ny);x.stroke();p.x=nx;p.y=ny;if(--p.age<0||p.x<0||p.x>W||p.y<0||p.y>H){p.x=rnd(0,W);p.y=rnd(0,H);p.age=rnd(80,260)}}}}};
+    const v=V[id];mid.style.top=(v.y*100)+"%";el.classList.toggle("sp-mono",!!v.mono);
     /* sharp on every screen: the canvas uses the device's real pixel density (up to 3×) */
     const size=()=>{W=innerWidth;H=innerHeight;dpr=Math.min(3,window.devicePixelRatio||1);cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);x.setTransform(dpr,0,0,dpr,0,0);x.imageSmoothingQuality="high";S={};v.init()};
     size();addEventListener("resize",size);
@@ -9316,7 +9341,7 @@ function applyLook(tmp){tmp=typeof tmp==="number"?{glass:tmp}:(tmp||{});const L=
     const PF=data.profile||{};h.classList.toggle("tpl-dpan",PF.tplPan==="dark");["none","dark"].forEach(k=>h.classList.toggle("tpl-bd-"+k,PF.tplBd===k));h.classList.toggle("tpl-sharp",PF.tplSharp===true);/* spacing sliders (replace the old Comfortable / Compact / Tight buttons) */
     const gi=PF.gapIn,go=PF.gapOut;h.classList.toggle("gap-in",gi!=null);h.classList.toggle("gap-out",go!=null);if(gi!=null)h.style.setProperty("--gin",gi+"px");if(go!=null)h.style.setProperty("--gout",go+"px");h.classList.toggle("tpl-bars-clear",PF.tplBars==="clear");h.classList.toggle("tpl-bars-pan",T?PF.tplBars!=="clear":PF.tplBars==="panel");setTimeout(barsSync,0);h.classList.remove("tpl-bd-light");spaFx.stop()/* lines off for now; was: if(tplBgOn())spaFx.run() */}}
 /* Settings → Opening screen: pick one of five styles (or off); tap again to preview */
-const SPL=[["specks","Specks","Drifting specks, breathing glow"],["aurora","Aurora","Soft colour clouds, film grain"],["orbit","Orbit","Fine rings turning, lights riding them"],["ripple","Ripple","Dots with a slow wave from the centre"],["threads","Threads","Faint silk threads in the wind"],["halftone","Halftone","A turning shape drawn only with dots"],["off","Off","Open straight into the app"]];
+const SPL=[["specks","Specks","Drifting specks, breathing glow"],["aurora","Aurora","Soft colour clouds, film grain"],["orbit","Orbit","Fine rings turning, lights riding them"],["ripple","Ripple","Dots with a slow wave from the centre"],["threads","Threads","Faint silk threads in the wind"],["threadsmono","Threads · Mono","The same threads in grey and lavender"],["halftone","Halftone","A figure of fine points that turns and reshapes"],["off","Off","Open straight into the app"]];
 const splashNow=()=>{try{return localStorage.getItem("aot-splash")||"specks"}catch(_){return "specks"}};
 function splashPanel(){const cur=splashNow();return `<div class="panel splp" style="margin-top:18px"><div class="ph"><span>Opening screen</span><i>Shown when the app opens</i></div><div class="spl-row">${SPL.map(([k,n,d])=>`<button type="button" class="spl-c spl-${k}" data-splash="${k}" aria-pressed="${cur===k}"><b>${n}</b><small>${d}</small></button>`).join("")}</div><p class="note" style="margin:10px 2px 0">Tap one to choose it and see it play.</p></div>`}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-splash]");if(!b)return;e.preventDefault();const k=b.dataset.splash;try{localStorage.setItem("aot-splash",k)}catch(_){}document.querySelectorAll("[data-splash]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.splash===k));if(k!=="off"&&window.aotSplash)window.aotSplash.play(k,{min:2600,manual:true})},true);
@@ -9649,7 +9674,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="787",APPT="2026-11-24T08:01:36Z";   /* APPT: when this update was made */
+const APPV="788",APPT="2026-11-24T08:09:04Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
