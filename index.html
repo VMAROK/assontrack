@@ -3394,6 +3394,7 @@ html:is(.tpl-vt,.tpl-stipple).tpl-bars-clear.tpl-bars-clear.tpl-bars-clear :is(a
 .nmp .nm-secs:not(.list) .nm-selbar .nm-selb{flex:1 1 0;min-width:0;height:30px;padding:0}
 .nmp .nm-secs:not(.list) .nm-selbar .nm-selb.del{order:5}.nmp .nm-secs:not(.list) .nm-selbar .nm-selb.cxl{order:6}.nmp .nm-secs:not(.list) .nm-selbar .nm-selb.ok{order:7}
 .nmp .nm-secs:not(.list) .nm-selbar::after{content:"";order:4;flex-basis:100%;height:0}
+.tplp .lk-in-tpl{display:block!important;padding-top:4px}.tplp .lk-in-tpl .lk-label{font-size:13px;font-weight:600;margin:12px 0 6px}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9515,7 +9516,7 @@ function tplPanel(){const T=tplOf();return `<div class="panel tplp" style="margi
       ${lk?row("all","Gap &amp; margins",gi,0,40):row("in","Gap",gi,0,40)+row("out","Margins",go,0,48)}
       <button type="button" class="gap-reset" data-gapreset>Reset</button></div></div>`})()}
   <div class="tpl-opt"><span>Corners</span><div class="seg2" role="group" aria-label="Panel corners"><button type="button" data-tplsharp="0" aria-pressed="${(data.profile||{}).tplSharp!==true}">Rounded</button><button type="button" data-tplsharp="1" aria-pressed="${(data.profile||{}).tplSharp===true}">Sharp</button></div></div>
-  <div class="tpl-opt"><span>Side &amp; top bars</span><div class="seg2" role="group" aria-label="Side and top bars">${T?"":`<button type="button" data-tplbars="" aria-pressed="${!(data.profile||{}).tplBars}">Original</button>`}<button type="button" data-tplbars="panel" aria-pressed="${T?(data.profile||{}).tplBars!=="clear":(data.profile||{}).tplBars==="panel"}">Panel color</button><button type="button" data-tplbars="clear" aria-pressed="${(data.profile||{}).tplBars==="clear"}">No color</button></div></div>`:""}</div>`}
+  <div class="tpl-opt"><span>Side &amp; top bars</span><div class="seg2" role="group" aria-label="Side and top bars">${T?"":`<button type="button" data-tplbars="" aria-pressed="${!(data.profile||{}).tplBars}">Original</button>`}<button type="button" data-tplbars="panel" aria-pressed="${T?(data.profile||{}).tplBars!=="clear":(data.profile||{}).tplBars==="panel"}">Panel color</button><button type="button" data-tplbars="clear" aria-pressed="${(data.profile||{}).tplBars==="clear"}">No color</button></div></div>${T&&T.visual?"":lookSliders()}`:""}</div>`}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tpl],[data-tplbg],[data-tplpan],[data-tplbd],[data-tplbars],[data-tplsharp],[data-gapreset]");if(!b)return;e.preventDefault();e.stopPropagation();data.profile=data.profile||{};
   if(b.dataset.gapreset!==undefined){delete data.profile.gapIn;delete data.profile.gapOut;applyLook()}
   else if(b.dataset.tplsharp!=null){if(b.dataset.tplsharp==="1")data.profile.tplSharp=true;else delete data.profile.tplSharp;applyLook()}
@@ -9523,14 +9524,18 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   else if(b.dataset.tplbd!=null){if(b.dataset.tplbd)data.profile.tplBd=b.dataset.tplbd;else delete data.profile.tplBd;applyLook()}
   else if(b.dataset.tplpan){data.profile.tplPan=b.dataset.tplpan;applyLook()}else if(b.dataset.tplbg!=null){data.profile.tplBg=b.dataset.tplbg==="1"}else{const id=b.dataset.tpl;if(id)data.profile.template=id;else data.profile.template="";/* was: delete data.profile.template — "" keeps "no template" from falling back to the Midnight default */toast(id?(TEMPLATES.find(t=>t.id===id)||{}).name+" template on":"Back to your own setup")}
   render();save()},true);
-function lookPanel(){const L=lookOf();return `<div class="panel" style="margin-top:18px"><div class="ph"><span>Boxes</span><i>${L.color==="auto"?"Matches wallpaper":esc((LOOKS.find(x=>x.id===L.color)||LOOKS[0]).name)}</i></div>
-  <div class="lk-label">Color</div>
-  <div class="lk-row" role="radiogroup" aria-label="Box color"><button class="lk" role="radio" aria-checked="${L.color==="auto"}" data-look="auto" title="Match wallpaper"><span class="lk-sw auto"></span><span>Match<br>wallpaper</span></button>${LOOKS.map(x=>`<button class="lk" role="radio" aria-checked="${L.color===x.id}" data-look="${x.id}" title="${esc(x.name)}"><span class="lk-sw" style="background:hsl(${x.h} ${Math.round(x.s*100)}% ${x.l?Math.round(x.l*100+4):42}%)"></span><span>${esc(x.name)}</span></button>`).join("")}</div>
-  <div class="lk-label" style="margin-top:18px">Blur</div>
+/* Blur, Transparency and Color depth — shown under Fine-tune with Corners etc. (regular templates and your own setup; visual templates keep their designed glass) */
+function lookSliders(){const L=lookOf();return `<div class="tpl-opt tpl-opt-col lk-in-tpl">
+  <div class="lk-label" style="margin-top:12px">Blur</div>
   <div class="glass-row"><span>Solid</span><input type="range" id="glassIn" min="0" max="100" step="1" value="${L.glass}" aria-label="Blur"><span>Blur</span><b id="glassVal">${L.glass}%</b><button type="button" class="slall" data-slall="main:glass" title="Use this for all categories and passions" aria-label="Apply Blur to all">All</button></div>
   <div class="lk-label" style="margin-top:18px">Transparency</div>
   <div class="glass-row"><span>Opaque</span><input type="range" id="transIn" min="0" max="100" step="1" value="${L.trans}" aria-label="Box transparency"><span>See-through</span><b id="transVal">${L.trans}%</b><button type="button" class="slall" data-slall="main:trans" title="Use this for all categories and passions" aria-label="Apply Transparency to all">All</button></div>
   <div class="lk-label" style="margin-top:18px">Color depth</div><div class="glass-row"><span>Soft</span><input type="range" id="toneIn" min="0" max="100" value="${L.tone}" aria-label="Color depth"><span>Deep</span><b id="toneInVal">${L.tone}%</b><button type="button" class="slall" data-slall="main:tone" title="Use this for all categories and passions" aria-label="Apply Color depth to all">All</button></div>
+  </div>`}
+function lookPanel(){const L=lookOf();return `<div class="panel" style="margin-top:18px"><div class="ph"><span>Boxes</span><i>${L.color==="auto"?"Matches wallpaper":esc((LOOKS.find(x=>x.id===L.color)||LOOKS[0]).name)}</i></div>
+  <div class="lk-label">Color</div>
+  <div class="lk-row" role="radiogroup" aria-label="Box color"><button class="lk" role="radio" aria-checked="${L.color==="auto"}" data-look="auto" title="Match wallpaper"><span class="lk-sw auto"></span><span>Match<br>wallpaper</span></button>${LOOKS.map(x=>`<button class="lk" role="radio" aria-checked="${L.color===x.id}" data-look="${x.id}" title="${esc(x.name)}"><span class="lk-sw" style="background:hsl(${x.h} ${Math.round(x.s*100)}% ${x.l?Math.round(x.l*100+4):42}%)"></span><span>${esc(x.name)}</span></button>`).join("")}</div>
+  <!-- Blur, Transparency, Color depth moved into the template Fine-tune section (lookSliders) -->
   <div class="lk-label" style="margin-top:18px">Outlines</div>
   <div class="seg2 lines-sw" role="group" aria-label="Box outlines"><button data-lines="1" aria-pressed="${L.lines!==false}">Match box color</button><button data-lines="0" aria-pressed="${L.lines===false}">Classic blue</button></div>
   <p class="note">Each slider does one thing. Blur only frosts what shows behind the boxes. Transparency only sets how see-through they are. Color depth only makes the box color softer or deeper.</p></div>`}
@@ -9831,7 +9836,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="813",APPT="2026-11-24T16:38:01Z";   /* APPT: when this update was made */
+const APPV="814",APPT="2026-11-24T16:40:49Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
