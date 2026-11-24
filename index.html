@@ -3439,7 +3439,7 @@ html.tpl-vt.tpl-vt #view .panel,html.tpl-stipple.tpl-stipple #view .panel{backgr
 html.tpl-chrome{--vlift:18,19,20;--vline:rgba(255,255,255,.11);--vr:12px;--vbg:#040404;--vbg2:#0b0b0c}/* was 34,35,36 / .16 / 14px */
 html.tpl-chrome.tpl-chrome.tpl-vt #view .panel{background-image:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,0) 45%)!important;box-shadow:0 14px 34px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.05)!important}
 html.tpl-chrome.tpl-chrome body #view :is(.bstrip,.calhead.cal-c,.nwp>.bc>.bc-h,.bm-has>.bc>.bc-h,.bm-has>.bm-r>.ph:first-child,.bwg-solo>.ph:first-child),html.tpl-chrome.tpl-chrome body #view[data-tab="fuel"] :is(.holopanel,.flogp,.nmp,.usp,.wtr)>.ph:first-child,html.tpl-chrome.tpl-chrome body #view[data-tab="fuel"] .nwp .bm-r>.ph:first-child,html.tpl-chrome.tpl-chrome body #view .panel.hasStrip>.ph:first-child{background:transparent!important}
-html.tpl-chrome #view:not([data-tab="set"]) .panel>*,html.tpl-chrome aside .navbtn,html.tpl-chrome .topbar .logo{filter:grayscale(1)}
+/* colors stay — only the panels are gray: html.tpl-chrome #view:not([data-tab="set"]) .panel>*,html.tpl-chrome aside .navbtn,html.tpl-chrome .topbar .logo[filter:grayscale(1)] */
 html.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome .topbar{background:transparent!important;background-image:none!important;border-color:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-bottom-color:transparent!important;box-shadow:none!important}
 html.tpl-chrome .topbar h1{font-weight:400!important;letter-spacing:-.01em}
 html.tpl-chrome #view :is(.tile>b,.bk-v,.bsec-t){font-weight:400!important;letter-spacing:-.01em}
@@ -9913,7 +9913,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="832",APPT="2026-11-24T17:58:00Z";   /* APPT: when this update was made */
+const APPV="833",APPT="2026-11-24T17:59:59Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
