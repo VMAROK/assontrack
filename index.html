@@ -9644,7 +9644,7 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener("DOMContentLoaded",()=>eUnitFix(document.body));setTimeout(()=>eUnitFix(document.body),0);
 function vSet(){
   const g=data.goals;
-  return banner()+tplPanel()+wallPanel()+splashPanel()+soundPanel()+/* wallpaper moved up under Templates (was after Opening sound) */affPanel()+lookPanel()+themePanel()+hkPanel()+`<div class="grid cols2" style="margin-top:18px">
+  return banner()+wallPanel()+tplPanel()+themePanel()+splashPanel()+soundPanel()+/* Wallpaper above Templates, Saved themes right under them (was: tplPanel()+wallPanel()+… themePanel() further down) */affPanel()+lookPanel()+hkPanel()+`<div class="grid cols2" style="margin-top:18px">
    <div class="panel"><div class="ph"><span>Goals</span><i>Goals</i></div>
     <form class="f" id="gForm"><div class="f2"><label>Daily calories<input id="gK" type="number" inputmode="numeric" min="0" value="${g.kcal}"></label><label>Daily protein (g)<input id="gP" type="number" inputmode="numeric" min="0" value="${g.protein}"></label></div>
     <label>Goal weight (${g.unit})<input id="gW" type="number" step="0.1" inputmode="decimal" value="${g.weight??""}" placeholder="Optional"></label>
@@ -9850,7 +9850,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="817",APPT="2026-11-24T16:56:09Z";   /* APPT: when this update was made */
+const APPV="818",APPT="2026-11-24T17:00:08Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
