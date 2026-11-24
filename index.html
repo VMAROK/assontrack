@@ -3395,6 +3395,11 @@ html:is(.tpl-vt,.tpl-stipple).tpl-bars-clear.tpl-bars-clear.tpl-bars-clear :is(a
 .nmp .nm-secs:not(.list) .nm-selbar .nm-selb.del{order:5}.nmp .nm-secs:not(.list) .nm-selbar .nm-selb.cxl{order:6}.nmp .nm-secs:not(.list) .nm-selbar .nm-selb.ok{order:7}
 .nmp .nm-secs:not(.list) .nm-selbar::after{content:"";order:4;flex-basis:100%;height:0}
 .tplp .lk-in-tpl{display:block!important;padding-top:4px}.tplp .lk-in-tpl .lk-label{font-size:13px;font-weight:600;margin:12px 0 6px}
+/* tab rows for Wallpaper and Saved themes */
+.wtabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:2px 0 12px;padding-bottom:2px}.wtabs::-webkit-scrollbar{display:none}
+.wtab{flex:none;font:inherit;font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:99px;border:1px solid rgba(var(--lr),.2);background:none;color:var(--muted);cursor:pointer;white-space:nowrap}
+.wtab[aria-selected="true"]{background:rgba(var(--tL),.22);border-color:rgba(var(--tL),.6);color:#fff}
+html.tpl-sharp .wtab{border-radius:0}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9421,8 +9426,13 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(d.affmode){data.profile.affMode=d.affmode;save();render();if(affPlaying){affVid=affMode()==="video";affUI();const w=document.getElementById("affPlayer");if(w)setTimeout(()=>affPlace(w,true),20)}return}
   if(d.affloop){data.profile.affLoop=d.affloop==="1";save();render();if(affEl)affEl.loop=affLoop()}});
 
+/* wallpaper groups as tabs (was: every group listed one under another). Opens on the tab holding your current wallpaper */
+let wallTab=null;try{wallTab=localStorage.getItem("aot-walltab")}catch(_){}
+const wallTabNow=(G,cur)=>{if(wallTab&&G.some(g=>g[0]===wallTab))return wallTab;const g=G.find(g=>g[1].some(w=>w.id===cur));return g?g[0]:G[0][0]};
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-walltab]");if(!b)return;e.preventDefault();wallTab=b.dataset.walltab;try{localStorage.setItem("aot-walltab",wallTab)}catch(_){}const v=document.getElementById("view"),st=v&&v.scrollTop;render();if(v)v.scrollTop=st},true);
 function wallPanel(){const cur=wallOf().id;return `<div class="panel wallp" style="margin-top:18px"><div class="ph"><span>Wallpaper</span><i>${esc(wallOf().name)}</i></div>
-  <div class="wgrid" role="radiogroup" aria-label="Wallpaper">${wallGroups().map(([n,ws])=>`<div class="wgroup">${esc(n)}</div>`+ws.map(w=>`<div class="wcell"><button class="wcard" role="radio" aria-checked="${w.id===cur}" data-wall="${w.id}"><span class="wimg" style="background-image:url('${thumbOf(w)}')"></span><span class="wname">${esc(w.name)}</span></button>${w.custom?`<button class="wdel" data-walldel="${w.id}" aria-label="Remove ${esc(w.name)}" title="Remove">×</button>`:""}</div>`).join("")).join("")}<label class="wcard wadd" title="Use your own photo"><span class="wimg wadd-i"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span class="wname">Add your own</span><input type="file" accept="image/*" data-wallup="main"></label></div>
+  ${(()=>{const G=wallGroups();if(!G.some(g=>g[0]==="Yours"))G.push(["Yours",[]]);const tab=wallTabNow(G,cur);return `<div class="wtabs" role="tablist" aria-label="Wallpaper groups">${G.map(([n])=>`<button type="button" role="tab" class="wtab" data-walltab="${esc(n)}" aria-selected="${n===tab}">${esc(n)}</button>`).join("")}</div>
+  <div class="wgrid" role="radiogroup" aria-label="Wallpaper">${G.filter(g=>g[0]===tab).map(([n,ws])=>ws.map(w=>`<div class="wcell"><button class="wcard" role="radio" aria-checked="${w.id===cur}" data-wall="${w.id}"><span class="wimg" style="background-image:url('${thumbOf(w)}')"></span><span class="wname">${esc(w.name)}</span></button>${w.custom?`<button class="wdel" data-walldel="${w.id}" aria-label="Remove ${esc(w.name)}" title="Remove">×</button>`:""}</div>`).join("")).join("")}${tab==="Yours"?`<label class="wcard wadd" title="Use your own photo"><span class="wimg wadd-i"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span class="wname">Add your own</span><input type="file" accept="image/*" data-wallup="main"></label>`:""}</div>`})()}
   <div class="anim-row"><div><b>Calorie label</b><small>Show energy as cal (like food labels in the US) or kcal. The numbers are the same.</small></div><div class="seg2" role="group" aria-label="Calorie label"><button data-eunit="cal" aria-pressed="${!eUnitK()}">cal</button><button data-eunit="kcal" aria-pressed="${eUnitK()}">kcal</button></div></div>
   <div class="anim-row"><div><b>Ambient sound</b><small>A deep, slow, spacious tone that plays while the app is open. It starts after your first tap. On an iPhone or iPad it follows the silent switch.</small></div><div class="seg2" role="group" aria-label="Ambient sound"><button data-sound="1" aria-pressed="${soundSet()}">On</button><button data-sound="0" aria-pressed="${!soundSet()}">Off</button></div></div>
   ${soundSet()?`<div class="glass-row snd-row"><span>Quiet</span><input type="range" id="sndVol" min="0" max="100" value="${Math.round(soundVol()*100)}" aria-label="Ambient sound volume"><span>Loud</span><b id="sndVolVal">${Math.round(soundVol()*100)}%</b><span></span></div>`:""}
@@ -9550,13 +9560,17 @@ function themeApply(s){const set=(o,v,ks)=>ks.forEach(k=>{if(v[k]===undefined)de
   (data.categories||[]).forEach(c=>{const v=(s.cats||{})[c.id];if(v)set(c,v,TS_C)});data.passions.forEach(p=>{const v=(s.pass||{})[p.id];if(v)set(p,v,TS_S)})}
 const themeSets=()=>(demoOn()?[]:data.themeSets)||[];
 let tsDelArm=null;
+/* saved themes as tabs: your themes / save current / import-export (was: all stacked) */
+let tsTab="mine";try{tsTab=localStorage.getItem("aot-tstab")||"mine"}catch(_){}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tstab]");if(!b)return;e.preventDefault();tsTab=b.dataset.tstab;try{localStorage.setItem("aot-tstab",tsTab)}catch(_){}const v=document.getElementById("view"),st=v&&v.scrollTop;render();if(v)v.scrollTop=st},true);
 function themePanel(){const sets=themeSets(),cur=tsKey(themeSnap());
   const card=t=>{const w=allWalls().find(x=>x.id===(t.snap.profile||{}).wallpaper)||WALLS[0],lk=LOOKS.find(l=>l.id===((t.snap.profile||{}).look||{}).color),on=tsKey(t.snap)===cur,n=Object.values(t.snap.cats||{}).filter(v=>Object.keys(v).length).length+Object.values(t.snap.pass||{}).filter(v=>Object.keys(v).length).length;
     return `<div class="wcell"><button class="wcard" role="radio" aria-checked="${on}" data-tsload="${t.id}" title="Load this theme"><span class="wimg" style="background-image:url('${thumbOf(w)}')">${lk?`<i class="ts-dot" style="background:hsl(${lk.h} ${Math.round(Math.max(.3,lk.s)*100)}% ${lk.l?22:52}%)"></i>`:""}${n?`<i class="ts-n">+${n}</i>`:""}</span><span class="wname">${esc(t.name)}</span></button><button class="wdel${tsDelArm===t.id?" arm":""}" data-tsdel="${t.id}" aria-label="Delete ${esc(t.name)}" title="Delete">${tsDelArm===t.id?"Sure?":"×"}</button></div>`};
   return `<div class="panel tsp" style="margin-top:18px"><div class="ph"><span>Saved themes</span><i>Main, categories and passions together</i></div>
-    <div class="ts-save"><input id="tsName" maxlength="28" autocomplete="off" enterkeyhint="done" placeholder="Name this look" aria-label="Theme name"><button class="btn" data-tssave>Save current theme</button></div>
-    ${sets.length?`<div class="wgrid" role="radiogroup" aria-label="Saved themes">${sets.map(card).join("")}</div>`:`<p class="note" style="margin:0">Nothing saved yet. Set up your wallpapers and colors the way you like them, then save. You can try something new and tap a saved theme to bring the old one back.</p>`}
-    <div class="ts-io"><button class="btn ghost" data-tsexport ${sets.length?"":"disabled"}>Export as a file</button><label class="btn ghost ts-imp">Import a file<input type="file" accept=".json,application/json" data-tsimport></label></div></div>`}
+    <div class="wtabs" role="tablist" aria-label="Saved themes">${[["mine","Your themes"],["save","Save current"],["io","Import / export"]].map(([k,l])=>`<button type="button" role="tab" class="wtab" data-tstab="${k}" aria-selected="${tsTab===k}">${l}</button>`).join("")}</div>
+    ${tsTab==="save"?`<div class="ts-save"><input id="tsName" maxlength="28" autocomplete="off" enterkeyhint="done" placeholder="Name this look" aria-label="Theme name"><button class="btn" data-tssave>Save current theme</button></div>`:""}
+    ${tsTab!=="mine"?"":sets.length?`<div class="wgrid" role="radiogroup" aria-label="Saved themes">${sets.map(card).join("")}</div>`:`<p class="note" style="margin:0">Nothing saved yet. Set up your wallpapers and colors the way you like them, then save. You can try something new and tap a saved theme to bring the old one back.</p>`}
+    ${tsTab!=="io"?"":`<div class="ts-io"><button class="btn ghost" data-tsexport ${sets.length?"":"disabled"}>Export as a file</button><label class="btn ghost ts-imp">Import a file<input type="file" accept=".json,application/json" data-tsimport></label></div>`}</div>`}
 function tsDownload(name,text){const f=new File([text],name,{type:"application/json"});
   if(typeof touchUI==="function"&&touchUI()&&navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:name}).catch(()=>{});return}
   const u=URL.createObjectURL(f),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
@@ -9630,7 +9644,7 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener("DOMContentLoaded",()=>eUnitFix(document.body));setTimeout(()=>eUnitFix(document.body),0);
 function vSet(){
   const g=data.goals;
-  return banner()+tplPanel()+splashPanel()+soundPanel()+wallPanel()+affPanel()+lookPanel()+themePanel()+hkPanel()+`<div class="grid cols2" style="margin-top:18px">
+  return banner()+tplPanel()+wallPanel()+splashPanel()+soundPanel()+/* wallpaper moved up under Templates (was after Opening sound) */affPanel()+lookPanel()+themePanel()+hkPanel()+`<div class="grid cols2" style="margin-top:18px">
    <div class="panel"><div class="ph"><span>Goals</span><i>Goals</i></div>
     <form class="f" id="gForm"><div class="f2"><label>Daily calories<input id="gK" type="number" inputmode="numeric" min="0" value="${g.kcal}"></label><label>Daily protein (g)<input id="gP" type="number" inputmode="numeric" min="0" value="${g.protein}"></label></div>
     <label>Goal weight (${g.unit})<input id="gW" type="number" step="0.1" inputmode="decimal" value="${g.weight??""}" placeholder="Optional"></label>
@@ -9836,7 +9850,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="816",APPT="2026-11-24T16:48:13Z";   /* APPT: when this update was made */
+const APPV="817",APPT="2026-11-24T16:56:09Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
