@@ -3210,7 +3210,8 @@ html.tablet.tablet .navbtn:is([data-tab="dash"],[data-tab="fuel"],[data-tab="bud
 /* narrow panels (Meals, Usuals, Calories trend / Income & expenses, Extras): 228px in from the top panels' edges on each side, centred — measured from the panels above, so it stays the same with the side tabs open, shut, or on desktop */
 @media (min-width:1100px){html:not(.phone) #view:is([data-tab="fuel"],[data-tab="budget"])>:is(.nmp,.usp,.wtr,.bco,.panel:has(.bstrip-amt)).panel.panel{margin-left:auto!important;margin-right:auto!important;max-width:calc(min(100%,980px) - 456px)!important;width:100%}}
 /* tab switch: each panel fades in, rises a few px and settles, staggered top to bottom */
-@keyframes tabIn{from{opacity:0;transform:translateY(14px) scale(.985);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
+/* was: @keyframes tabIn(from(opacity:0;transform:translateY(14px) scale(.985);filter:blur(3px))to(opacity:1;transform:none;filter:none)) — fading the panels switched off their frosted blur until the fade ended, so they flashed see-through. Now they only rise into place, and the blur stays on the whole time */
+@keyframes tabIn{from{transform:translateY(18px) scale(.985)}to{transform:none}}
 #view.tab-in>*{animation:tabIn .5s cubic-bezier(.22,.8,.28,1) both}
 #view.tab-in>*:nth-child(2){animation-delay:.05s}#view.tab-in>*:nth-child(3){animation-delay:.1s}#view.tab-in>*:nth-child(4){animation-delay:.15s}#view.tab-in>*:nth-child(5){animation-delay:.2s}#view.tab-in>*:nth-child(n+6){animation-delay:.24s}
 @media (prefers-reduced-motion:reduce){#view.tab-in>*{animation:none}}
@@ -9861,7 +9862,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="825",APPT="2026-11-24T17:30:06Z";   /* APPT: when this update was made */
+const APPV="826",APPT="2026-11-24T17:31:27Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
