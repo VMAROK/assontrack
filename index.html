@@ -2965,6 +2965,12 @@ html.tpl-sharp #view .panel.hasStrip::after,html.phone #view .panel.hasStrip::af
 #view[data-tab="budget"] .bco-sec{border:0!important;border-radius:0!important}
 #view[data-tab="budget"] .bco-sec:not(:has(>.bco-h.neg)) .bco-c{background:rgba(var(--tD),.5)!important}   /* darker group rows: Income only — Expenses keeps its own colour (reverted) */
 .bco-cn{display:inline-flex;align-items:center;gap:6px;padding:0;border:0;background:none;font:inherit;color:inherit;cursor:pointer}.bco-cn>i{width:8px;height:8px;border-radius:50%;background:var(--cc);display:inline-block}.bco-pen{opacity:1;color:var(--cc)}
+/* Extras: strip = title + month total only; Budget / Add group as quiet outline buttons; group tiles without the light border */
+#view[data-tab="budget"] .bstrip:has(.bstrip-amt) small{display:none}
+#view[data-tab="budget"] :is(.bs-budg,.bs-addg){background:none!important;border:1px solid rgba(var(--lr),.3)!important;color:#dfe6f3!important;box-shadow:none!important}
+#view[data-tab="budget"] :is(.bs-budg,.bs-addg) svg{color:var(--muted)}
+#view[data-tab="budget"] :is(.bs-budg,.bs-addg)[aria-pressed="true"]{background:rgba(var(--tL),.22)!important;border-color:rgba(var(--tL),.6)!important}
+#view[data-tab="budget"] .bsg{border-color:transparent!important;background:rgba(var(--tD),.45)!important;box-shadow:none!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -6703,14 +6709,14 @@ function bSheet(){let o=document.getElementById("bSheet");if(!bEdit){if(o){o.cla
   else if(e.t==="grp"){h=`<b>${isNew?"New":"Edit"} group</b>`;const cnt=b.items.filter(i=>bItCat(i)===v.cat&&i.grp===e.orig).length;acts=isNew?"":bHoldBtn;
     var body=`<label class="tp-lab">Group name<input id="beName" value="${esc(v.n||"")}" placeholder="${v.cat==="Subscriptions"?"Entertainment":"Car"}" maxlength="40"></label><p class="note" style="margin:0">A group inside ${esc(v.cat)}, just for organizing.${!isNew&&cnt?` ${cnt} item${cnt===1?"":"s"} in it. Deleting the group keeps them, ungrouped.`:""}</p>`}
   else{h=`<b>${isNew?"New":"Edit"} ${v.inc?"income":"expense"} group</b>`;const cnt=b.items.filter(i=>i.cat===e.orig).length;acts=isNew||e.orig==="Other"||e.orig==="Other income"?"":bHoldBtn;
-    var body=`<div class="bsh-2"><label class="tp-lab">Name<input id="beName" value="${esc(v.n||"")}" placeholder="${v.inc?"Freelance":"Groceries"}"${e.orig==="Other"||e.orig==="Other income"?" disabled":""}></label>${v.inc?"":`<label class="tp-lab">Monthly limit${moneyIn("beAmt",v.lim,bHome(),false,"No limit")}</label>`}</div>
+    var body=`<div class="bsh-2"><label class="tp-lab">Name<input id="beName" value="${esc(v.n||"")}" placeholder="${v.inc?"Freelance":"Groceries"}">${""/* was: disabled for Other / Other income — every group can be renamed now (the fallback is recreated if ever needed) */}</label>${v.inc?"":`<label class="tp-lab">Monthly limit${moneyIn("beAmt",v.lim,bHome(),false,"No limit")}</label>`}</div>
       <div class="tp-lab">Color<div class="bsh-sw">${BPAL.map(c=>`<button type="button" data-becol="${c}" aria-pressed="${v.c===c}" style="--cc:${c}" aria-label="Color ${c}"></button>`).join("")}</div></div>${!isNew&&cnt?`<p class="note" style="margin:0">${cnt} item${cnt===1?"":"s"} in this group. Deleting it moves them to ${v.inc?"Other income":"Other"}.</p>`:""}`}
   o.innerHTML=`<div class="wp-box panel bsh" role="dialog" aria-label="Edit"><div class="wp-h">${h}<button type="button" class="x wp-x" data-bclose aria-label="Close">×</button></div><div class="bsh-g">${body}</div><div class="bsh-acts">${acts}<span style="flex:1"></span><button type="button" class="btn ghost" data-bclose>Cancel</button><button type="button" class="btn" data-bsave>Save</button></div></div>`}
 function bRead(){const e=bEdit;if(!e)return;const g=id=>{const x=document.getElementById(id);return x?x.value:null},num=s=>parseFloat(String(s||"").replace(/[^0-9.]/g,""))||0,v=e.v;
   if(e.t==="item"){if(g("beName")!=null)v.name=g("beName").trim();if(g("beCo")!=null)v.co=g("beCo").trim();v.amt=mnyVal("beAmt");v.cur=mnyCur("beAmt");v.start=g("beStart")||"";if(g("beFrom")!=null){const f=g("beFrom")||"";if(f)v.from=f;else delete v.from}if(g("beUntil")!=null)v.until=g("beUntil")||"";if(g("beTotal")!=null)v.total=num(g("beTotal"))||"";if(g("beGrace")!=null){const ge=g("beGrace")||"";if(ge){if(ge!==v.graceEnd||!v.graceSince)v.graceSince=today();v.graceEnd=ge}else{delete v.graceEnd;delete v.graceSince}}}   /* was: silently dropped unless it came after the next charge date */
   else if(e.t==="spend"){v.amt=mnyVal("beAmt");v.cur=mnyCur("beAmt");v.d=g("beStart")||today();v.note=(g("beName")||"").trim()}
   else if(e.t==="grp"){v.n=(g("beName")||"").trim()}
-  else{if(g("beName")!=null&&e.orig!=="Other"&&e.orig!=="Other income")v.n=g("beName").trim();v.lim=v.inc?0:mnyVal("beAmt")}}
+  else{if(g("beName")!=null&&g("beName").trim())v.n=g("beName").trim();v.lim=v.inc?0:mnyVal("beAmt")}}
 const bOpen=(t,v,isNew,orig)=>{bEdit={t,v:JSON.parse(JSON.stringify(v)),isNew,orig};bSheet();if(isNew)setTimeout(()=>{const i=document.getElementById(t==="spend"?"beAmt":"beName");i&&i.focus()},60)};
 function bDelSheet(){const b=B(),e=bEdit;if(!e)return;if(e.t==="item"){b.items=b.items.filter(x=>x.id!==e.v.id);toast((e.v.name||"Item")+" deleted")}else if(e.t==="spend"){b.spends=b.spends.filter(x=>x.id!==e.v.id);toast("Expense deleted")}
   else if(e.t==="grp"){const c=bCat(e.v.cat);if(c)c.groups=(c.groups||[]).filter(x=>x!==e.orig);b.items.forEach(i=>{if(bItCat(i)===e.v.cat&&i.grp===e.orig)delete i.grp});toast(e.orig+" removed")}
@@ -9364,7 +9370,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="726",APPT="2026-11-24T02:51:37Z";   /* APPT: when this update was made */
+const APPV="727",APPT="2026-11-24T02:54:26Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
