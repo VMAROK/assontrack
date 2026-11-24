@@ -2917,6 +2917,18 @@ html #view .mcal .mc:not(.mc-blank){height:108px;overflow:hidden}html.phone #vie
 #view .mcal .mc .chips{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}#view .mcal .mc .chips::-webkit-scrollbar{display:none}
 #view .mcal .mc .chips{-webkit-mask-image:linear-gradient(#000 calc(100% - 10px),transparent);mask-image:linear-gradient(#000 calc(100% - 10px),transparent)}
 .mc-ok{filter:drop-shadow(0 0 3px rgba(61,220,132,.6))}   /* Dots: every item gets a dot; Details: first 3 + "+N more" */
+html #view .bstrip,html #view .calhead.cal-c{border-bottom:0!important}   /* no line under title strips */
+/* Nutrition: every panel title becomes the same theme-tinted strip as the Dashboard (no line under it) */
+#view[data-tab="fuel"]{--sp1:16px;--sp2:18px}html.phone #view[data-tab="fuel"]{--sp1:14px;--sp2:14px}
+#view[data-tab="fuel"] :is(.holopanel,.flogp,.nmp,.usp,.wtr){padding-top:0!important}
+#view[data-tab="fuel"] :is(.holopanel,.flogp,.nmp,.usp,.wtr)>.ph:first-child,#view[data-tab="fuel"] .nwp .bm-r>.ph:first-child{margin:0 calc(-1*var(--sp2)) 14px!important;padding:9px var(--sp2)!important;background:rgba(var(--tD),.5)!important;border:0!important;border-radius:0!important;min-height:44px;box-sizing:border-box;align-items:center}
+#view[data-tab="fuel"] .nwp .bm-r>.ph:first-child{margin-top:calc(-1*var(--sp1))!important;margin-left:-16px!important}
+#view[data-tab="fuel"] :is(.holopanel,.flogp,.nmp,.usp,.wtr)>.ph:first-child>span:first-child,#view[data-tab="fuel"] .nwp .bm-r>.ph:first-child>span:first-child{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",system-ui,sans-serif!important;font-size:15px!important;font-weight:600!important;letter-spacing:.01em!important;color:#e9eef8!important;-webkit-text-fill-color:#e9eef8!important;background:none!important;text-transform:none!important}
+#view[data-tab="fuel"] .holopanel>.ph:first-child{justify-content:center;position:relative}#view[data-tab="fuel"] .holopanel>.ph:first-child>button{position:absolute;right:10px;top:50%;transform:translateY(-50%);margin:0}
+#view[data-tab="fuel"] :is(.holopanel,.flogp,.nmp,.usp,.wtr,.nwp){overflow:hidden}
+.wtr-sum>.wtr-hi{border-color:rgba(255,94,108,.7)!important;box-shadow:0 0 14px rgba(255,94,108,.45),inset 0 0 12px rgba(255,94,108,.15);animation:wtrPulse 2.4s ease-in-out infinite}.wtr-sum>.wtr-hi b{text-shadow:0 0 10px rgba(255,94,108,.7)}.wtr-sum>.wtr-hi em{color:#ff8a95!important}
+.wtr-sum>.wtr-lo{border-color:rgba(255,159,67,.7)!important;box-shadow:0 0 14px rgba(255,159,67,.4),inset 0 0 12px rgba(255,159,67,.12);animation:wtrPulse 2.4s ease-in-out infinite}.wtr-sum>.wtr-lo b{text-shadow:0 0 10px rgba(255,159,67,.7)}.wtr-sum>.wtr-lo em{color:#ffb878!important}
+@keyframes wtrPulse{50%{box-shadow:0 0 6px rgba(255,255,255,0),inset 0 0 6px rgba(255,255,255,0)}}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4156,7 +4168,10 @@ function fuelTrend(S){const g=S.g,T=+g.kcal||0,D14=S.days,mx=Math.max(T*1.15,...
   const wk=S.wk,under=wk.filter(x=>T&&x.kcal<=T).length,over=wk.filter(x=>T&&x.kcal>T).length,dv=S.avg==null||!T?null:S.avg-T;
   const cell=(l,v,sub,c)=>`<div><small>${l}</small><b${c?` style="color:${c}"`:""}>${v}</b><em>${sub}</em></div>`;
   return `<div class="panel wtr" style="margin-top:18px"><div class="ph"><span>Calories trend</span><span class="mg-hr" style="display:flex;align-items:center;gap:10px"><i>Last 14 days</i><span class="seg2" role="group" aria-label="Show as"><button data-ntrv="bar" aria-pressed="${nPro().trV!=="line"}">Bars</button><button data-ntrv="line" aria-pressed="${nPro().trV==="line"}">Graph</button></span></span></div>
-    <div class="wtr-sum">${cell("Today",n0(S.kcal)+" kcal",T?(S.kcal>T?n0(S.kcal-T)+" over target":n0(T-S.kcal)+" under target"):"no target set",T&&S.kcal>T?OV:S.tm.length?UN:"")}${cell("7-day average",S.avg==null?"--":n0(S.avg)+" kcal",S.avg==null?"nothing logged this week":dv==null?wk.length+" days logged":(dv>0?"↑ "+n0(dv)+" over target":"↓ "+n0(-dv)+" under target"),dv==null?"":dv>0?OV:UN)}${cell("This week",`<span style="color:${UN}">↓ ${under}</span> <span style="color:${OV}">↑ ${over}</span>`,"days under · over")}${cell("Protein average",S.avgP==null?"--":n0(S.avgP)+" g",g.protein?"target "+n0(g.protein)+" g":"per logged day")}</div>
+    <div class="wtr-sum">${(()=>{/* way over (>125% of the limit) glows red; eating too little (<60%) glows orange */const LO="#ff9f43",lvl=k=>!T||k==null?"":k>T*1.25?"hi":k<T*.6?"lo":"",gl=(h,L)=>L?h.replace("<div>",`<div class="wtr-${L}">`):h;
+      const tl=S.tm.length?lvl(S.kcal):"",al=S.avg==null?"":lvl(S.avg);
+      return gl(cell("Today",n0(S.kcal)+" kcal",T?(tl==="hi"?"way over target":tl==="lo"?"eating too little":S.kcal>T?n0(S.kcal-T)+" over target":n0(T-S.kcal)+" under target"):"no target set",tl==="lo"?LO:T&&S.kcal>T?OV:S.tm.length?UN:""),tl)
+        +gl(cell("7-day average",S.avg==null?"--":n0(S.avg)+" kcal",S.avg==null?"nothing logged this week":al==="hi"?"way over target":al==="lo"?"eating too little":dv==null?wk.length+" days logged":(dv>0?"↑ "+n0(dv)+" over target":"↓ "+n0(-dv)+" under target"),al==="lo"?LO:dv==null?"":dv>0?OV:UN),al)})()}${cell("This week",`<span style="color:${UN}">↓ ${under}</span> <span style="color:${OV}">↑ ${over}</span>`,"days under · over")}${cell("Protein average",S.avgP==null?"--":n0(S.avgP)+" g",g.protein?"target "+n0(g.protein)+" g":"per logged day")}</div>
     ${(()=>{if(nPro().trV!=="line")return `<svg class="wtr-svg" viewBox="0 0 600 182" role="img" aria-label="Calories for each of the last 14 days against your target.">${grid}${bars}${tl}</svg>`;
       const P=D14.map((x,i)=>({x:X0+bw*i+bw/2,y:py(x.kcal),n:x.n,o:T&&x.kcal>T,x0:x})),L=P.filter(q=>q.n);
       const path=L.length>1?L.map((q,i)=>{if(!i)return `M${q.x.toFixed(1)} ${q.y.toFixed(1)}`;const a=L[i-1],m=(q.x-a.x)/2;return `C${(a.x+m).toFixed(1)} ${a.y.toFixed(1)} ${(q.x-m).toFixed(1)} ${q.y.toFixed(1)} ${q.x.toFixed(1)} ${q.y.toFixed(1)}`}).join(" "):"";
@@ -9310,7 +9325,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="712",APPT="2026-11-24T02:09:57Z";   /* APPT: when this update was made */
+const APPV="713",APPT="2026-11-24T02:14:46Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
