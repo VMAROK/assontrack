@@ -9543,6 +9543,11 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   render();save()},true);
 /* Blur, Transparency and Color depth — shown under Fine-tune with Corners etc. (regular templates and your own setup; visual templates keep their designed glass) */
 function lookSliders(){const L=tplOf()?effLook():lookOf();return `<div class="tpl-opt tpl-opt-col lk-in-tpl">
+  <!-- your own setup (no template): panel color + outlines, moved here from the Boxes panel -->
+  ${tplOf()?"":`<div class="lk-label" style="margin-top:12px">Panel color</div>
+  <div class="lk-row" role="radiogroup" aria-label="Box color"><button class="lk" role="radio" aria-checked="${L.color==="auto"}" data-look="auto" title="Match wallpaper"><span class="lk-sw auto"></span><span>Match<br>wallpaper</span></button>${LOOKS.map(x=>`<button class="lk" role="radio" aria-checked="${L.color===x.id}" data-look="${x.id}" title="${esc(x.name)}"><span class="lk-sw" style="background:hsl(${x.h} ${Math.round(x.s*100)}% ${x.l?Math.round(x.l*100+4):42}%)"></span><span>${esc(x.name)}</span></button>`).join("")}</div>
+  <div class="lk-label" style="margin-top:12px">Outlines</div>
+  <div class="seg2 lines-sw" role="group" aria-label="Box outlines"><button data-lines="1" aria-pressed="${L.lines!==false}">Match box color</button><button data-lines="0" aria-pressed="${L.lines===false}">Classic blue</button></div>`}
   <div class="lk-label" style="margin-top:12px">Blur</div>
   <div class="glass-row"><span>Solid</span><input type="range" id="glassIn" min="0" max="100" step="1" value="${L.glass}" aria-label="Blur"><span>Blur</span><b id="glassVal">${L.glass}%</b><button type="button" class="slall" data-slall="main:glass" title="Use this for all categories and passions" aria-label="Apply Blur to all">All</button></div>
   <div class="lk-label" style="margin-top:18px">Transparency</div>
@@ -9651,7 +9656,7 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener("DOMContentLoaded",()=>eUnitFix(document.body));setTimeout(()=>eUnitFix(document.body),0);
 function vSet(){
   const g=data.goals;
-  return banner()+wallPanel()+tplPanel()+themePanel()+splashPanel()+soundPanel()+displayPanel()+/* Wallpaper above Templates, Saved themes right under them (was: tplPanel()+wallPanel()+… themePanel() further down) */affPanel()+lookPanel()+hkPanel()+`<div class="grid cols2" style="margin-top:18px">
+  return banner()+wallPanel()+tplPanel()+themePanel()+splashPanel()+soundPanel()+displayPanel()+/* Wallpaper above Templates, Saved themes right under them (was: tplPanel()+wallPanel()+… themePanel() further down) */affPanel()+/* Boxes panel removed — color + outlines now in Fine-tune your own setup; templates set their own colors (was: lookPanel()) */hkPanel()+`<div class="grid cols2" style="margin-top:18px">
    <!-- Goals panel removed from Settings (moving to Nutrition: daily intake from weight etc.). Its old markup is in git history. The space stays, with a little animation -->
    <div class="set-art" aria-hidden="true"><canvas></canvas></div>
    <div class="panel"><div class="ph"><span>Account &amp; sync</span><i>${sbUser?"Synced":"This device"}</i></div>
@@ -9853,7 +9858,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="820",APPT="2026-11-24T17:12:22Z";   /* APPT: when this update was made */
+const APPV="821",APPT="2026-11-24T17:19:04Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
