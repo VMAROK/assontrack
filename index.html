@@ -3081,6 +3081,10 @@ aside .navbtn.nav-drag{z-index:5;transform:scale(1.08);opacity:.92;box-shadow:0 
 aside.nav-dragging .navbtn:not(.nav-drag){transition:transform .2s}
 aside.nav-dragging{touch-action:none}
 aside>.navbtn{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+/* Dashboard This week: coloured by tab, not by what's inside — Passions purple, Budget gold, events sky blue; done stays green, missed red */
+html body #view .wahead .wa-it.src-p{--wc:#b99cff}html body #view .wahead .wa-it.src-b{--wc:#ffc533}html body #view .wahead .wa-it.src-e{--wc:#4cc9ff}
+html body #view .wahead .wa-it{border-left-color:var(--wc)!important;background:color-mix(in srgb,var(--wc) 16%,transparent)!important}
+html body #view .wahead .wa-it.st-done{--wc:#3ddc84}html body #view .wahead .wa-it.st-missed{--wc:#ff5d6c}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4142,12 +4146,13 @@ function progressPanel(d){const wk=weekKey(today()),I={pass:passInfo(d),fit:fitI
   if(dtView()==="bar")return `<div class="panel dtiles dt-prog${dashAnim("tiles")}" style="height:${dtRingH||184}px!important;min-height:${dtRingH||184}px">${strip}<div class="dt-pb">${dashProg(d,today(),true)}</div></div>`;
   return `<div class="panel dtiles${dashAnim("tiles")}">${strip}${Object.keys(DCARDS).map(k=>`<div class="dtile">${miniRing(I[k].pct,I[k].col,HAS[k])}<b>${DCARDS[k]}</b><small style="color:${I[k].col}">${I[k].label}</small><button class="dview" data-dopen="${k}" aria-label="View ${DCARDS[k]} breakdown">View</button></div>`).join("")}</div>`}
 function weekAhead(d){const mon=monday(0);const days=WKO.map(i=>{const dn=DAYS[i];const dt=new Date(mon);dt.setDate(dt.getDate()+wkD(i));const ds=ymd(dt),it=[];
-    d.passions.forEach(p=>{if(!modesOf(p).includes("schedule"))return;(p.slots||[]).forEach(sl=>{if(isWk(sl)||sl.day!==i)return;const st=slotState(d,p,sl,ds);if(st==="none")return;it.push({k:sl.start||"99",t:sl.dur?slFreq(sl)+" · "+fmtH(sl.dur):fmtTime(sl.start).replace(/\s+/," "),n:p.name,st,go:p.id+":"+sl.id+":"+ds})})});
-    d.passions.forEach(p=>{if(!modesOf(p).includes("schedule"))return;(p.slots||[]).filter(isWk).forEach(sl=>{const wk=ymd(mon),st=slotState(d,p,sl,wk);if(st==="none")return;it.push({k:"96",t:slFreq(sl)+" · "+fmtH(sl.dur),n:p.name,st,go:p.id+":"+sl.id+":"+wk})})});
-    tasksDue(d,ds).forEach(x=>it.push({k:"98",t:x.st==="starts"?"Starts":"Due",n:x.t.title,st:x.st==="mastered"?"done":x.st==="overdue"||x.st==="late"?"missed":"upcoming"}));
-    (d.events||[]).filter(e=>e.d===ds).forEach(e=>it.push({k:e.time||"97",t:e.time?fmtTime(e.time).replace(/\s+/," "):"",n:e.title,st:"event"}));
+    d.passions.forEach(p=>{if(!modesOf(p).includes("schedule"))return;(p.slots||[]).forEach(sl=>{if(isWk(sl)||sl.day!==i)return;const st=slotState(d,p,sl,ds);if(st==="none")return;it.push({k:sl.start||"99",t:sl.dur?slFreq(sl)+" · "+fmtH(sl.dur):fmtTime(sl.start).replace(/\s+/," "),n:p.name,st,go:p.id+":"+sl.id+":"+ds,src:"p"})})});
+    d.passions.forEach(p=>{if(!modesOf(p).includes("schedule"))return;(p.slots||[]).filter(isWk).forEach(sl=>{const wk=ymd(mon),st=slotState(d,p,sl,wk);if(st==="none")return;it.push({k:"96",t:slFreq(sl)+" · "+fmtH(sl.dur),n:p.name,st,go:p.id+":"+sl.id+":"+wk,src:"p"})})});
+    tasksDue(d,ds).forEach(x=>it.push({k:"98",t:x.st==="starts"?"Starts":"Due",n:x.t.title,st:x.st==="mastered"?"done":x.st==="overdue"||x.st==="late"?"missed":"upcoming",src:"p"}));
+    calBud(ds).forEach(i=>{const pd=bIsPaid(B(),i,ds);it.push({k:"95",t:i.kind==="inc"?(pd?"Paid in":"Payday"):(pd?"Paid":"Due"),n:bTitle(i),st:pd?"done":"bill",src:"b"})});   /* budget items in This week too (Nutrition stays out) */
+    (d.events||[]).filter(e=>e.d===ds).forEach(e=>it.push({k:e.time||"97",t:e.time?fmtTime(e.time).replace(/\s+/," "):"",n:e.title,st:"event",src:"e"}));
     it.sort((a,b)=>a.k<b.k?-1:1);
-    return `<div class="wa-day${ds===today()?" now":""}${ds<today()?" past":""}"><div class="wa-h">${dn}<small>${dt.getDate()}</small></div>${it.length?it.map(x=>`<div class="wa-it st-${x.st==="donelocked"?"done":x.st}${x.go?" tap":""}" title="${esc(x.n)}"${x.go?` data-waslot="${x.go}" role="button" tabindex="0"`:""}><small>${x.t}</small><span>${esc(x.n)}</span></div>`).join(""):`<div class="wa-none">Free</div>`}</div>`});
+    return `<div class="wa-day${ds===today()?" now":""}${ds<today()?" past":""}"><div class="wa-h">${dn}<small>${dt.getDate()}</small></div>${it.length?it.map(x=>`<div class="wa-it st-${x.st==="donelocked"?"done":x.st} src-${x.src||"p"}${x.go?" tap":""}" title="${esc(x.n)}"${x.go?` data-waslot="${x.go}" role="button" tabindex="0"`:""}><small>${x.t}</small><span>${esc(x.n)}</span></div>`).join(""):`<div class="wa-none">Free</div>`}</div>`});
   return `<div class="panel wahead bstrip-p"><div class="bstrip"><b>This week</b><i>${fmtDate(ymd(mon))} – ${fmtDate(ymd(new Date(mon.getTime()+6*864e5)))}</i></div>${""/* was: weekly-goal strip above the days ("Xh of 5h this week" chips) — removed; the days now take that space */}<div class="wa-grid">${days.join("")}</div></div>`}
 function dashTop(d){return `<div class="passtop dashtop">${figurePanel().replace('<div class="panel holopanel"><div class="ph"><span>','<div class="panel holopanel bstrip-p"><div class="ph bstrip"><span>')}<div class="stack dstack">${progressPanel(d)}${weekAhead(d)}</div></div>`}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-dopen],[data-expdel]");if(!b)return;
@@ -9489,7 +9494,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="760",APPT="2026-11-24T06:08:39Z";   /* APPT: when this update was made */
+const APPV="761",APPT="2026-11-24T06:12:25Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
