@@ -3033,6 +3033,8 @@ html.tablet.tablet .navbtn:is([data-tab="dash"],[data-tab="fuel"],[data-tab="bud
 /* iPad portrait Budget: tiles + Where it goes 100px in each side (on screen); the calendar panel is scaled down whole (not squeezed) to the same width */
 @media (max-width:1099px){html.tablet:not(.phone) #view[data-tab="budget"]>:is(.bstick,.bstick-s,.bwg-solo){margin-left:144px!important;margin-right:144px!important;max-width:none}
 html.tablet:not(.phone) #view[data-tab="budget"]>.bm-has{zoom:var(--calz,.74);margin-left:auto!important;margin-right:auto!important;max-width:none!important;box-sizing:border-box}}
+/* iPad portrait Nutrition: everything from the top tiles down to Your body + Add food = same width as Budget's tiles (100px in each side on screen) */
+@media (max-width:1099px){html.tablet:not(.phone) #view[data-tab="fuel"]>:not(.nmp):not(.usp):not(.wtr):not(.foot){margin-left:144px!important;margin-right:144px!important;max-width:none}}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9440,7 +9442,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="751",APPT="2026-11-24T05:23:33Z";   /* APPT: when this update was made */
+const APPV="752",APPT="2026-11-24T05:28:13Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
