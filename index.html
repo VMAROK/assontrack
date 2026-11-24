@@ -2962,8 +2962,8 @@ html.tpl-sharp #view .panel.hasStrip::after,html.phone #view .panel.hasStrip::af
 .bsav-dots{display:flex;gap:5px;justify-content:center;margin-top:2px}.bsav-dots i{width:6px;height:6px;border-radius:50%;background:rgba(var(--lr),.3)}.bsav-dots i.on{background:var(--c);box-shadow:0 0 6px var(--c)}
 .bstick.stuck .bsav-dots{display:none}
 /* Income & expenses (list): group rows darker like a strip; no box around Income / Expenses; tap a group name to rename/recolour it */
-#view[data-tab="budget"] .bco-sec:not(:has(>.bco-h.neg)){border:0!important;border-radius:0!important}   /* border removed on Income only — Expenses keeps its border (reverted) */
-#view[data-tab="budget"] .bco-sec:not(:has(>.bco-h.neg)) .bco-c{background:rgba(var(--tD),.5)!important}   /* darker group rows: Income only — Expenses keeps its own colour (reverted) */
+#view[data-tab="budget"] .bco-sec{border:0!important;border-radius:0!important}   /* border removed on Income only — Expenses keeps its border (reverted) */
+#view[data-tab="budget"] .bco-c{background:rgba(var(--tD),.5)!important}#view[data-tab="budget"] .bco-sec .bco-r{background:rgba(var(--tD),.25)!important}   /* group rows = strip colour; items a lighter shade of it, still darker than the panel; no borders (Income + Expenses) */   /* darker group rows: Income only — Expenses keeps its own colour (reverted) */
 .bco-cn{display:inline-flex;align-items:center;gap:6px;padding:0;border:0;background:none;font:inherit;color:inherit;cursor:pointer}.bco-cn>i{width:8px;height:8px;border-radius:50%;background:var(--cc);display:inline-block}.bco-pen{opacity:1;color:var(--cc)}
 /* Extras: strip = title + month total only; Budget / Add group as quiet outline buttons; group tiles without the light border */
 #view[data-tab="budget"] .bstrip:has(.bstrip-amt) small{display:none}
@@ -9371,7 +9371,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="728",APPT="2026-11-24T02:55:36Z";   /* APPT: when this update was made */
+const APPV="729",APPT="2026-11-24T02:58:30Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
