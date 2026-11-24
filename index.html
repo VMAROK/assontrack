@@ -3006,6 +3006,25 @@ html body #view .panel.hasStrip::before{display:none!important}   /* the top-lef
 #view .us2-shelf>.us2-add .us2-pic{height:100px!important}
 @media (min-width:1100px){html:not(.phone) #view[data-tab="budget"]>:is(.bco,.panel:has(.bstrip-amt)).panel{max-width:none!important;margin-left:300px!important;margin-right:300px!important}}   /* landscape: Income & expenses and Extras = same width as Nutrition's Meals / Usuals / Calories trend */
 @media (min-width:1100px){html:not(.phone) #view[data-tab="fuel"]>:not(.nmp):not(.usp):not(.wtr):not(.foot){max-width:980px;margin-left:auto!important;margin-right:auto!important}}   /* Nutrition top (tiles, week+macros, body + Add food) = same width as Budget's tiles-to-calendar */
+/* iPad landscape: tabs on the left side (bottom bar stays for portrait). The ‹ at the top of the side bar slides it in to icons only, › slides it back out. */
+.navtog{display:none}
+@media (orientation:landscape){
+html.tablet.tablet .shell{grid-template-columns:168px minmax(0,1fr)!important;grid-template-rows:auto minmax(0,1fr)!important;transition:grid-template-columns .3s cubic-bezier(.25,.8,.3,1)}
+html.tablet.tablet.nav-mini .shell{grid-template-columns:64px minmax(0,1fr)!important}
+html.tablet.tablet .topbar{grid-column:1/-1!important;grid-row:1!important}
+html.tablet.tablet #view{grid-column:2!important;grid-row:2!important}
+html.tablet.tablet aside{grid-column:1!important;grid-row:2!important;flex-direction:column!important;flex-wrap:nowrap!important;justify-content:flex-start!important;gap:4px!important;overflow-x:hidden!important;overflow-y:auto!important;padding:10px 8px max(10px,env(safe-area-inset-bottom,0px))!important;border-top:0!important;border-right:1px solid rgba(var(--lr),.22)!important;height:auto!important;min-height:0;scroll-snap-type:none!important}
+html.tablet.tablet aside .navbtn,html.tablet.tablet aside .navbtn.navsub{flex:none!important;width:100%!important;height:auto!important;min-height:46px;flex-direction:row!important;justify-content:flex-start!important;gap:12px!important;font-size:14px!important;padding:10px 12px!important;white-space:nowrap;overflow:visible}
+html.tablet.tablet aside .navbtn svg{width:22px!important;height:22px!important}
+html.tablet.tablet aside .navbtn[aria-selected="true"]{background:rgba(var(--tL),.16)!important;border-color:rgba(var(--tL),.35)!important}
+html.tablet.tablet.nav-mini aside .navbtn{font-size:0!important;justify-content:center!important;padding:10px 0!important;gap:0!important}
+html.tablet.tablet .navtog{display:grid;place-items:center;align-self:flex-end;flex:none;width:36px;height:32px;margin:0 2px 6px;border-radius:9px;border:1px solid rgba(var(--lr),.25);background:rgba(var(--tD),.5);color:var(--muted);cursor:pointer;padding:0}
+html.tablet.tablet .navtog svg{transition:transform .3s}html.tablet.tablet.nav-mini .navtog{align-self:center}html.tablet.tablet.nav-mini .navtog svg{transform:rotate(180deg)}
+html.tablet.tablet .toast{bottom:24px}
+html.tablet.tablet .navbtn:is([data-tab="dash"],[data-tab="fuel"],[data-tab="budget"])[aria-selected]::before,html.tablet.tablet .navbtn:is([data-tab="dash"],[data-tab="fuel"],[data-tab="budget"])::before{left:30px!important;top:2px!important;font-size:10px;height:16px;line-height:16px;padding:0 5px 0 16px;background-size:10px;background-position:4px 50%}
+}
+/* narrow panels (Meals, Usuals, Calories trend / Income & expenses, Extras): 228px in from the top panels' edges on each side, centred — measured from the panels above, so it stays the same with the side tabs open, shut, or on desktop */
+@media (min-width:1100px){html:not(.phone) #view:is([data-tab="fuel"],[data-tab="budget"])>:is(.nmp,.usp,.wtr,.bco,.panel:has(.bstrip-amt)).panel.panel{margin-left:auto!important;margin-right:auto!important;max-width:calc(min(100%,980px) - 456px)!important;width:100%}}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -3679,6 +3698,7 @@ body.dbg-off .dbg-n{display:none}body.dbg-off .dbg-box{outline:none}
 
 <div class="shell">
   <aside role="tablist" aria-label="Sections">
+    <button type="button" class="navtog" data-navside aria-label="Hide or show the tabs" title="Hide / show tabs"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
     <button class="navbtn" data-tab="dash" style="--c:var(--cyan)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="10" width="8" height="11" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/></svg>Dashboard</button>
     <button class="navbtn" data-tab="rem" style="--c:#ffd166"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.3 20a2 2 0 003.4 0"/></svg>Reminders</button>
     <button class="navbtn nav-done" data-tab="fuel" style="--c:var(--magenta)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3c3 4 6 7 6 11a6 6 0 0 1-12 0c0-4 3-7 6-11z"/></svg>Nutrition</button>
@@ -9412,7 +9432,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="745",APPT="2026-11-24T04:07:15Z";   /* APPT: when this update was made */
+const APPV="746",APPT="2026-11-24T04:10:13Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -9556,5 +9576,9 @@ if("serviceWorker" in navigator&&location.protocol==="https:"){addEventListener(
 <script>/* mark panels whose first thing is a title strip, and where the strip ends (for the borderless strip) */
 (()=>{let t=0;const run=()=>{t=0;document.querySelectorAll('#view .bstrip,#view .calhead.cal-c,#view .bm-has>.bc>.bc-h,#view .bwg-solo>.ph:first-child,#view[data-tab="fuel"] :is(.holopanel,.flogp,.nmp,.usp,.wtr)>.ph:first-child').forEach(st=>{const p=st.closest('.panel');if(!p||st.offsetTop>4)return;p.classList.add('hasStrip');p.style.setProperty('--sh',(st.offsetTop+st.offsetHeight)+'px')})};
   new MutationObserver(()=>{if(!t)t=requestAnimationFrame(run)}).observe(document.documentElement,{childList:true,subtree:true});addEventListener('resize',()=>{if(!t)t=requestAnimationFrame(run)})})();
+</script>
+<script>/* side tabs: remember hidden/shown */
+(()=>{try{if(localStorage.getItem("aot-navmini")==="1")document.documentElement.classList.add("nav-mini")}catch(_){}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-navside]");if(!b)return;e.preventDefault();e.stopPropagation();const on=document.documentElement.classList.toggle("nav-mini");try{localStorage.setItem("aot-navmini",on?"1":"0")}catch(_){}},true)})();
 </script>
 </body></html>
