@@ -2854,7 +2854,7 @@ html.phone #view .dtiles.dt-prog{padding:40px 14px 14px!important}
 .bdn-main{display:grid;gap:8px}.bdn-hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.bdn-hd h4{margin:0;font-size:14px;color:var(--c)}.bdn-main .dp-t{height:10px}.bdn-main b{font-family:var(--mono);font-size:12.5px;color:var(--c);font-weight:700}
 /* Dashboard calendar: this month's day boxes darker, in the theme's own colour */
 /* v690 mistake: darkened this month's days — html #view .mcal .mc:not(.mc-blank):not(.today):not(.pick){background:linear-gradient(rgba(0,0,0,.42),rgba(0,0,0,.42)),rgba(var(--tX),.75)} */
-html #view .mcal .mc.mc-blank{background:linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.5)),rgba(var(--tX),.8)!important}   /* the empty boxes (other months) darker, in the theme colour */
+html #view .mcal .mc.mc-blank{background:linear-gradient(rgba(0,0,0,.22),rgba(0,0,0,.22)),rgba(6,14,36,.6)!important}   /* the empty boxes (other months) darker, in the theme colour */
 /* Dashboard calendar: month centred between its arrows; days aren't highlighted on hover/tap — only the day whose overview is open gets a faint white glow (same on every theme) */
 .calhead.cal-c{justify-content:center;gap:18px}.calhead.cal-c h2{text-align:center;min-width:0}
 html #view .mcal .mc:not(.mc-blank):not(.pick):hover{background:rgba(6,14,36,.6)}html #view .mcal .mc.sel{box-shadow:none}
@@ -2862,6 +2862,11 @@ html #view .mcal .mc.pick{position:relative;z-index:1;animation:mcPick .45s ease
 @keyframes mcPick{from{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,0),0 0 0 rgba(255,255,255,0);background-color:rgba(255,255,255,0)}to{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55),0 0 18px rgba(255,255,255,.28);background-color:rgba(255,255,255,.07)}}
 html #view .mcal .mc.pick:not(.today){background:rgba(255,255,255,.07)}
 .bc-day.dov{margin-top:14px}.dov .bdw-sh{font-weight:700}.dov-bud .bdw-in{padding:0;border:0;background:none;box-shadow:none}.dov-bud .bdw-h{display:none}
+/* "Add event" tab hanging off the bottom of the calendar panel (same panel look, so it follows the theme) */
+html #view .panel:has(+.cal-tab){border-bottom-left-radius:var(--pr,14px);border-bottom-right-radius:var(--pr,14px);position:relative;z-index:1}
+html #view .cal-tab{display:block;width:220px;max-width:60%;margin:-1px auto 0!important;padding:10px 18px!important;border-top:0!important;border-top-left-radius:0!important;border-top-right-radius:0!important;font:inherit;font-weight:700;font-size:14px;color:var(--fg);cursor:pointer;text-align:center;position:relative;z-index:0}
+html #view .cal-tab.open{color:var(--muted)}
+.ev-drawer{animation:evDrop .32s cubic-bezier(.25,.8,.3,1) both;overflow:hidden}@keyframes evDrop{from{opacity:0;max-height:0;margin-top:0}to{opacity:1;max-height:420px}}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -3959,7 +3964,8 @@ function vDash(){
   const P=d.passions,woT=d.workouts.filter(w=>w.d===t).length;
   return banner()+/* Today strip removed: todayStrip(d)+ */dashTop(d)+bigCal(d)+breakdownPanel(d);   /* was "Today's targets" (calories, protein, passion hours, date, workout note) */
 }
-let calMonth=null,calSel=null,dashDay=null,dashDayShown=null;
+let calMonth=null,calSel=null,dashDay=null,dashDayShown=null,evOpen=false;
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-evtab]");if(!b)return;e.preventDefault();e.stopPropagation();evOpen=!evOpen;const v=$("#view"),st=v?v.scrollTop:0;render();if(v)v.scrollTop=st;if(evOpen)setTimeout(()=>{const i=document.getElementById("evT");i&&i.focus({preventScroll:true})},60)},true);
 /* the day overview (like Budget's): events, passions and money for that day */
 function dashDayOv(d,ds){const it=dayItems(d,ds),T=today(),b=B(),SE=calBud(ds),SS=(b.spends||[]).filter(x=>x.d===ds),PL=it.logs.filter(l=>l.p),anim=dashDayShown!==ds;dashDayShown=ds;
   const sec=(t,c,L)=>L?`<div class="bdw-s"><div class="bdw-sh" style="color:${c}">${t}</div>${L}</div>`:"";
@@ -4034,13 +4040,13 @@ function bigCal(d){
     <div class="calhead cal-c">${""/* was: month on the left, ‹ Today › on the right */}<button class="pill calnav" data-cal="-1" aria-label="Previous month">‹</button><h2>${calMonth.toLocaleDateString(undefined,{month:"long",year:"numeric"})}</h2><button class="pill calnav" data-cal="1" aria-label="Next month">›</button></div>
     <div class="mcal">${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(w=>`<div class="cw">${w}</div>`).join("")}${cells.join("")}</div>
     ${dashDay?dashDayOv(d,dashDay):""}
-    <div class="dayview solo">
+    ${""/* was: the Add an event form always showing here — now it hides behind the "Add event" tab under the panel */}${evOpen?`<div class="dayview solo ev-drawer">
     ${""/* v684: the progress (Nutrition / Passions / Budget) lived here with a Bar/Donut switch — moved to the top panel. Under the calendar: just your events + Add an event */}${""/* events list moved into the day overview */}
       <form class="f" id="evForm"><div class="ph" style="margin-bottom:2px"><span>Add an event</span></div>
         <label>Event<input id="evT" required placeholder="Dance class" autocomplete="off"></label>
         <div class="f2"><label>Date<input id="evD" type="date" value="${calSel}" required></label><label>Time<input id="evTm" type="time"></label></div>
         <button class="btn">Add to calendar</button></form>
-    </div></div>`;
+    </div>`:""}</div><button type="button" class="panel cal-tab${evOpen?" open":""}" data-evtab aria-expanded="${evOpen}">${evOpen?"Close":"＋ Add event"}</button>`;
 }
 /* Breakdown: what's inside each progress bar. Nutrition → the macros; Passions → each passion; Budget → spending vs income (no breakdown yet) */
 const BDPAL=["#b99cff","#f27fb2","#4cc9ff","#ffb648","#3ddc84","#ff7a59","#9ad0ff","#e6c35c"];
@@ -9242,7 +9248,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="691",APPT="2026-11-24T01:02:55Z";   /* APPT: when this update was made */
+const APPV="692",APPT="2026-11-24T01:04:40Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
