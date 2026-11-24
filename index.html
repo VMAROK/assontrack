@@ -2890,7 +2890,7 @@ html.phone #view .cal-vsw{position:static;transform:none;order:9;margin:6px auto
 html #view .dashtop .holopanel>.ph.bstrip{display:flex;flex-direction:row;justify-content:center;margin:0 -18px 14px!important}html #view .dashtop .holopanel>.ph.bstrip>span{font-family:"Sora",var(--display);font-size:17px;font-weight:700;letter-spacing:.04em;background:linear-gradient(90deg,#eef3ff,rgb(var(--tL)) 120%);-webkit-background-clip:text;background-clip:text;color:transparent}html #view .dashtop .holopanel>.ph.bstrip>button{position:absolute;right:10px;top:50%;transform:translateY(-50%);margin:0}
 html #view .dtiles>.dt-strip,html #view .wahead>.bstrip,html #view .bdown>.bstrip{padding:9px 18px}html #view .wahead>.bstrip,html #view .bdown>.bstrip{margin:0 -18px 14px}
 /* title strips, all tabs: dark tint of the theme (not black), plain professional type, one solid colour (no gradient text) */
-html #view .bstrip,html #view .mcal .cw{background:rgba(var(--tD),.5)!important;border-bottom:1px solid rgba(var(--lr),.18)!important}
+html #view .bstrip{background:rgba(var(--tD),.5)!important;border-bottom:1px solid rgba(var(--lr),.18)!important}
 html #view .bstrip b,html #view .dashtop .holopanel>.ph.bstrip>span{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",system-ui,sans-serif!important;font-size:15px!important;font-weight:600!important;letter-spacing:.01em!important;background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;color:#e9eef8!important;-webkit-text-fill-color:#e9eef8!important}
 /* phone: strips run edge to edge and sit flush at the top of their panel */
 html.phone #view :is(.holopanel,.dtiles,.bdown,.wahead).bstrip-p,html.phone #view .dtiles{padding-top:0!important}
@@ -9383,7 +9383,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="732",APPT="2026-11-24T03:05:04Z";   /* APPT: when this update was made */
+const APPV="733",APPT="2026-11-24T03:25:53Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
