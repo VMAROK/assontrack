@@ -3511,6 +3511,11 @@ html.tpl-pyramid{--p1:29,26,23;--p2:22,20,18;--p3:18,16,15;--pbd:rgba(255,225,19
 html.tpl-bronze{--p1:19,16,14;--p2:16,13,12;--p3:15,13,11;--pbd:rgba(255,210,185,.115);--pbt:rgba(255,210,185,.12);--pin:rgba(255,220,195,.04)}
 html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono){--p1:12,13,15;--p2:12,13,15;--p3:12,13,15;--pbd:rgba(255,255,255,.135);--pbt:rgba(255,255,255,.13);--pin:rgba(255,255,255,.025)}
 html:is(.tpl-vt,.tpl-stipple):is(.tpl-vt,.tpl-stipple) body #view .panel.panel{background:linear-gradient(180deg,rgba(var(--p1),var(--vta,.95)) 0%,rgba(var(--p2),var(--vta,.95)) 45%,rgba(var(--p3),var(--vta,.95)) 100%)!important}
+/* Liquid Chrome side panel = the mockup's: clear glass over the wallpaper (ribbons show through, lightly dimmed), a little lighter at the top, fine light edge on the right, roomier white tab labels, frosted selected pill */
+html.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome aside{background:linear-gradient(180deg,rgba(44,44,46,.5),rgba(24,24,26,.28) 45%,rgba(12,12,13,.18))!important;-webkit-backdrop-filter:blur(1.5px)!important;backdrop-filter:blur(1.5px)!important;border-right:1px solid rgba(255,255,255,.13)!important;box-shadow:inset -1px 0 0 rgba(255,255,255,.04)!important}
+html.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome aside .navbtn{color:#e6e6e9!important;font-size:16.5px!important;font-weight:400!important;letter-spacing:.005em;padding-top:13px!important;padding-bottom:13px!important;margin-bottom:6px!important}
+html.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome aside .navbtn>svg{color:#e6e6e9!important;stroke:#e6e6e9!important;filter:none!important}/* white line icons like the mockup (side panel only) */
+html.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome aside .navbtn[aria-selected="true"]:not(.nav-done){background:linear-gradient(180deg,rgba(255,255,255,.17),rgba(255,255,255,.11))!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:10px!important;box-shadow:0 4px 14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.12)!important;color:#fff!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9978,7 +9983,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="839",APPT="2026-11-24T18:31:45Z";   /* APPT: when this update was made */
+const APPV="840",APPT="2026-11-24T18:43:44Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
