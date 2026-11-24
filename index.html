@@ -6658,8 +6658,8 @@ function vBudget(){fxLoad();const b=B();b.mode="comb";const S=bStats(),out=S.sub
   setTimeout(bStickInit,0);setTimeout(bStickInit,150);setTimeout(bStickInit,500);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>setTimeout(bStickInit,0));
   return bModeIn(b,`<div class="bstick-s" id="bStickS"></div><div class="bstick${bStOn?" stuck":""}" id="bStick"${bStOn&&bStH?` style="height:${bStH}px"`:""}><div class="grid tiles">
     <div class="panel tile" style="--c:var(--lime)">${ic("bolt")}<small>Income</small><b>${bMoney(S.inc,0)}</b><em>per month</em></div>
-    <div class="panel tile" style="--c:#ff5e6c">${ic("star")}<small>Expenses</small><b>${bMoney(S.subs+S.bills,0)}</b><em>${bMoney(S.subs,0)} subs · ${bMoney(S.bills,0)} bills<i class="bx-was"${S.mutedN?"":' style="visibility:hidden"'}>was ${bMoney(S.subs+S.bills+S.muted,0)} · −${bMoney(S.muted,0)} excluded</i></em></div>
-    <div class="panel tile" style="--c:var(--amber)">${ic("fire")}<small>Spent this month</small><b>${bMoney(S.spent,0)}</b><em>${S.sp.length} expense${S.sp.length===1?"":"s"}</em></div>
+    <div class="panel tile" style="--c:#6ea8ff">${ic("star")}<small>Expenses</small><b>${bMoney(S.subs+S.bills,0)}</b><em>${bMoney(S.subs,0)} subs · ${bMoney(S.bills,0)} bills<i class="bx-was"${S.mutedN?"":' style="visibility:hidden"'}>was ${bMoney(S.subs+S.bills+S.muted,0)} · −${bMoney(S.muted,0)} excluded</i></em></div>
+    <div class="panel tile" style="--c:${S.left<0?"#ff5e6c":"#3ddc84"}">${ic("fire")}<small>Spent this month</small><b>${bMoney(S.spent,0)}</b><em>${S.sp.length} expense${S.sp.length===1?"":"s"}</em></div>
     <div class="panel tile tdn" style="--c:var(--cyan)"><small>Left this month</small>${ring}<em style="${S.left<0?"color:#ff8a95":""}">${bMoney(S.left,0)} ${S.left<0?"over":"left"}<i class="bmu-was"${S.mutedN?"":' style="visibility:hidden"'}>${bMoney(S.left-S.muted,0)} with everything</i></em></div></div></div>
   ${(()=>{const WG=`<div class="ph"><span>Where it goes</span><label class="bhome" title="Currency for totals">Totals in<select data-bhome aria-label="Currency for totals">${BCUR.map(c=>`<option value="${c}"${c===b.home?" selected":""}>${c} ${curSym(c)}</option>`).join("")}</select></label></div>${bDonut(S)}${bExtrasMix(b)}`;
     /* narrow screens (iPad portrait, phone): "Where it goes" is its own panel right under the four tiles; wide screens: unchanged, beside the calendar */
@@ -9351,7 +9351,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="719",APPT="2026-11-24T02:33:21Z";   /* APPT: when this update was made */
+const APPV="720",APPT="2026-11-24T02:34:41Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
