@@ -9469,7 +9469,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="756",APPT="2026-11-24T05:56:40Z";   /* APPT: when this update was made */
+const APPV="757",APPT="2026-11-24T05:59:06Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -9566,7 +9566,7 @@ function fit(){const sh=$(".shell"),W=1180,de=document.documentElement,vw=de.cli
   if(vv&&vv.scale>1.02&&sh.style.cssText)return; /* pinch-zoomed in: keep the layout as it was */
   if(vw<W){const k=vw/W,sa=navigator.standalone===true||matchMedia("(display-mode: standalone)").matches,
     /* installed iPhone app: the page reports a height short by the status bar, which left a black bar at the bottom — use the full screen */
-    full=sa&&de.classList.contains("phone")?(innerWidth>innerHeight?Math.min(screen.width,screen.height):Math.max(screen.width,screen.height)):0,
+    full=sa&&(de.classList.contains("phone")||de.classList.contains("tablet"))?(/* was: phone only — iPad installed app had the same short-by-the-status-bar band at the bottom */innerWidth>innerHeight?Math.min(screen.width,screen.height):Math.max(screen.width,screen.height)):0,
     h=Math.max(de.clientHeight||0,innerHeight||0,full);if(de.classList.contains("phone")){/* phones: no shrink-then-zoom round trip (it made iOS paint 3× oversized layers) — lay out at the real screen width, same result */
       de.style.setProperty('--pz',1);de.style.setProperty('--az',k);sh.style.cssText=`position:fixed;left:0;top:0;width:${vw}px;height:${h}px`;return}
     de.style.setProperty('--pz',1/k);sh.style.cssText=`position:fixed;left:0;top:0;width:${W}px;height:${h/k}px;transform:scale(${k});transform-origin:0 0`}
