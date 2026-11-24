@@ -3087,6 +3087,9 @@ html body #view .wahead .wa-it{border-left-color:var(--wc)!important;background:
 html body #view .wahead .wa-it.st-done{--wc:#3ddc84}html body #view .wahead .wa-it.st-missed{--wc:#ff5d6c}
 html body #view .mcal .mc{cursor:pointer;-webkit-user-select:none;user-select:none}html body #view .mcal:not(.cal-dots) .mc .chips{touch-action:pan-y;-webkit-overflow-scrolling:touch}
 html body #view .wahead .wa-x{width:9px;height:9px;margin-right:4px;vertical-align:0;flex:none}
+/* Breakdown Passions: up to 6 bars show; more passions = slide down inside the column, no scroll bar */
+html body #view .bdown .bdn-scroll{display:grid;gap:12px;max-height:270px;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-width:none}
+html body #view .bdown .bdn-scroll::-webkit-scrollbar{display:none}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4292,8 +4295,8 @@ function breakdownPanel(d){const DS=dashStats(d,today()),t=today(),tm=d.meals.fi
   const P=d.passions.map((p,i)=>({n:p.name,k:p.id,c:BDPAL[i%BDPAL.length],v:d.sessions.filter(x=>x.pid===p.id&&!x.planned).reduce((a,x)=>a+(+x.mins||0),0),g:(+p.goal||0)*60}));
   let out=0,inc=0;try{const S=bStats();out=S.subs+S.bills+S.spent;inc=S.inc}catch(_){}
   return `<div class="panel bdown bstrip-p" style="margin-top:18px" data-akg="bd"><div class="bstrip"><b>Breakdown</b></div><div class="tgrid">
-    <section class="bdn-sec">${bdMain(DS[0],"Nutrition")}${bdMulti(mv)}${mv.map(x=>bdMeter(x.n,x.v,x.g,`${n0(x.v)}${x.g?" / "+n0(x.g):""} g`,x.c,x.k)).join("")}</section>
-    <section class="bdn-sec">${bdMain(DS[1],"Passions")}${P.length?bdMulti(P)+P.map(x=>bdMeter(x.n,x.v,x.g,x.g?`${fmtH(x.v)} / ${fmtH(x.g)}`:fmtH(x.v),x.c,x.k)).join(""):`<p class="note" style="margin:0">No passions yet</p>`}</section>
+    <section class="bdn-sec">${bdMain(DS[0],"Nutrition")}${bdMulti(mv)}${mv.map(x=>bdMeter(x.n,x.v,x.g,`${n0(x.v)}${x.g?" / "+n0(x.g):""} g`,x.c,x.k)).join("")}${bdMeter("Water",nWater(t),nWGoal(),`${n0(nWater(t))} / ${n0(nWGoal())} cups`,"#4cc9ff","water")}${bdMeter("Calories",sum("kcal"),kLim(t),`${n0(sum("kcal"))}${kLim(t)?" / "+n0(kLim(t)):""}`,"#3ddc84","kcal")}</section>
+    <section class="bdn-sec">${bdMain(DS[1],"Passions")}${P.length?bdMulti(P)+`<div class="bdn-scroll">${P.map(x=>bdMeter(x.n,x.v,x.g,x.g?`${fmtH(x.v)} / ${fmtH(x.g)}`:fmtH(x.v),x.c,x.k)).join("")}</div>`:`<p class="note" style="margin:0">No passions yet</p>`}</section>
     <section class="bdn-sec">${bdMain(DS[2],"Budget")}${""/* was: separate "Spent this month" meter (pushed the bars out of line) — the gold bar above is that */}</section>
   </div></div>`}
 function meter(label,v,goal,u,c){const p=goal?Math.min(v/goal,1):0;
@@ -9496,7 +9499,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="762",APPT="2026-11-24T06:16:25Z";   /* APPT: when this update was made */
+const APPV="763",APPT="2026-11-24T06:18:33Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
