@@ -2864,7 +2864,7 @@ html #view .mcal .mc.pick:not(.today){background:rgba(255,255,255,.07)}
 .bc-day.dov{margin-top:14px}.dov .bdw-sh{font-weight:700}.dov-bud .bdw-in{padding:0;border:0;background:none;box-shadow:none}.dov-bud .bdw-h{display:none}
 /* "Add event" tab hanging off the bottom of the calendar panel (same panel look, so it follows the theme) */
 html #view .panel:has(+.cal-tab){position:relative;z-index:0}
-html #view .cal-tab{display:block;width:min(560px,100%);margin:-2px auto 0!important;box-shadow:none!important;padding:16px 22px 18px!important;border-top:0!important;border-top-left-radius:0!important;border-top-right-radius:0!important;position:relative;z-index:1}   /* sits over the calendar panel's bottom edge, so there's no line between them: one shape */html #view .cal-evp .dayview{margin-top:0}
+html #view .cal-tab{display:block;width:min(560px,100%);margin:-2px auto 0!important;padding:16px 22px 18px!important;border-top:0!important;border-top-left-radius:0!important;border-top-right-radius:0!important;position:relative;z-index:1}   /* sits over the calendar panel's bottom edge, so there's no line between them: one shape */html #view .cal-evp .dayview{margin-top:0}
 html #view .cal-tab.open{color:var(--muted)}
 .ev-drawer{animation:evDrop .32s cubic-bezier(.25,.8,.3,1) both;overflow:hidden}@keyframes evDrop{from{opacity:0;max-height:0;margin-top:0}to{opacity:1;max-height:420px}}
 html #view .dtiles{grid-template-rows:auto minmax(0,1fr);height:auto!important;min-height:var(--dph)}html #view .dtiles>.dt-strip{grid-column:1/-1;margin:0!important;padding:9px 18px}html #view .dt-strip .dt-vsw{position:absolute;top:50%;right:12px;transform:translateY(-50%)}
@@ -2873,6 +2873,7 @@ html #view .dtiles:not(.dt-prog)>.dtile{padding-top:8px!important}
 /* v696 guess (wrong): html #view .dashtop>.dstack{gap:inherit} */
 html.gap-in #view .dstack>.panel{margin-top:0!important}html body #view .dashtop>.dstack.dstack{row-gap:inherit!important}   /* with your gap setting, This week got the gap twice (the stack's gap + its own top margin) */
 .bwg-solo{display:none}@media (max-width:1100px){#view .bwg-solo{display:block}#view .bm-has>.bm-sep,#view .bm-has>.bm-r{display:none!important}}
+html body #view .panel.cal-tab{margin-top:-2px!important}   /* stays joined to the calendar even with a custom gap setting */
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9262,7 +9263,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="698",APPT="2026-11-24T01:21:47Z";   /* APPT: when this update was made */
+const APPV="699",APPT="2026-11-24T01:25:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
