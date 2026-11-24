@@ -181,8 +181,15 @@ window.aotFullH=()=>{const sw=screen.width,sh=screen.height,land=innerWidth>inne
   const pick=()=>{try{return localStorage.getItem("aot-sound")||"off"}catch(_){return "off"}};
   window.aotSound={play,pick,list:Object.keys(SND)};
   /* once per opening: the first touch anywhere plays the chosen sound */
-  let done=false;const first=()=>{if(done)return;done=true;const k=pick();if(k!=="off")play(k)};
-  addEventListener("pointerdown",first,{capture:true,once:true})})();</script>
+  /* was: played on the first pointerdown — iPhone/iPad don't count a touch-down as permission to start sound, so it stayed silent.
+     Now: try on every kind of tap (finger lifted, click, key) until the sound actually starts, then stop listening */
+  let done=false;const EV=["touchend","pointerup","click","keydown"];
+  const first=()=>{if(done)return;const k=pick();if(k==="off"){stop();return}const c=ctx();if(!c)return;
+    try{const b=c.createBuffer(1,1,22050),src=c.createBufferSource();src.buffer=b;src.connect(c.destination);src.start(0)}catch(_){}
+    const go=()=>{if(done||c.state!=="running")return;done=true;stop();play(k)};
+    if(c.state==="running")go();else c.resume().then(go).catch(()=>{})};
+  const stop=()=>{EV.forEach(e=>removeEventListener(e,first,true))};
+  EV.forEach(e=>addEventListener(e,first,true))})();</script>
 <script>(()=>{
   const STY=["specks","aurora","orbit","ripple","threads","threadsmono","halftone"];
   const rnd=(a,b)=>a+Math.random()*(b-a);
@@ -9820,7 +9827,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="809",APPT="2026-11-24T15:07:15Z";   /* APPT: when this update was made */
+const APPV="810",APPT="2026-11-24T16:22:55Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
