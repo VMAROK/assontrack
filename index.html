@@ -3066,6 +3066,8 @@ html body #view .mcal:not(.cal-dots) .mc .chips em{display:block!important;heigh
 html body #view .mcal:not(.cal-dots) .mc .chips em::before{width:2px!important;top:2px!important;bottom:2px!important}
 html body #view .mcal:not(.cal-dots) .mc .chips em .mc-x{width:8px;height:8px;margin-right:3px}
 html body #view .mcal .mc .chips em.mc-done{color:#d9fbe8!important}
+/* Dashboard: calendar now under Breakdown — same gap as between the other panels */
+html:not(.phone) body #view[data-tab="dash"]>.panel:has(.mcal){margin-top:18px!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4165,7 +4167,7 @@ function vDash(){
   const d=D(),g=d.goals,t=today(),tm=d.meals.filter(m=>m.d===t);
   const kcal=tm.reduce((s,m)=>s+(+m.kcal||0),0),pro=tm.reduce((s,m)=>s+(+m.protein||0),0);
   const P=d.passions,woT=d.workouts.filter(w=>w.d===t).length;
-  return banner()+/* Today strip removed: todayStrip(d)+ */dashTop(d)+bigCal(d)+breakdownPanel(d);   /* was "Today's targets" (calories, protein, passion hours, date, workout note) */
+  return banner()+/* Today strip removed: todayStrip(d)+ */dashTop(d)+breakdownPanel(d)+bigCal(d);/* was: dashTop(d)+bigCal(d)+breakdownPanel(d) — Breakdown now above the calendar */   /* was "Today's targets" (calories, protein, passion hours, date, workout note) */
 }
 let cvV=null;const calView=()=>{if(cvV==null){try{cvV=localStorage.getItem("aot-cview")||"dots"}catch(_){cvV="dots"}}return cvV};
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-cview]");if(!b)return;e.preventDefault();e.stopPropagation();cvV=b.dataset.cview;try{localStorage.setItem("aot-cview",cvV)}catch(_){}const v=$("#view"),st=v?v.scrollTop:0;render();if(v)v.scrollTop=st},true);
@@ -9473,7 +9475,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="758",APPT="2026-11-24T06:01:02Z";   /* APPT: when this update was made */
+const APPV="759",APPT="2026-11-24T06:03:54Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
