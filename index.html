@@ -2973,7 +2973,7 @@ html.tpl-sharp #view .panel.hasStrip::after,html.phone #view .panel.hasStrip::af
 #view[data-tab="budget"] :is(.bs-budg,.bs-addg) svg{color:var(--muted)}
 #view[data-tab="budget"] :is(.bs-budg,.bs-addg)[aria-pressed="true"]{background:rgba(var(--tL),.22)!important;border-color:rgba(var(--tL),.6)!important}
 #view[data-tab="budget"] .bsg{border-color:transparent!important;background:rgba(var(--tD),.45)!important;box-shadow:none!important}
-@media (min-width:1100px){html:not(.phone) #view[data-tab="budget"]>.bco{max-width:860px}}   /* Income & expenses: 10px narrower on each side in landscape */
+@media (min-width:1100px){html:not(.phone) #view[data-tab="budget"]>:is(.bco,.panel:has(.bstrip-amt)){max-width:860px}}   /* Income & expenses: 10px narrower on each side in landscape */
 @media (max-width:1099px){html.tablet:not(.phone) #view[data-tab="budget"]>:is(.bco,.panel:has(.bstrip-amt)){max-width:none;margin-left:144px!important;margin-right:144px!important}}   /* 144 layout px = ~100 on screen (the iPad view is scaled ~0.7) */   /* iPad portrait: Income & expenses and Extras 100px in from each side */
 /* 10:30 list, done while away:
    1) wide screens: Usuals and the Add food results list sit in a narrower centred column */
@@ -2987,6 +2987,7 @@ html:not(.phone) #view[data-tab="budget"] .bs-add .mny{border:0!important;backgr
 html:not(.phone) #view[data-tab="budget"] .bs-add>.bs-plus{border-top:0!important;border-right:0!important;border-bottom:0!important;margin:0;min-width:52px}
 html:not(.phone) #view[data-tab="budget"] #bsForm>:is(input,select){box-shadow:inset 1px 0 0 rgba(var(--lr),.28)!important}
 html body #view .panel.hasStrip::before{display:none!important}   /* the top-left corner bracket sat on the title strip */
+@media (min-width:1100px){html:not(.phone) #view[data-tab="fuel"]>*{margin-left:100px!important;margin-right:100px!important}html:not(.phone) #view[data-tab="fuel"]>.usp.usp{max-width:none;margin-left:100px!important;margin-right:100px!important}}   /* Nutrition, landscape: every panel 100px in from each side */
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9386,7 +9387,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="736",APPT="2026-11-24T03:44:20Z";   /* APPT: when this update was made */
+const APPV="737",APPT="2026-11-24T03:47:08Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
