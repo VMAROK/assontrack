@@ -9764,7 +9764,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="799",APPT="2026-11-24T08:54:51Z";   /* APPT: when this update was made */
+const APPV="800",APPT="2026-11-24T08:56:34Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -9958,29 +9958,15 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 (()=>{let t=0,w=innerWidth,h=innerHeight;const go=()=>{t=0;if(innerWidth===w&&innerHeight===h)return;w=innerWidth;h=innerHeight;const v=document.getElementById("view");if(!v||v.dataset.tab!=="dash"||typeof render!=="function")return;const st=v.scrollTop;render();requestAnimationFrame(()=>{v.scrollTop=st})};
   const q=()=>{clearTimeout(t);t=setTimeout(go,300)};addEventListener("resize",q);addEventListener("orientationchange",q)})();
 </script>
-<script>/* Stipple backdrop (like the mockup): two halftone "cloths" — one rippling across the top behind the header (middle → right),
-   one down the bottom-left behind the sidebar. Each is a warped grid of dots; dot size follows the light on the folds. Moves slowly.
-   (was v797: two thin diagonal dot ribbons from the corners — in git history) */
-(()=>{const c=document.getElementById("stipbg");if(!c)return;const x=c.getContext("2d");let W=0,H=0,raf=0,last=0,on=false,G=[];
+<script>/* (v798–v799 halftone "cloths" version is in git history — reverted to this one) Stipple backdrop: two slow ribbons of fine dots, top-right and bottom-left, drawn only while the Stipple template is on */
+(()=>{const c=document.getElementById("stipbg");if(!c)return;const x=c.getContext("2d");let W=0,H=0,raf=0,last=0,on=false,R=[];
   const size=()=>{const d=Math.min(2.5,devicePixelRatio||1);W=innerWidth;H=(window.aotFullH?aotFullH():innerHeight);c.width=Math.round(W*d);c.height=Math.round(H*d);x.setTransform(d,0,0,d,0,0);
-    const gap=Math.max(5.5,Math.min(W,H)/150);G=[];
-    /* top cloth */
-    const tw=W*.7,th=Math.max(120,H*.2),nu=Math.round(tw/gap),nv=Math.round(th/gap);for(let i=0;i<nu;i++)for(let j=0;j<nv;j++)G.push([0,i/(nu-1),j/(nv-1)]);
-    /* left cloth */
-    const lw=Math.max(170,W*.18),lh=H*.66,mu=Math.round(lw/gap),mv=Math.round(lh/gap);for(let i=0;i<mu;i++)for(let j=0;j<mv;j++)G.push([1,i/(mu-1),j/(mv-1)]);
-    G.tw=tw;G.th=th;G.lw=lw;G.lh=lh};
-  const draw=t=>{x.clearRect(0,0,W,H);const tw=G.tw,th=G.th,lw=G.lw,lh=G.lh;
-    for(const [k,u,v] of G){let X,Y,lit,fade;
-      if(!k){/* across the top: rises and dips like a sheet in a slow wind */
-        const ph=u*5.2+t*.28,ph2=u*2.3-t*.17+v*1.6,wave=Math.sin(ph)*th*.34+Math.sin(ph2)*th*.22;
-        X=W*.33+u*tw+Math.sin(v*3+t*.2)*8;Y=-th*.18+v*th+wave*(0.55+v*.6);
-        lit=.5+.5*Math.cos(ph+v*2.4);fade=Math.pow(Math.sin(Math.PI*v),1.3)*Math.min(1,u*3.2)*Math.min(1,(1-u)*6+.35)}
-      else{/* down the bottom-left: a fold that widens toward the bottom */
-        const ph=v*4.6+t*.24,ph2=v*2.1-t*.15+u*1.8,bend=Math.sin(ph)*lw*.32+Math.sin(ph2)*lw*.2;
-        X=-lw*.12+u*lw*(.7+v*.55)+bend*(0.4+u*.7);Y=H-lh+v*lh*1.05;
-        lit=.5+.5*Math.cos(ph+u*2.8);fade=Math.pow(Math.sin(Math.PI*u),1.2)*Math.min(1,v*3)}
-      if(X<-3||X>W+3||Y<-3||Y>H+3)continue;const f=fade*(.25+.75*lit);if(f<.04)continue;
-      const r=.45+1.25*f;x.fillStyle=`rgba(214,211,230,${(.12+.68*f).toFixed(3)})`;x.beginPath();x.arc(X,Y,r,0,6.2832);x.fill()}};/* round dots (were squares) */
+    R=[];const cols=Math.round(Math.min(220,Math.max(120,W/6))),rows=44;for(const side of [0,1])for(let i=0;i<cols;i++)for(let j=0;j<rows;j++)R.push([side,i/(cols-1),j/(rows-1),Math.random()*6.28])};
+  const draw=t=>{x.clearRect(0,0,W,H);const M=Math.min(W,H);
+    for(const [side,s0,w,ph] of R){const s=side?1-s0:s0,bx=side?W*1.02:-W*.04,by=side?-H*.04:H*1.02,ex=side?W*.42:W*.42,ey=side?H*.3:H*.5;
+      const px=bx+(ex-bx)*s+Math.sin(s*4+t*.22+side)*M*.06,py=by+(ey-by)*s+Math.cos(s*3.3-t*.18+side*2)*M*.055,th=(M*.2+M*.1*Math.sin(s*2.6+t*.26+side))*(1-s*.5),ang=Math.atan2(ey-by,ex-bx)+1.5708,off=(w-.5)*th*2+Math.sin(w*8+s*6+t*.45)*7;
+      const X=px+Math.cos(ang)*off,Y=py+Math.sin(ang)*off;if(X<-4||X>W+4||Y<-4||Y>H+4)continue;const den=.5+.5*Math.sin(w*9.4+s*8-t*.4+ph*.15),al=Math.min(.95,Math.pow(1-s,.9)*(.25+.75*den)*(.15+1.1*Math.pow(1-Math.abs(w-.5)*2,1.1)));if(al<.03)continue;
+      x.fillStyle=`rgba(208,205,226,${al.toFixed(3)})`;const z=.9+1.3*den*Math.pow(1-s,1.2);x.fillRect(X-z/2,Y-z/2,z,z)}};
   /* slow and light: about 24 frames a second, paused when the app is hidden */
   const loop=n=>{raf=requestAnimationFrame(loop);if(document.hidden||n-last<41)return;last=n;draw(n/1000)};
   const check=()=>{const h=document.documentElement,want=h.classList.contains("tpl-stipple")&&h.classList.contains("tpl-bg");if(want&&!on){on=true;size();raf=requestAnimationFrame(loop)}else if(!want&&on){on=false;cancelAnimationFrame(raf);x.clearRect(0,0,W,H)}};
