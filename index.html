@@ -3496,6 +3496,9 @@ html:is(.tpl-chrome,.tpl-silk) body #view :is(.bstrip>b,.bc-h>b,.calhead.cal-c>h
 html.tpl-pyramid body #view :is(.bstrip>b,.bc-h>b,.calhead.cal-c>h2,.panel>.ph:first-child>span:first-child,.panel .ph:first-child>span:first-child:not(:only-child)){font-size:14px!important;font-weight:500!important;color:#d8ad72!important;letter-spacing:.22em!important;text-transform:uppercase!important}
 html.tpl-bronze body #view :is(.bstrip>b,.bc-h>b,.calhead.cal-c>h2,.panel>.ph:first-child>span:first-child,.panel .ph:first-child>span:first-child:not(:only-child)){font-size:13.5px!important;font-weight:600!important;color:#ece2d8!important;letter-spacing:.22em!important;text-transform:uppercase!important}
 html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono) body #view :is(.bstrip>b,.bc-h>b,.calhead.cal-c>h2,.panel>.ph:first-child>span:first-child,.panel .ph:first-child>span:first-child:not(:only-child)){font-size:12px!important;font-weight:600!important;color:#dcd9e8!important;letter-spacing:.24em!important;text-transform:uppercase!important}
+/* visual templates with their real wallpaper image (from the mockups), animated by #vtimg; the drawn backdrops step aside */
+#vtimg{display:none}html.vt-img.tpl-bg #vtimg{display:block;position:fixed;inset:0;width:100%;height:var(--apph,100%);z-index:0;pointer-events:none}
+html.vt-img.tpl-bg :is(#chromebg,#vtbg,#stipbg){display:none!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4156,7 +4159,7 @@ body.dbg-off .dbg-n{display:none}body.dbg-off .dbg-box{outline:none}
 </style>
 
 <div id="bgimg" class="on" aria-hidden="true"></div><div id="bgimg2" aria-hidden="true"></div><canvas id="bglive" aria-hidden="true"></canvas><div id="bgspin" aria-hidden="true"></div>
-<div class="bgshade" aria-hidden="true"></div><div id="tplbg" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></div><canvas id="tplfx" aria-hidden="true"></canvas><canvas id="stipbg" aria-hidden="true"></canvas><canvas id="vtbg" aria-hidden="true"></canvas><canvas id="chromebg" aria-hidden="true"></canvas>
+<div class="bgshade" aria-hidden="true"></div><div id="tplbg" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></div><canvas id="tplfx" aria-hidden="true"></canvas><canvas id="stipbg" aria-hidden="true"></canvas><canvas id="vtbg" aria-hidden="true"></canvas><canvas id="chromebg" aria-hidden="true"></canvas><canvas id="vtimg" aria-hidden="true"></canvas>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
   <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   <linearGradient id="gCyan" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4cc9ff" stop-opacity=".3"/><stop offset="1" stop-color="#4cc9ff" stop-opacity="0"/></linearGradient>
@@ -9963,7 +9966,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="836",APPT="2026-11-24T18:21:49Z";   /* APPT: when this update was made */
+const APPV="837",APPT="2026-11-24T18:24:52Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -10317,5 +10320,29 @@ void main(){vec2 uv=gl_FragCoord.xy/R;float a=R.x/R.y;vec2 p=vec2(uv.x*a,uv.y);f
   new MutationObserver(check).observe(document.documentElement,{attributes:true,attributeFilter:["class"]});addEventListener("resize",()=>{if(on)size()});check()})();
 /* one-time: Liquid Chrome was redone to match its mockup — drop old Chrome slider/fine-tune tweaks so the new look shows */
 (()=>{const go=()=>{try{if(typeof data!=="object"||!data||!data.profile)return setTimeout(go,300);const P=data.profile;if(P.vtV3)return;P.vtV3=1;P.chromeV2=1;delete P.vtLook;const _T=typeof tplOf==="function"&&tplOf();if(_T&&_T.visual&&typeof fineLoad==="function")fineLoad(VTFINE(_T.id));/* was: chromeV2 — Chrome only */if(typeof save==="function")save();if(typeof applyLook==="function")applyLook();if(typeof render==="function")render()}catch(e){}};setTimeout(go,600)})();
+</script>
+<script>/* Animated wallpaper images for the visual templates: the picture stays exactly as designed; it breathes with a very slow drift and zoom, the folds ripple gently, and a soft sheen of light slides across the highlights. Add a template by putting its image in VTIMG. */
+(()=>{const VTIMG={chrome:"wp/vt/chrome.jpg"};
+  const cv=document.getElementById("vtimg");if(!cv)return;let g=null,pr=null,tex=null,cur=null,img=null,raf=0,last=0,U={};const t0=performance.now()/1000;
+  const FS=`precision mediump float;uniform vec2 R;uniform float T;uniform sampler2D TX;uniform vec2 IS;
+  void main(){vec2 uv=gl_FragCoord.xy/R;uv.y=1.-uv.y;float ra=R.x/R.y,ia=IS.x/IS.y;vec2 s=ra>ia?vec2(1.,ia/ra):vec2(ra/ia,1.);
+    float z=1.05+.02*sin(T*.045);vec2 q=(uv-.5)*s/z+.5+vec2(.008*sin(T*.027),.006*cos(T*.021));
+    q+=vec2(sin(q.y*6.+T*.32)*.0028+sin(q.y*11.-T*.21)*.0014,cos(q.x*5.-T*.27)*.0024+sin(q.x*9.+T*.18)*.001);
+    vec3 c=texture2D(TX,clamp(q,.001,.999)).rgb;float l=dot(c,vec3(.299,.587,.114));
+    float b=(q.x*.85+q.y*.55)-(fract(T*.028)*2.6-.5);float band=exp(-b*b*28.);
+    c+=c*smoothstep(.1,.55,l)*band*.45;gl_FragColor=vec4(c,1.);}`;
+  const init=()=>{g=cv.getContext("webgl",{antialias:false,alpha:false});if(!g)return false;const sh=(ty,src)=>{const o=g.createShader(ty);g.shaderSource(o,src);g.compileShader(o);return o};
+    pr=g.createProgram();g.attachShader(pr,sh(g.VERTEX_SHADER,"attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}"));g.attachShader(pr,sh(g.FRAGMENT_SHADER,FS));g.linkProgram(pr);if(!g.getProgramParameter(pr,g.LINK_STATUS))return false;g.useProgram(pr);
+    const b=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,b);g.bufferData(g.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),g.STATIC_DRAW);const l=g.getAttribLocation(pr,"a");g.enableVertexAttribArray(l);g.vertexAttribPointer(l,2,g.FLOAT,false,0,0);
+    for(const k of ["R","T","TX","IS"])U[k]=g.getUniformLocation(pr,k);tex=g.createTexture();return true};
+  const size=()=>{const d=Math.min(1.5,devicePixelRatio||1),H=(window.aotFullH?aotFullH():innerHeight);cv.width=Math.round(innerWidth*d);cv.height=Math.round(H*d)};
+  const draw=t=>{g.viewport(0,0,cv.width,cv.height);g.uniform2f(U.R,cv.width,cv.height);g.uniform1f(U.T,t);g.uniform2f(U.IS,img.width,img.height);g.uniform1i(U.TX,0);g.drawArrays(g.TRIANGLES,0,3)};
+  const loop=n=>{raf=requestAnimationFrame(loop);if(document.hidden||n-last<33)return;last=n;draw(n/1000-t0)};
+  const stop=()=>{cancelAnimationFrame(raf);raf=0;cur=null;document.documentElement.classList.remove("vt-img")};
+  const check=()=>{const h=document.documentElement;let want=null;if(h.classList.contains("tpl-bg"))for(const k in VTIMG)if(h.classList.contains("tpl-"+k))want=k;
+    if(want===cur)return;stop();if(!want)return;if(!g&&!init())return;cur=want;const im=new Image();im.onload=()=>{if(cur!==want)return;img=im;g.bindTexture(g.TEXTURE_2D,tex);g.texImage2D(g.TEXTURE_2D,0,g.RGB,g.RGB,g.UNSIGNED_BYTE,im);
+      for(const [p,v] of [[g.TEXTURE_MIN_FILTER,g.LINEAR],[g.TEXTURE_MAG_FILTER,g.LINEAR],[g.TEXTURE_WRAP_S,g.CLAMP_TO_EDGE],[g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE]])g.texParameteri(g.TEXTURE_2D,p,v);
+      size();h.classList.add("vt-img");raf=requestAnimationFrame(loop)};im.src=VTIMG[want]};
+  new MutationObserver(check).observe(document.documentElement,{attributes:true,attributeFilter:["class"]});addEventListener("resize",()=>{if(cur)size()});check()})();
 </script>
 </body></html>
