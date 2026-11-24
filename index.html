@@ -2850,6 +2850,7 @@ html.phone #view .dtiles.dt-prog{padding:40px 14px 14px!important}
 .bdn-sec{display:grid;gap:12px;align-content:start;min-width:0}.bdn-sec h4{margin:0;font-size:14px;color:var(--c);letter-spacing:.02em}
 .bdn-all{display:flex;height:10px;border-radius:99px;background:rgba(150,180,240,.14);overflow:hidden}.bdn-all i{display:block;height:100%;background:var(--c)}.bdn-all i+i{box-shadow:inset 2px 0 0 rgba(0,0,0,.55)}
 .bdn-leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--muted);margin-top:-4px}.bdn-leg span{display:inline-flex;align-items:center;gap:5px}.bdn-leg i{width:8px;height:8px;border-radius:2px;background:var(--c)}.bdn-leg em{font-style:normal;font-family:var(--mono);font-size:11px}
+.mc.mc-blank{pointer-events:none;background:none!important;box-shadow:none!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4007,8 +4008,8 @@ function bigCal(d){
   const y=calMonth.getFullYear(),m=calMonth.getMonth(),off=new Date(y,m,1).getDay(),last=new Date(y,m+1,0);
   const start=new Date(y,m,1-off),endOff=6-last.getDay(),end=new Date(y,m,last.getDate()+endOff);
   const cells=[];
-  for(let x=new Date(start);x<=end;x.setDate(x.getDate()+1)){const ds=ymd(x),it=dayItems(d,ds),out=x.getMonth()!==m;
-    cells.push(`<button class="mc${out?" out":""}${ds===today()?" today":""}${ds===calSel?" sel":""}" data-day="${ds}"><span class="mn">${x.getDate()}</span><div class="chips">${it.chips.slice(0,3).map(c=>`<em style="--c:${c.c}">${esc(c.t)}</em>`).join("")}${it.chips.length>3?`<small>+${it.chips.length-3} more</small>`:""}</div></button>`)}
+  for(let x=new Date(start);x<=end;x.setDate(x.getDate()+1)){const ds=ymd(x),out=x.getMonth()!==m;if(out){cells.push(`<div class="mc out mc-blank" aria-hidden="true"></div>`);continue}   /* days from the next/previous month: left blank */
+    const it=dayItems(d,ds);cells.push(`<button class="mc${out?" out":""}${ds===today()?" today":""}${ds===calSel?" sel":""}" data-day="${ds}"><span class="mn">${x.getDate()}</span><div class="chips">${it.chips.slice(0,3).map(c=>`<em style="--c:${c.c}">${esc(c.t)}</em>`).join("")}${it.chips.length>3?`<small>+${it.chips.length-3} more</small>`:""}</div></button>`)}
   const it=dayItems(d,calSel);
   return `<div class="panel">
     <div class="calhead"><h2>${calMonth.toLocaleDateString(undefined,{month:"long",year:"numeric"})}</h2>
@@ -9219,7 +9220,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="687",APPT="2026-11-24T00:53:07Z";   /* APPT: when this update was made */
+const APPV="688",APPT="2026-11-24T00:54:21Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
