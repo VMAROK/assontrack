@@ -3418,6 +3418,22 @@ html.tpl-plain:not(.tpl-vt):not(.tpl-stipple) #view .panel{background:color-mix(
 html.tpl-sharp .lk-orig,html.tpl-sharp .lk-origb{border-radius:0}
 /* visual templates' designed panels (from the mockups): Stipple nearly square, the rest softly rounded */
 html.tpl-vt.tpl-vt #view .panel{border-radius:var(--vr,14px)}
+/* visual templates: every panel border is the template's own line colour — including panels with a title strip (their outline was still the default blue) and the figure panel */
+html.tpl-stipple{--vr:2px}/* line colour now set with the other templates */
+html:is(.tpl-vt,.tpl-stipple):not(.tpl-bd-none):not(.tpl-bd-dark) body #view .panel.panel{border-color:var(--vline)!important}
+html:is(.tpl-vt,.tpl-stipple):not(.x1):not(.x2):not(.x3) body #view .panel.hasStrip.hasStrip{border-color:transparent!important}
+html:is(.tpl-vt,.tpl-stipple):not(.tpl-bd-none):not(.tpl-bd-dark) body #view .panel.hasStrip::after{border-color:var(--vline)!important;border-top-color:var(--vline)!important;border-radius:var(--vr,14px)!important}
+html:is(.tpl-vt,.tpl-stipple).tpl-bd-dark body #view .panel.hasStrip::after{border-color:rgba(0,0,0,.7)!important}
+html.tpl-sharp:is(.tpl-vt,.tpl-stipple) body #view .panel.hasStrip::after{border-radius:0!important}
+/* visual templates matched to the mockups: panels are a faint lighter glass over the page (not darker), hairline borders in a soft neutral tone */
+html.tpl-stipple{--vlift:24,25,28;--vline:rgba(255,255,255,.1)}
+html.tpl-silk{--vlift:44,50,78;--vline:rgba(200,210,255,.09)}
+html.tpl-chrome{--vlift:60,61,61;--vline:rgba(255,255,255,.13)}
+html.tpl-pyramid{--vlift:60,50,44;--vline:rgba(255,220,180,.11)}
+html.tpl-bronze{--vlift:50,42,38;--vline:rgba(255,215,190,.1)}
+html.tpl-flow{--vlift:40,50,90;--vline:rgba(200,210,255,.09)}
+html.tpl-flowmono{--vlift:30,30,32;--vline:rgba(255,255,255,.1)}
+html.tpl-vt.tpl-vt #view .panel,html.tpl-stipple.tpl-stipple #view .panel{background:color-mix(in srgb,color-mix(in srgb,rgb(var(--va,170,161,226)) var(--vtd,3%),rgb(var(--vlift))) calc(var(--vta,.15)*100%),transparent)!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9510,20 +9526,28 @@ const TEMPLATES=[{id:"spa",name:"Spa",sub:"Warm orange ambience, soft glass, slo
   {id:"midnight",name:"Midnight",sub:"Flat deep navy, clean blue accents",look:{color:"blue",glass:0,tone:50},bg:true,plain:true},
   {id:"slate",name:"Slate",sub:"Soft grey-blue, low contrast, easy on the eyes",look:{color:"graphite",glass:0,tone:50},bg:true,plain:true},
   /* visual templates: a whole designed look (backdrop + surfaces + type); panels and layout stay the same */
-  {id:"stipple",name:"Stipple",sub:"Near-black, fine drifting dots, quiet lavender",look:{color:"graphite",glass:0,trans:10,tone:20},bg:true,plain:true,visual:true},
-  {id:"silk",name:"Violet Silk",sub:"Deep indigo, glowing violet silk waves",look:{color:"dream",glass:25,trans:35,tone:60},bg:true,plain:true,visual:true,vt:true},
-  {id:"chrome",name:"Liquid Chrome",sub:"Black and silver, slow molten chrome",look:{color:"graphite",glass:55,trans:50,tone:30},bg:true,plain:true,visual:true,vt:true},
-  {id:"bronze",name:"Bronze Ribbon",sub:"Warm black, glowing bronze silk",look:{color:"gold",glass:15,trans:22,tone:35},bg:true,plain:true,visual:true,vt:true},
-  {id:"pyramid",name:"Pyramids",sub:"Golden pyramids in moving light",look:{color:"gold",glass:15,trans:22,tone:40},bg:true,plain:true,visual:true,vt:true},
-  {id:"flow",name:"Threads",sub:"Faint silk threads flowing like wind",look:{color:"blue",glass:25,trans:35,tone:50},bg:true,plain:true,visual:true,vt:true},
-  {id:"flowmono",name:"Threads · Mono",sub:"White threads on deep black",look:{color:"graphite",glass:10,trans:25,tone:20},bg:true,plain:true,visual:true,vt:true}];
+  {id:"stipple",name:"Stipple",sub:"Near-black, fine drifting dots, quiet lavender",look:{color:"graphite",glass:0,trans:85,tone:10},bg:true,plain:true,visual:true},
+  {id:"silk",name:"Violet Silk",sub:"Deep indigo, glowing violet silk waves",look:{color:"dream",glass:10,trans:84,tone:10},bg:true,plain:true,visual:true,vt:true},
+  {id:"chrome",name:"Liquid Chrome",sub:"Black and silver, slow molten chrome",look:{color:"graphite",glass:45,trans:55,tone:10},bg:true,plain:true,visual:true,vt:true},
+  {id:"bronze",name:"Bronze Ribbon",sub:"Warm black, glowing bronze silk",look:{color:"gold",glass:10,trans:80,tone:10},bg:true,plain:true,visual:true,vt:true},
+  {id:"pyramid",name:"Pyramids",sub:"Golden pyramids in moving light",look:{color:"gold",glass:10,trans:80,tone:10},bg:true,plain:true,visual:true,vt:true},
+  {id:"flow",name:"Threads",sub:"Faint silk threads flowing like wind",look:{color:"blue",glass:10,trans:84,tone:10},bg:true,plain:true,visual:true,vt:true},
+  {id:"flowmono",name:"Threads · Mono",sub:"White threads on deep black",look:{color:"graphite",glass:0,trans:85,tone:10},bg:true,plain:true,visual:true,vt:true}];
 const tplOf=()=>{const t=(data.profile||{}).template;return TEMPLATES.find(x=>x.id===(t===undefined?"midnight":t))||null};/* never picked = Midnight (default for new visitors); "" = picked no template. was: TEMPLATES.find(t=>t.id===(data.profile||{}).template)||null */
 const tplBgOn=()=>{const t=tplOf();return !!(t&&t.bg&&(data.profile||{}).tplBg!==false)};
 const effLook=()=>{const g=lookOf(),pl=passLook()||{},T=tplOf();if(T)return T.visual?Object.assign({color:g.color,glass:g.glass,trans:g.trans,tone:g.tone??50},T.look,((data.profile||{}).vtLook||{})[T.id]||{})/* visual: its designed panels (from the mockups) + your tweaks for that template */:Object.assign({color:g.color,glass:g.glass,trans:g.trans,tone:g.tone??50},T.look,{glass:g.glass,trans:g.trans,tone:g.tone??50});/* your Blur / Transparency / Color depth stay the same on every template (no per-template defaults; was: T.look,(data.profile||{}).tplLook) *//* + your slider changes on top of the template (tplLook resets when you pick a template) */return {color:pl.color||g.color,glass:pl.glass??g.glass,trans:pl.trans??g.trans,tone:pl.tone??g.tone??50}};
+/* visual templates carry their own Fine-tune (panels, borders, corners, bars, spacing) like their own sliders: designed defaults from the mockups, your tweaks kept per template, your main setup put back when you leave */
+const FINE=["tplPan","tplBd","tplSharp","tplBars","gapIn","gapOut","gapLink"];
+const VTFINE=id=>Object.assign({tplBars:"panel",gapIn:16,gapOut:16,gapLink:true},id==="stipple"?{tplSharp:true}:{});
+const fineGet=()=>{const o={},P=data.profile||{};FINE.forEach(k=>{if(P[k]!==undefined)o[k]=P[k]});return o};
+const fineLoad=o=>{FINE.forEach(k=>{if(o[k]===undefined)delete data.profile[k];else data.profile[k]=o[k]})};
+const fineSame=(a,b)=>FINE.every(k=>(a[k]??null)===(b[k]??null));
+const vtTweaked=id=>{const v=((data.profile||{}).vtLook||{})[id];return !!v&&Object.keys(v).length>0};
 function applyLook(tmp){tmp=typeof tmp==="number"?{glass:tmp}:(tmp||{});const L=effLook(),g=(tmp.glass??L.glass)/100,t=(tmp.trans??L.trans)/100,r=document.documentElement.style;toneNow=(tmp.tone??L.tone)/100;r.setProperty("--go",(1-t*.88).toFixed(3));r.setProperty("--vta",(1-t).toFixed(3));r.setProperty("--vtb",(g*24).toFixed(1)+"px");r.setProperty("--vtd",Math.round(toneNow*30)+"%");/* visual templates: tint = 100% − transparency, blur, color depth tints toward the template colour */r.setProperty("--gb",(4+g*24).toFixed(1)+"px");
   if(L.color==="auto"){const w=passWall()||wallOf();sampleColor(w.src).then(c=>{if(effLook().color==="auto"&&(passWall()||wallOf()).src===w.src)setTint(c.h,c.s)})}else{const P=LOOKS.find(x=>x.id===L.color)||LOOKS[0];setTint(P.h,P.s,P.l)}document.documentElement.classList.toggle("lk-orange",L.color==="orange");{const T=tplOf(),h=document.documentElement;TEMPLATES.forEach(x=>h.classList.toggle("tpl-"+x.id,!!T&&T.id===x.id));h.classList.toggle("tpl-vt",!!T&&!!T.vt);h.classList.toggle("tpl-plain",!!T&&!!T.plain);h.classList.toggle("tpl-bg",tplBgOn());/* these looks now work with or without a template (your own wallpaper too) */
     /* default setup for anyone who never picked a theme: Midnight, plain backdrop, light panels, light borders, 15px spacing, sharp corners, bars in the panel colour */
     if(!data.profile)data.profile={};if(data.profile.template===undefined){Object.assign(data.profile,{template:"midnight",tplSharp:true,gapIn:15,gapOut:15,gapLink:true});delete data.profile.tplPan;delete data.profile.tplBd;delete data.profile.tplBg;delete data.profile.tplBars}
+    if(T&&T.visual&&data.profile){const V=data.profile.vtLook=data.profile.vtLook||{},f=fineGet();if(fineSame(f,VTFINE(T.id))){if(V[T.id]){delete V[T.id].fine;if(!Object.keys(V[T.id]).length)delete V[T.id]}}else V[T.id]=Object.assign({},V[T.id],{fine:f})}
     const PF=data.profile||{};h.classList.toggle("tpl-dpan",PF.tplPan==="dark");["none","dark"].forEach(k=>h.classList.toggle("tpl-bd-"+k,PF.tplBd===k));h.classList.toggle("tpl-sharp",PF.tplSharp===true);/* spacing sliders (replace the old Comfortable / Compact / Tight buttons) */
     const gi=PF.gapIn,go=PF.gapOut;h.classList.toggle("gap-in",gi!=null);h.classList.toggle("gap-out",go!=null);if(gi!=null)h.style.setProperty("--gin",gi+"px");if(go!=null)h.style.setProperty("--gout",go+"px");h.classList.toggle("tpl-bars-clear",PF.tplBars==="clear");h.classList.toggle("tpl-bars-pan",T?PF.tplBars!=="clear":PF.tplBars==="panel");setTimeout(barsSync,0);h.classList.remove("tpl-bd-light");spaFx.stop()/* lines off for now; was: if(tplBgOn())spaFx.run() */}}
 /* Settings → Opening screen: pick one of five styles (or off); tap again to preview */
@@ -9541,7 +9565,7 @@ function tplPanel(){const T=tplOf();return `<div class="panel tplp" style="margi
   <div class="tpl-opt-h">Visual templates</div><p class="note" style="margin:2px 0 10px">A full designed look: its own live backdrop, surfaces and type. Your panels and layout stay exactly the same.</p>
   <div class="tpl-row">${TEMPLATES.filter(t=>t.visual).map(t=>`<button type="button" class="tpl-c" data-tpl="${t.id}" aria-pressed="${!!T&&T.id===t.id}"><span class="tpl-pv tpl-pv-${t.id}"><i></i><i></i><i></i><em></em><em></em></span><b>${esc(t.name)}</b><small>${esc(t.sub)}</small></button>`).join("")}</div>
   ${T&&T.bg?`<div class="tpl-opt"><span>Backdrop</span><div class="seg2" role="group" aria-label="Backdrop"><button type="button" data-tplbg="1" aria-pressed="${tplBgOn()}">${T.plain?"Plain "+esc(T.name.replace(/^Plain /,"").toLowerCase())+" background":esc(T.name)+" glow"}</button><button type="button" data-tplbg="0" aria-pressed="${!tplBgOn()}">My wallpaper</button></div></div>`:""}
-  ${true?`<div class="tpl-opt-h">${T?"Fine-tune "+esc(T.name):"Fine-tune your own setup"}</div><div class="tpl-opt"><span>Panels</span><div class="seg2" role="group" aria-label="Panels"><button type="button" data-tplpan="light" aria-pressed="${(data.profile||{}).tplPan!=="dark"}">Light</button><button type="button" data-tplpan="dark" aria-pressed="${(data.profile||{}).tplPan==="dark"}">Darker than the wallpaper</button></div></div>
+  ${true?`<div class="tpl-opt-h">${T?"Fine-tune "+esc(T.name):"Fine-tune your own setup"}</div>${T&&T.visual?`<div class="lk-orig">${vtTweaked(T.id)?`<span>Your own tweaks</span><button type="button" class="lk-origb" data-vtorig>Restore original look</button>`:`<span class="lk-orig-on">Original ${esc(T.name)} look</span>`}</div>`:""}<div class="tpl-opt"><span>Panels</span><div class="seg2" role="group" aria-label="Panels"><button type="button" data-tplpan="light" aria-pressed="${(data.profile||{}).tplPan!=="dark"}">Light</button><button type="button" data-tplpan="dark" aria-pressed="${(data.profile||{}).tplPan==="dark"}">Darker than the wallpaper</button></div></div>
   <div class="tpl-opt"><span>Borders</span><div class="seg2" role="group" aria-label="Panel borders">${[["","Light"],["none","No border"],["dark","Dark"]].map(([k,l])=>`<button type="button" data-tplbd="${k}" aria-pressed="${((data.profile||{}).tplBd||"")===k}">${l}</button>`).join("")}</div></div>
   ${(()=>{const PF=data.profile||{},gi=PF.gapIn??18,go=PF.gapOut??24,lk=!!PF.gapLink;
     const row=(id,lab,v,min,max)=>`<div class="gap-row"><span class="gap-lab">${lab}</span><input type="range" min="${min}" max="${max}" step="1" value="${v}" data-gapsl="${id}" aria-label="${lab}"><b data-gapval="${id}">${v}px</b></div>`;
@@ -9556,11 +9580,10 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   else if(b.dataset.tplsharp!=null){if(b.dataset.tplsharp==="1")data.profile.tplSharp=true;else delete data.profile.tplSharp;applyLook()}
   else if(b.dataset.tplbars!=null){if(b.dataset.tplbars)data.profile.tplBars=b.dataset.tplbars;else delete data.profile.tplBars;applyLook()}
   else if(b.dataset.tplbd!=null){if(b.dataset.tplbd)data.profile.tplBd=b.dataset.tplbd;else delete data.profile.tplBd;applyLook()}
-  else if(b.dataset.tplpan){data.profile.tplPan=b.dataset.tplpan;applyLook()}else if(b.dataset.tplbg!=null){data.profile.tplBg=b.dataset.tplbg==="1"}else{const id=b.dataset.tpl;/* sliders are kept when you switch templates (was: reset to the template defaults) */if(id)data.profile.template=id;else data.profile.template="";/* was: delete data.profile.template — "" keeps "no template" from falling back to the Midnight default */toast(id?(TEMPLATES.find(t=>t.id===id)||{}).name+" template on":"Back to your own setup")}
+  else if(b.dataset.tplpan){data.profile.tplPan=b.dataset.tplpan;applyLook()}else if(b.dataset.tplbg!=null){data.profile.tplBg=b.dataset.tplbg==="1"}else{const id=b.dataset.tpl;/* sliders are kept when you switch templates (was: reset to the template defaults) */{const pv=tplOf(),nx=TEMPLATES.find(t=>t.id===id);if(!(pv&&pv.visual)&&nx&&nx.visual)data.profile.fineMain=fineGet();if(nx&&nx.visual)fineLoad((((data.profile.vtLook||{})[id])||{}).fine||VTFINE(id));else if(pv&&pv.visual){fineLoad(data.profile.fineMain||{});delete data.profile.fineMain}}if(id)data.profile.template=id;else data.profile.template="";/* was: delete data.profile.template — "" keeps "no template" from falling back to the Midnight default */toast(id?(TEMPLATES.find(t=>t.id===id)||{}).name+" template on":"Back to your own setup")}
   render();save()},true);
 /* Blur, Transparency and Color depth — shown under Fine-tune with Corners etc. (regular templates and your own setup; visual templates keep their designed glass) */
 function lookSliders(){const L=tplOf()?effLook():lookOf(),_T=tplOf(),tw=_T&&_T.visual&&((data.profile||{}).vtLook||{})[_T.id];return `<div class="tpl-opt tpl-opt-col lk-in-tpl">
-  ${_T&&_T.visual?`<div class="lk-orig">${tw?`<span>Your own tweaks</span><button type="button" class="lk-origb" data-vtorig>Restore original look</button>`:`<span class="lk-orig-on">Original ${esc(_T.name)} look</span>`}</div>`:""}
   <!-- your own setup (no template): panel color + outlines, moved here from the Boxes panel -->
   ${tplOf()?"":`<div class="lk-label" style="margin-top:12px">Panel color</div>
   <div class="lk-row" role="radiogroup" aria-label="Box color"><button class="lk" role="radio" aria-checked="${L.color==="auto"}" data-look="auto" title="Match wallpaper"><span class="lk-sw auto"></span><span>Match<br>wallpaper</span></button>${LOOKS.map(x=>`<button class="lk" role="radio" aria-checked="${L.color===x.id}" data-look="${x.id}" title="${esc(x.name)}"><span class="lk-sw" style="background:hsl(${x.h} ${Math.round(x.s*100)}% ${x.l?Math.round(x.l*100+4):42}%)"></span><span>${esc(x.name)}</span></button>`).join("")}</div>
@@ -9740,7 +9763,7 @@ document.addEventListener("focusout",e=>{if(e.target.id==="slH"||e.target.id==="
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&renaming&&e.target.id==="rnIn"){renaming=null;render()}});
 document.addEventListener("input",e=>{const id=e.target.id;if(id!=="toneIn"&&id!=="pTone"&&id!=="cTone")return;const v=+e.target.value;applyLook({tone:v});const o=$("#"+id+"Val");if(o)o.textContent=v+"%"});
 /* visual template: put its panels back the way it was designed */
-document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-vtorig]");if(!b)return;e.preventDefault();const T=tplOf();if(!T)return;if(data.profile.vtLook)delete data.profile.vtLook[T.id];applyLook();save();render();toast(T.name+": original look back")},true);
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-vtorig]");if(!b)return;e.preventDefault();const T=tplOf();if(!T)return;if(data.profile.vtLook)delete data.profile.vtLook[T.id];fineLoad(VTFINE(T.id));applyLook();save();render();toast(T.name+": original look back")},true);
 document.addEventListener("change",e=>{const id=e.target.id,v=+e.target.value;if(id==="toneIn"){const _T=tplOf();if(_T&&_T.visual){const V=data.profile.vtLook=data.profile.vtLook||{};V[_T.id]=Object.assign({},V[_T.id],{tone:v});applyLook();save();render();return}data.profile=Object.assign({},data.profile,{look:Object.assign(lookOf(),{tone:v})});save()}
   else if(id==="pTone"){const p=data.passions.find(x=>x.id===selP);if(p){p.look=Object.assign({},p.look,{tone:v});render();save()}}
   else if(id==="cTone"){const c=cats().find(x=>x.id===passCat);if(c){c.look=Object.assign({},c.look,{tone:v});render();save()}}});
@@ -9878,7 +9901,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="828",APPT="2026-11-24T17:38:40Z";   /* APPT: when this update was made */
+const APPV="829",APPT="2026-11-24T17:43:37Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
