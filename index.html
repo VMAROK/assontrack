@@ -3434,6 +3434,18 @@ html.tpl-bronze{--vlift:17,14,13;--vline:rgba(255,210,180,.14)}
 html.tpl-flow{--vlift:13,14,16;--vline:rgba(255,255,255,.12);--vr:2px}/* Threads panels = Stipple panels */
 html.tpl-flowmono{--vlift:13,14,16;--vline:rgba(255,255,255,.12);--vr:2px}
 html.tpl-vt.tpl-vt #view .panel,html.tpl-stipple.tpl-stipple #view .panel{background:color-mix(in srgb,color-mix(in srgb,rgb(var(--va,170,161,226)) var(--vtd,3%),rgb(var(--vlift))) calc(var(--vta,.15)*100%),transparent)!important}
+/* ===== Liquid Chrome = the mockup: glossy black satin backdrop (WebGL), frosted near-black panels with a faint top sheen, hairline borders, no title strips, everything monochrome, light-weight numbers ===== */
+#chromebg{display:none}html.tpl-chrome.tpl-bg #chromebg{display:block;position:fixed;inset:0;width:100%;height:var(--apph,100%);z-index:0;pointer-events:none}
+html.tpl-chrome{--vlift:18,19,20;--vline:rgba(255,255,255,.11);--vr:12px;--vbg:#040404;--vbg2:#0b0b0c}/* was 34,35,36 / .16 / 14px */
+html.tpl-chrome.tpl-chrome.tpl-vt #view .panel{background-image:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,0) 45%)!important;box-shadow:0 14px 34px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.05)!important}
+html.tpl-chrome.tpl-chrome body #view :is(.bstrip,.calhead.cal-c,.nwp>.bc>.bc-h,.bm-has>.bc>.bc-h,.bm-has>.bm-r>.ph:first-child,.bwg-solo>.ph:first-child),html.tpl-chrome.tpl-chrome body #view[data-tab="fuel"] :is(.holopanel,.flogp,.nmp,.usp,.wtr)>.ph:first-child,html.tpl-chrome.tpl-chrome body #view[data-tab="fuel"] .nwp .bm-r>.ph:first-child,html.tpl-chrome.tpl-chrome body #view .panel.hasStrip>.ph:first-child{background:transparent!important}
+html.tpl-chrome #view:not([data-tab="set"]) .panel>*,html.tpl-chrome aside .navbtn,html.tpl-chrome .topbar .logo{filter:grayscale(1)}
+html.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome .topbar{background:transparent!important;background-image:none!important;border-color:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-bottom-color:transparent!important;box-shadow:none!important}
+html.tpl-chrome .topbar h1{font-weight:400!important;letter-spacing:-.01em}
+html.tpl-chrome #view :is(.tile>b,.bk-v,.bsec-t){font-weight:400!important;letter-spacing:-.01em}
+html.tpl-chrome #view .panel>.ph:first-child>span{font-weight:500!important}
+html.tpl-chrome .navbtn[aria-selected="true"]:not(.nav-done){background:rgba(255,255,255,.13)!important;border-radius:10px;box-shadow:none!important}
+html.tpl-chrome .seg2 [aria-pressed="true"],html.tpl-chrome .btn.primary{background:#e4e4e8!important;color:#0b0b0c!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4094,7 +4106,7 @@ body.dbg-off .dbg-n{display:none}body.dbg-off .dbg-box{outline:none}
 </style>
 
 <div id="bgimg" class="on" aria-hidden="true"></div><div id="bgimg2" aria-hidden="true"></div><canvas id="bglive" aria-hidden="true"></canvas><div id="bgspin" aria-hidden="true"></div>
-<div class="bgshade" aria-hidden="true"></div><div id="tplbg" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></div><canvas id="tplfx" aria-hidden="true"></canvas><canvas id="stipbg" aria-hidden="true"></canvas><canvas id="vtbg" aria-hidden="true"></canvas>
+<div class="bgshade" aria-hidden="true"></div><div id="tplbg" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></div><canvas id="tplfx" aria-hidden="true"></canvas><canvas id="stipbg" aria-hidden="true"></canvas><canvas id="vtbg" aria-hidden="true"></canvas><canvas id="chromebg" aria-hidden="true"></canvas>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
   <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   <linearGradient id="gCyan" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4cc9ff" stop-opacity=".3"/><stop offset="1" stop-color="#4cc9ff" stop-opacity="0"/></linearGradient>
@@ -9528,7 +9540,7 @@ const TEMPLATES=[{id:"spa",name:"Spa",sub:"Warm orange ambience, soft glass, slo
   /* visual templates: a whole designed look (backdrop + surfaces + type); panels and layout stay the same */
   {id:"stipple",name:"Stipple",sub:"Near-black, fine drifting dots, quiet lavender",look:{color:"graphite",glass:0,trans:8,tone:10},bg:true,plain:true,visual:true},
   {id:"silk",name:"Violet Silk",sub:"Deep indigo, glowing violet silk waves",look:{color:"dream",glass:10,trans:10,tone:10},bg:true,plain:true,visual:true,vt:true},
-  {id:"chrome",name:"Liquid Chrome",sub:"Black and silver, slow molten chrome",look:{color:"graphite",glass:70,trans:40,tone:10},bg:true,plain:true,visual:true,vt:true},
+  {id:"chrome",name:"Liquid Chrome",sub:"Black and silver, slow molten chrome",look:{color:"graphite",glass:80,trans:15,tone:10}/* was glass 70, trans 40 */,bg:true,plain:true,visual:true,vt:true},
   {id:"bronze",name:"Bronze Ribbon",sub:"Warm black, glowing bronze silk",look:{color:"gold",glass:10,trans:12,tone:10},bg:true,plain:true,visual:true,vt:true},
   {id:"pyramid",name:"Pyramids",sub:"Golden pyramids in moving light",look:{color:"gold",glass:10,trans:12,tone:10},bg:true,plain:true,visual:true,vt:true},
   {id:"flow",name:"Threads",sub:"Faint silk threads flowing like wind",look:{color:"blue",glass:0,trans:8,tone:10},bg:true,plain:true,visual:true,vt:true},
@@ -9901,7 +9913,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="831",APPT="2026-11-24T17:47:13Z";   /* APPT: when this update was made */
+const APPV="832",APPT="2026-11-24T17:58:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -10142,7 +10154,8 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
       ribbon((s,t)=>[-W*.08+s*W*1.2,H*(.95-.7*s)+Math.sin(s*5+t*.25)*M*.12+Math.sin(s*2-t*.18)*M*.06],(s,t)=>M*(.05+.1*Math.sin(s*3.1+t*.2)**2),(s,t)=>s*6+t*.35,46,[170,150,255],.75,t);
       ribbon((s,t)=>[W*.25+s*W*.85,H*(.15+.5*s)+Math.cos(s*4-t*.22)*M*.09],(s,t)=>M*(.03+.06*Math.sin(s*2.4-t*.15)**2),(s,t)=>s*5-t*.3,30,[140,125,250],.5,t);
       x.globalCompositeOperation="source-over";dust("200,190,255",t,.35)},
-    chrome(t){x.lineWidth=1.1;
+    /* chrome: replaced by the glossy satin shader (#chromebg) to match the mockup — old striped ribbons kept, unused */
+    chromeOld(t){x.lineWidth=1.1;
       ribbon((s,t)=>[-W*.1+s*W*1.25,H*(.2+.25*Math.sin(s*2.2+t*.12))+s*H*.35],(s,t)=>M*(.09+.06*Math.sin(s*2+t*.14)),(s,t)=>s*4.2+t*.22,60,[235,235,242],.35,t);
       ribbon((s,t)=>[W*(.95-s*.3)+Math.sin(s*3+t*.15)*M*.08,-H*.1+s*H*1.25],(s,t)=>M*(.07+.05*Math.cos(s*2.5-t*.12)),(s,t)=>s*3.6-t*.2,50,[215,215,224],.3,t);
       ribbon((s,t)=>[W*(.02+.12*Math.sin(s*2.4+t*.1)),H*(1.1-s*1.2)],(s,t)=>M*(.05+.04*Math.sin(s*3+t*.2)),(s,t)=>s*5+t*.25,40,[200,200,210],.28,t)},
@@ -10203,5 +10216,36 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
     c.addEventListener("pointerup",up);c.addEventListener("pointercancel",up);c.addEventListener("pointerleave",()=>{I.px=I.py=-1e4});c.addEventListener("selectstart",e=>e.preventDefault())};
   const check=()=>{const c=document.querySelector(".set-art canvas");if(c&&c!==cv){cv=c;x=c.getContext("2d");size();hook(c);if(!raf)raf=requestAnimationFrame(loop)}else if(!c&&cv)stop()};
   new MutationObserver(check).observe(document.body,{childList:true,subtree:true});addEventListener("resize",()=>{if(cv)size()});check()})();
+</script>
+<script>/* Liquid Chrome backdrop: glossy black satin folds (one fold family bent across the screen so the highlights run in long lines, like the mockup); drawn at half resolution — satin is soft, so it upscales cleanly — and only while the template is on */
+(()=>{const cv=document.getElementById("chromebg");if(!cv)return;let g=null,draw=null,raf=0,last=0,on=false;const t0=performance.now()/1000-40;
+  const FS=`precision highp float;uniform vec2 R;uniform float T;
+float H(vec2 p,float t){
+  /* one long fold family whose direction bends across the screen (domain warp) -> long continuous highlight lines like draped satin */
+  float w=1.3*sin(p.y*1.25+t*.06)+.7*sin(p.y*2.3+p.x*.9-t*.045)+.35*sin(p.x*1.7-p.y*.6+t*.05);
+  float ph=p.x*1.9+p.y*.8+w*1.6;
+  float h=.6*sin(ph)+.22*sin(ph*2.03+1.7+p.y*.7)+.06*sin(p.y*3.3-p.x*1.4+t*.08);
+  return h;}
+void main(){vec2 uv=gl_FragCoord.xy/R;float a=R.x/R.y;vec2 p=vec2(uv.x*a,uv.y)*2.3;float t=T;
+  float e=.002,h=H(p,t),hx=H(p+vec2(e,0.),t)-h,hy=H(p+vec2(0.,e),t)-h;
+  vec3 n=normalize(vec3(-hx/e*.62,-hy/e*.62,1.));
+  vec3 L=normalize(vec3(-.45,.55,.7)),V=vec3(0.,0.,1.),Hh=normalize(L+V);
+  float d=max(dot(n,L),0.),s=pow(max(dot(n,Hh),0.),130.),s2=pow(max(dot(n,normalize(vec3(.5,-.3,1.))),0.),18.);
+  float s3=pow(max(dot(n,Hh),0.),10.);float c=.012+.06*d*d+1.15*s+.16*s3+.08*s2;
+  /* composition: folds bright round the edges and top, dark in the middle where the panels sit */
+  vec2 m=(uv-vec2(.52,.45))*vec2(1.,1.15);float k=smoothstep(.18,.62,length(m));k=max(k,smoothstep(.72,1.,uv.y)*.9);
+  c*=mix(.22,1.,k);
+  gl_FragColor=vec4(vec3(c,c,c*1.02),1.);}`;
+  const init=()=>{g=cv.getContext("webgl",{antialias:false,alpha:false,preserveDrawingBuffer:false});if(!g)return false;const sh=(ty,s)=>{const o=g.createShader(ty);g.shaderSource(o,s);g.compileShader(o);return o};
+    const pr=g.createProgram();g.attachShader(pr,sh(g.VERTEX_SHADER,"attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}"));g.attachShader(pr,sh(g.FRAGMENT_SHADER,FS));g.linkProgram(pr);if(!g.getProgramParameter(pr,g.LINK_STATUS))return false;g.useProgram(pr);
+    const b=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,b);g.bufferData(g.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),g.STATIC_DRAW);const l=g.getAttribLocation(pr,"a");g.enableVertexAttribArray(l);g.vertexAttribPointer(l,2,g.FLOAT,false,0,0);
+    const uR=g.getUniformLocation(pr,"R"),uT=g.getUniformLocation(pr,"T");draw=t=>{g.viewport(0,0,cv.width,cv.height);g.uniform2f(uR,cv.width,cv.height);g.uniform1f(uT,t);g.drawArrays(g.TRIANGLES,0,3)};return true};
+  const size=()=>{const d=Math.min(1,(devicePixelRatio||1)*.5),H=(window.aotFullH?aotFullH():innerHeight);cv.width=Math.round(innerWidth*d);cv.height=Math.round(H*d)};
+  const loop=n=>{raf=requestAnimationFrame(loop);if(document.hidden||n-last<33)return;last=n;draw(n/1000-t0)};
+  const check=()=>{const h=document.documentElement,want=h.classList.contains("tpl-chrome")&&h.classList.contains("tpl-bg");
+    if(want&&!on){if(!draw&&!init())return;on=true;size();raf=requestAnimationFrame(loop)}else if(!want&&on){on=false;cancelAnimationFrame(raf)}};
+  new MutationObserver(check).observe(document.documentElement,{attributes:true,attributeFilter:["class"]});addEventListener("resize",()=>{if(on)size()});check()})();
+/* one-time: Liquid Chrome was redone to match its mockup — drop old Chrome slider/fine-tune tweaks so the new look shows */
+(()=>{const go=()=>{try{if(typeof data!=="object"||!data||!data.profile)return setTimeout(go,300);const P=data.profile;if(P.chromeV2)return;P.chromeV2=1;if(P.vtLook)delete P.vtLook.chrome;if(P.template==="chrome"&&typeof fineLoad==="function")fineLoad(VTFINE("chrome"));if(typeof save==="function")save();if(typeof applyLook==="function")applyLook();if(typeof render==="function")render()}catch(e){}};setTimeout(go,600)})();
 </script>
 </body></html>
