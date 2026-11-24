@@ -3094,6 +3094,9 @@ html body #view .bdown .bdn-scroll::-webkit-scrollbar{display:none}
 html body #view .bdown .bd-kov .track{display:flex}html body #view .bdown .bd-kov .track>i{flex:none;border-radius:0}html body #view .bdown .bd-kov .track>i:first-child{border-radius:99px 0 0 99px}html body #view .bdown .bd-kov .track>i:last-child{border-radius:0 99px 99px 0}
 /* Breakdown main bars, over the goal: keep the heavy shade and lay red over it (test) */
 html body #view .bdown .bdn-main .dp-t.ov>i:last-child{background-image:linear-gradient(rgba(255,60,80,.55),rgba(255,60,80,.55))!important}
+/* Breakdown Passions: level tag beside each name */
+html body #view .bdown .bd-lv{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.02em;margin-left:7px;padding:1px 6px;border-radius:99px;vertical-align:1px}
+html body #view .bdown .bd-lv[data-lvl="Priority"]{color:#ff5d6c;background:rgba(255,93,108,.14)}html body #view .bdown .bd-lv[data-lvl="Moderate"]{color:#ffb648;background:rgba(255,182,72,.14)}html body #view .bdown .bd-lv[data-lvl="Bonus"]{color:#2ee6c5;background:rgba(46,230,197,.14)}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4299,11 +4302,13 @@ function bdMain(x,h){const cl=v=>Math.max(0,Math.min(1,v)),ov=x.over?Math.min(10
   return `<div class="bdn-main" style="--c:${x.c}"><div class="dp-t${ov?" ov":""}">${ov?`<i data-akw="bd:M${x.k}" style="width:${(100-ov).toFixed(1)}%;--c:${x.c}"></i><i data-akw="bd:O${x.k}" style="width:${ov.toFixed(1)}%;--c:${x.d}"></i>`:`<i data-akw="bd:M${x.k}" style="width:${(cl(x.f)*100).toFixed(1)}%"></i>`}</div></div>`.replace('<div class="dp-t',`<div class="bdn-hd"><h4>${DPQ(h)}${h}</h4><b>${num}</b></div><div class="dp-t`)}   /* numbers top-right, across from the name (was under the bar) */
 function breakdownPanel(d){const DS=dashStats(d,today()),t=today(),tm=d.meals.filter(m=>m.d===t),sum=k=>tm.reduce((a,m)=>a+(+m[k]||0),0);
   const MK=[["Carbs","carbs","#f27fb2"],["Protein","protein","#a688f2"],["Fiber","fiber","#b8875f"],["Fat","fat","#f2c14e"]],mv=MK.map(([n,k,c])=>({n,k,c,v:sum(k),g:mgGoal(k)}));
-  const P=d.passions.map((p,i)=>({n:p.name,k:p.id,c:BDPAL[i%BDPAL.length],v:d.sessions.filter(x=>x.pid===p.id&&!x.planned).reduce((a,x)=>a+(+x.mins||0),0),g:(+p.goal||0)*60}));
+  /* Passions in order: Priority, then Moderate, then Bonus (then none); within a level, by the order of the category tabs on Passions, then the passion's own order. Colours stay with each passion. (was: d.passions in stored order) */
+  const CI=id=>{let k=-1;try{k=cats().findIndex(c=>c.id===id)}catch(_){}return k<0?999:k};
+  const P=d.passions.map((p,i)=>[p,i]).sort((a,b)=>((LVR[a[0].lvl]??3)-(LVR[b[0].lvl]??3))||(CI(a[0].cat)-CI(b[0].cat))||((a[0].order??a[1])-(b[0].order??b[1]))).map(([p,i])=>({n:p.name,k:p.id,lvl:p.lvl||"",c:BDPAL[i%BDPAL.length],v:d.sessions.filter(x=>x.pid===p.id&&!x.planned).reduce((a,x)=>a+(+x.mins||0),0),g:(+p.goal||0)*60}));
   let out=0,inc=0;try{const S=bStats();out=S.subs+S.bills+S.spent;inc=S.inc}catch(_){}
   return `<div class="panel bdown bstrip-p" style="margin-top:18px" data-akg="bd"><div class="bstrip"><b>Breakdown</b></div><div class="tgrid">
     <section class="bdn-sec">${bdMain(DS[0],"Nutrition")}${bdMulti(mv)}${mv.map(x=>bdMeter(x.n,x.v,x.g,`${n0(x.v)}${x.g?" / "+n0(x.g):""} g`,x.c,x.k)).join("")}${bdMeter("Water",nWater(t),nWGoal(),`${n0(nWater(t))} / ${n0(nWGoal())} cups`,"#4cc9ff","water")}${bdKcal(sum("kcal"),kLim(t))}</section>
-    <section class="bdn-sec">${bdMain(DS[1],"Passions")}${P.length?bdMulti(P)+`<div class="bdn-scroll">${P.map(x=>bdMeter(x.n,x.v,x.g,x.g?`${fmtH(x.v)} / ${fmtH(x.g)}`:fmtH(x.v),x.c,x.k)).join("")}</div>`:`<p class="note" style="margin:0">No passions yet</p>`}</section>
+    <section class="bdn-sec">${bdMain(DS[1],"Passions")}${P.length?bdMulti(P)+`<div class="bdn-scroll">${P.map(x=>bdMeter(x.n,x.v,x.g,x.g?`${fmtH(x.v)} / ${fmtH(x.g)}`:fmtH(x.v),x.c,x.k).replace("</span><b>",x.lvl?`<em class="bd-lv" data-lvl="${esc(x.lvl)}">${esc(x.lvl)}</em></span><b>`:"</span><b>")).join("")}</div>`:`<p class="note" style="margin:0">No passions yet</p>`}</section>
     <section class="bdn-sec">${bdMain(DS[2],"Budget")}${""/* was: separate "Spent this month" meter (pushed the bars out of line) — the gold bar above is that */}</section>
   </div></div>`}
 function meter(label,v,goal,u,c){const p=goal?Math.min(v/goal,1):0;
@@ -9506,7 +9511,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="764",APPT="2026-11-24T06:24:07Z";   /* APPT: when this update was made */
+const APPV="765",APPT="2026-11-24T06:26:39Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
