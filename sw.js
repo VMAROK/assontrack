@@ -1,5 +1,5 @@
 // Offline support: the app opens without a connection; data syncs when back online.
-const VERSION = "aot-v742";
+const VERSION = "aot-v743";
 const LIB = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4";
 const SHELL = ["./", "./index.html", "./config.js", "./ramsau.jpg", "./manifest.webmanifest",
   "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", LIB];
