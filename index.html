@@ -156,6 +156,9 @@
 #aotSplash .sp-line{width:120px;height:1px;background:rgba(160,190,255,.14);overflow:hidden}
 #aotSplash .sp-line i{display:block;height:100%;width:0;background:linear-gradient(90deg,transparent,#9cc2ff)}
 #aotSplash.sp-mono .sp-word b{color:#c9c5ee}#aotSplash.sp-mono .sp-line{background:rgba(220,218,240,.12)}#aotSplash.sp-mono .sp-line i{background:linear-gradient(90deg,transparent,#d8d5f2)}#aotSplash.sp-mono .sp-sub{color:rgba(200,198,220,.45)}
+#aotSplash .sp-tap{position:absolute;left:0;right:0;bottom:max(34px,calc(env(safe-area-inset-bottom) + 22px));text-align:center;font:400 10px/1 -apple-system,"SF Pro Text","Inter",system-ui,sans-serif;letter-spacing:.34em;margin-right:-.34em;text-transform:uppercase;color:rgba(200,210,230,.5);opacity:0;transition:opacity 1.6s ease;pointer-events:none}
+#aotSplash.sp-ready .sp-tap{opacity:1;animation:spTap 3.6s 1.6s ease-in-out infinite}
+@keyframes spTap{0%,100%{opacity:1}50%{opacity:.35}}
 #aotSplash .sp-mid.on .sp-line i{width:100%;transition:width 1.6s .1s cubic-bezier(.6,0,.2,1)}
 @media (prefers-reduced-motion:reduce){#aotSplash .sp-grain{animation:none}}
 </style>
@@ -183,7 +186,7 @@
     if(STY.indexOf(id)<0)id="specks";
     const R=matchMedia("(prefers-reduced-motion:reduce)").matches;
     const el=document.createElement("div");el.id="aotSplash";el.setAttribute("aria-hidden","true");
-    el.innerHTML='<canvas></canvas>'+(id==="aurora"||id==="threads"||id==="threadsmono"?'<div class="sp-grain"></div>':'')+'<div class="sp-mid"><div class="sp-word">Ass<b>On</b>Track</div><div class="sp-line"><i></i></div><div class="sp-sub">one quiet step at a time</div></div>';
+    el.innerHTML='<canvas></canvas>'+(id==="aurora"||id==="threads"||id==="threadsmono"?'<div class="sp-grain"></div>':'')+'<div class="sp-mid"><div class="sp-word">Ass<b>On</b>Track</div><div class="sp-line"><i></i></div><div class="sp-sub">one quiet step at a time</div></div><div class="sp-tap">Tap to enter</div>';
     (document.body||document.documentElement).appendChild(el);
     const cv=el.querySelector("canvas"),x=cv.getContext("2d",{alpha:false}),mid=el.querySelector(".sp-mid");
     let W=0,H=0,dpr=1,raf=0,S={},t0=performance.now();
@@ -244,7 +247,10 @@
           /* the shape */
           const cyc=7.5,ph=T/cyc,i0=Math.floor(ph)%5,i1=(i0+1)%5,fr=ph-Math.floor(ph),m=fr<.72?0:(fr-.72)/.28,mm=m*m*(3-2*m),A=S.sh[i0],B=S.sh[i1];
           /* touch / mouse: drag to spin it (it keeps turning, then settles); fast spins make the points spill outward */
-          const dt=Math.min(.05,Math.max(0,T-(S.lt||T)));S.lt=T;S.ur+=S.uv*dt;S.uv*=Math.pow(.18,dt);S.spill*=Math.pow(.06,dt);S.spill=Math.min(1.4,S.spill+Math.abs(S.uv)*dt*.32);S.ux*=Math.pow(.3,dt);
+          const dt=Math.min(.05,Math.max(0,T-(S.lt||T)));S.lt=T;S.uv=Math.max(-1.1,Math.min(1.1,S.uv));S.ur+=S.uv*dt;S.uv*=Math.pow(.3,dt);S.ux*=Math.pow(.4,dt);
+          /* spill eases toward its target (no jumps): a little from spinning, a slow cosmic spread while two fingers rest on it */
+          {const tg=Math.min(.35,Math.abs(S.uv)*.3)+(S.two?1.25:0),r=tg>S.spill?(S.two?1-Math.pow(.72,dt):1-Math.pow(.5,dt)):1-Math.pow(.55,dt);S.spill+=(tg-S.spill)*r}
+          /* was: S.uv*=Math.pow(.18,dt);S.spill*=Math.pow(.06,dt);S.spill=Math.min(1.4,S.spill+Math.abs(S.uv)*dt*.32);S.ux*=Math.pow(.3,dt) */
           const sc=Math.min(W,H)*.31,cx=W/2,cy=H*.4,ry=T*.4+(i0===0?Math.sin(T*.5)*.35-T*.4+.35:0)+S.ur,rx=-.18+S.ux,sp=S.spill,pxp=S.px,pyp=S.py,cR=Math.cos(ry),sR=Math.sin(ry),cX=Math.cos(rx),sX=Math.sin(rx),L=[-.5,.55,-.67];
           for(let i=0;i<S.N;i++){const a=A[i],b=B[i];let px=a[0],py=a[1],pz=a[2],nx=a[3],ny=a[4],nz=a[5];if(mm){px+=(b[0]-px)*mm;py+=(b[1]-py)*mm;pz+=(b[2]-pz)*mm;nx+=(b[3]-nx)*mm;ny+=(b[4]-ny)*mm;nz+=(b[5]-nz)*mm}
             if(sp>.003){const k=sp*S.sd[i]*.55;px+=nx*k;py+=ny*k-k*k*.18;pz+=nz*k}
@@ -267,13 +273,18 @@
     requestAnimationFrame(()=>requestAnimationFrame(()=>mid.classList.add("on")));
     /* Halftone can be played with while the app loads: drag to spin, points push away from the finger; the screen waits while you play */
     let busy=0,moved=0;
-    if(v.touch){let d=null;el.style.touchAction="none";el.style.cursor="grab";
-      el.addEventListener("pointerdown",e=>{d={x:e.clientX,y:e.clientY,t:performance.now()};moved=0;busy=performance.now()+1500;el.style.cursor="grabbing";try{el.setPointerCapture(e.pointerId)}catch(_){}});
-      el.addEventListener("pointermove",e=>{S.px=e.clientX;S.py=e.clientY;if(!d)return;const n=performance.now(),dx=e.clientX-d.x,dy=e.clientY-d.y,dtm=Math.max(8,n-d.t)/1000;if(Math.abs(dx)+Math.abs(dy)>3)moved=1;S.ur+=dx*.008;S.uv=S.uv*.4+(dx*.008/dtm)*.6;S.ux=Math.max(-.6,Math.min(.6,S.ux-dy*.004))/* was +dy: swiping down tipped it up */;S.spill=Math.min(1.4,S.spill+Math.hypot(dx,dy)*.0025);d={x:e.clientX,y:e.clientY,t:n};busy=n+1500});
-      const up=()=>{d=null;el.style.cursor="grab";busy=performance.now()+1200};el.addEventListener("pointerup",up);el.addEventListener("pointercancel",up);el.addEventListener("pointerleave",()=>{S.px=-1e4;S.py=-1e4})}
-    let gone=false;const done=()=>{if(gone)return;if(performance.now()<busy){setTimeout(done,300);return}gone=true;el.classList.add("out");setTimeout(()=>{cancelAnimationFrame(raf);removeEventListener("resize",size);el.remove()},1000)};
+    /* was: one-finger drag only, fast spins allowed (full code in git history, v790) */
+    if(v.touch){let d=null;const F=new Map();el.style.touchAction="none";el.style.cursor="grab";
+      el.addEventListener("pointerdown",e=>{F.set(e.pointerId,1);moved=0;try{el.setPointerCapture(e.pointerId)}catch(_){}
+        if(F.size>=2){d=null;S.two=true;moved=1;S.px=-1e4;S.py=-1e4;S.uv*=.3}else{d={x:e.clientX,y:e.clientY,t:performance.now()};el.style.cursor="grabbing"}});
+      el.addEventListener("pointermove",e=>{if(S.two)return;S.px=e.clientX;S.py=e.clientY;if(!d)return;const n=performance.now(),dx=e.clientX-d.x,dy=e.clientY-d.y,dtm=Math.max(16,n-d.t)/1000;if(Math.abs(dx)+Math.abs(dy)>3)moved=1;
+        /* gentle: half the turn per finger move, and the spin speed is capped so the points never go wild */
+        S.ur+=Math.max(-.05,Math.min(.05,dx*.004));S.uv=S.uv*.6+Math.max(-1.1,Math.min(1.1,dx*.004/dtm))*.4;S.ux=Math.max(-.5,Math.min(.5,S.ux-dy*.003));d={x:e.clientX,y:e.clientY,t:n}});
+      const up=e=>{F.delete(e.pointerId);if(F.size<2&&S.two){S.two=false;moved=1}if(!F.size){d=null;el.style.cursor="grab"}};el.addEventListener("pointerup",up);el.addEventListener("pointercancel",up);el.addEventListener("pointerleave",()=>{S.px=-1e4;S.py=-1e4})}
+    let gone=false;const done=()=>{if(gone)return;gone=true;/* closes only on a tap now, so no wait-while-playing check */el.classList.add("out");setTimeout(()=>{cancelAnimationFrame(raf);removeEventListener("resize",size);el.remove()},1000)};
     const ready=()=>setTimeout(done,Math.max(0,(R?400:min)-(performance.now()-t0)));
-    if(manual||document.readyState==="complete")ready();else addEventListener("load",ready,{once:true});setTimeout(done,max);
+    /* stays until the user taps to enter (was: faded out by itself after ~2s — if(manual||document.readyState==="complete")ready();else addEventListener("load",ready,{once:true});setTimeout(done,max);) */
+    const hint=()=>el.classList.add("sp-ready");if(document.readyState==="complete")setTimeout(hint,1600);else addEventListener("load",()=>setTimeout(hint,1200),{once:true});
     el.addEventListener("click",()=>{if(!moved)done()});/* was: any click closed it — a drag on Halftone no longer does */
   }
   window.aotSplash={STY,play};
@@ -9705,7 +9716,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="791",APPT="2026-11-24T08:21:49Z";   /* APPT: when this update was made */
+const APPV="792",APPT="2026-11-24T08:24:54Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
