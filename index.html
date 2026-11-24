@@ -3435,7 +3435,7 @@ html.tpl-flow{--vlift:13,14,16;--vline:rgba(255,255,255,.12);--vr:2px}/* Threads
 html.tpl-flowmono{--vlift:13,14,16;--vline:rgba(255,255,255,.12);--vr:2px}
 html.tpl-vt.tpl-vt #view .panel,html.tpl-stipple.tpl-stipple #view .panel{background:color-mix(in srgb,color-mix(in srgb,rgb(var(--va,170,161,226)) var(--vtd,3%),rgb(var(--vlift))) calc(var(--vta,.15)*100%),transparent)!important}
 /* ===== Liquid Chrome = the mockup: glossy black satin backdrop (WebGL), frosted near-black panels with a faint top sheen, hairline borders, no title strips, everything monochrome, light-weight numbers ===== */
-#chromebg{display:none}html.tpl-chrome.tpl-bg #chromebg{display:block;position:fixed;inset:0;width:100%;height:var(--apph,100%);z-index:0;pointer-events:none}
+#chromebg{display:none}html:is(.tpl-chrome,.tpl-bronze).tpl-bg #chromebg{display:block;position:fixed;inset:0;width:100%;height:var(--apph,100%);z-index:0;pointer-events:none}
 html.tpl-chrome{--vlift:18,19,20;--vline:rgba(255,255,255,.11);--vr:12px;--vbg:#040404;--vbg2:#0b0b0c}/* was 34,35,36 / .16 / 14px */
 html.tpl-chrome.tpl-chrome.tpl-vt #view .panel{background-image:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,0) 45%)!important;box-shadow:0 14px 34px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.05)!important}
 html.tpl-chrome.tpl-chrome body #view :is(.bstrip,.calhead.cal-c,.nwp>.bc>.bc-h,.bm-has>.bc>.bc-h,.bm-has>.bm-r>.ph:first-child,.bwg-solo>.ph:first-child),html.tpl-chrome.tpl-chrome body #view[data-tab="fuel"] :is(.holopanel,.flogp,.nmp,.usp,.wtr)>.ph:first-child,html.tpl-chrome.tpl-chrome body #view[data-tab="fuel"] .nwp .bm-r>.ph:first-child,html.tpl-chrome.tpl-chrome body #view .panel.hasStrip>.ph:first-child{background:transparent!important}
@@ -3461,6 +3461,31 @@ html:is(.tpl-vt,.tpl-stipple):is(.tpl-vt,.tpl-stipple) body #view .panel .panel.
 html:is(.tpl-vt,.tpl-stipple):is(.tpl-vt,.tpl-stipple) body #view :is(.bstrip,.calhead.cal-c,.nwp>.bc>.bc-h,.bm-has>.bc>.bc-h,.bm-has>.bm-r>.ph:first-child,.bwg-solo>.ph:first-child),html:is(.tpl-vt,.tpl-stipple):is(.tpl-vt,.tpl-stipple) body #view[data-tab="fuel"] :is(.holopanel,.flogp,.nmp,.usp,.wtr)>.ph:first-child,html:is(.tpl-vt,.tpl-stipple):is(.tpl-vt,.tpl-stipple) body #view[data-tab="fuel"] .nwp .bm-r>.ph:first-child,html:is(.tpl-vt,.tpl-stipple):is(.tpl-vt,.tpl-stipple) body #view .panel.hasStrip>.ph:first-child{background:transparent!important}
 /* the Dark panels Fine-tune option still wins */
 html:is(.tpl-vt,.tpl-stipple).tpl-dpan.tpl-dpan body #view .panel.panel{background:rgba(0,0,0,.4)!important}
+/* ===== visual templates, inside the panels (from the mockups): framed sub-cards, number weights, heading styles, sidebar highlight ===== */
+/* sub-cards: the Overview cells become their own raised cards with a fine border, like the mockups' inner tiles (Stipple keeps plain dividers) */
+html:is(.tpl-chrome,.tpl-silk,.tpl-pyramid,.tpl-bronze) body #view .dtiles{gap:10px!important;padding:4px 12px 12px!important}
+html:is(.tpl-chrome,.tpl-silk,.tpl-pyramid,.tpl-bronze) body #view .dtile.dtile{border:1px solid var(--pbd)!important;border-top-color:var(--pbt)!important;border-radius:calc(var(--vr,12px) - 4px);background:linear-gradient(180deg,var(--pin),rgba(255,255,255,.01))!important;box-shadow:0 6px 16px rgba(0,0,0,.28),inset 0 1px 0 var(--pin)!important}
+html.tpl-sharp:is(.tpl-chrome,.tpl-silk,.tpl-pyramid,.tpl-bronze) body #view .dtile.dtile{border-radius:0}
+/* big numbers: the mockups' weights */
+html:is(.tpl-vt,.tpl-stipple) #view :is(.panel>b,.bsum-c b,.bdw-tot>b,.bdw-tot b,.bc-h>b,.cs-txt>b,.tile>b,.bk-v){letter-spacing:-.01em}
+html.tpl-chrome #view :is(.panel>b,.bsum-c b,.bdw-tot b,.cs-txt>b){font-weight:400!important}
+html.tpl-silk #view :is(.panel>b,.bsum-c b,.bdw-tot b,.cs-txt>b){font-weight:600!important}
+html.tpl-pyramid #view :is(.panel>b,.bsum-c b,.bdw-tot b,.cs-txt>b){font-weight:300!important}
+html.tpl-bronze #view :is(.panel>b,.bsum-c b,.bdw-tot b,.cs-txt>b){font-weight:400!important}
+html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono) #view :is(.panel>b,.bsum-c b,.bdw-tot b,.cs-txt>b){font-weight:300!important}
+/* panel headings: Chrome / Silk = clean white title; Pyramids = gold spaced capitals; Bronze = light spaced capitals */
+html:is(.tpl-chrome,.tpl-silk) #view .panel>.ph:first-child>span{font-size:16.5px!important;font-weight:600!important;color:#f2f2f6!important;letter-spacing:-.005em}
+html.tpl-pyramid #view :is(.panel>.ph:first-child>span,.panel>.ph:first-child>span>span,.bstrip>b,.tile>small,.dtile>b){color:#d8ad72!important;font-weight:500!important;letter-spacing:.22em!important}
+html.tpl-bronze #view :is(.panel>.ph:first-child>span,.panel>.ph:first-child>span>span,.bstrip>b,.tile>small,.dtile>b){color:#ece2d8!important;font-weight:600!important;letter-spacing:.22em!important}
+/* selected tab in the sidebar */
+html.tpl-chrome.tpl-chrome .navbtn[aria-selected="true"]:not(.nav-done){background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.09))!important;border-radius:10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)!important}
+html.tpl-silk.tpl-silk .navbtn[aria-selected="true"]:not(.nav-done){background:linear-gradient(90deg,rgba(108,98,220,.55),rgba(78,70,175,.38))!important;border-radius:12px;box-shadow:inset 0 1px 0 rgba(190,185,255,.18)!important}
+html.tpl-pyramid.tpl-pyramid .navbtn[aria-selected="true"]:not(.nav-done){background:linear-gradient(90deg,rgba(150,112,64,.72),rgba(92,72,46,.5))!important;border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,220,160,.2)!important}
+html.tpl-bronze.tpl-bronze .navbtn[aria-selected="true"]:not(.nav-done){background:linear-gradient(90deg,rgba(138,90,58,.72),rgba(92,62,42,.5))!important;border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,205,165,.2)!important}
+html:is(.tpl-silk,.tpl-pyramid,.tpl-bronze,.tpl-chrome) .navbtn[aria-selected="true"]:not(.nav-done){color:#fff!important}
+html.tpl-sharp:is(.tpl-silk,.tpl-pyramid,.tpl-bronze,.tpl-chrome) .navbtn[aria-selected="true"]{border-radius:0!important}
+/* Bronze Ribbon: the sidebar is see-through like the mockup, so the copper ribbon shows behind the tabs (top bar untouched) */
+html.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze aside{background-color:rgba(10,8,7,.3)!important;background-image:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9928,7 +9953,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="834",APPT="2026-11-24T18:04:59Z";   /* APPT: when this update was made */
+const APPV="835",APPT="2026-11-24T18:17:34Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -10174,7 +10199,8 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
       ribbon((s,t)=>[-W*.1+s*W*1.25,H*(.2+.25*Math.sin(s*2.2+t*.12))+s*H*.35],(s,t)=>M*(.09+.06*Math.sin(s*2+t*.14)),(s,t)=>s*4.2+t*.22,60,[235,235,242],.35,t);
       ribbon((s,t)=>[W*(.95-s*.3)+Math.sin(s*3+t*.15)*M*.08,-H*.1+s*H*1.25],(s,t)=>M*(.07+.05*Math.cos(s*2.5-t*.12)),(s,t)=>s*3.6-t*.2,50,[215,215,224],.3,t);
       ribbon((s,t)=>[W*(.02+.12*Math.sin(s*2.4+t*.1)),H*(1.1-s*1.2)],(s,t)=>M*(.05+.04*Math.sin(s*3+t*.2)),(s,t)=>s*5+t*.25,40,[200,200,210],.28,t)},
-    bronze(t){x.globalCompositeOperation="lighter";x.lineWidth=.9;
+    /* bronze: now the copper ribbon shader (#chromebg) — old strands kept, unused */
+    bronzeOld(t){x.globalCompositeOperation="lighter";x.lineWidth=.9;
       ribbon((s,t)=>[W*(.06+.09*Math.sin(s*4.2+t*.2)),H*(1.08-s*1.2)],(s,t)=>M*(.06+.07*Math.sin(s*3+t*.18)**2),(s,t)=>s*6.5+t*.32,50,[240,165,100],.8,t);
       ribbon((s,t)=>[W*(.55+.5*s),H*(.05+.35*s)+Math.sin(s*3.4+t*.2)*M*.07],(s,t)=>M*(.04+.06*Math.sin(s*2.6-t*.16)**2),(s,t)=>s*5-t*.28,36,[230,150,90],.5,t);
       x.globalCompositeOperation="source-over";dust("240,180,120",t,.4)},
@@ -10233,8 +10259,8 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   new MutationObserver(check).observe(document.body,{childList:true,subtree:true});addEventListener("resize",()=>{if(cv)size()});check()})();
 </script>
 <script>/* Liquid Chrome backdrop: glossy black satin folds (one fold family bent across the screen so the highlights run in long lines, like the mockup); drawn at half resolution — satin is soft, so it upscales cleanly — and only while the template is on */
-(()=>{const cv=document.getElementById("chromebg");if(!cv)return;let g=null,draw=null,raf=0,last=0,on=false;const t0=performance.now()/1000-40;
-  const FS=`precision highp float;uniform vec2 R;uniform float T;
+(()=>{const cv=document.getElementById("chromebg");if(!cv)return;let g=null,draw=null,raf=0,last=0,on=false,mo=0;const t0=performance.now()/1000-40;
+  const FS=`precision highp float;uniform vec2 R;uniform float T;uniform float MO;
 vec3 C;float SH;
 /* one glossy ribbon: centre line in its own frame, bent by two waves; it twists along its length (projected width pinches), cross-section curved so a sharp white highlight runs along it */
 void rib(vec2 p,vec2 o,float an,float k,float A,float ph,float w0,float tk,float t){
@@ -10257,6 +10283,11 @@ void main(){vec2 uv=gl_FragCoord.xy/R;float a=R.x/R.y;vec2 p=vec2(uv.x*a,uv.y);f
   vec2 sp=p*2.3;float e=.003,h=SAT(sp,t);vec3 n=normalize(vec3(-(SAT(sp+vec2(e,0.),t)-h)/e*.6,-(SAT(sp+vec2(0.,e),t)-h)/e*.6,1.));
   float sv=.012+.05*pow(max(dot(n,normalize(vec3(-.45,.55,.7))),0.),2.)+.22*pow(max(dot(n,normalize(vec3(-.2,.3,1.))),0.),60.);
   C=vec3(sv*mix(.5,1.,smoothstep(.15,.7,length((uv-vec2(.52,.45))*vec2(1.,1.15)))));/* dim satin folds underneath, darkest mid-screen */
+  if(MO>.5){/* Bronze Ribbon: near-black, one big copper ribbon curling down the left, a smaller one top right */
+    C*=.45;
+    rib(p,vec2(.95*a,.86),2.3,2.2,.05,1.1,.07*m,1.5,t);
+    rib(p,vec2(.11*a,.5),1.5,2.6,.08,4.2,.12*m,1.05,t);
+    float v=C.r;vec3 K=vec3(1.,.66,.42);v=pow(v,.8)*1.9;C=mix(K*v,vec3(1.,.9,.8),smoothstep(.8,1.4,v));gl_FragColor=vec4(C,1.);return;}
   /* back to front */
   rib(p,vec2(.78*a,.02),.22,2.2,.06,1.3,.11*m,1.3,t);         /* bottom right sweep */
   rib(p,vec2(.93*a,.78),1.05,2.6,.05,2.4,.1*m,1.5,t);         /* top right */
@@ -10268,10 +10299,10 @@ void main(){vec2 uv=gl_FragCoord.xy/R;float a=R.x/R.y;vec2 p=vec2(uv.x*a,uv.y);f
   const init=()=>{g=cv.getContext("webgl",{antialias:false,alpha:false,preserveDrawingBuffer:false});if(!g)return false;const sh=(ty,s)=>{const o=g.createShader(ty);g.shaderSource(o,s);g.compileShader(o);return o};
     const pr=g.createProgram();g.attachShader(pr,sh(g.VERTEX_SHADER,"attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}"));g.attachShader(pr,sh(g.FRAGMENT_SHADER,FS));g.linkProgram(pr);if(!g.getProgramParameter(pr,g.LINK_STATUS))return false;g.useProgram(pr);
     const b=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,b);g.bufferData(g.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),g.STATIC_DRAW);const l=g.getAttribLocation(pr,"a");g.enableVertexAttribArray(l);g.vertexAttribPointer(l,2,g.FLOAT,false,0,0);
-    const uR=g.getUniformLocation(pr,"R"),uT=g.getUniformLocation(pr,"T");draw=t=>{g.viewport(0,0,cv.width,cv.height);g.uniform2f(uR,cv.width,cv.height);g.uniform1f(uT,t);g.drawArrays(g.TRIANGLES,0,3)};return true};
+    const uR=g.getUniformLocation(pr,"R"),uT=g.getUniformLocation(pr,"T"),uM=g.getUniformLocation(pr,"MO");draw=t=>{g.viewport(0,0,cv.width,cv.height);g.uniform2f(uR,cv.width,cv.height);g.uniform1f(uT,t);g.uniform1f(uM,mo);g.drawArrays(g.TRIANGLES,0,3)};return true};
   const size=()=>{const d=Math.min(1,(devicePixelRatio||1)*.5),H=(window.aotFullH?aotFullH():innerHeight);cv.width=Math.round(innerWidth*d);cv.height=Math.round(H*d)};
   const loop=n=>{raf=requestAnimationFrame(loop);if(document.hidden||n-last<33)return;last=n;draw(n/1000-t0)};
-  const check=()=>{const h=document.documentElement,want=h.classList.contains("tpl-chrome")&&h.classList.contains("tpl-bg");
+  const check=()=>{const h=document.documentElement,want=(h.classList.contains("tpl-chrome")||h.classList.contains("tpl-bronze"))&&h.classList.contains("tpl-bg");mo=h.classList.contains("tpl-bronze")?1:0;/* was Chrome only */
     if(want&&!on){if(!draw&&!init())return;on=true;size();raf=requestAnimationFrame(loop)}else if(!want&&on){on=false;cancelAnimationFrame(raf)}};
   new MutationObserver(check).observe(document.documentElement,{attributes:true,attributeFilter:["class"]});addEventListener("resize",()=>{if(on)size()});check()})();
 /* one-time: Liquid Chrome was redone to match its mockup — drop old Chrome slider/fine-tune tweaks so the new look shows */
