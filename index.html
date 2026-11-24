@@ -4316,7 +4316,7 @@ function breakdownPanel(d){const DS=dashStats(d,today()),t=today(),tm=d.meals.fi
   const MK=[["Carbs","carbs","#f27fb2"],["Protein","protein","#a688f2"],["Fiber","fiber","#b8875f"],["Fat","fat","#f2c14e"]],mv=MK.map(([n,k,c])=>({n,k,c,v:sum(k),g:mgGoal(k)}));
   /* Passions in order: Priority, then Moderate, then Bonus (then none); within a level, by the order of the category tabs on Passions, then the passion's own order. Colours stay with each passion. (was: d.passions in stored order) */
   const CI=id=>{let k=-1;try{k=cats().findIndex(c=>c.id===id)}catch(_){}return k<0?999:k};
-  const P=d.passions.map((p,i)=>[p,i]).sort((a,b)=>((LVR[a[0].lvl]??3)-(LVR[b[0].lvl]??3))||(CI(a[0].cat)-CI(b[0].cat))||((a[0].order??a[1])-(b[0].order??b[1]))).map(([p,i])=>({n:p.name,k:p.id,lvl:p.lvl||"",c:BDPAL[i%BDPAL.length],v:d.sessions.filter(x=>x.pid===p.id&&!x.planned).reduce((a,x)=>a+(+x.mins||0),0),g:(+p.goal||0)*60}));
+  const P=d.passions.map((p,i)=>[p,i]).sort((a,b)=>((LVR[a[0].lvl]??3)-(LVR[b[0].lvl]??3))||(CI(a[0].cat)-CI(b[0].cat))||((a[0].order??a[1])-(b[0].order??b[1]))).map(([p,i])=>({n:p.name,k:p.id,lvl:p.lvl||"",c:(()=>{try{const k=cats().find(c=>c.id===p.cat);if(k)return catColor(k)}catch(_){}return "#9db0d0"})(),/* colour = its category colour on the Passions tab (was: BDPAL[i%BDPAL.length]) */v:d.sessions.filter(x=>x.pid===p.id&&!x.planned).reduce((a,x)=>a+(+x.mins||0),0),g:(+p.goal||0)*60}));
   let out=0,inc=0;try{const S=bStats();out=S.subs+S.bills+S.spent;inc=S.inc}catch(_){}
   return `<div class="panel bdown bstrip-p" style="margin-top:18px" data-akg="bd"><div class="bstrip"><b>Breakdown</b></div><div class="tgrid">
     <section class="bdn-sec">${bdMain(DS[0],"Nutrition")}${bdMulti(mv)}${mv.map(x=>bdMeter(x.n,x.v,x.g,`${n0(x.v)}${x.g?" / "+n0(x.g):""} g`,x.c,x.k)).join("")}${bdMeter("Water",nWater(t),nWGoal(),`${n0(nWater(t))} / ${n0(nWGoal())} cups`,"#4cc9ff","water")}${bdKcal(sum("kcal"),kLim(t))}</section>
@@ -9523,7 +9523,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="773",APPT="2026-11-24T06:47:30Z";   /* APPT: when this update was made */
+const APPV="774",APPT="2026-11-24T06:49:54Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
