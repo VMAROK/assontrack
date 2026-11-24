@@ -3321,7 +3321,7 @@ html.tpl-stipple.tpl-bg #tplbg{background:#09090c!important}
 #stipbg{display:none}html.tpl-stipple.tpl-bg #stipbg{display:block;position:fixed;inset:0;width:100%;height:var(--apph,100%);z-index:0;pointer-events:none}
 html.tpl-stipple .panel{background:var(--card)!important;border:1px solid var(--line)!important;border-radius:2px!important}
 /* panels a little see-through so the dots show faintly behind them (fixed by the template, not the Glass sliders); a light blur keeps them from distracting */
-html.tpl-stipple.tpl-stipple #view .panel{background:rgba(14,14,18,.45)!important;-webkit-backdrop-filter:blur(2px)!important;backdrop-filter:blur(2px)!important}/* was .66 / 3px */
+html.tpl-stipple.tpl-stipple #view .panel{background:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}/* fully see-through (was .45 + 2px blur) *//* was .66 / 3px */
 html.tpl-stipple.tpl-stipple #view .panel .panel,html.tpl-stipple.tpl-stipple #view .panel .tile{background:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 html.tpl-stipple.tpl-stipple.tpl-stipple :is(aside,.topbar){background-color:rgba(9,9,12,.3)!important;background-image:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}/* no blur: the dots behind stay crisp */
 html.tpl-stipple :is(.nav,nav,aside,header,.topbar){background:rgba(9,9,12,.38)!important;border-color:var(--line)!important}
@@ -9768,7 +9768,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="802",APPT="2026-11-24T08:59:43Z";   /* APPT: when this update was made */
+const APPV="803",APPT="2026-11-24T09:03:30Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
