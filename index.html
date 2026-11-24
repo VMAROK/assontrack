@@ -2818,6 +2818,16 @@ html.tpl-dpan .flogp .fd-chain,html.tpl-dpan .flogp .fd-ct{background:rgba(255,2
 .nm-card.nm-sel,.nm-row.nm-sel,.nm-secs.list .nm-row.nm-sel{background:color-mix(in srgb,var(--cc) 22%,transparent)!important;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--cc) 65%,transparent)!important}.nm-selbar{display:flex;align-items:center;gap:8px;margin:0;padding:8px 10px;border:1px solid rgba(var(--lr),.18);border-radius:12px;background:rgba(var(--tX),.4)}.nm-selbar b{font-size:13.5px}.nm-selb{font:inherit;font-size:13px;font-weight:600;color:inherit;background:rgba(var(--tX),.5);border:1px solid rgba(var(--lr),.22);border-radius:9px;padding:6px 12px;cursor:pointer;display:inline-flex;align-items:center}.nm-selb.del{color:#fff;background:#e5484d;border-color:#e5484d}.nm-selb:disabled{opacity:.4}   /* multi-select in Meals */
 .nm-swact{position:absolute;z-index:4;width:0;overflow:hidden;display:flex;flex-direction:column;background:rgba(var(--tX),.92);border:0}.nm-swact.row{flex-direction:row}.nm-swact.nsw-anim{transition:width .25s cubic-bezier(.25,.8,.3,1)}.nm-swact button{flex:1 1 0;min-width:0;min-height:0;display:grid;place-items:center;border:0;background:none;color:var(--cc,#cfe0ff);cursor:pointer;padding:0;font:inherit}.nm-swact:not(.row) button+button{border-top:1px solid rgba(var(--lr),.18)}.nm-swact.row button+button{border-left:1px solid rgba(var(--lr),.18)}.nm-swact button svg{flex:none}   /* right-swipe actions: Edit / Log again / Save to Usuals */
 .nm-selck{width:24px;height:24px;flex:none;display:grid;place-items:center;padding:0;border-radius:6px;border:2px solid rgba(var(--lr),.55);background:none;color:#fff;cursor:pointer}.nm-selck svg path{display:none}.nm-selck.all,.nm-selck.some{background:var(--cc,#4cc9ff);border-color:var(--cc,#4cc9ff)}.nm-selck.all .ck,.nm-selck.some .dash{display:block}.nm-selb.ok{background:#2fbf71;border-color:#2fbf71;color:#fff}.nm-selb.cxl{background:#ff8a1f;border-color:#ff8a1f;color:#fff}.nm-selb.del,.nm-selb.ok,.nm-selb.cxl{padding:6px 10px}   /* select bar: checkbox select-all, red delete, orange cancel, green done */
+/* Dashboard: today is gold on every theme (independent of the theme colour) */
+html #view .mc.today .mn{background:#ffb020!important;color:#1a1000!important;box-shadow:0 0 12px rgba(255,176,32,.6)!important}
+html #view .mc.today{background:linear-gradient(180deg,rgba(255,176,32,.32),rgba(255,140,0,.1))!important;box-shadow:inset 0 0 0 2px #ffb020,0 0 18px rgba(255,176,32,.45)!important}
+html #view .mc.today.sel{box-shadow:inset 0 0 0 2px #ffb020,inset 0 0 0 4px rgba(255,255,255,.9),0 0 22px rgba(255,176,32,.6)!important}
+.dayview .ph .seg2{margin-left:auto}
+.dp{display:grid;gap:12px;margin-top:10px}.dp-all{display:flex;height:14px;border-radius:99px;background:rgba(150,180,240,.14);overflow:hidden}.dp-all i{display:block;height:100%;background:var(--c)}.dp-all i+i{box-shadow:inset 2px 0 0 rgba(0,0,0,.55)}
+.dp-r{display:grid;grid-template-columns:86px minmax(0,1fr) auto;align-items:center;gap:12px;font-size:13.5px}.dp-r b{color:var(--c);font-family:var(--mono);font-size:12.5px;white-space:nowrap}
+.dp-t{height:10px;border-radius:99px;background:rgba(150,180,240,.14);overflow:hidden;display:flex}.dp-t i{display:block;height:100%;background:var(--c);border-radius:99px;flex:none}.dp-t.ov i{border-radius:0}.dp-t.ov i:first-child{border-radius:99px 0 0 99px}.dp-t.ov i:last-child{border-radius:0 99px 99px 0}
+.dp-d{grid-template-columns:150px minmax(0,1fr);align-items:center;gap:18px}.dp-svg{width:150px;height:150px}.dp-leg{display:grid;gap:10px}.dp-leg>div{display:grid;grid-template-columns:12px auto minmax(0,1fr) auto;align-items:center;gap:8px;font-size:13.5px}.dp-leg i{width:10px;height:10px;border-radius:3px;background:var(--c)}.dp-leg b{font-family:var(--mono);font-size:12.5px;color:var(--c);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dp-leg em{font-style:normal;color:var(--muted);font-size:12px;min-width:36px;text-align:right}
+html.phone .dp-d{grid-template-columns:minmax(0,1fr);justify-items:center}html.phone .dp-leg{width:100%}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -3937,6 +3947,24 @@ function dayItems(d,ds){
     ...(wt?[{c:"var(--violet)",t:"Weigh-in",s:"Body",v:wt.v+" "+d.goals.unit}]:[])];
   return {ev,chips,logs};
 }
+/* Dashboard: the selected day's progress — Nutrition (calories vs limit), Passions (time done vs planned), Budget (this month's spending vs income) */
+let dpV=null;const dpView=()=>{if(dpV==null){try{dpV=localStorage.getItem("aot-dpv")||"bar"}catch(_){dpV="bar"}}return dpV};
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-dpv]");if(!b)return;e.preventDefault();e.stopPropagation();dpV=b.dataset.dpv;try{localStorage.setItem("aot-dpv",dpV)}catch(_){}const v=$("#view"),st=v?v.scrollTop:0;render();if(v)v.scrollTop=st},true);
+function dashStats(d,ds){
+  const k=d.meals.filter(m=>m.d===ds).reduce((a,m)=>a+(+m.kcal||0),0),L=+kLim(ds)||0;
+  const done=d.sessions.filter(s=>s.d===ds&&!s.planned).reduce((a,s)=>a+(+s.mins||0),0);let plan=0;try{plan=slotsOn(d,ds).reduce((a,x)=>a+(+slotMins(x.slot)||0),0)}catch(_){}
+  let out=0,inc=0;try{const S=bStats();out=S.subs+S.bills+S.spent;inc=S.inc}catch(_){}
+  const N={k:"Nutrition",c:"#3ddc84",f:L?k/L:0,v:L?`${n0(k)} / ${n0(L)} cal`:`${n0(k)} cal`,over:L&&k>L},
+    P={k:"Passions",c:"#ffb648",f:plan?done/plan:done?1:0,v:plan?`${fmtH(done)} / ${fmtH(plan)}`:done?fmtH(done):"nothing planned",over:false},
+    Bu={k:"Budget",c:"#a688f2",f:inc?out/inc:0,v:inc?`${bMoney(out,0)} / ${bMoney(inc,0)}`:"no income set",over:inc&&out>inc};
+  return [N,P,Bu]}
+function dashProg(d,ds){const A=dashStats(d,ds),cl=x=>Math.max(0,Math.min(1,x));
+  if(dpView()==="donut"){/* three rings, touching, outlined — like the week strip */const R=[44,32,20],SW=12;
+    const ring=(x,i)=>{const r=R[i],C=2*Math.PI*r,f=cl(x.f),ov=x.over?Math.min(.999,x.f-1):0;return `<circle cx="60" cy="60" r="${r}" fill="none" stroke="rgba(150,180,240,.12)" stroke-width="${SW}"/>${f?`<circle data-ak="dp:${x.k}" cx="60" cy="60" r="${r}" fill="none" stroke="${x.c}" stroke-width="${SW}" stroke-dasharray="${(C*f).toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="0" transform="rotate(-90 60 60)"/>`:""}${ov?`<circle data-ak="dp:${x.k}o" cx="60" cy="60" r="${r}" fill="none" stroke="#ff4d6a" stroke-width="${SW}" stroke-dasharray="${(C*ov).toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="0" transform="rotate(-90 60 60)"/>`:""}`};
+    return `<div class="dp dp-d" data-akg="dp"><svg class="dp-svg" data-akg="dpr" viewBox="0 0 120 120" aria-hidden="true">${A.map(ring).join("")}${[R[0]+SW/2,R[0]-SW/2,R[1]-SW/2,R[2]-SW/2].map(r=>`<circle cx="60" cy="60" r="${r}" fill="none" stroke="#000" stroke-width="1.2"/>`).join("")}</svg><div class="dp-leg">${A.map(x=>`<div style="--c:${x.over?"#ff4d6a":x.c}"><i></i><span>${x.k}</span><b>${x.v}</b><em>${Math.round(x.f*100)}%</em></div>`).join("")}</div></div>`}
+  /* bar view: one multicolour bar (each area fills its third), then a bar each */
+  return `<div class="dp" data-akg="dp"><div class="dp-all">${A.map(x=>`<i data-akw="dp:a${x.k}" style="width:${(cl(x.f)*100/3).toFixed(2)}%;--c:${x.over?"#ff4d6a":x.c}"></i>`).join("")}</div>
+    ${A.map(x=>{const ov=x.over?Math.min(100,(x.f-1)*100):0;return `<div class="dp-r" style="--c:${x.over?"#ff4d6a":x.c}"><span>${x.k}</span><div class="dp-t${ov?" ov":""}">${ov?`<i data-akw="dp:r${x.k}" style="width:${ov.toFixed(1)}%;--c:#ff4d6a"></i><i data-akw="dp:g${x.k}" style="width:${(100-ov).toFixed(1)}%;--c:${x.c}"></i>`:`<i data-akw="dp:g${x.k}" style="width:${(cl(x.f)*100).toFixed(1)}%"></i>`}</div><b>${x.v}</b></div>`}).join("")}</div>`}
 function bigCal(d){
   const now=new Date();if(!calMonth)calMonth=new Date(now.getFullYear(),now.getMonth(),1);if(!calSel)calSel=today();
   const y=calMonth.getFullYear(),m=calMonth.getMonth(),off=new Date(y,m,1).getDay(),last=new Date(y,m+1,0);
@@ -3950,10 +3978,9 @@ function bigCal(d){
       <div style="display:flex;gap:8px"><button class="pill calnav" data-cal="-1" aria-label="Previous month">‹</button><button class="pill calnav" data-cal="0">Today</button><button class="pill calnav" data-cal="1" aria-label="Next month">›</button></div></div>
     <div class="mcal">${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(w=>`<div class="cw">${w}</div>`).join("")}${cells.join("")}</div>
     <div class="dayview">
-      <div><div class="ph"><span>${new Date(calSel+"T12:00").toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</span><i>${it.ev.length+it.logs.length} item${it.ev.length+it.logs.length===1?"":"s"}</i></div>
-        <div class="rows">${it.ev.map(e=>`<div class="r" style="--c:var(--cyan)"><span class="dot"></span><div class="m"><div>${esc(e.title)}</div><small>${e.time?fmtTime(e.time):"All day"}</small></div>${del("events",e.id)}</div>`).join("")}
-        ${it.logs.map(l=>`<div class="r" style="--c:${l.c}"><span class="dot"></span><div class="m"><div>${esc(l.t)}</div><small>${esc(l.s)}</small></div><div class="v">${l.v}</div></div>`).join("")}
-        ${!it.ev.length&&!it.logs.length?`<div class="empty" style="padding:16px">Nothing planned or logged</div>`:""}</div></div>
+      ${""/* was: the day's list of everything logged (foods, passions…) — too messy; replaced by progress for Nutrition / Passions / Budget. Events you add still show. */}<div><div class="ph"><span>${new Date(calSel+"T12:00").toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</span><div class="seg2" role="group" aria-label="Show as"><button data-dpv="bar" aria-pressed="${dpView()!=="donut"}">Bar</button><button data-dpv="donut" aria-pressed="${dpView()==="donut"}">Donut</button></div></div>
+        ${dashProg(d,calSel)}
+        ${it.ev.length?`<div class="rows" style="margin-top:12px">${it.ev.map(e=>`<div class="r" style="--c:var(--cyan)"><span class="dot"></span><div class="m"><div>${esc(e.title)}</div><small>${e.time?fmtTime(e.time):"All day"}</small></div>${del("events",e.id)}</div>`).join("")}</div>`:""}</div>
       <form class="f" id="evForm"><div class="ph" style="margin-bottom:2px"><span>Add an event</span></div>
         <label>Event<input id="evT" required placeholder="Dance class" autocomplete="off"></label>
         <div class="f2"><label>Date<input id="evD" type="date" value="${calSel}" required></label><label>Time<input id="evTm" type="time"></label></div>
@@ -9144,7 +9171,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="674",APPT="2026-11-24T00:14:45Z";   /* APPT: when this update was made */
+const APPV="675",APPT="2026-11-24T00:16:55Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
