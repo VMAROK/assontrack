@@ -2989,6 +2989,10 @@ html:not(.phone) #view[data-tab="budget"] #bsForm>:is(input,select){box-shadow:i
 html body #view .panel.hasStrip::before{display:none!important}   /* the top-left corner bracket sat on the title strip */
 @media (min-width:1100px){html:not(.phone) #view[data-tab="fuel"]>*{margin-left:150px!important;margin-right:150px!important}html:not(.phone) #view[data-tab="fuel"]>.usp.usp{max-width:none;margin-left:150px!important;margin-right:150px!important}}   /* Nutrition, landscape: every panel 100px in from each side */
 .us-dupb{display:inline-flex;align-items:center;gap:6px}
+/* "Logged" badge on a usual: Undo inside it; stays ~4s, then fades out slowly */
+.us2-tick{display:flex;align-items:center;justify-content:center;gap:10px;animation:usTick 4s ease both}
+@keyframes usTick{0%{opacity:0;transform:translateY(6px)}6%{opacity:1;transform:none}70%{opacity:1}100%{opacity:0}}
+.us2-undo{padding:3px 10px;border-radius:8px;background:rgba(11,16,32,.85);color:#fff;font-weight:700;font-size:12px;cursor:pointer}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4294,7 +4298,7 @@ function usRecent(){const seen={},out=[];[...data.meals].sort((a,b)=>(a.d<b.d?1:
 const US=()=>{if(!data.usuals||!Array.isArray(data.usuals.groups))data.usuals={groups:[]};return data.usuals};
 const usFind=id=>{for(const g of US().groups){const it=(g.items||[]).find(x=>x.id===id);if(it)return [g,it]}return [null,null]};
 function foodEntry(f,qty,unit,cz){const m=foodCalcZ(f,qty,unit,cz),czt=czTxt(f,cz);return {img:f.img||"",name:((String(f.id||"").startsWith("ff:")&&f.brand?f.brand+" ":"")+(cz&&cz.milk&&cz.milk!=="2%"&&czMilk(f)?f.name.replace(/, (2%|whole) milk/i,""):f.name)+(m.txt?" ("+m.txt.replace(/ × $/,"×")+")":"")).slice(0,90)+(czt?" · "+czt:""),kcal:Math.round(m.kcal),protein:Math.round(m.p),carbs:Math.round(m.c),fat:Math.round(m.f),fiber:Math.round(m.fb||0),fid:f.id}}
-function usLog(it,type){nLogCopy(it,type||fType||mealNow());}
+function usLog(it,type){return nLogCopy(it,type||fType||mealNow());}
 function usPanel(){const G=US().groups,t=fType||mealNow();
   return `<div class="panel bpan usp" style="margin-top:18px"><div class="ph bp-h"><span>Usuals</span><span class="bp-add">${/* (was) <i>tap a card to log it</i> */""}<button type="button" data-usadd="">＋ Add</button><button type="button" data-usgnew>＋ Group</button></span></div>
     ${G.length?`<div class="us-grid us2">${G.map((g,gi)=>usGroupCard(g,gi)).join("")}</div>`
@@ -4319,7 +4323,7 @@ function usGroupCard(g,gi){const c=g.c||UPAL[gi%UPAL.length],I=(g.items||[]).sli
     <div class="us2-shelf">${order.map(([x,n])=>{const on=fl&&(fl.id===x.id||fl.g===g.id);return `<button type="button" class="us-it us2-c${on?" logged":""}" data-usit="${x.id}">
         ${n?`<span class="us2-b">logged ${n}×</span>`:""}<span class="us2-star${x.fav?" on":""}" data-usfav="${x.id}" role="button" aria-label="${x.fav?"Unpin favourite":"Pin as favourite"}">${x.fav?"★":"☆"}</span>
         <span class="us2-pic">${fPic(x)}</span>${(sp=>`<span class="us2-n" title="${esc(x.name)}">${esc(sp.t)}</span><small class="us2-sub">${sp.br?`<em class="nm-br">${esc(sp.br)}</em>`:""}${esc(sp.d)||"&nbsp;"}</small>`)(nSplit(x.name))}<span class="us2-k">${n0(x.kcal)}<i>cal</i></span>${usStrip(x)}
-        ${on?`<span class="us2-tick">✓ Logged to ${esc(fl.meal)}</span>`:""}</button>`}).join("")}
+        ${on?`<span class="us2-tick" style="animation-delay:-${Math.max(0,4000-(fl.until-Date.now()))}ms">✓ Logged to ${esc(fl.meal)}<span class="us2-undo" role="button" tabindex="0" data-usundo>Undo</span></span>`:""}</button>`}).join("")}
       <button type="button" class="us2-c us2-add" data-usadd="${g.id}"><span class="us2-pic">＋</span><span class="us2-n">Add a usual</span></button></div></section>`}
 /* window: pick a group to save into (or make one), rename/delete a group, edit an item */
 /* add to usuals: pick from your recent logs, or search your foods and every restaurant menu */
@@ -4371,7 +4375,7 @@ function usSheet(){let o=document.getElementById("usSheet");const open=usPick||u
   o.innerHTML=`<div class="wp-box panel bsh${usAdd?" usw":""}" role="dialog" aria-label="${h}"><div class="wp-h"><b>${h}</b><button type="button" class="x wp-x" data-usclose aria-label="Close">×</button></div><div class="bsh-g">${body}</div><div class="bsh-acts">${acts}</div></div>`;const sc2=o.querySelector(".us-rec");if(sc2)sc2.scrollTop=st;const n2=o.querySelector("#usNew");if(n2&&nv!=null&&usAdd)n2.value=nv}
 function usAddTo(gid,entry){const g=US().groups.find(x=>x.id===gid);if(!g)return;g.items=g.items||[];g.items.push(Object.assign({id:uid()},entry));save();sfx("blip");toast("Saved to "+g.n)}
 let usHoldT=null,usCmT=null;
-window.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-usadd],[data-usag],[data-uspickm],[data-usaddgo],[data-ussavefd],[data-usgnew],[data-usgedit],[data-usall],[data-usit],[data-usfav],[data-usmeal],[data-uspick],[data-uspicknew],[data-usclose],[data-uscol],[data-ussaveg],[data-ussavei],[data-usmv],[data-ushold],[data-usdup],[data-usdupg],[data-nmsave],#usSheet");if(!t)return;const d=t.dataset;
+window.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-usadd],[data-usag],[data-uspickm],[data-usaddgo],[data-ussavefd],[data-usgnew],[data-usgedit],[data-usall],[data-usit],[data-usfav],[data-usmeal],[data-uspick],[data-uspicknew],[data-usclose],[data-uscol],[data-ussaveg],[data-ussavei],[data-usmv],[data-ushold],[data-usdup],[data-usdupg],[data-usundo],[data-nmsave],#usSheet");if(!t)return;const d=t.dataset;
   if(t.id==="usSheet"){e.stopPropagation();if(e.target.id==="usSheet"&&Date.now()-usAt>700){usPick=null;usEdit=null;usAdd=null;usSheet()}return}
   e.preventDefault();e.stopPropagation();
   if(d.ushold!=null)return;
@@ -4385,12 +4389,13 @@ window.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("
   if(d.usgedit){const g=US().groups.find(x=>x.id===d.usgedit);usEdit={t:"g",id:d.usgedit,c:g&&g.c};usSheet();return}
   if(d.usfav){const [,it]=usFind(d.usfav);if(it){it.fav=!it.fav;sfx("blip");render();save()}return}
   if(d.usmeal){const [gid,m]=d.usmeal.split("|"),g=US().groups.find(x=>x.id===gid);if(g){g.meal=m;render();save()}return}
-  if(d.usall){const g=US().groups.find(x=>x.id===d.usall);if(!g)return;const ty=usMeal(g);(g.items||[]).forEach(x=>usLog(x,ty));sfx("blip");usFlash={g:g.id,meal:ty,until:Date.now()+1800};setTimeout(()=>{if(usFlash&&Date.now()>=usFlash.until){usFlash=null;render()}},1850);toast(g.n+": "+(g.items||[]).length+" items logged to "+ty.toLowerCase());render();save();return}
-  if(d.usit){if(cmHeld&&Date.now()-cmAt<900)return;const [g,it]=usFind(d.usit);if(!it)return;const ty=usMeal(g||{});usLog(it,ty);sfx("blip");usFlash={id:it.id,meal:ty,until:Date.now()+1800};setTimeout(()=>{if(usFlash&&Date.now()>=usFlash.until){usFlash=null;render()}},1850);toast(it.name.split(" · ")[0]+" logged to "+ty.toLowerCase());render();save();return}
+  if(d.usall){const g=US().groups.find(x=>x.id===d.usall);if(!g)return;const ty=usMeal(g);const ids=(g.items||[]).map(x=>usLog(x,ty).id);sfx("blip");usFlash={g:g.id,meal:ty,ids,until:Date.now()+4000};setTimeout(()=>{if(usFlash&&Date.now()>=usFlash.until){usFlash=null;render()}},4050);toast(g.n+": "+(g.items||[]).length+" items logged to "+ty.toLowerCase());render();save();return}
+  if(d.usit){if(cmHeld&&Date.now()-cmAt<900)return;const [g,it]=usFind(d.usit);if(!it)return;const ty=usMeal(g||{});const lg=usLog(it,ty);sfx("blip");usFlash={id:it.id,meal:ty,ids:[lg.id],until:Date.now()+4000};setTimeout(()=>{if(usFlash&&Date.now()>=usFlash.until){usFlash=null;render()}},4050);toast(it.name.split(" · ")[0]+" logged to "+ty.toLowerCase());render();save();return}
   if(d.uspick){usAddTo(d.uspick,usPick);usPick=null;usSheet();render();return}
   if(d.uspicknew!=null){const n=($("#usNew")||{}).value;if(!n||!n.trim()){toast("Name the group");return}const g={id:uid(),n:n.trim(),c:UPAL[US().groups.length%UPAL.length],items:[]};US().groups.push(g);usAddTo(g.id,usPick);usPick=null;usSheet();render();return}
   if(d.usdup){/* copy the usual right after the original, in the same group */const [g,it]=usFind(d.usdup);if(!it)return;const c=JSON.parse(JSON.stringify(it));c.id=uid();c.fav=false;c.name=(it.name||"Food")+" (copy)";const k=g.items.indexOf(it);g.items.splice(k+1,0,c);usEdit={t:"i",id:c.id};usSheet();render();save();toast("Duplicated — rename it here");setTimeout(()=>{const i=$("#usName");i&&(i.focus(),i.select())},60);return}
   if(d.usdupg){/* copy a whole group with all its usuals */const G=US().groups,g=G.find(x=>x.id===d.usdupg);if(!g)return;const c=JSON.parse(JSON.stringify(g));c.id=uid();c.n=(g.n||"Group")+" (copy)";(c.items||[]).forEach(x=>{x.id=uid()});G.splice(G.indexOf(g)+1,0,c);usEdit=null;usSheet();render();save();toast("Group duplicated");return}
+  if(d.usundo!=null){/* take back what was just logged */const f=usFlash;if(!f||!f.ids)return;data.meals=data.meals.filter(m=>!f.ids.includes(m.id));data.mealsGone=[...(data.mealsGone||[]),...f.ids].slice(-500);usFlash=null;toast("Undone");render();save();return}
   if(d.usclose!=null){usPick=null;usEdit=null;usAdd=null;usSheet();return}
   if(d.uscol){usEdit.c=d.uscol;const n=$("#usName"),v=n&&n.value;usSheet();const n2=$("#usName");if(n2&&v!=null)n2.value=v;return}
   if(d.ussaveg!=null){const n=(($("#usName")||{}).value||"").trim();if(!n){toast("Name the group");return}let g=US().groups.find(x=>x.id===usEdit.id);if(!g){g={id:usEdit.id,n,c:usEdit.c,items:[]};US().groups.push(g)}else{g.n=n;if(usEdit.c)g.c=usEdit.c}usEdit=null;usSheet();render();save();return}
@@ -9390,7 +9395,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="739",APPT="2026-11-24T03:51:12Z";   /* APPT: when this update was made */
+const APPV="740",APPT="2026-11-24T03:52:52Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
