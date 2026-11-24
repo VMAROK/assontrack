@@ -3108,7 +3108,7 @@ html.tpl-bd-dark body #view .panel.hasStrip::after{border-top-color:rgba(0,0,0,.
 html.tpl-bd-dark body #view .panel.hasStrip::after{border-color:rgba(0,0,0,.7)!important;opacity:1!important}
 html.tpl-bd-none body #view .panel.hasStrip::after{display:none!important}
 /* title strips (all tabs): lighter than the page behind, darker than the panel (was rgba(var(--tD),.5), which blended into the page with No border) */
-html body #view :is(.bstrip,.calhead.cal-c,.nwp>.bc>.bc-h,.bm-has>.bc>.bc-h,.bm-has>.bm-r>.ph:first-child,.bwg-solo>.ph:first-child),html body #view[data-tab="fuel"] :is(.holopanel,.flogp,.nmp,.usp,.wtr)>.ph:first-child,html body #view[data-tab="fuel"] .nwp .bm-r>.ph:first-child,html body #view .panel.hasStrip>.ph:first-child{background:rgba(var(--tD),.28)!important}
+html body #view :is(.bstrip,.calhead.cal-c,.nwp>.bc>.bc-h,.bm-has>.bc>.bc-h,.bm-has>.bm-r>.ph:first-child,.bwg-solo>.ph:first-child),html body #view[data-tab="fuel"] :is(.holopanel,.flogp,.nmp,.usp,.wtr)>.ph:first-child,html body #view[data-tab="fuel"] .nwp .bm-r>.ph:first-child,html body #view .panel.hasStrip>.ph:first-child{background:rgba(0,0,0,.22)!important}/* same step on every theme: plain black at 22% over the panel (was rgba(var(--tD),.28) — each theme darkened by a different amount) */
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9523,7 +9523,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="774",APPT="2026-11-24T06:49:54Z";   /* APPT: when this update was made */
+const APPV="775",APPT="2026-11-24T06:52:54Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
