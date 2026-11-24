@@ -296,7 +296,7 @@ window.aotFullH=()=>{const sw=screen.width,sh=screen.height,land=innerWidth>inne
     const size=()=>{W=innerWidth;H=window.aotFullH?window.aotFullH():innerHeight;dpr=Math.min(3,window.devicePixelRatio||1);cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);x.setTransform(dpr,0,0,dpr,0,0);x.imageSmoothingQuality="high";S={};v.init()};
     size();addEventListener("resize",size);
     let lastN=0;const loop=n=>{const ddt=Math.min(.05,lastN?(n-lastN)/1000:0);lastN=n;if(v.magnet){const tg=MAG.pts.length?1:0;MAG.k+=(tg-MAG.k)*(1-Math.pow(tg?.25:.08,ddt))}v.draw((n-t0)/1000);if(!R)raf=requestAnimationFrame(loop)};loop(performance.now());
-    let gate=false;/* "Tap to begin" gate turned off (v811) — the scene starts right away; was: try{gate=!manual&&!!window.aotSound&&window.aotSound.pick()!=="off"}catch(_){} */
+    let gate=false;try{gate=!manual&&!!window.aotSound&&window.aotSound.pick()!=="off"}catch(_){}/* "Tap to begin" is back: that tap starts the sound and the scene together; touching the scene afterwards makes no sound */
     if(gate){el.classList.add("sp-gate");el.insertAdjacentHTML("beforeend",'<div class="sp-begin">Tap to begin</div>')}else requestAnimationFrame(()=>requestAnimationFrame(()=>mid.classList.add("on")));
     /* Halftone can be played with while the app loads: drag to spin, points push away from the finger; the screen waits while you play */
     let busy=0,moved=0;
@@ -9831,7 +9831,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="812",APPT="2026-11-24T16:33:08Z";   /* APPT: when this update was made */
+const APPV="813",APPT="2026-11-24T16:38:01Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
