@@ -140,35 +140,76 @@
 .us2-edit:hover{background:color-mix(in srgb,var(--cc) 22%,transparent)}
 </style>
 </head><body>
-<!-- opening screen: quiet, spacious, drifting specks; fades away once the app is ready -->
+<!-- opening screen: five styles (Settings → Opening screen); drawn at the screen's full pixel density so it stays sharp -->
+<!-- was: a single "Specks" opening screen (v784) — its look is style 1 below -->
 <style>
-#aotSplash{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;overflow:hidden;background:radial-gradient(120% 90% at 50% 42%,#18233f 0%,#0d1426 48%,#070a14 100%);transition:opacity .9s cubic-bezier(.4,0,.2,1),visibility 0s linear .9s;-webkit-user-select:none;user-select:none}
+#aotSplash{position:fixed;inset:0;z-index:2147483000;overflow:hidden;background:#0a0f1e;transition:opacity .9s cubic-bezier(.4,0,.2,1),visibility 0s linear .9s;-webkit-user-select:none;user-select:none}
 #aotSplash.out{opacity:0;visibility:hidden;pointer-events:none}
-#aotSplash canvas{position:absolute;inset:0;width:100%;height:100%}
-#aotSplash .sp-orb{position:absolute;left:50%;top:46%;width:min(70vmin,520px);height:min(70vmin,520px);margin:calc(min(70vmin,520px)/-2) 0 0 calc(min(70vmin,520px)/-2);border-radius:50%;background:radial-gradient(circle at 50% 50%,rgba(91,157,255,.20),rgba(120,110,255,.08) 38%,transparent 66%);filter:blur(18px);animation:spBreathe 5.5s ease-in-out infinite}
-#aotSplash .sp-ring{position:absolute;left:50%;top:46%;width:min(38vmin,280px);height:min(38vmin,280px);margin:calc(min(38vmin,280px)/-2) 0 0 calc(min(38vmin,280px)/-2);border-radius:50%;border:1px solid rgba(160,190,255,.10);animation:spSpin 24s linear infinite}
-#aotSplash .sp-ring::after{content:"";position:absolute;top:-2px;left:50%;width:3px;height:3px;margin-left:-1.5px;border-radius:50%;background:#cfe0ff;box-shadow:0 0 10px 2px rgba(150,190,255,.7)}
-#aotSplash .sp-mid{position:relative;display:grid;justify-items:center;gap:18px;transform:translateY(-3vh);opacity:0;animation:spIn 1.4s .15s cubic-bezier(.2,.7,.2,1) forwards}
-#aotSplash .sp-word{font:300 15px/1 -apple-system,"SF Pro Display","Inter",system-ui,sans-serif;letter-spacing:.48em;margin-right:-.48em;text-transform:uppercase;color:rgba(232,238,250,.88)}
+#aotSplash canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#aotSplash .sp-grain{position:absolute;inset:-50%;opacity:.06;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");animation:spGr 1s steps(4) infinite}
+@keyframes spGr{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-1%)}}
+#aotSplash .sp-mid{position:absolute;left:0;right:0;margin-top:-40px;display:grid;justify-items:center;gap:18px;opacity:0;transform:translateY(8px);transition:opacity 1.4s cubic-bezier(.2,.7,.2,1),transform 1.4s cubic-bezier(.2,.7,.2,1)}
+#aotSplash .sp-mid.on{opacity:1;transform:none}
+#aotSplash .sp-word{font:300 15px/1 -apple-system,"SF Pro Display","Inter",system-ui,sans-serif;letter-spacing:.48em;margin-right:-.48em;text-transform:uppercase;color:rgba(232,238,250,.9);-webkit-font-smoothing:antialiased}
 #aotSplash .sp-word b{font-weight:500;color:#9cc2ff}
-#aotSplash .sp-sub{font:400 10.5px/1 -apple-system,"SF Pro Text","Inter",system-ui,sans-serif;letter-spacing:.32em;margin-right:-.32em;text-transform:uppercase;color:rgba(170,184,210,.45)}
-#aotSplash .sp-line{width:120px;height:1px;background:rgba(160,190,255,.14);overflow:hidden;border-radius:1px}
-#aotSplash .sp-line i{display:block;height:100%;width:0;background:linear-gradient(90deg,transparent,#9cc2ff);animation:spFill 1.5s .3s cubic-bezier(.6,0,.2,1) forwards}
-@keyframes spBreathe{0%,100%{transform:scale(.92);opacity:.75}50%{transform:scale(1.06);opacity:1}}
-@keyframes spSpin{to{transform:rotate(360deg)}}
-@keyframes spIn{to{opacity:1;transform:none}}
-@keyframes spFill{to{width:100%}}
-@media (prefers-reduced-motion:reduce){#aotSplash .sp-orb,#aotSplash .sp-ring,#aotSplash .sp-mid,#aotSplash .sp-line i{animation:none!important;opacity:1;transform:none;width:100%}}
+#aotSplash .sp-sub{font:400 10.5px/1 -apple-system,"SF Pro Text","Inter",system-ui,sans-serif;letter-spacing:.32em;margin-right:-.32em;text-transform:uppercase;color:rgba(170,184,210,.5);-webkit-font-smoothing:antialiased}
+#aotSplash .sp-line{width:120px;height:1px;background:rgba(160,190,255,.14);overflow:hidden}
+#aotSplash .sp-line i{display:block;height:100%;width:0;background:linear-gradient(90deg,transparent,#9cc2ff)}
+#aotSplash .sp-mid.on .sp-line i{width:100%;transition:width 1.6s .1s cubic-bezier(.6,0,.2,1)}
+@media (prefers-reduced-motion:reduce){#aotSplash .sp-grain{animation:none}}
 </style>
-<div id="aotSplash" aria-hidden="true"><canvas></canvas><div class="sp-orb"></div><div class="sp-ring"></div>
-  <div class="sp-mid"><div class="sp-word">Ass<b>On</b>Track</div><div class="sp-line"><i></i></div><div class="sp-sub">one quiet step at a time</div></div></div>
-<script>(()=>{const el=document.getElementById("aotSplash");if(!el)return;const cv=el.querySelector("canvas"),x=cv.getContext("2d"),R=matchMedia("(prefers-reduced-motion:reduce)").matches;let W=0,H=0,dpr=Math.min(2,window.devicePixelRatio||1),P=[],raf=0,t0=performance.now();
-  const size=()=>{W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;x.setTransform(dpr,0,0,dpr,0,0)};size();addEventListener("resize",size);
-  const N=Math.round(Math.min(220,Math.max(90,W*H/7000)));for(let i=0;i<N;i++)P.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()<.85?.35+Math.random()*.7:.9+Math.random()*.9,v:.06+Math.random()*.22,ph:Math.random()*6.28,tw:.4+Math.random()*1.4,hue:Math.random()<.2?260:215});
-  const draw=n=>{const t=(n-t0)/1000;x.clearRect(0,0,W,H);for(const p of P){p.y-=p.v;p.x+=Math.sin(t*.35+p.ph)*.08;if(p.y<-4){p.y=H+4;p.x=Math.random()*W}const a=.18+.5*(.5+.5*Math.sin(t*p.tw+p.ph));x.beginPath();x.arc(p.x,p.y,p.r,0,6.283);x.fillStyle=`hsla(${p.hue},90%,86%,${a.toFixed(3)})`;x.fill()}if(!R)raf=requestAnimationFrame(draw)};draw(performance.now());
-  let gone=false;const done=()=>{if(gone)return;gone=true;el.classList.add("out");setTimeout(()=>{cancelAnimationFrame(raf);el.remove()},1000)};
-  const minT=R?400:2200,ready=()=>{const w=Math.max(0,minT-(performance.now()-t0));setTimeout(done,w)};
-  if(document.readyState==="complete")ready();else addEventListener("load",ready,{once:true});setTimeout(done,4000)})();</script>
+<script>(()=>{
+  const STY=["specks","aurora","orbit","ripple","threads"];
+  const rnd=(a,b)=>a+Math.random()*(b-a);
+  function play(id,{min=2200,max=4000,manual=false}={}){
+    const old=document.getElementById("aotSplash");if(old)old.remove();
+    if(STY.indexOf(id)<0)id="specks";
+    const R=matchMedia("(prefers-reduced-motion:reduce)").matches;
+    const el=document.createElement("div");el.id="aotSplash";el.setAttribute("aria-hidden","true");
+    el.innerHTML='<canvas></canvas>'+(id==="aurora"||id==="threads"?'<div class="sp-grain"></div>':'')+'<div class="sp-mid"><div class="sp-word">Ass<b>On</b>Track</div><div class="sp-line"><i></i></div><div class="sp-sub">one quiet step at a time</div></div>';
+    (document.body||document.documentElement).appendChild(el);
+    const cv=el.querySelector("canvas"),x=cv.getContext("2d",{alpha:false}),mid=el.querySelector(".sp-mid");
+    let W=0,H=0,dpr=1,raf=0,S={},t0=performance.now();
+    const bg=(a,b,cx=.5,cy=.44)=>{const g=x.createRadialGradient(W*cx,H*cy,0,W*cx,H*cy,Math.hypot(W,H)*.62);g.addColorStop(0,a);g.addColorStop(1,b);x.fillStyle=g;x.fillRect(0,0,W,H)};
+    const dot=(px,py,r)=>{x.beginPath();x.arc(px,py,r,0,6.2832);x.fill()};
+    const V={
+      specks:{y:.5,init(){const n=Math.round(Math.min(240,Math.max(90,W*H/6500)));S.p=[...Array(n)].map(()=>({x:rnd(0,W),y:rnd(0,H),r:Math.random()<.85?rnd(.35,1.05):rnd(.9,1.8),v:rnd(.06,.28),ph:rnd(0,6.28),tw:rnd(.4,1.8),h:Math.random()<.2?260:215}))},
+        draw(t){bg("#18233f","#070a14");const M=Math.min(W,H),cx=W/2,cy=H*.46,b=.92+.14*(.5+.5*Math.sin(t*1.14));const g=x.createRadialGradient(cx,cy,0,cx,cy,M*.36*b);g.addColorStop(0,"rgba(91,157,255,.22)");g.addColorStop(.5,"rgba(120,110,255,.07)");g.addColorStop(1,"rgba(91,157,255,0)");x.fillStyle=g;x.fillRect(0,0,W,H);
+          const rr=Math.min(M*.19,140);x.strokeStyle="rgba(160,190,255,.12)";x.lineWidth=1;x.beginPath();x.arc(cx,cy,rr,0,6.2832);x.stroke();const a=t*.26-1.57;x.fillStyle="#d6e5ff";x.shadowColor="rgba(150,190,255,.9)";x.shadowBlur=12;dot(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr,1.6);x.shadowBlur=0;
+          for(const p of S.p){p.y-=p.v;p.x+=Math.sin(t*.35+p.ph)*.08;if(p.y<-4){p.y=H+4;p.x=rnd(0,W)}x.fillStyle=`hsla(${p.h},90%,86%,${(.18+.5*(.5+.5*Math.sin(t*p.tw+p.ph))).toFixed(3)})`;dot(p.x,p.y,p.r)}}},
+      aurora:{y:.5,init(){S.b=[{h:222,s:80,l:50,a:.55},{h:262,s:70,l:55,a:.45},{h:192,s:75,l:45,a:.38},{h:240,s:60,l:35,a:.5}].map((b,i)=>({...b,ph:i*1.7,sp:rnd(.05,.11)}));S.p=[...Array(80)].map(()=>({x:rnd(0,W),y:rnd(0,H),r:rnd(.3,.9),ph:rnd(0,6.28)}))},
+        draw(t){x.fillStyle="#0a0f1e";x.fillRect(0,0,W,H);x.globalCompositeOperation="lighter";const M=Math.max(W,H);
+          S.b.forEach((b,i)=>{const cx=W*(.5+.28*Math.sin(t*b.sp*2+b.ph)),cy=H*(.45+.22*Math.cos(t*b.sp*1.6+b.ph*1.3)),r=M*(.42+.08*Math.sin(t*.4+i)),h=b.h+Math.sin(t*.15+i)*14;const g=x.createRadialGradient(cx,cy,0,cx,cy,r);g.addColorStop(0,`hsla(${h},${b.s}%,${b.l}%,${b.a*.55})`);g.addColorStop(.3,`hsla(${h},${b.s}%,${b.l*.85}%,${b.a*.32})`);g.addColorStop(.6,`hsla(${b.h},${b.s}%,${b.l*.6}%,${b.a*.12})`);g.addColorStop(1,`hsla(${b.h},${b.s}%,${b.l*.5}%,0)`);x.fillStyle=g;x.fillRect(0,0,W,H)});
+          x.globalCompositeOperation="source-over";const v=x.createRadialGradient(W/2,H/2,M*.2,W/2,H/2,M*.75);v.addColorStop(0,"rgba(5,8,16,0)");v.addColorStop(1,"rgba(5,8,16,.75)");x.fillStyle=v;x.fillRect(0,0,W,H);
+          for(const p of S.p){x.fillStyle=`rgba(230,240,255,${(.15+.35*(.5+.5*Math.sin(t*.9+p.ph))).toFixed(3)})`;dot(p.x,p.y,p.r)}}},
+      orbit:{y:.7,init(){const M=Math.min(W,H);S.r=[...Array(9)].map((_,i)=>({rad:M*(.08+i*.045),tilt:.38+.05*Math.sin(i),sp:(i%2?1:-1)*rnd(.04,.16),dots:[...Array(1+(i%3))].map(()=>rnd(0,6.28)),al:.07+.06*(1-i/9)}));S.p=[...Array(120)].map(()=>({x:rnd(0,W),y:rnd(0,H),r:rnd(.25,.8),ph:rnd(0,6.28)}))},
+        draw(t){bg("#141d35","#060912");for(const p of S.p){x.fillStyle=`rgba(200,215,255,${(.12+.25*(.5+.5*Math.sin(t*.8+p.ph))).toFixed(3)})`;dot(p.x,p.y,p.r)}
+          x.save();x.translate(W/2,H*.44);x.rotate(-.35);
+          for(const o of S.r){x.strokeStyle=`rgba(170,200,255,${o.al})`;x.lineWidth=.8;x.beginPath();x.ellipse(0,0,o.rad,o.rad*o.tilt,0,0,6.2832);x.stroke();
+            for(const d of o.dots){const a=d+t*o.sp,px=Math.cos(a)*o.rad,py=Math.sin(a)*o.rad*o.tilt,front=Math.sin(a)>0;x.fillStyle=front?"#dbe7ff":"rgba(180,200,255,.45)";x.shadowColor="rgba(150,190,255,.9)";x.shadowBlur=front?10:0;dot(px,py,front?1.5:1);x.shadowBlur=0}}
+          const b=.8+.2*Math.sin(t*1.3),g=x.createRadialGradient(0,0,0,0,0,26*b);g.addColorStop(0,"rgba(210,225,255,.95)");g.addColorStop(.25,"rgba(120,170,255,.45)");g.addColorStop(1,"rgba(120,170,255,0)");x.fillStyle=g;dot(0,0,26*b);x.restore()}},
+      ripple:{y:.5,init(){const gap=Math.max(14,Math.round(Math.min(W,H)/34));S.g=[];for(let yy=gap/2;yy<H;yy+=gap)for(let xx=gap/2;xx<W;xx+=gap)S.g.push([xx,yy])},
+        draw(t){bg("#121a30","#070a14");const cx=W/2,cy=H*.46,M=Math.hypot(W,H)*.6;
+          for(const [px,py] of S.g){const d=Math.hypot(px-cx,py-cy),w=Math.max(0,Math.sin(d*.028-t*1.3)),e=Math.max(0,1-d/M),a=(.12+.7*w*w)*e;if(a<.03)continue;x.fillStyle=`rgba(${150+60*w|0},${185+40*w|0},255,${a.toFixed(3)})`;dot(px,py,.7+1.3*w*w*w*e)}
+          const g=x.createRadialGradient(cx,cy,0,cx,cy,Math.min(W,H)*.3);g.addColorStop(0,"rgba(80,140,255,.14)");g.addColorStop(1,"rgba(80,140,255,0)");x.fillStyle=g;x.fillRect(0,0,W,H)}},
+      threads:{y:.5,init(){const n=Math.round(Math.min(1400,W*H/400));S.p=[...Array(n)].map(()=>({x:rnd(0,W),y:rnd(0,H),age:rnd(0,200)}));x.fillStyle="#090d1c";x.fillRect(0,0,W,H)},
+        draw(t){x.fillStyle="rgba(9,13,28,.1)";x.fillRect(0,0,W,H);x.lineWidth=.7;
+          for(const p of S.p){const a=Math.sin(p.x*.0042+t*.12)*1.6+Math.cos(p.y*.0051-t*.09)*1.4+Math.sin((p.x+p.y)*.0017)*.8,nx=p.x+Math.cos(a)*.9,ny=p.y+Math.sin(a)*.9;x.strokeStyle=`hsla(${(228+22*Math.sin(p.y*.004+t*.1))|0},85%,80%,.22)`;x.beginPath();x.moveTo(p.x,p.y);x.lineTo(nx,ny);x.stroke();p.x=nx;p.y=ny;if(--p.age<0||p.x<0||p.x>W||p.y<0||p.y>H){p.x=rnd(0,W);p.y=rnd(0,H);p.age=rnd(80,260)}}}}};
+    const v=V[id];mid.style.top=(v.y*100)+"%";
+    /* sharp on every screen: the canvas uses the device's real pixel density (up to 3×) */
+    const size=()=>{W=innerWidth;H=innerHeight;dpr=Math.min(3,window.devicePixelRatio||1);cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);x.setTransform(dpr,0,0,dpr,0,0);x.imageSmoothingQuality="high";S={};v.init()};
+    size();addEventListener("resize",size);
+    const loop=n=>{v.draw((n-t0)/1000);if(!R)raf=requestAnimationFrame(loop)};loop(performance.now());
+    requestAnimationFrame(()=>requestAnimationFrame(()=>mid.classList.add("on")));
+    let gone=false;const done=()=>{if(gone)return;gone=true;el.classList.add("out");setTimeout(()=>{cancelAnimationFrame(raf);removeEventListener("resize",size);el.remove()},1000)};
+    const ready=()=>setTimeout(done,Math.max(0,(R?400:min)-(performance.now()-t0)));
+    if(manual||document.readyState==="complete")ready();else addEventListener("load",ready,{once:true});setTimeout(done,max);
+    el.addEventListener("click",done);
+  }
+  window.aotSplash={STY,play};
+  let pick="specks";try{pick=localStorage.getItem("aot-splash")||"specks"}catch(_){}
+  if(pick!=="off")play(pick);
+})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap">
 <style>
@@ -3161,6 +3202,12 @@ html:not(.phone) body #view[data-tab="dash"] .mcal .mc .mn{font-size:9.5px!impor
 html:not(.phone) body #view[data-tab="dash"] .mcal .mc:not(.mc-blank)::before{height:27px}
 html:not(.phone) body #view[data-tab="dash"] .mcal .mc:not(.mc-blank)>.chips.chips{top:30px}}
 .tpl-pv .tpl-def{position:absolute;right:8px;top:6px;font:600 10px/1 -apple-system,"SF Pro Text",Inter,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;color:rgba(200,206,220,.45);pointer-events:none}
+/* Settings → Opening screen picker */
+.spl-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.spl-c{display:grid;gap:4px;text-align:left;padding:12px 14px;border-radius:12px;border:1px solid rgba(var(--lr),.2);background:rgba(var(--tX),.35);color:var(--fg);font:inherit;cursor:pointer}
+.spl-c b{font-size:13.5px}.spl-c small{font-size:11.5px;color:var(--muted);line-height:1.35}
+.spl-c[aria-pressed="true"]{border-color:rgba(var(--tL),.8);box-shadow:0 0 0 1px rgba(var(--tL),.5),0 0 14px rgba(var(--tL),.2)}
+html.tpl-sharp .spl-c{border-radius:0}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9250,6 +9297,11 @@ function applyLook(tmp){tmp=typeof tmp==="number"?{glass:tmp}:(tmp||{});const L=
     if(!data.profile)data.profile={};if(data.profile.template===undefined){Object.assign(data.profile,{template:"midnight",tplSharp:true,gapIn:15,gapOut:15,gapLink:true});delete data.profile.tplPan;delete data.profile.tplBd;delete data.profile.tplBg;delete data.profile.tplBars}
     const PF=data.profile||{};h.classList.toggle("tpl-dpan",PF.tplPan==="dark");["none","dark"].forEach(k=>h.classList.toggle("tpl-bd-"+k,PF.tplBd===k));h.classList.toggle("tpl-sharp",PF.tplSharp===true);/* spacing sliders (replace the old Comfortable / Compact / Tight buttons) */
     const gi=PF.gapIn,go=PF.gapOut;h.classList.toggle("gap-in",gi!=null);h.classList.toggle("gap-out",go!=null);if(gi!=null)h.style.setProperty("--gin",gi+"px");if(go!=null)h.style.setProperty("--gout",go+"px");h.classList.toggle("tpl-bars-clear",PF.tplBars==="clear");h.classList.toggle("tpl-bars-pan",T?PF.tplBars!=="clear":PF.tplBars==="panel");setTimeout(barsSync,0);h.classList.remove("tpl-bd-light");spaFx.stop()/* lines off for now; was: if(tplBgOn())spaFx.run() */}}
+/* Settings → Opening screen: pick one of five styles (or off); tap again to preview */
+const SPL=[["specks","Specks","Drifting specks, breathing glow"],["aurora","Aurora","Soft colour clouds, film grain"],["orbit","Orbit","Fine rings turning, lights riding them"],["ripple","Ripple","Dots with a slow wave from the centre"],["threads","Threads","Faint silk threads in the wind"],["off","Off","Open straight into the app"]];
+const splashNow=()=>{try{return localStorage.getItem("aot-splash")||"specks"}catch(_){return "specks"}};
+function splashPanel(){const cur=splashNow();return `<div class="panel splp" style="margin-top:18px"><div class="ph"><span>Opening screen</span><i>Shown when the app opens</i></div><div class="spl-row">${SPL.map(([k,n,d])=>`<button type="button" class="spl-c spl-${k}" data-splash="${k}" aria-pressed="${cur===k}"><b>${n}</b><small>${d}</small></button>`).join("")}</div><p class="note" style="margin:10px 2px 0">Tap one to choose it and see it play.</p></div>`}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-splash]");if(!b)return;e.preventDefault();const k=b.dataset.splash;try{localStorage.setItem("aot-splash",k)}catch(_){}document.querySelectorAll("[data-splash]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.splash===k));if(k!=="off"&&window.aotSplash)window.aotSplash.play(k,{min:2600,manual:true})},true);
 function tplPanel(){const T=tplOf();return `<div class="panel tplp" style="margin-top:18px"><div class="ph"><span>Templates</span><i>${T?esc(T.name)+" is on":"Whole-page looks"}</i></div>
   <p class="note" style="margin:-2px 0 12px">A template restyles the whole app at once: colours, glass, type and its own backdrop. Your wallpaper and Boxes settings stay saved and come back when you switch it off.</p>
   <div class="tpl-row"><button type="button" class="tpl-c tpl-none" data-tpl="" aria-pressed="${!T}"><span class="tpl-pv"><span>Your own setup</span></span><b>None</b><small>Wallpaper and Boxes as you set them</small></button>${TEMPLATES.map(t=>`<button type="button" class="tpl-c" data-tpl="${t.id}" aria-pressed="${!!T&&T.id===t.id}"><span class="tpl-pv tpl-pv-${t.id}"><i></i><i></i><i></i><em></em><em></em>${t.id==="midnight"?'<s class="tpl-def">Default</s>':""}</span><b>${esc(t.name)}</b><small>${esc(t.sub)}</small></button>`).join("")}</div>
@@ -9373,7 +9425,7 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener("DOMContentLoaded",()=>eUnitFix(document.body));setTimeout(()=>eUnitFix(document.body),0);
 function vSet(){
   const g=data.goals;
-  return banner()+tplPanel()+wallPanel()+affPanel()+lookPanel()+themePanel()+hkPanel()+`<div class="grid cols2" style="margin-top:18px">
+  return banner()+tplPanel()+splashPanel()+wallPanel()+affPanel()+lookPanel()+themePanel()+hkPanel()+`<div class="grid cols2" style="margin-top:18px">
    <div class="panel"><div class="ph"><span>Goals</span><i>Goals</i></div>
     <form class="f" id="gForm"><div class="f2"><label>Daily calories<input id="gK" type="number" inputmode="numeric" min="0" value="${g.kcal}"></label><label>Daily protein (g)<input id="gP" type="number" inputmode="numeric" min="0" value="${g.protein}"></label></div>
     <label>Goal weight (${g.unit})<input id="gW" type="number" step="0.1" inputmode="decimal" value="${g.weight??""}" placeholder="Optional"></label>
@@ -9579,7 +9631,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="784",APPT="2026-11-24T07:27:04Z";   /* APPT: when this update was made */
+const APPV="785",APPT="2026-11-24T07:54:55Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
