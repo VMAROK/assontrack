@@ -3584,6 +3584,14 @@ html:not(.phone) body #view[data-tab="dash"] .bdown .bdn-sec{gap:7px!important}h
 html body #view .bdown .bdn-sec .meter .track{height:3px!important;min-height:3px!important;border-radius:2px!important}
 html body #view .bdown .bdn-sec .meter .track>i{border-radius:2px!important}
 html body #view .bdown .bdn-sec .meter{gap:3px!important}
+/* Breakdown rows line up across columns: every child row is the same height (label line fixed at 20px, the Priority/Moderate tag no longer makes it taller), the Passions list uses the same spacing as Nutrition, and it shows exactly 6 rows then scrolls (was gap 12px / max 270px, so rows drifted and 7+ showed) */
+html body #view .bdown{--bdg:12px}
+html:not(.phone) body #view[data-tab="dash"] .bdown{--bdg:7px}
+html body #view .bdown .bdn-sec{gap:var(--bdg)!important}
+html body #view .bdown .bdn-sec .meter-top{height:20px;line-height:20px;align-items:center}
+html body #view .bdown .bdn-sec .meter-top>span{display:flex;align-items:center;min-width:0;white-space:nowrap}
+html body #view .bdown .bd-lv{line-height:14px!important;padding:0 6px!important;vertical-align:middle!important}
+html body #view .bdown .bdn-scroll{gap:var(--bdg)!important;max-height:calc(28px * 6 + var(--bdg) * 5 + 2px)!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10058,7 +10066,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="854",APPT="2026-11-25T02:18:50Z";   /* APPT: when this update was made */
+const APPV="855",APPT="2026-11-25T02:22:21Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
