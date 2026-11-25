@@ -3770,6 +3770,9 @@ html:not(.phone):not(.tpl-bd-none) body #view[data-tab="fuel"]>:is(.nmp,.usp).pa
 /* Income / Expenses columns: nothing shows above the pinned title — the column has no top padding and the title covers the gap */
 html body #view[data-tab="budget"] .bco .bsecs>.bco-sec{padding-top:0!important}
 html body #view[data-tab="budget"] .bco .bsecs>.bco-sec>.bco-h{box-shadow:0 -30px 0 #0b0c0e,0 1px 0 rgba(255,255,255,.08)!important}
+/* top bar on iPad / iPhone: the device already shows the time, so the app clock is hidden there (desktop keeps it); the bar starts below the status bar so the logo isn't under the device clock, and stays slim */
+html:is(.tablet,.phone) #clk{display:none!important}
+html:is(.tablet,.phone) .topbar.topbar{padding-top:calc(env(safe-area-inset-top,0px) + 8px)!important;padding-bottom:8px!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10268,7 +10271,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="890",APPT="2026-11-25T04:02:17Z";   /* APPT: when this update was made */
+const APPV="891",APPT="2026-11-25T04:05:47Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
