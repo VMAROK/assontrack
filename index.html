@@ -3615,12 +3615,22 @@ html:not(.phone) body #view[data-tab="dash"]>.dcal-row>.cal-evp{align-self:stret
 /* Stipple (and Threads, which share its panels): the calendar in the theme's own monochrome — graphite weekday row, near-black days, fine grey grid, white numbers (was the navy calendar) */
 html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono):is(.tpl-stipple,.tpl-flow,.tpl-flowmono) body #view .mcal{border:1px solid rgba(255,255,255,.12)!important;border-radius:0!important;background:#08080a!important;overflow:hidden}
 html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono):is(.tpl-stipple,.tpl-flow,.tpl-flowmono) body #view .mcal .cw{background:#171718!important;color:#ececf0!important;font-size:13px!important;font-weight:400!important;border-color:rgba(255,255,255,.08)!important}
-html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono):is(.tpl-stipple,.tpl-flow,.tpl-flowmono) body #view .mcal .mc:not(.today){background:#08080a!important;border-color:rgba(255,255,255,.09)!important;box-shadow:none!important}
+html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono):is(.tpl-stipple,.tpl-flow,.tpl-flowmono) body #view .mcal .mc:not(.today):not(.pick){background:#08080a!important;border-color:rgba(255,255,255,.09)!important;box-shadow:none!important}
 html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono):is(.tpl-stipple,.tpl-flow,.tpl-flowmono) body #view .mcal .mc:not(.today) .mn{color:#f2f2f5!important;font-size:13px!important;font-weight:400!important;background:none!important}
 html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono):is(.tpl-stipple,.tpl-flow,.tpl-flowmono) body #view .mcal .mc:not(.today)::before{background:transparent!important}
 /* today stays gold on every theme (user) — grey/lavender version removed */
 html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono):is(.tpl-stipple,.tpl-flow,.tpl-flowmono) body #view .mcal .mc:is(.out,.mc-out,.other){background:#060607!important}
 html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono):is(.tpl-stipple,.tpl-flow,.tpl-flowmono) body #view .mcal .mc:is(.out,.mc-out,.other) .mn{color:rgba(255,255,255,.3)!important}
+/* selected day: the soft white highlight fades in on every theme (Stipple's dark days were covering it) */
+html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono):is(.tpl-stipple,.tpl-flow,.tpl-flowmono) body #view .mcal .mc.pick:not(.today){background:rgba(255,255,255,.09)!important;border-color:rgba(255,255,255,.09)!important}
+/* calendar dot view: every dot a perfect circle (they were being squeezed by the row) */
+html body #view .mcal.cal-dots .mc .chips em{flex:0 0 8px!important;width:8px!important;height:8px!important;min-height:8px!important;max-height:8px!important;line-height:0!important;aspect-ratio:1!important;box-sizing:border-box!important;border:0!important;overflow:hidden!important}
+html body #view .mcal.cal-dots .mc .chips em::before,html body #view .mcal.cal-dots .mc .chips em::after{display:none!important}
+html body #view .mcal.cal-dots .mc .chips em>*{display:none!important}
+/* every device: extra room at the end of each tab so the footer is always reachable (phones too, any rotation) */
+html.phone body #view{padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))!important}
+/* very wide screens: content stays a comfortable width, centred; closing the side panel lets the panels use the freed space up to that width */
+@media (min-width:1700px){html:not(.phone) body #view{padding-left:max(20px,calc((100% - 1560px) / 2))!important;padding-right:max(20px,calc((100% - 1560px) / 2))!important}}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4683,8 +4693,11 @@ function progressPanel(d){const wk=weekKey(today()),I={pass:passInfo(d),fit:fitI
   /* Overview = "Orbit" design (same on every theme): spaced label, thin full circle, progress arc + end dot in the tab's own colour, big light %, status word under — was: miniRing + name + coloured status + View button
   return `<div class="panel dtiles${dashAnim("tiles")}">${strip}${Object.keys(DCARDS).map(k=>`<div class="dtile">${miniRing(I[k].pct,I[k].col,HAS[k])}<b>${DCARDS[k]}</b><small style="color:${I[k].col}">${I[k].label}</small><button class="dview" data-dopen="${k}" aria-label="View ${DCARDS[k]} breakdown">View</button></div>`).join("")}</div>` */
   /* three rings — Nutrition, Passions, Budget (the Breakdown's order and colours; no Fitness) — and the moving knot art in the fourth spot on the right */
-  return `<div class="panel dtiles orbit${dashAnim("tiles")}">${strip}${[["diet","Nutrition"],["pass","Passions"],["budget","Budget"]].map(([k,nm])=>`<div class="dtile ob-t" style="--oc:${OBCOL[k]}"><b class="ob-l">${nm}</b>${orbitRing(I[k].pct)}<small class="ob-s">${I[k].label}</small><button class="dview" data-dopen="${k}" aria-label="View ${nm} breakdown">View</button></div>`).join("")}<div class="dtile ob-t ob-art" aria-hidden="true"><canvas></canvas></div></div>`}
+  return `<div class="panel dtiles orbit${dashAnim("tiles")}">${strip}${obOrder().map(([k,nm])=>`<div class="dtile ob-t" style="--oc:${OBCOL[k]}"><b class="ob-l">${nm}</b>${orbitRing(I[k].pct)}<small class="ob-s">${I[k].label}</small><button class="dview" data-dopen="${k}" aria-label="View ${nm} breakdown">View</button></div>`).join("")}<div class="dtile ob-t ob-art" aria-hidden="true"><canvas></canvas></div></div>`}
 /* Orbit ring: faint full circle, arc from 12 o'clock clockwise in the tab colour, a dot riding the arc's end, % in the middle */
+/* Overview cells follow the side-panel tab order (Nutrition / Passions / Budget as the user arranged them) */
+function obOrder(){const NM={fuel:["diet","Nutrition"],pass:["pass","Passions"],budget:["budget","Budget"]};let o=null;try{o=JSON.parse(localStorage.getItem("aot-navord")||"null")}catch(_){}
+  if(!Array.isArray(o))o=[];const seq=o.filter(k=>NM[k]);["fuel","pass","budget"].forEach(k=>{if(!seq.includes(k))seq.push(k)});return seq.map(k=>NM[k])}
 const OBCOL={pass:"#b99cff",fit:"#2ee6c5",diet:"#4cc9ff",budget:"#ffc533"};/* same colours as the Breakdown panel (Nutrition blue, Passions violet, Budget gold) — was amber / teal / blue / green */
 function orbitRing(pct){const r=46,C=2*Math.PI*r,f=pct==null?0:Math.max(0,Math.min(1,pct)),a=-Math.PI/2+f*2*Math.PI,dx=60+r*Math.cos(a),dy=60+r*Math.sin(a),txt=pct==null?"–":Math.round(Math.max(0,pct)*100)+"%";
   return `<div class="ob-r"><svg viewBox="7 7 106 106" aria-hidden="true"><circle cx="60" cy="60" r="${r}" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="1"/>${f>0?`<circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--oc)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="${(f*C).toFixed(2)} ${C.toFixed(2)}" transform="rotate(-90 60 60)" style="filter:drop-shadow(0 0 3px var(--oc))"/>`:""}${pct!=null?`<circle cx="${dx.toFixed(2)}" cy="${dy.toFixed(2)}" r="4.2" fill="var(--oc)" style="filter:drop-shadow(0 0 4px var(--oc))"/>`:""}</svg><span class="ob-p">${txt}</span></div>`}
@@ -10095,7 +10108,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="863",APPT="2026-11-25T02:44:04Z";   /* APPT: when this update was made */
+const APPV="864",APPT="2026-11-25T02:50:35Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -10274,7 +10287,7 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
     const off=lp-drag.grab-pos(drag.b);drag.b.style.transform=v?`translateY(${off}px)`:`translateX(${off}px)`},{capture:true,passive:false});
   document.addEventListener("touchmove",e=>{if(drag)e.preventDefault()},{capture:true,passive:false});
   const end=()=>{clearTimeout(hold);hold=0;if(!drag)return;const db=drag.b;db.style.transition="transform .2s cubic-bezier(.2,.8,.3,1)";db.style.transform="";setTimeout(()=>{db.style.transition="";db.classList.remove("nav-drag")},220);A().classList.remove("nav-dragging");
-    const o=cur().map(x=>x.dataset.tab);try{localStorage.setItem(K,JSON.stringify(o))}catch(_){}
+    const o=cur().map(x=>x.dataset.tab);try{localStorage.setItem(K,JSON.stringify(o))}catch(_){}try{if(typeof tab!=="undefined"&&tab==="dash"&&typeof render==="function")render()}catch(_){}/* Overview follows the new tab order */
     justDragged=true;setTimeout(()=>justDragged=false,350);drag=null};
   document.addEventListener("pointerup",end,true);document.addEventListener("pointercancel",end,true);
   document.addEventListener("click",e=>{if(justDragged&&e.target.closest&&e.target.closest("aside")){e.stopPropagation();e.preventDefault()}},true);
