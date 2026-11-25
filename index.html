@@ -3631,6 +3631,12 @@ html body #view .mcal.cal-dots .mc .chips em>*{display:none!important}
 html.phone body #view{padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))!important}
 /* very wide screens: content stays a comfortable width, centred; closing the side panel lets the panels use the freed space up to that width */
 @media (min-width:1700px){html:not(.phone) body #view{padding-left:max(20px,calc((100% - 1560px) / 2))!important;padding-right:max(20px,calc((100% - 1560px) / 2))!important}}
+/* Budget privacy: a floating eye button on the Budget tab hides company / item names and every amount behind dots, for screenshots */
+#bPriv{display:none;position:fixed;right:22px;bottom:calc(22px + env(safe-area-inset-bottom,0px));z-index:60;width:50px;height:50px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(20,20,24,.82);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#eee;place-items:center;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.45)}
+html.on-budget #bPriv{display:grid}
+html.phone #bPriv{bottom:calc(92px + env(safe-area-inset-bottom,0px));right:14px}
+html.bpriv #bPriv{background:rgba(255,197,51,.92);color:#151515;border-color:transparent}
+.bp-mask{letter-spacing:.12em}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10108,7 +10114,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="864",APPT="2026-11-25T02:50:35Z";   /* APPT: when this update was made */
+const APPV="865",APPT="2026-11-25T02:52:43Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -10491,5 +10497,19 @@ void main(){vec2 uv=gl_FragCoord.xy/R;float a=R.x/R.y;vec2 p=vec2(uv.x*a,uv.y);f
 (()=>{const add=()=>{const a=document.querySelector("aside");if(!a)return setTimeout(add,400);if(!a.querySelector(".navgrip")){const g=document.createElement("button");g.type="button";g.className="navgrip";g.setAttribute("data-navside","");g.setAttribute("aria-label","Hide or show the tabs");a.appendChild(g)}
   let x0=null,y0=0;a.addEventListener("touchstart",e=>{const t=e.touches[0];x0=t.clientX;y0=t.clientY},{passive:true});
   a.addEventListener("touchend",e=>{if(x0==null)return;const t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;x0=null;if(Math.abs(dx)<50||Math.abs(dx)<Math.abs(dy)*1.5)return;const h=document.documentElement;if(!h.classList.contains("tablet"))return;const mini=h.classList.contains("nav-mini");if((dx<0&&!mini)||(dx>0&&mini)){h.classList.toggle("nav-mini");try{localStorage.setItem("aot-navmini",mini?"0":"1")}catch(_){}}},{passive:true})};add()})();
+</script>
+<button id="bPriv" type="button" aria-label="Hide names and amounts" title="Hide names and amounts"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="bp-x" d="M4 4l16 16"/></svg></button>
+<script>/* Budget privacy mode: tap the eye to hide every amount and every income / expense / subscription / company name on the Budget tab (group names stay). Remembered on this device */
+(()=>{const B=document.getElementById("bPriv"),H=document.documentElement;let on=false;try{on=localStorage.getItem("aot-bpriv")==="1"}catch(_){}
+  const MONEY=/([-+−]?\s?[$€£¥₹]\s?[\d.,]+(?:\s?\/\s?\w+)?|[-+−]?[\d.,]*\d\s?(?:USD|EUR|GBP|CAD|AUD))/g,DOT="•••••";
+  const names=()=>{const out=new Set();try{(data.budget&&data.budget.items||[]).forEach(i=>{[i.name,i.co].forEach(v=>{v=(v||"").trim();if(v.length>1)out.add(v)})})}catch(_){}return [...out].sort((a,b)=>b.length-a.length)};
+  const esc=t=>t.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  let busy=false;const mask=()=>{if(!on||busy)return;const v=document.getElementById("view");if(!v||v.dataset.tab!=="budget")return;busy=true;const N=names(),NR=N.length?new RegExp(N.map(esc).join("|"),"g"):null;
+    const w=document.createTreeWalker(v,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement&&!n.parentElement.closest("input,textarea,select,option,script,style,#bPriv")?1:2});const L=[];while(w.nextNode())L.push(w.currentNode);
+    L.forEach(n=>{let t=n.nodeValue,o=t;t=t.replace(MONEY,DOT);if(NR)t=t.replace(NR,DOT);if(t!==o)n.nodeValue=t});
+    v.querySelectorAll("img[alt]").forEach(i=>{if(i.closest("#view"))i.style.filter="blur(6px)"});busy=false};
+  const sync=()=>{H.classList.toggle("bpriv",on);B.setAttribute("aria-pressed",on);const x=B.querySelector(".bp-x");if(x)x.style.display=on?"":"none";const v=document.getElementById("view");H.classList.toggle("on-budget",!!v&&v.dataset.tab==="budget")};
+  B.addEventListener("click",()=>{on=!on;try{localStorage.setItem("aot-bpriv",on?"1":"0")}catch(_){}sync();if(on)mask();else if(typeof render==="function")render()});
+  const start=()=>{const v=document.getElementById("view");if(!v)return setTimeout(start,300);new MutationObserver(()=>{sync();if(on)mask()}).observe(v,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:["data-tab"]});sync();mask()};start()})();
 </script>
 </body></html>
