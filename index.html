@@ -10254,7 +10254,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="885",APPT="2026-11-25T03:50:37Z";   /* APPT: when this update was made */
+const APPV="886",APPT="2026-11-25T03:51:54Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -10649,7 +10649,7 @@ void main(){vec2 uv=gl_FragCoord.xy/R;float a=R.x/R.y;vec2 p=vec2(uv.x*a,uv.y);f
     L.forEach(n=>{let t=n.nodeValue,o=t;t=t.replace(MONEY,DOT);if(NR)t=t.replace(NR,DOT);if(t!==o)n.nodeValue=t});
     v.querySelectorAll("img[alt]").forEach(i=>{if(i.closest("#view"))i.style.filter="blur(6px)"});busy=false};
   const sync=()=>{H.classList.toggle("bpriv",on);B.setAttribute("aria-pressed",on);const x=B.querySelector(".bp-x");if(x)x.style.display=on?"":"none";const v=document.getElementById("view");H.classList.toggle("on-budget",!!v&&v.dataset.tab==="budget")};
-  B.addEventListener("click",()=>{on=!on;try{localStorage.setItem("aot-bpriv",on?"1":"0")}catch(_){}sync();if(on)mask();else if(typeof render==="function")render()});
+  B.addEventListener("click",()=>{on=!on;try{localStorage.setItem("aot-bpriv",on?"1":"0")}catch(_){}sync();if(on)mask();else if(typeof render==="function"){/* keep the page where it is (it jumped when un-hiding) */const v=document.getElementById("view"),els=[document.scrollingElement,v,...document.querySelectorAll("#view .bco-sec,.main,main")].filter(Boolean),pos=els.map(e=>e.scrollTop);render();const back=()=>els.forEach((e,i)=>{const t=e.isConnected?e:null;if(t)t.scrollTop=pos[i]});back();requestAnimationFrame(()=>{back();requestAnimationFrame(back)})}});
   const start=()=>{const v=document.getElementById("view");if(!v)return setTimeout(start,300);new MutationObserver(()=>{sync();if(on)mask()}).observe(v,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:["data-tab"]});sync();mask()};start()})();
 </script>
 </body></html>
