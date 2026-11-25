@@ -3995,6 +3995,31 @@ html.phone #view[data-tab="budget"] .bstick.stuck .bst-full{display:none}html.ph
 /* phone: smaller privacy eye so it doesn't cover headings */
 html.phone #bPriv{width:42px!important;height:42px!important;right:10px!important;opacity:.9}
 html.phone #bPriv svg{width:20px;height:20px}
+/* ===== phone layout (mockup): page header with the privacy eye, four slim tiles in one row, tidier Where it goes ===== */
+.phead{display:none}
+html.phone .phead{display:flex;align-items:center;gap:12px;padding:6px 2px 14px}
+html.phone .phead .ph-logo{display:flex;align-items:center;gap:8px;font-size:21px;font-weight:700;letter-spacing:-.01em;white-space:nowrap}
+html.phone .phead .ph-logo svg{width:28px;height:28px;flex:none}
+html.phone .phead .ph-logo span{color:var(--acc,#4cc9ff)}
+html.phone .phead .ph-sep{width:1px;height:26px;background:rgba(255,255,255,.18);flex:none}
+html.phone .phead .ph-t{font-size:21px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+html.phone .phead .ph-sp{flex:1}
+html.phone .phead .ph-eye{display:grid;place-items:center;width:46px;height:46px;border-radius:13px;flex:none;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.2);color:#eee;cursor:pointer}
+html.phone.bpriv .phead .ph-eye{background:rgba(255,197,51,.92);color:#151515;border-color:transparent}
+html.phone .phead .ph-eye .bp-x{display:none}html.phone.bpriv .phead .ph-eye .bp-x{display:inline}
+html.phone.on-budget #bPriv{display:none!important}   /* the floating eye is replaced by the one in the header */
+html.phone body #view[data-tab="budget"] .bstick:not(.stuck) .tiles{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important}
+html.phone body #view[data-tab="budget"] .bstick:not(.stuck) .tile.tile.tile{min-height:96px!important;padding:12px 4px 26px!important;gap:4px!important;justify-content:flex-start!important;border-radius:14px!important}
+html.phone body #view[data-tab="budget"] .bstick:not(.stuck) .tile.tile.tile>svg:first-child{display:none!important}
+html.phone body #view[data-tab="budget"] .bstick:not(.stuck) .tile.tile.tile small{font-size:10px!important;letter-spacing:.14em!important;line-height:1.25!important;text-align:center;padding:0 2px}
+html.phone body #view[data-tab="budget"] .bstick:not(.stuck) .tile.tile.tile>b{font-size:17px!important;line-height:1.2}
+html.phone body #view[data-tab="budget"] .bstick:not(.stuck) .tile.tile.tile>b s,html.phone body #view[data-tab="budget"] .bstick:not(.stuck) .tile.tile.tile>b small{font-size:10px!important}
+html.phone body #view[data-tab="budget"] .bstick:not(.stuck) .tile.tile.tile:not(.bsav)>em{display:none!important}
+html.phone body #view[data-tab="budget"] .bstick:not(.stuck) .tile.tile.tile>.bsav-dots{bottom:10px!important;gap:5px!important}
+html.phone body #view[data-tab="budget"] .bstick:not(.stuck) .tile.tile.tile>.bsav-dots i{width:6px;height:6px}
+html.phone #view[data-tab="budget"] .bd-leg>button{border-bottom:1px solid rgba(255,255,255,.08);padding-block:10px}
+html.phone #view[data-tab="budget"] .bd-leg>button:last-child{border-bottom:0}
+html.phone #view[data-tab="budget"] .bd-leg>button>i{border-radius:50%!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10527,7 +10552,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="902",APPT="2026-11-25T19:17:24Z";   /* APPT: when this update was made */
+const APPV="903",APPT="2026-11-25T19:42:21Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -11118,4 +11143,17 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener("change",e=>{const i=e.target.closest&&e.target.closest("[data-tkrem]");if(!i)return;const t=findTaskAny(i.dataset.tkrem);if(!t)return;if(i.value)t.remAt=+new Date(i.value);else delete t.remAt;save();toast(i.value?"Reminder set · "+remTxt(t.remAt):"Reminder cleared")});
 </script>
 
+<script>
+/* phone: a page header (logo | tab name) at the top of every tab; on Budget it holds the privacy eye (was a floating button) */
+(function(){const NAMES={dash:"Dashboard",fuel:"Nutrition",pass:"Passions",budget:"Budget",set:"Settings",settings:"Settings"};
+  function head(){try{if(!document.documentElement.classList.contains("phone"))return;const v=document.getElementById("view");if(!v)return;
+    let h=v.querySelector(":scope>.phead");const t=v.dataset.tab||"";
+    if(!h){h=document.createElement("div");h.className="phead";v.prepend(h)}
+    const logo=document.querySelector(".topbar .logo svg");
+    h.innerHTML=`<span class="ph-logo">${logo?logo.outerHTML:""}<b>Ass<span>On</span>Track</b></span><i class="ph-sep" aria-hidden="true"></i><span class="ph-t">${NAMES[t]||""}</span><span class="ph-sp"></span>`;
+    const eye=document.getElementById("bPriv");if(eye&&t==="budget"){const c=document.createElement("button");c.type="button";c.className="ph-eye";c.setAttribute("aria-label",eye.getAttribute("aria-label")||"Hide names and amounts");c.innerHTML=eye.innerHTML;c.addEventListener("click",()=>eye.click());h.appendChild(c)}}catch(e){}}   /* a copy that presses the real eye, so its state and handler stay in one place */
+  const r0=window.render;if(typeof r0==="function"){window.render=function(){const out=r0.apply(this,arguments);head();return out};try{render=window.render}catch(e){}}
+  new MutationObserver(()=>{const v=document.getElementById("view");if(v&&!v.querySelector(":scope>.phead"))head()}).observe(document.getElementById("view")||document.body,{childList:true});
+  head()})();
+</script>
 </body></html>
