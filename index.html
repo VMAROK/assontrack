@@ -3560,6 +3560,26 @@ html.phone body #view .dtiles.orbit .dtile.ob-t>small{text-align:center!importan
 html.phone body #view .dtiles.orbit .dtile.ob-t{border-left:0!important}html.phone body #view .dtiles.orbit .dtile.ob-t:nth-child(odd){border-left:1px solid rgba(255,255,255,.12)!important}html.phone body #view .dtiles.orbit .dtile.ob-t:nth-child(n+4){border-top:0!important}
 html body #view .dstack .dtiles.orbit .ob-l{letter-spacing:.24em!important;margin-right:-.24em}
 
+/* Overview 4th spot: the knot art from Settings, no label */
+html body #view .dtiles.orbit .dtile.ob-art{padding:0!important;min-height:150px;background:radial-gradient(closest-side,rgba(3,5,10,.6),rgba(3,5,10,0))!important}
+html body #view .dtiles.orbit .dtile.ob-art canvas{position:absolute;inset:0;width:100%;height:100%;display:block;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+html.phone body #view .dtiles.orbit .dtile.ob-art{min-height:0}
+/* ===== Dashboard layout (iPad / desktop) like the reference: big "Dashboard" title in the page with room above it, compact Overview, figure + Overview/This week on one row, Breakdown full width. Calendar untouched ===== */
+.dhead{display:none}
+html:not(.phone) body #view[data-tab="dash"] .dhead{display:flex;flex-direction:column;gap:4px;padding:30px 4px 22px}
+html:not(.phone) body #view[data-tab="dash"] .dhead b{font-size:40px;font-weight:400;letter-spacing:-.01em;line-height:1.05;color:#f4f4f7}
+html:not(.phone) body #view[data-tab="dash"] .dhead span{font-size:19px;font-weight:400;color:rgba(235,235,240,.78)}
+html:not(.phone):has(#view[data-tab="dash"]) #ttl{visibility:hidden}/* the title now sits in the page */
+html:not(.phone) body #view[data-tab="dash"] .bdown{max-width:none!important;margin-left:0!important;margin-right:0!important}/* was max 900px centred */
+html:not(.phone) body #view[data-tab="dash"] .dtiles.orbit .dtile.ob-t{gap:4px!important;padding:6px 4px 10px!important;justify-content:center}
+html:not(.phone) body #view[data-tab="dash"] .dtiles.orbit .ob-r{order:1;width:min(78px,48cqi)}
+html:not(.phone) body #view[data-tab="dash"] .dtiles.orbit .ob-l{order:2;margin-top:4px}
+html:not(.phone) body #view[data-tab="dash"] .dtiles.orbit .ob-s{order:3}
+html:not(.phone) body #view[data-tab="dash"] .dtiles.orbit .ob-p{font-size:clamp(15px,10cqi,21px)}
+html:not(.phone) body #view[data-tab="dash"] .dtiles.orbit .dtile.ob-art{min-height:110px}
+html:not(.phone) body #view[data-tab="dash"] .dashtop .holopanel>.holo{max-width:165px!important}/* smaller figure so the top row is compact like the reference (was up to 260px wide) */
+html:not(.phone) body #view[data-tab="dash"] .dashtop .holopanel .hcap{margin-top:2px;margin-bottom:0}
+html:not(.phone) body #view[data-tab="dash"] .bdown .bdn-sec{gap:7px!important}html:not(.phone) body #view[data-tab="dash"] .bdown .meter{margin:0!important;gap:3px!important}html:not(.phone) body #view[data-tab="dash"] .bdown .meter-top{margin-bottom:2px!important}/* tighter Breakdown rows like the reference */
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4621,7 +4641,8 @@ function progressPanel(d){const wk=weekKey(today()),I={pass:passInfo(d),fit:fitI
   if(dtView()==="bar")return `<div class="panel dtiles dt-prog${dashAnim("tiles")}" style="height:${dtRingH||184}px!important;min-height:${dtRingH||184}px">${strip}<div class="dt-pb">${dashProg(d,today(),true)}</div></div>`;
   /* Overview = "Orbit" design (same on every theme): spaced label, thin full circle, progress arc + end dot in the tab's own colour, big light %, status word under — was: miniRing + name + coloured status + View button
   return `<div class="panel dtiles${dashAnim("tiles")}">${strip}${Object.keys(DCARDS).map(k=>`<div class="dtile">${miniRing(I[k].pct,I[k].col,HAS[k])}<b>${DCARDS[k]}</b><small style="color:${I[k].col}">${I[k].label}</small><button class="dview" data-dopen="${k}" aria-label="View ${DCARDS[k]} breakdown">View</button></div>`).join("")}</div>` */
-  return `<div class="panel dtiles orbit${dashAnim("tiles")}">${strip}${Object.keys(DCARDS).map(k=>`<div class="dtile ob-t" style="--oc:${OBCOL[k]}"><b class="ob-l">${DCARDS[k]}</b>${orbitRing(I[k].pct)}<small class="ob-s">${I[k].label}</small><button class="dview" data-dopen="${k}" aria-label="View ${DCARDS[k]} breakdown">View</button></div>`).join("")}</div>`}
+  /* three rings — Nutrition, Passions, Budget (the Breakdown's order and colours; no Fitness) — and the moving knot art in the fourth spot on the right */
+  return `<div class="panel dtiles orbit${dashAnim("tiles")}">${strip}${[["diet","Nutrition"],["pass","Passions"],["budget","Budget"]].map(([k,nm])=>`<div class="dtile ob-t" style="--oc:${OBCOL[k]}"><b class="ob-l">${nm}</b>${orbitRing(I[k].pct)}<small class="ob-s">${I[k].label}</small><button class="dview" data-dopen="${k}" aria-label="View ${nm} breakdown">View</button></div>`).join("")}<div class="dtile ob-t ob-art" aria-hidden="true"><canvas></canvas></div></div>`}
 /* Orbit ring: faint full circle, arc from 12 o'clock clockwise in the tab colour, a dot riding the arc's end, % in the middle */
 const OBCOL={pass:"#b99cff",fit:"#2ee6c5",diet:"#4cc9ff",budget:"#ffc533"};/* same colours as the Breakdown panel (Nutrition blue, Passions violet, Budget gold) — was amber / teal / blue / green */
 function orbitRing(pct){const r=46,C=2*Math.PI*r,f=pct==null?0:Math.max(0,Math.min(1,pct)),a=-Math.PI/2+f*2*Math.PI,dx=60+r*Math.cos(a),dy=60+r*Math.sin(a),txt=pct==null?"–":Math.round(Math.max(0,pct)*100)+"%";
@@ -4635,7 +4656,7 @@ function weekAhead(d){const mon=monday(0);const days=WKO.map(i=>{const dn=DAYS[i
     it.sort((a,b)=>a.k<b.k?-1:1);
     return `<div class="wa-day${ds===today()?" now":""}${ds<today()?" past":""}"><div class="wa-h">${dn}<small>${dt.getDate()}</small></div>${it.length?it.map(x=>`<div class="wa-it st-${x.st==="donelocked"?"done":x.st} src-${x.src||"p"}${x.go?" tap":""}" title="${esc(x.n)}"${x.go?` data-waslot="${x.go}" role="button" tabindex="0"`:""}><small>${x.t}</small><span>${x.st==="missed"?'<svg class="wa-x" viewBox="0 0 12 12" aria-label="Missed"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="#ff4d5e" stroke-width="2.4" stroke-linecap="round"/></svg>':x.st==="done"||x.st==="donelocked"?'<svg class="wa-x" viewBox="0 0 12 12" aria-label="Done"><path d="M2 6.5l2.6 2.6L10 3.5" fill="none" stroke="#3ddc84" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>':""}${esc(x.n)}</span></div>`).join(""):`<div class="wa-none">Free</div>`}</div>`});
   return `<div class="panel wahead bstrip-p"><div class="bstrip"><b>This week</b><i>${fmtDate(ymd(mon))} – ${fmtDate(ymd(new Date(mon.getTime()+6*864e5)))}</i></div>${""/* was: weekly-goal strip above the days ("Xh of 5h this week" chips) — removed; the days now take that space */}<div class="wa-grid">${days.join("")}</div></div>`}
-function dashTop(d){return `<div class="passtop dashtop">${figurePanel().replace('<div class="panel holopanel"><div class="ph"><span>','<div class="panel holopanel bstrip-p"><div class="ph bstrip"><span>')}<div class="stack dstack">${progressPanel(d)}${weekAhead(d)}</div></div>`}
+function dashTop(d){return `<div class="dhead"><b>Dashboard</b><span>Calendar and breakdown</span></div><div class="passtop dashtop">${figurePanel().replace('<div class="panel holopanel"><div class="ph"><span>','<div class="panel holopanel bstrip-p"><div class="ph bstrip"><span>')}<div class="stack dstack">${progressPanel(d)}${weekAhead(d)}</div></div>`}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-dopen],[data-expdel]");if(!b)return;
   if(b.dataset.expdel){data.expenses=(data.expenses||[]).filter(x=>x.id!==b.dataset.expdel);render();save();return}
   const k=b.dataset.dopen||null;if(k===dashOpen)return;dashGo(k,k?1:-1)});
@@ -10033,7 +10054,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="852",APPT="2026-11-25T02:08:44Z";   /* APPT: when this update was made */
+const APPV="853",APPT="2026-11-25T02:13:59Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -10335,7 +10356,7 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
       I.ur+=Math.max(-.05,Math.min(.05,dx*.005));I.uv=I.uv*.6+Math.max(-1.2,Math.min(1.2,dx*.005/dts))*.4;I.tilt=Math.max(-.4,Math.min(.4,I.tilt+dy*.002));d.x=e.clientX;d.y=e.clientY;d.t=n});
     const up=e=>{F.delete(e.pointerId);if(F.size<2){I.two=false;I.hold=F.size===1;I.sx=I.sy=-1e4}if(!F.size){I.hold=false;if(d&&!d.m)I.pulse=1;noSel(false)}d=F.size?d:null;c.style.cursor="grab";if(e.pointerType!=="mouse"){I.px=I.py=-1e4}};
     c.addEventListener("pointerup",up);c.addEventListener("pointercancel",up);c.addEventListener("pointerleave",()=>{I.px=I.py=-1e4});c.addEventListener("selectstart",e=>e.preventDefault())};
-  const check=()=>{const c=document.querySelector(".set-art canvas");if(c&&c!==cv){cv=c;x=c.getContext("2d");size();hook(c);if(!raf)raf=requestAnimationFrame(loop)}else if(!c&&cv)stop()};
+  const check=()=>{const c=document.querySelector(".set-art canvas,.ob-art canvas");/* also the Dashboard Overview art spot — was .set-art only */if(c&&c!==cv){cv=c;x=c.getContext("2d");size();hook(c);if(!raf)raf=requestAnimationFrame(loop)}else if(!c&&cv)stop()};
   new MutationObserver(check).observe(document.body,{childList:true,subtree:true});addEventListener("resize",()=>{if(cv)size()});check()})();
 </script>
 <script>/* Liquid Chrome backdrop: glossy black satin folds (one fold family bent across the screen so the highlights run in long lines, like the mockup); drawn at half resolution — satin is soft, so it upscales cleanly — and only while the template is on */
