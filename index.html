@@ -2164,6 +2164,7 @@ html.phone #view:has(>.grid.tiles .mgt) .holo canvas{max-height:300px!important}
 /* ===== plain templates: flat app look — solid surfaces, no glow, no glass ===== */
 html.tpl-plain{--bg0:#121212;--card:#1c1c1e;--card2:#242427;--line:#2c2c30;--fg:#ececf1;--muted:#9a9aa3;--accent:#8ab4ff;--cyan:#8ab4ff}
 html.tpl-midnight{--bg0:#0b1120;--card:#121a2c;--card2:#18223a;--line:#22304d;--fg:#e6ecf7;--muted:#8d9ab3;--accent:#5b9dff;--cyan:#5b9dff}
+html.tpl-grad{--bg0:#1b1c21;--card:#23252b;--card2:#2b2e35;--line:#30333b;--fg:#eceef3;--muted:#80858f;--accent:#3d8bfd;--cyan:#20d9d2;--g1:linear-gradient(90deg,#18e0d0,#3a6dfd);--g2:linear-gradient(90deg,#ff5f8f,#a32cf5)}   /* Gradient: graphite panels, cyan→blue and pink→violet */
 html.tpl-onyx{--bg0:#000000;--card:#111111;--card2:#1b1b1b;--line:#2a2a2a;--fg:#f0f0f0;--muted:#8e8e8e;--accent:#cfcfcf;--cyan:#cfcfcf}   /* Onyx: black and grey only */
 html.tpl-slate{--bg0:#1d2229;--card:#262c35;--card2:#2e3540;--line:#39414d;--fg:#e3e7ec;--muted:#9aa4b1;--accent:#7cc4b8;--cyan:#7cc4b8}
 html.tpl-plain body{color:var(--fg);background:var(--bg0)!important}
@@ -4101,6 +4102,14 @@ html.phone body #view#view#view[data-tab="dash"] .bdown .tgrid>.bdn-sec{border:0
 .tile:has(>.kc-ic){position:relative}
 .kc-ic{position:absolute;top:10px;right:10px;z-index:2;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:rgba(255,255,255,.8);cursor:pointer;transition:background .2s,color .2s,border-color .2s}
 .kc-ic:hover,.kc-ic:focus-visible{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.3)}
+/* ===== Gradient template: every progress bar fades from its own colour into violet, selections use the cyan→blue gradient ===== */
+html.tpl-grad #view :is([class*="bar"],[class*="track"],[class*="-tr"],[class*="prog"],[class*="meter"])>:is(i,span,b,div)[style*="width"]{background-image:linear-gradient(90deg,rgba(0,0,0,0) 0%,rgba(140,60,255,.55) 100%)!important;box-shadow:0 0 12px -2px rgba(120,80,255,.45)}
+html.tpl-grad :is(.seg2,.bpx-seg,.bpx-vw,.bdx-seg,.tk2-seg,.tk2-org) [aria-pressed="true"],html.tpl-grad .btn.primary,html.tpl-grad [role="tab"][aria-selected="true"]:not(.navbtn){background:linear-gradient(90deg,#18e0d0,#3a6dfd)!important;color:#fff!important;border-color:transparent!important}
+html.tpl-grad .navbtn[aria-selected="true"]:not(.nav-done){background:linear-gradient(90deg,rgba(24,224,208,.18),rgba(58,109,253,.18))!important;color:#fff!important}
+html.tpl-grad .navbtn[aria-selected="true"]:not(.nav-done) svg{color:#22d3e6!important}
+html.tpl-grad .ph span,html.tpl-grad .bstrip b{text-shadow:none!important}
+.tpl-pv-grad{background:#1b1c21}.tpl-pv-grad i{position:absolute;left:12%;right:12%;height:16px;border-radius:5px;background:#23252b;border:1px solid #30333b}.tpl-pv-grad i:nth-child(1){top:16%;right:52%}.tpl-pv-grad i:nth-child(2){top:16%;left:52%}.tpl-pv-grad i:nth-child(3){top:42%;height:40px}
+.tpl-pv-grad em{position:absolute;bottom:12%;width:22%;height:8px;border-radius:4px;left:12%;background:linear-gradient(90deg,#18e0d0,#3a6dfd)}.tpl-pv-grad em+em{left:38%;width:18%;background:linear-gradient(90deg,#ff5f8f,#a32cf5)}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10257,6 +10266,7 @@ const TEMPLATES=[{id:"spa",name:"Spa",sub:"Warm orange ambience, soft glass, slo
   {id:"plain",name:"Plain dark",sub:"Flat charcoal, quiet and simple",look:{color:"graphite",glass:0,tone:50},bg:true,plain:true},
   {id:"midnight",name:"Midnight",sub:"Flat deep navy, clean blue accents",look:{color:"blue",glass:0,tone:50},bg:true,plain:true},
   {id:"slate",name:"Slate",sub:"Soft grey-blue, low contrast, easy on the eyes",look:{color:"graphite",glass:0,tone:50},bg:true,plain:true},
+  {id:"grad",name:"Gradient",sub:"Graphite panels, cyan-to-violet glow on bars and selections",look:{color:"blue",glass:0,tone:50},bg:true,plain:true},
   {id:"onyx",name:"Onyx",sub:"Pure black and soft greys, no colour",look:{color:"graphite",glass:0,tone:50},bg:true,plain:true},
   /* visual templates: a whole designed look (backdrop + surfaces + type); panels and layout stay the same */
   {id:"stipple",name:"Stipple",sub:"Near-black, fine drifting dots, quiet lavender",look:{color:"graphite",glass:0,trans:3,tone:10},bg:true,plain:true,visual:true},
@@ -10634,7 +10644,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="910",APPT="2026-11-25T23:16:12Z";   /* APPT: when this update was made */
+const APPV="911",APPT="2026-11-25T23:20:27Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
