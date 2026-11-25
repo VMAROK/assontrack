@@ -4060,6 +4060,41 @@ html.bpx-sheet .bpx-ext #bsForm::before{content:"Add expense";position:absolute;
 .bpx-shx{display:none}html.bpx-sheet .bpx-shx{display:grid;place-items:center;position:fixed;right:14px;bottom:calc(68px + env(safe-area-inset-bottom,0px) + var(--bpxh,300px) - 44px);z-index:81;width:36px;height:36px;border:0;background:none;color:#fff;cursor:pointer}
 html.bpx-sheet .bpx-scrim{position:fixed;inset:0;z-index:79;background:rgba(0,0,0,.45)}
 @keyframes bpxUp{from{transform:translateY(40%);opacity:0}}
+/* ===== phone Dashboard (mockup): compact figure card, three rings in a row, This week as day pills, Breakdown in tabs ===== */
+html.phone body #view#view#view[data-tab="dash"] .holopanel{display:grid!important;grid-template-columns:118px minmax(0,1fr);grid-template-rows:auto auto 1fr auto;column-gap:14px;row-gap:8px;padding:12px!important;min-height:0!important;height:auto!important}
+html.phone body #view#view#view[data-tab="dash"] .holopanel>.ph{grid-column:2;grid-row:1;margin:0!important;padding:0!important;background:none!important;border:0!important;min-height:0!important;box-shadow:none!important}
+html.phone body #view#view#view[data-tab="dash"] .holopanel>.ph>span{font-size:19px!important;font-weight:700!important;letter-spacing:0!important;text-transform:none!important}
+html.phone body #view#view#view[data-tab="dash"] .holopanel>.holo{grid-column:1;grid-row:1/5;width:118px!important;height:150px!important;min-height:0!important;margin:0!important;border-radius:12px;overflow:hidden}
+html.phone body #view#view#view[data-tab="dash"] .holopanel>.hstage{grid-column:2;grid-row:2;margin:0!important;justify-content:flex-start!important;transform:scale(.92);transform-origin:left center}
+html.phone body #view#view#view[data-tab="dash"] .holopanel>.hcap{grid-column:2;grid-row:3;margin:0!important;text-align:left!important;font-size:13.5px!important;align-self:start}
+html.phone body #view#view#view[data-tab="dash"] .holopanel>.avfoot{grid-column:1/-1;grid-row:4}html.phone body #view#view#view[data-tab="dash"] .holopanel>.avfoot:empty{display:none}html.phone body #view#view#view[data-tab="dash"] .wahead .wa-h{color:inherit}
+html.phone body #view#view#view[data-tab="dash"] .dtiles.orbit>.dt-strip{display:none!important}
+html.phone body #view#view#view[data-tab="dash"] .dtiles.orbit{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important;padding:14px 8px!important}
+html.phone body #view#view#view[data-tab="dash"] .dtiles.orbit>.ob-art{display:none!important}
+html.phone body #view#view#view[data-tab="dash"] .dtiles.orbit>.dtile{border:0!important;min-height:0!important;padding:4px 0!important}
+/* This week: a row of day pills, then the picked day's items */
+html.phone body #view#view#view[data-tab="dash"] .wahead .wa-grid{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:6px!important;grid-auto-flow:row}
+html.phone body #view#view#view[data-tab="dash"] .wahead .wa-day{display:contents!important}
+html.phone body #view#view#view[data-tab="dash"] .wahead .wa-h{grid-row:1;display:grid!important;place-items:center;gap:2px;padding:8px 0!important;border-radius:10px;border:1px solid rgba(255,255,255,.12);font-size:13px!important;cursor:pointer;text-align:center;background:none}
+html.phone body #view#view#view[data-tab="dash"] .wahead .wa-h small{font-size:13px!important;opacity:.8}
+html.phone body #view#view#view[data-tab="dash"] .wahead .wa-day.wsel>.wa-h{background:#ffc533;color:#141414;border-color:transparent;font-weight:700}
+html.phone body #view#view#view[data-tab="dash"] .wahead .wa-day.wsel>.wa-h small{opacity:1}
+html.phone body #view#view#view[data-tab="dash"] .wahead .wa-day:not(.wsel)>:not(.wa-h){display:none!important}
+html.phone body #view#view#view[data-tab="dash"] .wahead .wa-day.wsel>:not(.wa-h){grid-column:1/-1!important;grid-row:auto!important}
+html.phone body #view#view#view[data-tab="dash"] .wahead .wa-day:nth-child(1)>.wa-h{grid-column:1!important;grid-row:1!important}html.phone body #view#view#view[data-tab="dash"] .wahead .wa-day:nth-child(2)>.wa-h{grid-column:2!important;grid-row:1!important}html.phone body #view#view#view[data-tab="dash"] .wahead .wa-day:nth-child(3)>.wa-h{grid-column:3!important;grid-row:1!important}html.phone body #view#view#view[data-tab="dash"] .wahead .wa-day:nth-child(4)>.wa-h{grid-column:4!important;grid-row:1!important}html.phone body #view#view#view[data-tab="dash"] .wahead .wa-day:nth-child(5)>.wa-h{grid-column:5!important;grid-row:1!important}html.phone body #view#view#view[data-tab="dash"] .wahead .wa-day:nth-child(6)>.wa-h{grid-column:6!important;grid-row:1!important}html.phone body #view#view#view[data-tab="dash"] .wahead .wa-day:nth-child(7)>.wa-h{grid-column:7!important;grid-row:1!important}
+html.phone body #view#view#view[data-tab="dash"] .holopanel{min-height:0!important;height:auto!important;align-content:start}html.phone body #view#view#view[data-tab="dash"] .holopanel>.holo canvas{width:118px!important;height:150px!important}
+html.phone body #view#view#view[data-tab="dash"] .wahead .wa-it{display:grid!important;gap:3px;padding:12px 14px!important;border-radius:12px;background:rgba(255,255,255,.05);border-left:3px solid #b99cff;margin:0!important}
+html.phone body #view#view#view[data-tab="dash"] .wahead .wa-it.src-b{border-left-color:#ffc533}html.phone body #view#view#view[data-tab="dash"] .wahead .wa-it.src-e{border-left-color:#4cc9ff}html.phone body #view#view#view[data-tab="dash"] .wahead .wa-it.st-missed{border-left-color:#ff4d5e}
+html.phone body #view#view#view[data-tab="dash"] .wahead .wa-it small{font-size:13px!important;opacity:.7}html.phone body #view#view#view[data-tab="dash"] .wahead .wa-it span{font-size:16px!important;font-weight:600;white-space:normal!important}
+html.phone body #view#view#view[data-tab="dash"] .wahead .wa-none{grid-column:1/-1;padding:12px 4px;color:rgba(255,255,255,.55);font-size:14px}
+/* Breakdown: Nutrition | Passions | Budget tabs, one at a time */
+.bdx-seg{display:none}
+html.phone body #view#view#view[data-tab="dash"] .bdx-seg{display:grid;grid-template-columns:repeat(3,1fr);padding:3px;border-radius:12px;border:1px solid rgba(255,255,255,.16);margin:4px 0 14px}
+html.phone body #view#view#view[data-tab="dash"] .bdx-seg button{height:38px;border:0;border-radius:9px;background:none;color:rgba(255,255,255,.75);font:inherit;font-size:15px;cursor:pointer}
+html.phone body #view#view#view[data-tab="dash"] .bdx-seg button[aria-pressed="true"]{background:rgba(255,255,255,.12);color:#fff;font-weight:600}
+html.phone body #view#view#view[data-tab="dash"] .bdown .tgrid{display:block!important}
+html.phone body #view#view#view[data-tab="dash"] .bdown .tgrid>.bdn-sec:not(.bdx-on){display:none!important}
+html.phone body #view#view#view[data-tab="dash"] .bdown .tgrid>.bdn-sec{border:0!important;padding:0!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10592,7 +10627,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="905",APPT="2026-11-25T21:43:55Z";   /* APPT: when this update was made */
+const APPV="906",APPT="2026-11-25T21:52:47Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -11223,5 +11258,21 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(d.bpadd!==undefined){bpxN=B().spends.length;H.classList.add("bpx-sheet");requestAnimationFrame(()=>{const f=document.getElementById("bsForm");if(f)H.style.setProperty("--bpxh",f.offsetHeight+"px");const a=document.getElementById("bsAmt");if(a)a.focus()});return}
   if(d.bpaddx!==undefined){H.classList.remove("bpx-sheet");return}},true);
 let bpxN=0;document.addEventListener("submit",e=>{if(e.target.id!=="bsForm"||!document.documentElement.classList.contains("bpx-sheet"))return;setTimeout(()=>{if(B().spends.length>bpxN)document.documentElement.classList.remove("bpx-sheet")},60)});   /* closes once the expense is saved (count taken when the sheet opened) */
+</script>
+<script>
+/* phone Dashboard: This week day pills (default today) and Breakdown tabs; both just show/hide what the page already drew */
+(function(){let wSel=null,bdTab=0;
+  function apply(){try{if(!document.documentElement.classList.contains("phone"))return;const v=document.getElementById("view");if(!v||v.dataset.tab!=="dash")return;
+    const days=[...v.querySelectorAll(".wahead .wa-day")];if(days.length){let i=wSel;if(i==null||i>=days.length){i=days.findIndex(d=>d.classList.contains("now"));if(i<0)i=0}
+      days.forEach((d,k)=>{d.classList.toggle("wsel",k===i);const h=d.querySelector(".wa-h");if(h){h.setAttribute("role","button");h.setAttribute("tabindex","0");h.dataset.wsel=k}
+        if(k===i&&d.children.length===1&&!d.querySelector(".wa-none")){const n=document.createElement("div");n.className="wa-none";n.textContent="Nothing planned for this day.";d.appendChild(n)}})}
+    const bd=v.querySelector(".bdown");if(bd){const S=[...bd.querySelectorAll(".tgrid>.bdn-sec")];if(S.length&&!bd.querySelector(".bdx-seg")){const g=document.createElement("div");g.className="bdx-seg";g.setAttribute("role","group");g.setAttribute("aria-label","Breakdown");
+        g.innerHTML=["Nutrition","Passions","Budget"].slice(0,S.length).map((n,k)=>`<button type="button" data-bdx="${k}" aria-pressed="${k===bdTab}">${n}</button>`).join("");bd.querySelector(".tgrid").before(g)}
+      S.forEach((x,k)=>x.classList.toggle("bdx-on",k===bdTab));bd.querySelectorAll("[data-bdx]").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.bdx===bdTab))}}catch(e){}}
+  document.addEventListener("click",e=>{const h=e.target.closest&&e.target.closest("html.phone .wahead .wa-h[data-wsel]");if(h){e.preventDefault();e.stopPropagation();wSel=+h.dataset.wsel;apply();return}
+    const b=e.target.closest&&e.target.closest("[data-bdx]");if(b){e.preventDefault();e.stopPropagation();bdTab=+b.dataset.bdx;apply()}},true);
+  const r0=window.render;if(typeof r0==="function"){window.render=function(){const o=r0.apply(this,arguments);apply();return o};try{render=window.render}catch(e){}}
+  new MutationObserver(()=>{const v=document.getElementById("view");if(v&&v.dataset.tab==="dash"&&!v.querySelector(".bdx-seg"))apply()}).observe(document.getElementById("view")||document.body,{childList:true});
+  apply()})();
 </script>
 </body></html>
