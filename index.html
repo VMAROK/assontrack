@@ -3146,7 +3146,12 @@ html.tpl-sharp #view .panel.hasStrip::after,html.phone #view .panel.hasStrip::af
 .bsav-dots{display:flex;gap:5px;justify-content:center;margin-top:2px}.bsav-dots i{width:6px;height:6px;border-radius:50%;background:rgba(var(--lr),.3)}.bsav-dots i.on{background:var(--c);box-shadow:0 0 6px var(--c)}
 .bstick.stuck .bsav-dots{display:none}
 .bsav-v s{text-decoration:none;font-size:.5em;font-weight:600;color:var(--muted);margin-left:3px;text-shadow:none}
-.bsav-v.in-r{animation:bsavR .38s cubic-bezier(.25,.8,.3,1)}.bsav-v.in-l{animation:bsavL .38s cubic-bezier(.25,.8,.3,1)}@keyframes bsavR{from{opacity:0;transform:translateX(26px)}}@keyframes bsavL{from{opacity:0;transform:translateX(-26px)}}
+/* was: .bsav-v.in-r{animation:bsavR .38s cubic-bezier(.25,.8,.3,1)}.bsav-v.in-l{animation:bsavL .38s cubic-bezier(.25,.8,.3,1)}@keyframes bsavR{from{opacity:0;transform:translateX(26px)}}@keyframes bsavL{from{opacity:0;transform:translateX(-26px)}} */
+.bsav-v.in-r,.bsav-v.in-l{animation:bsavR .9s cubic-bezier(.16,1,.3,1) both;animation-delay:var(--bsd,0ms);will-change:transform,opacity,filter}.bsav-v.in-l{animation-name:bsavL}
+@keyframes bsavR{0%{opacity:0;transform:translateX(22px) scale(.94);filter:blur(7px)}55%{opacity:1;filter:blur(0)}100%{opacity:1;transform:none;filter:none}}
+@keyframes bsavL{0%{opacity:0;transform:translateX(-22px) scale(.94);filter:blur(7px)}55%{opacity:1;filter:blur(0)}100%{opacity:1;transform:none;filter:none}}
+.bsav-v:is(.in-r,.in-l) s{display:inline-block;animation:bsavU 1.1s cubic-bezier(.16,1,.3,1) both;animation-delay:var(--bsd,0ms)}@keyframes bsavU{0%,35%{opacity:0;transform:translateY(6px)}100%{opacity:1;transform:none}}
+.bsav .bsav-dots i{transition:width .5s cubic-bezier(.16,1,.3,1),background-color .5s,opacity .5s}
 /* Income & expenses (list): group rows darker like a strip; no box around Income / Expenses; tap a group name to rename/recolour it */
 #view[data-tab="budget"] .bco-sec{border:0!important;border-radius:0!important}   /* border removed on Income only — Expenses keeps its border (reverted) */
 #view[data-tab="budget"] .bco-c{background:rgba(var(--tD),.5)!important}#view[data-tab="budget"] .bco-sec .bco-r{background:rgba(var(--tD),.25)!important}   /* group rows = strip colour; items a lighter shade of it, still darker than the panel; no borders (Income + Expenses) */   /* darker group rows: Income only — Expenses keeps its own colour (reverted) */
@@ -3431,7 +3436,7 @@ html.tpl-silk{--vlift:17,19,30;--vline:rgba(190,200,255,.14)}
 html.tpl-chrome{--vlift:34,35,36;--vline:rgba(255,255,255,.16)}
 html.tpl-pyramid{--vlift:27,23,20;--vline:rgba(255,215,170,.16)}
 html.tpl-bronze{--vlift:17,14,13;--vline:rgba(255,210,180,.14)}
-html.tpl-flow{--vlift:13,14,16;--vline:rgba(255,255,255,.12);--vr:2px}/* Threads panels = Stipple panels */
+/* was: html.tpl-flow{--vlift:13,14,16;--vline:rgba(255,255,255,.12);--vr:2px} Threads panels = Stipple panels — now Violet Silk panels */
 html.tpl-flowmono{--vlift:13,14,16;--vline:rgba(255,255,255,.12);--vr:2px}
 html.tpl-vt.tpl-vt #view .panel,html.tpl-stipple.tpl-stipple #view .panel{background:color-mix(in srgb,color-mix(in srgb,rgb(var(--va,170,161,226)) var(--vtd,3%),rgb(var(--vlift))) calc(var(--vta,.15)*100%),transparent)!important}
 /* ===== Liquid Chrome = the mockup: glossy black satin backdrop (WebGL), frosted near-black panels with a faint top sheen, hairline borders, no title strips, everything monochrome, light-weight numbers ===== */
@@ -3451,7 +3456,7 @@ html.tpl-chrome{--p1:50,50,51;--p2:28,28,29;--p3:20,21,22;--pbd:rgba(255,255,255
 html.tpl-silk{--p1:27,29,40;--p2:18,19,28;--p3:11,12,19;--pbd:rgba(150,150,255,.13);--pbt:rgba(175,175,255,.26);--pin:rgba(170,170,255,.08);--psh:rgba(2,2,12,.6)}
 html.tpl-pyramid{--p1:48,40,32;--p2:31,27,23;--p3:21,19,18;--pbd:rgba(255,205,150,.12);--pbt:rgba(255,215,165,.26);--pin:rgba(255,220,180,.07);--psh:rgba(0,0,0,.6)}
 html.tpl-bronze{--p1:23,19,16;--p2:17,14,12;--p3:12,10,9;--pbd:rgba(255,195,150,.11);--pbt:rgba(255,205,165,.2);--pin:rgba(255,215,180,.05);--psh:rgba(0,0,0,.6)}
-html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono){--p1:14,15,17;--p2:12,13,15;--p3:11,12,13;--pbd:rgba(255,255,255,.085);--pbt:rgba(255,255,255,.12);--pin:rgba(255,255,255,.03);--psh:rgba(0,0,0,.4)}
+html:is(.tpl-stipple,.tpl-flowmono){--p1:14,15,17;--p2:12,13,15;--p3:11,12,13;--pbd:rgba(255,255,255,.085);--pbt:rgba(255,255,255,.12);--pin:rgba(255,255,255,.03);--psh:rgba(0,0,0,.4)}
 html:is(.tpl-vt,.tpl-stipple):is(.tpl-vt,.tpl-stipple) body #view .panel.panel{background:linear-gradient(180deg,rgba(var(--p1),var(--vta,.9)) 0%,rgba(var(--p2),var(--vta,.9)) 42%,rgba(var(--p3),var(--vta,.9)) 100%)!important;box-shadow:0 18px 40px -8px var(--psh),0 3px 10px rgba(0,0,0,.35),inset 0 1px 0 var(--pin),inset 0 0 0 1px rgba(255,255,255,.012)!important}
 html:is(.tpl-vt,.tpl-stipple):not(.tpl-bd-none):not(.tpl-bd-dark) body #view .panel.panel:not(.hasStrip){border-color:var(--pbd)!important;border-top-color:var(--pbt)!important}
 html:is(.tpl-vt,.tpl-stipple):not(.tpl-bd-none):not(.tpl-bd-dark) body #view .panel.hasStrip::after{border-color:var(--pbd)!important;border-top-color:var(--pbt)!important}
@@ -3472,7 +3477,7 @@ html.tpl-chrome #view :is(.panel>b,.bsum-c b,.bdw-tot b,.cs-txt>b){font-weight:4
 html.tpl-silk #view :is(.panel>b,.bsum-c b,.bdw-tot b,.cs-txt>b){font-weight:600!important}
 html.tpl-pyramid #view :is(.panel>b,.bsum-c b,.bdw-tot b,.cs-txt>b){font-weight:300!important}
 html.tpl-bronze #view :is(.panel>b,.bsum-c b,.bdw-tot b,.cs-txt>b){font-weight:400!important}
-html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono) #view :is(.panel>b,.bsum-c b,.bdw-tot b,.cs-txt>b){font-weight:300!important}
+html:is(.tpl-stipple,.tpl-flowmono) #view :is(.panel>b,.bsum-c b,.bdw-tot b,.cs-txt>b){font-weight:300!important}
 /* panel headings: Chrome / Silk = clean white title; Pyramids = gold spaced capitals; Bronze = light spaced capitals */
 html:is(.tpl-chrome,.tpl-silk) #view .panel>.ph:first-child>span{font-size:16.5px!important;font-weight:600!important;color:#f2f2f6!important;letter-spacing:-.005em}
 html.tpl-pyramid #view :is(.panel>.ph:first-child>span,.panel>.ph:first-child>span>span,.bstrip>b,.tile>small,.dtile>b){color:#d8ad72!important;font-weight:500!important;letter-spacing:.22em!important}
@@ -3495,7 +3500,7 @@ html:is(.tpl-vt,.tpl-stipple):is(.tpl-vt,.tpl-stipple) body #view .calhead.cal-c
 html:is(.tpl-chrome,.tpl-silk) body #view :is(.bstrip>b,.bc-h>b,.calhead.cal-c>h2,.panel>.ph:first-child>span:first-child,.panel .ph:first-child>span:first-child:not(:only-child)){font-size:17px!important;font-weight:600!important;color:#f3f3f7!important;letter-spacing:-.005em!important;text-transform:none!important}
 html.tpl-pyramid body #view :is(.bstrip>b,.bc-h>b,.calhead.cal-c>h2,.panel>.ph:first-child>span:first-child,.panel .ph:first-child>span:first-child:not(:only-child)){font-size:14px!important;font-weight:500!important;color:#d8ad72!important;letter-spacing:.22em!important;text-transform:uppercase!important}
 html.tpl-bronze body #view :is(.bstrip>b,.bc-h>b,.calhead.cal-c>h2,.panel>.ph:first-child>span:first-child,.panel .ph:first-child>span:first-child:not(:only-child)){font-size:13.5px!important;font-weight:600!important;color:#ece2d8!important;letter-spacing:.22em!important;text-transform:uppercase!important}
-html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono) body #view :is(.bstrip>b,.bc-h>b,.calhead.cal-c>h2,.panel>.ph:first-child>span:first-child,.panel .ph:first-child>span:first-child:not(:only-child)){font-size:12px!important;font-weight:600!important;color:#dcd9e8!important;letter-spacing:.24em!important;text-transform:uppercase!important}
+html:is(.tpl-stipple,.tpl-flowmono) body #view :is(.bstrip>b,.bc-h>b,.calhead.cal-c>h2,.panel>.ph:first-child>span:first-child,.panel .ph:first-child>span:first-child:not(:only-child)){font-size:12px!important;font-weight:600!important;color:#dcd9e8!important;letter-spacing:.24em!important;text-transform:uppercase!important}
 /* visual templates with their real wallpaper image (from the mockups), animated by #vtimg; the drawn backdrops step aside */
 #vtimg{display:none}html.vt-img.tpl-bg #vtimg{display:block;position:fixed;inset:0;width:100%;height:var(--apph,100%);z-index:0;pointer-events:none}
 html.vt-img.tpl-bg :is(#chromebg,#vtbg,#stipbg){display:none!important}
@@ -3509,7 +3514,7 @@ html.tpl-chrome{--p1:31,31,32;--p2:20,20,21;--p3:20,21,21;--pbd:rgba(255,255,255
 html.tpl-silk{--p1:19,20,29;--p2:16,17,25;--p3:12,13,20;--pbd:rgba(195,200,235,.16);--pbt:rgba(210,212,235,.13);--pin:rgba(190,190,255,.06)}
 html.tpl-pyramid{--p1:29,26,23;--p2:22,20,18;--p3:18,16,15;--pbd:rgba(255,225,195,.09);--pbt:rgba(255,225,200,.13);--pin:rgba(255,225,190,.05)}
 html.tpl-bronze{--p1:19,16,14;--p2:16,13,12;--p3:15,13,11;--pbd:rgba(255,210,185,.115);--pbt:rgba(255,210,185,.12);--pin:rgba(255,220,195,.04)}
-html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono){--p1:12,13,15;--p2:12,13,15;--p3:12,13,15;--pbd:rgba(255,255,255,.135);--pbt:rgba(255,255,255,.13);--pin:rgba(255,255,255,.025)}
+html:is(.tpl-stipple,.tpl-flowmono){--p1:12,13,15;--p2:12,13,15;--p3:12,13,15;--pbd:rgba(255,255,255,.135);--pbt:rgba(255,255,255,.13);--pin:rgba(255,255,255,.025)}
 html:is(.tpl-vt,.tpl-stipple):is(.tpl-vt,.tpl-stipple) body #view .panel.panel{background:linear-gradient(180deg,rgba(var(--p1),var(--vta,.95)) 0%,rgba(var(--p2),var(--vta,.95)) 45%,rgba(var(--p3),var(--vta,.95)) 100%)!important}
 /* Liquid Chrome side panel = the mockup's: clear glass over the wallpaper (ribbons show through, lightly dimmed), a little lighter at the top, fine light edge on the right, roomier white tab labels, frosted selected pill */
 html.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome.tpl-chrome aside{background:linear-gradient(180deg,rgba(44,44,46,.5),rgba(24,24,26,.28) 45%,rgba(12,12,13,.18))!important;-webkit-backdrop-filter:blur(1.5px)!important;backdrop-filter:blur(1.5px)!important;border-right:1px solid rgba(255,255,255,.13)!important;box-shadow:inset -1px 0 0 rgba(255,255,255,.04)!important}
@@ -3613,16 +3618,16 @@ html body #view[data-tab] .dtiles.orbit.orbit .dtile.ob-t.ob-t{align-self:stretc
 html:not(.phone) body #view[data-tab="dash"]>.dcal-row{max-width:none!important;margin-left:0!important;margin-right:0!important;align-items:stretch!important;grid-template-columns:minmax(0,1fr) 320px!important}
 html:not(.phone) body #view[data-tab="dash"]>.dcal-row>.cal-evp{align-self:stretch!important}
 /* Stipple (and Threads, which share its panels): the calendar in the theme's own monochrome — graphite weekday row, near-black days, fine grey grid, white numbers (was the navy calendar) */
-html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono):is(.tpl-stipple,.tpl-flow,.tpl-flowmono) body #view .mcal{border:1px solid rgba(255,255,255,.12)!important;border-radius:0!important;background:#08080a!important;overflow:hidden}
-html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono):is(.tpl-stipple,.tpl-flow,.tpl-flowmono) body #view .mcal .cw{background:#171718!important;color:#ececf0!important;font-size:13px!important;font-weight:400!important;border-color:rgba(255,255,255,.08)!important}
-html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono):is(.tpl-stipple,.tpl-flow,.tpl-flowmono) body #view .mcal .mc:not(.today):not(.pick){background:#08080a!important;border-color:rgba(255,255,255,.09)!important;box-shadow:none!important}
-html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono):is(.tpl-stipple,.tpl-flow,.tpl-flowmono) body #view .mcal .mc:not(.today) .mn{color:#f2f2f5!important;font-size:13px!important;font-weight:400!important;background:none!important}
-html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono):is(.tpl-stipple,.tpl-flow,.tpl-flowmono) body #view .mcal .mc:not(.today)::before{background:transparent!important}
+html:is(.tpl-stipple,.tpl-flowmono):is(.tpl-stipple,.tpl-flowmono) body #view .mcal{border:1px solid rgba(255,255,255,.12)!important;border-radius:0!important;background:#08080a!important;overflow:hidden}
+html:is(.tpl-stipple,.tpl-flowmono):is(.tpl-stipple,.tpl-flowmono) body #view .mcal .cw{background:#171718!important;color:#ececf0!important;font-size:13px!important;font-weight:400!important;border-color:rgba(255,255,255,.08)!important}
+html:is(.tpl-stipple,.tpl-flowmono):is(.tpl-stipple,.tpl-flowmono) body #view .mcal .mc:not(.today):not(.pick){background:#08080a!important;border-color:rgba(255,255,255,.09)!important;box-shadow:none!important}
+html:is(.tpl-stipple,.tpl-flowmono):is(.tpl-stipple,.tpl-flowmono) body #view .mcal .mc:not(.today) .mn{color:#f2f2f5!important;font-size:13px!important;font-weight:400!important;background:none!important}
+html:is(.tpl-stipple,.tpl-flowmono):is(.tpl-stipple,.tpl-flowmono) body #view .mcal .mc:not(.today)::before{background:transparent!important}
 /* today stays gold on every theme (user) — grey/lavender version removed */
-html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono):is(.tpl-stipple,.tpl-flow,.tpl-flowmono) body #view .mcal .mc:is(.out,.mc-out,.other){background:#060607!important}
-html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono):is(.tpl-stipple,.tpl-flow,.tpl-flowmono) body #view .mcal .mc:is(.out,.mc-out,.other) .mn{color:rgba(255,255,255,.3)!important}
+html:is(.tpl-stipple,.tpl-flowmono):is(.tpl-stipple,.tpl-flowmono) body #view .mcal .mc:is(.out,.mc-out,.other){background:#060607!important}
+html:is(.tpl-stipple,.tpl-flowmono):is(.tpl-stipple,.tpl-flowmono) body #view .mcal .mc:is(.out,.mc-out,.other) .mn{color:rgba(255,255,255,.3)!important}
 /* selected day: the soft white highlight fades in on every theme (Stipple's dark days were covering it) */
-html:is(.tpl-stipple,.tpl-flow,.tpl-flowmono):is(.tpl-stipple,.tpl-flow,.tpl-flowmono) body #view .mcal .mc.pick:not(.today){background:rgba(255,255,255,.09)!important;border-color:rgba(255,255,255,.09)!important}
+html:is(.tpl-stipple,.tpl-flowmono):is(.tpl-stipple,.tpl-flowmono) body #view .mcal .mc.pick:not(.today){background:rgba(255,255,255,.09)!important;border-color:rgba(255,255,255,.09)!important}
 /* calendar dot view: every dot a perfect circle (they were being squeezed by the row) */
 html body #view .mcal.cal-dots .mc .chips em{flex:0 0 8px!important;width:8px!important;height:8px!important;min-height:8px!important;max-height:8px!important;line-height:0!important;aspect-ratio:1!important;box-sizing:border-box!important;border:0!important;overflow:hidden!important}
 html body #view .mcal.cal-dots .mc .chips em::before,html body #view .mcal.cal-dots .mc .chips em::after{display:none!important}
@@ -3796,10 +3801,10 @@ html.phone body #view>.sitefoot.sitefoot{padding-bottom:calc(96px + env(safe-are
 html:not(.tpl-bd-none) body #view .dcal-row>.cal-evp.cal-evp{border-top-width:1px!important;border-top-style:solid!important;border-top-color:var(--pbd,rgba(255,255,255,.13))!important}
 /* calendar follows the theme on every theme (today stays gold, the picked day keeps its soft white highlight):
    visual templates use their own panel shades and border colour; every other theme uses its accent line colour (--lr) for the weekday row and grid */
-html.tpl-vt:not(.tpl-stipple):not(.tpl-flow):not(.tpl-flowmono) body #view .mcal{background:rgb(var(--p3))!important;border:1px solid var(--pbd)!important;overflow:hidden}
-html.tpl-vt:not(.tpl-stipple):not(.tpl-flow):not(.tpl-flowmono) body #view .mcal .cw{background:rgb(var(--p1))!important;color:#ececf0!important;border-color:var(--pbd)!important}
-html.tpl-vt:not(.tpl-stipple):not(.tpl-flow):not(.tpl-flowmono) body #view .mcal .mc:not(.today):not(.pick){background:rgb(var(--p3))!important;border-color:var(--pbd)!important;box-shadow:none!important}
-html.tpl-vt:not(.tpl-stipple):not(.tpl-flow):not(.tpl-flowmono) body #view .mcal .mc:not(.today)::before{background:transparent!important}
+html.tpl-vt:not(.tpl-stipple):not(.tpl-flowmono) body #view .mcal{background:rgb(var(--p3))!important;border:1px solid var(--pbd)!important;overflow:hidden}
+html.tpl-vt:not(.tpl-stipple):not(.tpl-flowmono) body #view .mcal .cw{background:rgb(var(--p1))!important;color:#ececf0!important;border-color:var(--pbd)!important}
+html.tpl-vt:not(.tpl-stipple):not(.tpl-flowmono) body #view .mcal .mc:not(.today):not(.pick){background:rgb(var(--p3))!important;border-color:var(--pbd)!important;box-shadow:none!important}
+html.tpl-vt:not(.tpl-stipple):not(.tpl-flowmono) body #view .mcal .mc:not(.today)::before{background:transparent!important}
 html:not(.tpl-vt):not(.tpl-stipple):not(.tpl-flow):not(.tpl-flowmono) body #view .mcal{border:1px solid rgba(var(--lr),.22)!important;overflow:hidden}
 html:not(.tpl-vt):not(.tpl-stipple):not(.tpl-flow):not(.tpl-flowmono) body #view .mcal .cw{background:rgba(var(--lr),.16)!important;border-color:rgba(var(--lr),.2)!important}
 html:not(.tpl-vt):not(.tpl-stipple):not(.tpl-flow):not(.tpl-flowmono) body #view .mcal .mc:not(.today):not(.pick){background:rgba(0,0,0,.22)!important;border-color:rgba(var(--lr),.16)!important}
@@ -3828,6 +3833,35 @@ html body #view .usp .us-list.us-list .us2-c .us2-log{grid-area:1/4/3/5!importan
 html body #view .usp .us-list.us-list .us2-add .us2-pic{height:36px!important;font-size:22px!important;margin:0!important}
 html body #view .usp .us-list.us-list .us2-add .us2-n{grid-area:1/2/3/3!important;align-self:center}
 .usp .bp-add .bvsw{margin-right:6px}
+html body #view .dtiles.orbit .ob-ov.ob-note{color:var(--muted);font-weight:500}
+/* calorie limit calculator (sheet) */
+.kc-tl{display:inline-block;margin-left:6px;padding:2px 9px;border-radius:99px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:var(--txt,#fff);font:inherit;font-size:11.5px;font-style:normal;cursor:pointer}
+.kc-box{width:min(460px,100%);max-height:calc(100dvh - 32px);overflow:auto}
+.kc-seg{display:flex;flex-wrap:wrap;gap:6px}.kc-seg button{flex:1 1 auto;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:inherit;font:inherit;font-size:13px;cursor:pointer}
+.kc-seg button[aria-pressed="true"]{background:var(--cyan,#4cc9ff);border-color:transparent;color:#04121c;font-weight:700}
+.kc-act button{display:grid;text-align:left;flex:1 1 100%}.kc-act button small{opacity:.7;font-size:11.5px;font-weight:400}
+.kc-res{margin-top:14px;padding:14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);text-align:center}
+.kc-res b{display:block;font-size:34px;line-height:1.1;color:var(--cyan,#4cc9ff)}.kc-res small{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+.kc-row{display:flex;gap:8px;align-items:end}.kc-row .tp-lab{flex:1}
+/* Threads (not Mono): panels, title strips and tiles exactly like Violet Silk */
+html.tpl-flow{--vlift:17,19,30;--vline:rgba(190,200,255,.14)}
+html.tpl-flow{--p1:27,29,40;--p2:18,19,28;--p3:11,12,19;--pbd:rgba(150,150,255,.13);--pbt:rgba(175,175,255,.26);--pin:rgba(170,170,255,.08);--psh:rgba(2,2,12,.6)}
+html:is(.tpl-chrome,.tpl-flow,.tpl-pyramid,.tpl-bronze) body #view .dtiles{gap:10px!important;padding:4px 12px 12px!important}
+html:is(.tpl-chrome,.tpl-flow,.tpl-pyramid,.tpl-bronze) body #view .dtile.dtile{border:1px solid var(--pbd)!important;border-top-color:var(--pbt)!important;border-radius:calc(var(--vr,12px) - 4px);background:linear-gradient(180deg,var(--pin),rgba(255,255,255,.01))!important;box-shadow:0 6px 16px rgba(0,0,0,.28),inset 0 1px 0 var(--pin)!important}
+html.tpl-sharp:is(.tpl-chrome,.tpl-flow,.tpl-pyramid,.tpl-bronze) body #view .dtile.dtile{border-radius:0}
+html.tpl-flow #view :is(.panel>b,.bsum-c b,.bdw-tot b,.cs-txt>b){font-weight:600!important}
+html:is(.tpl-chrome,.tpl-flow) #view .panel>.ph:first-child>span{font-size:16.5px!important;font-weight:600!important;color:#f2f2f6!important;letter-spacing:-.005em}
+html:is(.tpl-chrome,.tpl-flow) body #view :is(.bstrip>b,.bc-h>b,.calhead.cal-c>h2,.panel>.ph:first-child>span:first-child,.panel .ph:first-child>span:first-child:not(:only-child)){font-size:17px!important;font-weight:600!important;color:#f3f3f7!important;letter-spacing:-.005em!important;text-transform:none!important}
+html.tpl-flow{--p1:19,20,29;--p2:16,17,25;--p3:12,13,20;--pbd:rgba(195,200,235,.16);--pbt:rgba(210,212,235,.13);--pin:rgba(190,190,255,.06)}
+/* Bronze side-panel picture on the bottom bar (tablet/phone portrait): the portrait image is turned on its side so the ribbon runs along the bar, and it slowly flows left↔right (was: the tall picture squeezed into a sliver in the middle) */
+@media (orientation:portrait){
+html.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bg:is(.tablet,.phone) aside{background:#0c0907!important;animation:none!important;overflow:hidden;isolation:isolate}
+html.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bg:is(.tablet,.phone) aside::before{content:"";position:absolute;left:50%;top:50%;width:360px;height:150vw;z-index:-2;pointer-events:none;background:url(wp/vt/bronze-side.jpg) 50% 50%/cover no-repeat;transform:translate(-50%,-50%) rotate(90deg);animation:bzBar 22s ease-in-out infinite}
+html.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bg:is(.tablet,.phone) aside::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(12,9,7,.25),rgba(12,9,7,.55))}
+html.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bg.phone aside{position:relative!important}   /* the phone bar sits static in a fixed shell: give the picture a box to fill */
+@keyframes bzBar{0%,100%{transform:translate(-50%,-50%) rotate(90deg) translateY(-6%) scale(1);filter:brightness(1)}50%{transform:translate(-50%,-50%) rotate(90deg) translateY(6%) scale(1.08);filter:brightness(1.3)}}
+}
+[data-bsav]{touch-action:pan-y}   /* budget top tiles: the browser only scrolls up/down here; sideways belongs to the month ⇄ year swipe */
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4890,7 +4924,7 @@ function progressPanel(d){const wk=weekKey(today()),I={pass:passInfo(d),fit:fitI
   /* Overview = "Orbit" design (same on every theme): spaced label, thin full circle, progress arc + end dot in the tab's own colour, big light %, status word under — was: miniRing + name + coloured status + View button
   return `<div class="panel dtiles${dashAnim("tiles")}">${strip}${Object.keys(DCARDS).map(k=>`<div class="dtile">${miniRing(I[k].pct,I[k].col,HAS[k])}<b>${DCARDS[k]}</b><small style="color:${I[k].col}">${I[k].label}</small><button class="dview" data-dopen="${k}" aria-label="View ${DCARDS[k]} breakdown">View</button></div>`).join("")}</div>` */
   /* three rings — Nutrition, Passions, Budget (the Breakdown's order and colours; no Fitness) — and the moving knot art in the fourth spot on the right */
-  return `<div class="panel dtiles orbit${dashAnim("tiles")}">${strip}${obOrder().map(([k,nm])=>{const S=obScore(k,I[k].pct);return `<div class="dtile ob-t${S.over?" ob-over":""}" style="--oc:${OBCOL[k]}"><b class="ob-l">${nm}</b>${orbitRing(S.pct,S.over)}<small class="ob-s">${I[k].label}</small>${S.over?`<em class="ob-ov">${S.over}</em>`:""}<button class="dview" data-dopen="${k}" aria-label="View ${nm} breakdown">View</button></div>`}).join("")}<div class="dtile ob-t ob-art" aria-hidden="true"><canvas></canvas></div></div>`}
+  return `<div class="panel dtiles orbit${dashAnim("tiles")}">${strip}${obOrder().map(([k,nm])=>{const S=obScore(k,I[k].pct);return `<div class="dtile ob-t${S.over?" ob-over":""}" style="--oc:${OBCOL[k]}"><b class="ob-l">${nm}</b>${orbitRing(S.pct,S.over)}<small class="ob-s">${I[k].label}</small>${S.over?`<em class="ob-ov">${S.over}</em>`:S.note?`<em class="ob-ov ob-note">${S.note}</em>`:""}<button class="dview" data-dopen="${k}" aria-label="View ${nm} breakdown">View</button></div>`}).join("")}<div class="dtile ob-t ob-art" aria-hidden="true"><canvas></canvas></div></div>`}
 /* Orbit ring: faint full circle, arc from 12 o'clock clockwise in the tab colour, a dot riding the arc's end, % in the middle */
 /* Overview cells follow the side-panel tab order (Nutrition / Passions / Budget as the user arranged them) */
 function obOrder(){const NM={fuel:["diet","Nutrition"],pass:["pass","Passions"],budget:["budget","Budget"]};let o=null;try{o=JSON.parse(localStorage.getItem("aot-navord")||"null")}catch(_){}
@@ -4899,9 +4933,18 @@ const OBCOL={pass:"#b99cff",fit:"#2ee6c5",diet:"#4cc9ff",budget:"#ffc533"};/* sa
 /* Overview score (the ring never passes 100%):
    Nutrition — under the calorie goal the ring fills as you eat (eaten ÷ goal); over it, the score drops by how far over you are: 1 − over ÷ goal (2× the goal or more = 0%), with the exact amount over in red underneath.
    Budget — spending within income scores 100%; past it, 1 − over ÷ income, with the dollars over in red. Passions unchanged for now. */
+const OB_TOL=.10;   /* nutrition target range = calorie limit ± 10% */
 function obScore(k,raw){try{const t=today();
+  /* was: under the limit = eaten/limit, over = 1 − over/limit
   if(k==="diet"){const e=data.meals.filter(m=>m.d===t).reduce((a,m)=>a+(+m.kcal||0),0),L=+kLim(t)||0;if(!L)return {pct:raw,over:""};
-    if(e<=L)return {pct:e/L,over:""};const ov=e-L;return {pct:Math.max(0,1-ov/L),over:`${Math.round(ov).toLocaleString()} cal over`}}
+    if(e<=L)return {pct:e/L,over:""};const ov=e-L;return {pct:Math.max(0,1-ov/L),over:`${Math.round(ov).toLocaleString()} cal over`}} */
+  if(k==="diet"){const ds=t,e=data.meals.filter(m=>m.d===ds).reduce((a,m)=>a+(+m.kcal||0),0),L=+kLim(ds)||0;if(!L)return {pct:raw,over:""};
+    const lo=Math.round(L*(1-OB_TOL)),hi=Math.round(L*(1+OB_TOL)),f=n=>Math.round(n).toLocaleString();   // target range: the limit ± OB_TOL
+    if(!e)return {pct:null,over:"",note:"No intake logged"};
+    if(e>hi)return {pct:Math.max(0,1-(e-hi)/L),over:`${f(e-hi)} cal above range`};                       // over: red as soon as they cross it
+    if(e>=lo)return {pct:1,over:""};                                                                      // inside the range: 100%
+    if(ds<today())return {pct:Math.max(0,1-(lo-e)/L),over:`${f(lo-e)} cal below range`};                  // a finished day under the range: red too
+    return {pct:e/lo,over:"",note:`${f(lo-e)} cal to reach range`}}                                       // today, still eating: no penalty yet
   if(k==="budget"&&typeof bStats==="function"){const S=bStats(),cap=+S.inc||0,out=(+S.subs||0)+(+S.bills||0)+(+S.spent||0);if(!cap)return {pct:raw,over:""};
     if(out<=cap)return {pct:1,over:""};const ov=out-cap;return {pct:Math.max(0,1-ov/cap),over:`${bMoney(ov,0)} over`}}}catch(e){}
   return {pct:raw==null?raw:Math.min(1,raw),over:""}}
@@ -5143,7 +5186,7 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
 function vFuel(){
   const d=D(),S=fuelStats(d,nD()),g=S.g,T=+g.kcal||0,left=T-S.kcal,day=nD()===today()?"today":nDayLbl(nD()),w=nWater(),W=nWGoal();
   return banner()+lostPanel()+`<div class="dhead"><b>Nutrition</b><span>Meals and macros</span></div><div class="grid tiles">
-    <div class="panel tile" style="--c:var(--cyan)">${ic("fire")}<small>Calorie limit${nD()===today()?"":" · "+nDayLbl(nD())}</small><b><input class="tgt-in" id="kcalTgt" inputmode="numeric" value="${T?n0(T):""}" placeholder="Set" aria-label="Daily calorie limit" style="width:${Math.max(3,String(T?n0(T):"Set").length)+.3}ch"></b><em>${T?"tap to change":"tap to set yours"}</em></div>
+    <div class="panel tile" style="--c:var(--cyan)">${ic("fire")}<small>Calorie limit${nD()===today()?"":" · "+nDayLbl(nD())}</small><b><input class="tgt-in" id="kcalTgt" inputmode="numeric" value="${T?n0(T):""}" placeholder="Set" aria-label="Daily calorie limit" style="width:${Math.max(3,String(T?n0(T):"Set").length)+.3}ch"></b><em>${T?"tap to change":"tap to set yours"}<button type="button" class="kc-tl" data-kcalc>Calculate</button></em></div>
     <div class="panel tile" style="--c:${(()=>{/* over the limit red; in range (60–100%) green; eating too little orange — for today only once it's 6 PM, so a morning with little eaten isn't flagged */const k=+S.kcal||0,past=nD()<today()||new Date().getHours()>=18;return !T?"var(--violet)":k>T?"#ff5e6c":k>=T*.6?"#3ddc84":past&&k>0?"#ff9f43":"var(--violet)"})()}">${ic("star")}<small>Calories eaten ${day}</small><b>${n0(S.kcal)}</b><em>${T?n0(Math.abs(left))+" kcal "+(left<0?"over":"left"):"no limit set"}</em></div>
     ${nWaterTile()}
     <div class="panel tile mgt" style="--c:var(--cyan)"><small>Macros</small>${(()=>{const V=[+S.carbs||0,+S.pro||0,+S.fiber||0,+S.fat||0],CL=MGCL;mgV=V;const G=data.goals||{};return `${mgDonut(V)}<div class="mgt-in">${[["carbs","Carbs",CL[0],V[0]],["protein","Protein",CL[1],V[1]],["fiber","Fiber",CL[2],V[2]],["fat","Fat",CL[3],V[3]]].map(([k,l,c,e])=>{const gv=mgGoal(k);return `<label style="--mc:${c}" class="${gv&&e>=gv?(k==="carbs"||k==="fat"?(e>gv?"mg-over":""):"mg-hit"):""}"><span>${l}</span><b class="mg-e">${n0(e)}</b><span class="mg-of">/ <span class="mg-gl"><input data-mgin="${k}" inputmode="numeric" enterkeyhint="done" placeholder="–" value="${gv||""}" style="width:${gv?String(gv).length+.4:4.2}ch" aria-label="${l} goal in grams"><i class="mg-ar" aria-hidden="true"><svg viewBox="0 0 10 6" width="9" height="6"><path d="M1 5l4-4 4 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></i></span>${gv?"g":""}</span></label>`}).join("")}</div>`})()}</div>
@@ -7403,8 +7446,14 @@ const BICO={rich:`<svg viewBox="0 0 24 24" width="17" height="17" fill="none" st
 const BVN={cards:"Cards",rich:"Detailed list",list:"Compact list"};
 const bViewSw=(attr,cur)=>`<div class="bmode bvsw" role="group" aria-label="View">${["cards","rich","list"].map(k=>`<button type="button" ${attr}="${k}" aria-pressed="${cur===k}" title="${BVN[k]}" aria-label="${BVN[k]} view">${BICO[k]}</button>`).join("")}</div>`;
 let bSecAdd=false,bNewExp=false,bSavI=0,bSavDir=0;
-{let sx=null;document.addEventListener("touchstart",e=>{const t=e.target.closest&&e.target.closest("[data-bsav]");sx=t?{x:e.touches[0].clientX,y:e.touches[0].clientY}:null},{passive:true,capture:true});document.addEventListener("touchend",e=>{if(!sx)return;const t=e.changedTouches[0],dx=t.clientX-sx.x,dy=t.clientY-sx.y;sx=null;if(Math.abs(dx)>30&&Math.abs(dx)>Math.abs(dy)){bSavI=(bSavI+1)%2;bSavDir=dx<0?1:-1;bSavSkip=Date.now();const v=$("#view"),st=v.scrollTop;render();v.scrollTop=st;bSavDir=0}},true);}
-let bSavSkip=0;document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-bsav]");if(!t||Date.now()-bSavSkip<400)return;bSavI=(bSavI+1)%2;bSavDir=1;const v=$("#view"),st=v.scrollTop;render();v.scrollTop=st;bSavDir=0},true);
+/* was: {let sx=null;document.addEventListener("touchstart",e=>{const t=e.target.closest&&e.target.closest("[data-bsav]");sx=t?{x:e.touches[0].clientX,y:e.touches[0].clientY}:null},{passive:true,capture:true});document.addEventListener("touchend",e=>{if(!sx)return;const t=e.changedTouches[0],dx=t.clientX-sx.x,dy=t.clientY-sx.y;sx=null;if(Math.abs(dx)>30&&Math.abs(dx)>Math.abs(dy)){bSavI=(bSavI+1)%2;bSavDir=dx<0?1:-1;bSavSkip=Date.now();const v=$("#view"),st=v.scrollTop;render();v.scrollTop=st;bSavDir=0}},true);} */
+{let sx=null,lock=null;const keep=()=>{const v=$("#view"),st=v?v.scrollTop:0,wy=window.scrollY,se=document.scrollingElement,sy=se?se.scrollTop:0;return ()=>{if(v)v.scrollTop=st;if(se)se.scrollTop=sy;if(window.scrollY!==wy)window.scrollTo(0,wy)}};
+  document.addEventListener("touchstart",e=>{const t=e.target.closest&&e.target.closest("[data-bsav]");sx=t?{x:e.touches[0].clientX,y:e.touches[0].clientY}:null;lock=null},{passive:true,capture:true});
+  document.addEventListener("touchmove",e=>{if(!sx)return;const t=e.touches[0],dx=t.clientX-sx.x,dy=t.clientY-sx.y;
+    if(lock==null&&(Math.abs(dx)>6||Math.abs(dy)>6))lock=Math.abs(dx)>=Math.abs(dy)*.8?"x":"y";   // decide early: a sideways swipe never moves the page
+    if(lock==="x"&&e.cancelable)e.preventDefault()},{passive:false,capture:true});
+  document.addEventListener("touchend",e=>{if(!sx)return;const t=e.changedTouches[0],dx=t.clientX-sx.x,dy=t.clientY-sx.y,wasX=lock==="x";sx=null;lock=null;if((wasX||Math.abs(dx)>Math.abs(dy))&&Math.abs(dx)>30){bSavI=(bSavI+1)%2;bSavDir=dx<0?1:-1;bSavSkip=Date.now();const back=keep();(window.bSavRoll||(f=>f()))(render);back();requestAnimationFrame(back);bSavDir=0}},true);}
+let bSavSkip=0;document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-bsav]");if(!t||Date.now()-bSavSkip<400)return;bSavI=(bSavI+1)%2;bSavDir=1;const v=$("#view"),st=v.scrollTop,wy=window.scrollY;(window.bSavRoll||(f=>f()))(render);v.scrollTop=st;if(window.scrollY!==wy)window.scrollTo(0,wy);bSavDir=0},true);
 function bCombined(S){const b=B(),srt=(a,z)=>((a.ord??1e9)-(z.ord??1e9))||(bLvR(a.lvl)-bLvR(z.lvl))||(bMo(z)-bMo(a)),SECS=bSecs(b),pv=["cards","rich","list"].includes(b.viewC)?b.viewC:"list";
   const row=(it,sign)=>{const m=bMo(it),off=it.paused||(it.muted),cy=(BCYC.find(x=>x[0]===it.cyc)||BCYC[1])[1],g=it.grp&&bGroups(bItCat(it)).includes(it.grp)?it.grp+" · ":"",raw=it.cyc!=="mo"||(it.cur||bHome())!==bHome()?bMoneyI(it)+" · ":"";
     return `<button type="button" class="bco-r${off?" off":""}" data-bedit="${it.id}" data-bid="${it.id}" style="--cc:${bCol(bItCat(it))}"><i></i><span class="bco-t"><b>${esc(bTitle(it))}</b><small>${esc(g)}${raw}${it.paused?"paused":it.muted?"excluded":cy}</small></span><span class="bco-v ${sign>0?"pos":"neg"}">${sign>0?"+":"−"}${bMoney(m)}</span>${false?`<span class="bco-sp"></span>`:`<span class="bi-x${it.muted?" on":""}" role="button" tabindex="0" data-bxt="${it.id}" aria-pressed="${!!it.muted}" aria-label="${it.muted?"Include in totals":"Exclude from totals"}">${BMUTE.replace('width="12" height="12"','width="15" height="15"')}</span>`}</button>`};
@@ -9978,7 +10027,7 @@ const tplBgOn=()=>{const t=tplOf();return !!(t&&t.bg&&(data.profile||{}).tplBg!=
 const effLook=()=>{const g=lookOf(),pl=passLook()||{},T=tplOf();if(T)return T.visual?Object.assign({color:g.color,glass:g.glass,trans:g.trans,tone:g.tone??50},T.look,((data.profile||{}).vtLook||{})[T.id]||{})/* visual: its designed panels (from the mockups) + your tweaks for that template */:Object.assign({color:g.color,glass:g.glass,trans:g.trans,tone:g.tone??50},T.look,{glass:g.glass,trans:g.trans,tone:g.tone??50});/* your Blur / Transparency / Color depth stay the same on every template (no per-template defaults; was: T.look,(data.profile||{}).tplLook) *//* + your slider changes on top of the template (tplLook resets when you pick a template) */return {color:pl.color||g.color,glass:pl.glass??g.glass,trans:pl.trans??g.trans,tone:pl.tone??g.tone??50}};
 /* visual templates carry their own Fine-tune (panels, borders, corners, bars, spacing) like their own sliders: designed defaults from the mockups, your tweaks kept per template, your main setup put back when you leave */
 const FINE=["tplPan","tplBd","tplSharp","tplBars","gapIn","gapOut","gapLink"];
-const VTFINE=id=>Object.assign({tplBars:"panel",gapIn:16,gapOut:16,gapLink:true},(id==="stipple"||id==="flow"||id==="flowmono")?{tplSharp:true}:{});
+const VTFINE=id=>Object.assign({tplBars:"panel",gapIn:16,gapOut:16,gapLink:true},(id==="stipple"||id==="flowmono")?{tplSharp:true}/* was: flow too — Threads now has Silk's rounded panels */:{});
 const fineGet=()=>{const o={},P=data.profile||{};FINE.forEach(k=>{if(P[k]!==undefined)o[k]=P[k]});return o};
 const fineLoad=o=>{FINE.forEach(k=>{if(o[k]===undefined)delete data.profile[k];else data.profile[k]=o[k]})};
 const fineSame=(a,b)=>FINE.every(k=>(a[k]??null)===(b[k]??null));
@@ -10341,7 +10390,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="898",APPT="2026-11-25T05:44:59Z";   /* APPT: when this update was made */
+const APPV="899",APPT="2026-11-25T05:50:58Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -10694,7 +10743,7 @@ void main(){vec2 uv=gl_FragCoord.xy/R;float a=R.x/R.y;vec2 p=vec2(uv.x*a,uv.y);f
     if(want&&!on){if(!draw&&!init())return;on=true;size();raf=requestAnimationFrame(loop)}else if(!want&&on){on=false;cancelAnimationFrame(raf)}};
   new MutationObserver(check).observe(document.documentElement,{attributes:true,attributeFilter:["class"]});addEventListener("resize",()=>{if(on)size()});check()})();
 /* one-time: Liquid Chrome was redone to match its mockup — drop old Chrome slider/fine-tune tweaks so the new look shows */
-(()=>{const go=()=>{try{if(typeof data!=="object"||!data||!data.profile)return setTimeout(go,300);const P=data.profile;if(P.vtV4)return;P.vtV4=1;P.vtV3=1;/* was vtV3 */P.chromeV2=1;delete P.vtLook;const _T=typeof tplOf==="function"&&tplOf();if(_T&&_T.visual&&typeof fineLoad==="function")fineLoad(VTFINE(_T.id));/* was: chromeV2 — Chrome only */if(typeof save==="function")save();if(typeof applyLook==="function")applyLook();if(typeof render==="function")render()}catch(e){}};setTimeout(go,600)})();
+(()=>{const go=()=>{try{if(typeof data!=="object"||!data||!data.profile)return setTimeout(go,300);const P=data.profile;if(P.template==="flow"&&!P.flowSilk){P.flowSilk=1;delete P.vtLook;if(typeof fineLoad==="function")fineLoad(VTFINE("flow"));if(typeof save==="function")save();if(typeof applyLook==="function")applyLook();if(typeof render==="function")render()}if(P.vtV4)return;P.vtV4=1;P.vtV3=1;/* was vtV3 */P.chromeV2=1;delete P.vtLook;const _T=typeof tplOf==="function"&&tplOf();if(_T&&_T.visual&&typeof fineLoad==="function")fineLoad(VTFINE(_T.id));/* was: chromeV2 — Chrome only */if(typeof save==="function")save();if(typeof applyLook==="function")applyLook();if(typeof render==="function")render()}catch(e){}};setTimeout(go,600)})();
 </script>
 <script>/* Animated wallpaper images for the visual templates: the picture stays exactly as designed; it breathes with a very slow drift and zoom, the folds ripple gently, and a soft sheen of light slides across the highlights. Add a template by putting its image in VTIMG. */
 (()=>{const VTIMG={chrome:"wp/vt/chrome.jpg",silk:"wp/vt/silk.jpg",pyramid:"wp/vt/pyramid.jpg",bronze:"wp/vt/bronze.jpg",stipple:"wp/vt/stipple.jpg"},FOC={chrome:.5,silk:.66,pyramid:.18,bronze:.78,stipple:.5};/* (unused while fitted) FOC = which side of the picture to keep when the screen is narrower (portrait) */
@@ -10738,5 +10787,52 @@ void main(){vec2 uv=gl_FragCoord.xy/R;float a=R.x/R.y;vec2 p=vec2(uv.x*a,uv.y);f
   const sync=()=>{H.classList.toggle("bpriv",on);B.setAttribute("aria-pressed",on);const x=B.querySelector(".bp-x");if(x)x.style.display=on?"":"none";const v=document.getElementById("view");H.classList.toggle("on-budget",!!v&&v.dataset.tab==="budget")};
   B.addEventListener("click",()=>{on=!on;try{localStorage.setItem("aot-bpriv",on?"1":"0")}catch(_){}sync();if(on)mask();else if(typeof render==="function"){/* keep the page where it is (it jumped when un-hiding) */const v=document.getElementById("view"),els=[document.scrollingElement,v,...document.querySelectorAll("#view .bco-sec,.main,main")].filter(Boolean),pos=els.map(e=>e.scrollTop);render();const back=()=>els.forEach((e,i)=>{const t=e.isConnected?e:null;if(t)t.scrollTop=pos[i]});back();requestAnimationFrame(()=>{back();requestAnimationFrame(back)})}});
   const start=()=>{const v=document.getElementById("view");if(!v)return setTimeout(start,300);new MutationObserver(()=>{sync();if(on)mask()}).observe(v,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:["data-tab"]});sync();mask()};start()})();
+</script>
+<script>
+/* calorie limit calculator: Mifflin-St Jeor × activity, ± goal. Opens from the Calorie limit tile, no extra panel */
+(function(){
+const ACT=[["sed",1.2,"Not active","desk job, little exercise"],["light",1.375,"Lightly active","exercise 1–3 days a week"],["mod",1.55,"Moderately active","exercise 3–5 days a week"],["act",1.725,"Very active","hard exercise 6–7 days a week"],["xtra",1.9,"Extremely active","physical job or training twice a day"]];
+const GOAL=[["lose2",-500,"Lose 1 lb/wk"],["lose1",-250,"Lose ½ lb/wk"],["keep",0,"Maintain"],["gain1",250,"Gain ½ lb/wk"]];
+const B=()=>{const p=data.profile||(data.profile={});return p.body||(p.body={sex:"m",unit:"us",act:"mod",goal:"keep"})};
+function calc(b){const kg=+b.kg,cm=+b.cm,age=+b.age;if(!(kg>0&&cm>0&&age>0))return null;
+  const bmr=10*kg+6.25*cm-5*age+(b.sex==="f"?-161:5),a=(ACT.find(x=>x[0]===b.act)||ACT[2])[1],tdee=bmr*a,g=(GOAL.find(x=>x[0]===b.goal)||GOAL[2])[1],floor=b.sex==="f"?1200:1500;
+  let v=Math.round((tdee+g)/10)*10,low=false;if(v<floor){v=floor;low=true}return {v,tdee:Math.round(tdee/10)*10,low}}
+function read(){const b=B(),q=id=>{const el=document.getElementById(id);return el?parseFloat(String(el.value).replace(",","."))||0:0};
+  b.age=q("kcAge")||b.age;
+  if(b.unit==="us"){const ft=q("kcFt"),inch=q("kcIn"),lb=q("kcLb");if(ft||inch)b.cm=+((ft*12+inch)*2.54).toFixed(1);if(lb)b.kg=+(lb*.45359237).toFixed(2)}
+  else{const cm=q("kcCm"),kg=q("kcKg");if(cm)b.cm=cm;if(kg)b.kg=kg}}
+function resHTML(){const r=calc(B());return r?`<b>${r.v.toLocaleString()}</b><small>calories a day${r.low?" · kept at a safe minimum":""}</small><small>maintenance ≈ ${r.tdee.toLocaleString()} cal</small>`:`<b>–</b><small>fill in age, height and weight</small>`}
+function seg(k,list,cls){const b=B();return `<div class="kc-seg ${cls||""}">${list.map(x=>`<button type="button" data-kc${k}="${x[0]}" aria-pressed="${b[k]===x[0]}">${x[2]}${x[3]?`<small>${x[3]}</small>`:""}</button>`).join("")}</div>`}
+function draw(){let o=document.getElementById("kcSheet");if(!o){o=document.createElement("div");o.id="kcSheet";o.className="wp-sheet";document.body.appendChild(o)}
+  const b=B(),us=b.unit==="us",inT=b.cm?b.cm/2.54:0,ft=inT?Math.floor(Math.round(inT)/12):"",inch=inT?Math.round(inT)%12:"",lb=b.kg?Math.round(b.kg/.45359237):"";
+  o.innerHTML=`<div class="wp-box panel bsh kc-box" role="dialog" aria-label="Calorie calculator"><div class="wp-h"><b>Suggested calorie limit</b><button type="button" class="x wp-x" data-kcx aria-label="Close">×</button></div><div class="bsh-g">
+    <div class="tp-lab">Units${seg("unit",[["us",0,"lb · ft/in"],["met",0,"kg · cm"]])}</div>
+    <div class="tp-lab">Sex${seg("sex",[["m",0,"Male"],["f",0,"Female"]])}</div>
+    <div class="kc-row"><label class="tp-lab">Age<input id="kcAge" inputmode="numeric" value="${b.age||""}" placeholder="years"></label>
+    ${us?`<label class="tp-lab">Height ft<input id="kcFt" inputmode="numeric" value="${ft}"></label><label class="tp-lab">in<input id="kcIn" inputmode="numeric" value="${inch}"></label><label class="tp-lab">Weight lb<input id="kcLb" inputmode="decimal" value="${lb}"></label>`
+        :`<label class="tp-lab">Height cm<input id="kcCm" inputmode="decimal" value="${b.cm?Math.round(b.cm):""}"></label><label class="tp-lab">Weight kg<input id="kcKg" inputmode="decimal" value="${b.kg?Math.round(b.kg*10)/10:""}"></label>`}</div>
+    <div class="tp-lab">How active are you?${seg("act",ACT,"kc-act")}</div>
+    <div class="tp-lab">Goal${seg("goal",GOAL)}</div>
+    <div class="kc-res" id="kcRes">${resHTML()}</div></div>
+    <div class="bsh-acts"><span style="flex:1"></span><button type="button" class="btn ghost" data-kcx>Cancel</button><button type="button" class="btn" data-kcuse>Use this</button></div></div>`}
+function close(){const o=document.getElementById("kcSheet");if(o){o.classList.add("out");setTimeout(()=>o.remove(),180)}}
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-kcalc],#kcSheet");if(!t)return;
+  if(t.dataset.kcalc!==undefined){e.preventDefault();e.stopPropagation();draw();return}
+  e.stopPropagation();if(e.target===t){read();save();close();return}
+  const btn=e.target.closest("button");if(!btn)return;const ds=btn.dataset,b=B();
+  if(ds.kcx!==undefined){read();save();close();return}
+  if(ds.kcuse!==undefined){read();const r=calc(b);if(!r){toast("Fill in age, height and weight");return}kLimSet(nD(),r.v);save();close();render();toast("Calorie limit set to "+r.v.toLocaleString());return}
+  for(const k of ["unit","sex","act","goal"])if(ds["kc"+k]){read();b[k]=ds["kc"+k];draw();return}},true);
+document.addEventListener("input",e=>{if(!e.target.closest||!e.target.closest("#kcSheet"))return;read();const r=document.getElementById("kcRes");if(r)r.innerHTML=resHTML()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.getElementById("kcSheet")){read();save();close()}});
+})();
+</script>
+<script>
+/* Budget top tiles: when month ⇄ year switches, each number rolls from its old value to the new one (eased, staggered) instead of snapping */
+window.bSavRoll=function(run){const old=[...document.querySelectorAll("#view .bsav-v")].map(b=>{const t=b.firstChild;return t&&t.nodeType===3?t.nodeValue:""});run();
+  const num=x=>{const m=String(x).match(/-?[\d,]+(\.\d+)?/);return m?+m[0].replace(/,/g,""):null};
+  document.querySelectorAll("#view .bsav-v").forEach((b,k)=>{b.style.setProperty("--bsd",k*70+"ms");const t=b.firstChild;if(!t||t.nodeType!==3)return;const to=t.nodeValue,a=num(old[k]),z=num(to);if(a==null||z==null||a===z)return;
+    const D=950,t0=performance.now()+k*70,fmt=v=>to.replace(/-?[\d,]+(\.\d+)?/,Math.round(v).toLocaleString()),ease=x=>1-Math.pow(1-x,4);t.nodeValue=fmt(a);
+    const step=n=>{if(!t.isConnected)return;const x=Math.min(1,Math.max(0,(n-t0)/D));t.nodeValue=x>=1?to:fmt(a+(z-a)*ease(x));if(x<1)requestAnimationFrame(step)};requestAnimationFrame(step)})};
 </script>
 </body></html>
