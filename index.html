@@ -3804,6 +3804,10 @@ html:not(.tpl-vt):not(.tpl-stipple):not(.tpl-flow):not(.tpl-flowmono) body #view
 html:not(.tpl-vt):not(.tpl-stipple):not(.tpl-flow):not(.tpl-flowmono) body #view .mcal .cw{background:rgba(var(--lr),.16)!important;border-color:rgba(var(--lr),.2)!important}
 html:not(.tpl-vt):not(.tpl-stipple):not(.tpl-flow):not(.tpl-flowmono) body #view .mcal .mc:not(.today):not(.pick){background:rgba(0,0,0,.22)!important;border-color:rgba(var(--lr),.16)!important}
 html:not(.tpl-vt):not(.tpl-stipple):not(.tpl-flow):not(.tpl-flowmono) body #view .mcal .mc:not(.today)::before{background:rgba(var(--lr),.08)!important}
+/* Add food · Your usuals: the picked food is highlighted with its Log button */
+.fd-r.fd-sel{background:rgba(143,184,255,.12)!important;box-shadow:inset 0 0 0 1.5px rgba(143,184,255,.7)!important;border-radius:12px}
+.fd-r .fd-logbtn{margin-left:auto;flex:none;padding:8px 14px;border-radius:999px;border:0;background:#8fb8ff;color:#0b0c10;font:inherit;font-size:13px;font-weight:700;cursor:pointer;animation:fdIn .18s ease-out}
+@keyframes fdIn{from{opacity:0;transform:translateX(6px)}to{opacity:1;transform:none}}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -5549,7 +5553,7 @@ function fdPopShow(on){fOpen=on;const p=$("#fdPop");if(!p)return;p.hidden=false;
 document.addEventListener("focusin",e=>{if(e.target.id==="fdQ"&&!fOpen)fdPopShow(true)});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&tab==="fuel"&&(fOpen||fq||fSel)&&!fForm&&!scan){fOpen=false;fq="";fSel=null;fChain=null;render()}});
 document.addEventListener("click",e=>{const t=e.target;if(!t.closest)return;
-  if(t.closest("[data-flog],[data-fquick],[data-fsave],[data-fcancel],[data-fus]"))fOpen=false;                                  // these finish the job: the list closes once they have run
+  if(t.closest("[data-flog],[data-fquick],[data-fsave],[data-fcancel],[data-fuslog]"))fOpen=false;/* was [data-fus]: selecting no longer closes the list */                                  // these finish the job: the list closes once they have run
   const o=t.closest("[data-fopen]");if(o){e.stopPropagation();if(fOpen||fq||fSel||fForm){fOpen=false;fq="";fSel=null;fChain=null;fForm=null}else fOpen=true;render();return}
   if(tab==="fuel"&&(fq||fSel||fChain)&&!fForm&&t.isConnected&&!t.closest(".flogp")&&!t.closest(".scan")&&!t.closest(".askbox")&&!t.closest("#czSheet,#nSheet,#usSheet,.cm-menu")){fOpen=false;fq="";fSel=null;fChain=null;render()}   /* tapping elsewhere clears a search; the panel stays as it is */
   const g=t.closest("[data-tgedit],[data-tgcancel],[data-tgsave]");if(!g)return;
@@ -6314,8 +6318,11 @@ document.addEventListener("input",e=>{const t=e.target;if(t.id==="fdQ"){fq=t.val
 document.addEventListener("change",e=>{const t=e.target;if(t.id==="fdUnit"&&fSel){const f=fSel.f,old=fSel.u;fSel.u=t.value;if(old!==t.value){const g=foodCalc(f,fSel.q,old).g||0;fSel.q=t.value==="sv"?fr1(g/(f.sv||100))||1:t.value==="oz"?fr1(g/28.35):Math.round(g);const i=$("#fdQty");if(i)i.value=fSel.q}const m=$("#fdMac");if(m)m.innerHTML=foodMac(foodCalcZ(f,fSel.q,fSel.u,fSel.cz))}
   else if(t.id==="fdType")fType=t.value;else if(t.id==="frServes"&&fForm){render()}});
 document.addEventListener("keydown",e=>{if(e.key!=="Enter")return;const t=e.target;if(t.id==="fdQty"){e.preventDefault();const b=$("[data-flog]");b&&b.click()}else if(t.id==="scanCode"){e.preventDefault();const b=$("[data-scango]");b&&b.click()}else if(t.id==="fdQ"){e.preventDefault();t.blur()}else if(t.matches&&t.matches("[data-fpick],[data-fus]")){e.preventDefault();t.click()}});
-document.addEventListener("click",e=>{const T=e.target;if(!T.closest)return;const b=T.closest("[data-fquick],[data-fdel],[data-fedit],[data-fpick],[data-fback],[data-flog],[data-fnew],[data-fcancel],[data-fsave],[data-fitem],[data-fscan],[data-fus]");if(!b)return;const ds=b.dataset;
-  if(ds.fus){const [,it]=usFind(ds.fus);if(!it)return;const ty=fType||mealNow();usLog(it,ty);fOpen=false;fq="";fOn=[];fChain=null;sfx("blip");toast(it.name.split(" · ")[0]+" logged to "+ty.toLowerCase());render();save();return}
+document.addEventListener("click",e=>{const T=e.target;if(!T.closest)return;const b=T.closest("[data-fquick],[data-fdel],[data-fedit],[data-fpick],[data-fback],[data-flog],[data-fnew],[data-fcancel],[data-fsave],[data-fitem],[data-fscan],[data-fuslog],[data-fus]");if(!b)return;const ds=b.dataset;
+  /* tap a usual = select it (highlight + a Log button); the Log button logs it — was: tapping logged straight away */
+  if(ds.fus&&ds.fuslog==null){const on=!b.classList.contains("fd-sel");document.querySelectorAll(".fd-r.fd-sel").forEach(r=>{r.classList.remove("fd-sel");r.querySelectorAll(".fd-logbtn").forEach(x=>x.remove())});
+    if(on){const ty=fType||mealNow();b.classList.add("fd-sel");b.insertAdjacentHTML("beforeend",`<button type="button" class="fd-logbtn" data-fuslog="${ds.fus}">Log to ${ty.toLowerCase()}</button>`)}return}
+  if(ds.fuslog){const [,it]=usFind(ds.fuslog);if(!it)return;const ty=fType||mealNow();usLog(it,ty);fOpen=false;fq="";fOn=[];fChain=null;sfx("blip");toast(it.name.split(" · ")[0]+" logged to "+ty.toLowerCase());render();save();return}
   if(ds.fdel==null&&fDelArm){fDelArm=null}
   if(ds.fscan!=null){scanOpen();return}
   if(ds.fquick!=null){const f=fList[+ds.fquick];if(!f)return;const [q,u]=foodDef(f);foodLog(f,q,u,fType);fq="";fOn=[];toast(f.name+" logged");render();save();return}
@@ -10311,7 +10318,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="896",APPT="2026-11-25T05:36:02Z";   /* APPT: when this update was made */
+const APPV="897",APPT="2026-11-25T05:38:11Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
