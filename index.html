@@ -4136,6 +4136,19 @@ html body #view .panel{--lrd:30,30,33}
 html:not(.tpl-bd-none):not(.tpl-bd-dark) body #view#view .panel.hasStrip::after{border-color:rgba(255,255,255,.11)!important;border-top-color:rgba(255,255,255,.11)!important}   /* the strip panels' border (drawn on ::after) was rgba(85,132,252,.24) blue / --vline */
 html body #view#view .panel:has(+.cal-tab)::after{background:linear-gradient(90deg,rgba(255,255,255,.11) 0,rgba(255,255,255,.11) calc(50% - min(280px,50%) + var(--pr0,12px)),transparent calc(50% - min(280px,50%) + var(--pr0,12px)),transparent calc(50% + min(280px,50%) - var(--pr0,12px)),rgba(255,255,255,.11) calc(50% + min(280px,50%) - var(--pr0,12px)))!important}   /* the calendar panel's divider line was blue */
 html.tpl-spa:not(.tpl-bd-none):not(.tpl-bd-dark) body #view#view .panel.hasStrip::after,html.tpl-bronze:not(.tpl-bd-none):not(.tpl-bd-dark) body #view#view .panel.hasStrip::after,html.tpl-pyramid:not(.tpl-bd-none):not(.tpl-bd-dark) body #view#view .panel.hasStrip::after{border-color:var(--pbd,rgba(255,200,150,.14))!important;border-top-color:var(--pbd,rgba(255,200,150,.14))!important}
+/* ===== phone Nutrition: the four top tiles in one row of four columns ===== */
+html.phone body #view#view#view[data-tab="fuel"]>.tiles{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
+html.phone body #view#view#view[data-tab="fuel"]>.tiles>.tile.tile{min-height:112px!important;height:auto!important;padding:10px 3px 9px!important;gap:3px!important;justify-content:center!important;border-radius:14px!important;position:relative}
+html.phone body #view#view#view[data-tab="fuel"]>.tiles>.tile>small{font-size:9px!important;letter-spacing:.08em!important;line-height:1.2!important;text-align:center;margin:0!important;padding:0 2px}
+html.phone body #view#view#view[data-tab="fuel"]>.tiles>.tile>b{font-size:17px!important;line-height:1.1!important;margin:0!important}
+html.phone body #view#view#view[data-tab="fuel"]>.tiles>.tile:not(.wtile):not(.mgt)>svg:first-child{width:15px!important;height:15px!important;margin:0 0 2px!important}
+html.phone body #view#view#view[data-tab="fuel"]>.tiles>.tile>em{font-size:9.5px!important;margin:0!important;line-height:1.2}
+html.phone body #view#view#view[data-tab="fuel"]>.tiles>.tile .kc-ic{top:4px!important;right:4px!important;width:24px!important;height:24px!important}html.phone body #view#view#view[data-tab="fuel"]>.tiles>.tile .kc-ic svg{width:13px;height:13px}
+html.phone body #view#view#view[data-tab="fuel"]>.tiles>.wtile>svg{width:24px!important;height:32px!important;margin:2px 0!important}
+html.phone body #view#view#view[data-tab="fuel"]>.tiles>.wtile>em{display:none!important}
+html.phone body #view#view#view[data-tab="fuel"]>.tiles>.wtile .wt-m{top:4px!important;right:4px!important;width:22px!important;height:22px!important;transform:scale(.85)}
+html.phone body #view#view#view[data-tab="fuel"]>.tiles>.mgt>svg{width:46px!important;height:46px!important;margin:2px 0!important}
+html.phone body #view#view#view[data-tab="fuel"]>.tiles>.mgt .mgt-in{display:none!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10671,7 +10684,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="915",APPT="2026-11-25T23:38:17Z";   /* APPT: when this update was made */
+const APPV="916",APPT="2026-11-25T23:47:22Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
