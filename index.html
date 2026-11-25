@@ -3695,7 +3695,7 @@ html body #view[data-tab="budget"] .bl-cat .bl-ch>b{color:var(--cc)!important}/*
 html body #view[data-tab="budget"] .bco-r .bco-v.bco-v,html body #view[data-tab="budget"] .bl-cat .bl-v.bl-v b{color:#f2f2f5!important}
 /* group headers in their colour in every view: dot, name, total */
 html body #view[data-tab="budget"] .bco-c .bco-cn,html body #view[data-tab="budget"] .bl-cat .bl-ch>span{color:var(--cc)!important}
-html body #view[data-tab="budget"] .bk-cat .bk-h .bk-t,html body #view[data-tab="budget"] .bk-cat .bk-h .bk-v{color:var(--cc)!important}/* cards view too */
+html body #view[data-tab="budget"] .bk-cat.bk-cat>.bk-h>.bk-t,html body #view[data-tab="budget"] .bk-cat.bk-cat>.bk-h>.bk-v,html body #view[data-tab="budget"] .bk-cat.bk-cat .bk-gh>*:first-child{color:var(--cc)!important}/* cards view: group name, total and sub-group names in the group colour */
 /* ===== iPad portrait = the landscape layout (user): every panel the full content width, calendar + Add an event side by side, Income | Expenses side by side, Budget calendar unzoomed ===== */
 @media (max-width:1099px){
 html.tablet:not(.phone) body #view[data-tab="dash"]>.dcal-row.dcal-row{display:grid!important;grid-template-columns:minmax(0,1fr) 270px!important;gap:16px;align-items:stretch!important;margin:16px 0 0!important;max-width:none!important;width:100%}
@@ -3738,6 +3738,8 @@ html body #view[data-tab="budget"] .bstick:not(.stuck) .tile.bsav{position:relat
 html body #view[data-tab="budget"] .bstick:not(.stuck) .tile>.bsav-dots{position:absolute!important;left:50%;bottom:12px;transform:translateX(-50%);height:auto!important;padding:0!important;margin:0!important;display:flex;gap:7px}
 html body #view[data-tab="budget"] .tile>.bsav-dots i{width:7px!important;height:7px!important;border-radius:50%}
 html body #view[data-tab="budget"] .bstick.stuck .tile>.bsav-dots{display:none!important}
+/* Budget cards: no "in 7 days" countdown chip — it squeezed the cards */
+html body #view[data-tab="budget"] .bi-next{display:none!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10219,7 +10221,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="879",APPT="2026-11-25T03:37:29Z";   /* APPT: when this update was made */
+const APPV="880",APPT="2026-11-25T03:39:15Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
