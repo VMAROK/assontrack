@@ -465,7 +465,7 @@ label{font-size:13px;font-weight:500}
 .toast{font-size:14px;border-radius:10px}
 .chip{font-size:12px;border-radius:99px}
 .banner b{font-weight:600}
-.panel{border-radius:14px;border-color:rgba(var(--lr),.24);background:linear-gradient(180deg,rgba(40,100,220,.12),rgba(8,14,42,.72));box-shadow:inset 0 1px 0 rgba(120,200,255,.12),0 0 24px rgba(30,110,255,.08)}
+.panel{border-radius:14px;border-color:rgba(var(--lr),.24);background:linear-gradient(180deg,rgba(40,100,220,.12),rgba(8,14,42,.72));box-shadow:inset 0 1px 0 rgba(120,200,255,.12)/* was also: 0 0 24px rgba(30,110,255,.08) — blue glow behind every panel, removed */}
 .panel::before,.panel::after{display:none}
 .navbtn{border-radius:10px}
 .navgrp{display:grid;grid-template-rows:0fr;opacity:0;transform:translateY(-6px);transition:grid-template-rows .45s cubic-bezier(.4,0,.2,1),opacity .35s ease,transform .45s cubic-bezier(.4,0,.2,1)}.navgrp.open{grid-template-rows:1fr;opacity:1;transform:none}.navgrp-in{min-height:0;overflow:hidden;padding-left:18px}
@@ -3296,7 +3296,7 @@ html body #view .bdown .bdn-main .dp-t.ov>i:last-child{background:#ff4d5e!import
 html body #view .bdown .bd-lv{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.02em;margin-left:7px;padding:1px 6px;border-radius:99px;vertical-align:1px}
 html body #view .bdown .bd-lv[data-lvl="Priority"]{color:#ff5d6c;background:rgba(255,93,108,.14)}html body #view .bdown .bd-lv[data-lvl="Moderate"]{color:#ffb648;background:rgba(255,182,72,.14)}html body #view .bdown .bd-lv[data-lvl="Bonus"]{color:#2ee6c5;background:rgba(46,230,197,.14)}
 /* title strips: nothing around them — no 1px panel rim and no top highlight line on panels that have a strip (all tabs) */
-html body #view .panel.hasStrip,html body #view .panel.bstrip-p{border-width:0!important;border-color:transparent!important;box-shadow:0 0 24px rgba(30,110,255,.08)!important}
+html body #view .panel.hasStrip,html body #view .panel.bstrip-p{border-width:0!important;border-color:transparent!important;box-shadow:none!important/* was: 0 0 24px rgba(30,110,255,.08) — the blue glow behind panels, removed for every theme */}
 /* panels with a title strip: the border under the strip follows the Borders setting (Dark = black, Light = default line, No border = none); it sits flush now that the panel has no rim */
 html:not(.tpl-bd-none) body #view .panel.hasStrip::after{left:0!important;right:0!important;bottom:0!important}
 /* the Borders setting goes all the way round, title strip included (was: border started under the strip) */
@@ -10659,7 +10659,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="912",APPT="2026-11-25T23:23:29Z";   /* APPT: when this update was made */
+const APPV="913",APPT="2026-11-25T23:25:42Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
