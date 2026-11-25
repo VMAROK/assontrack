@@ -3595,6 +3595,16 @@ html body #view .bdown .bdn-scroll{gap:var(--bdg)!important;max-height:calc(28px
 /* Overview: room under the cells so the dividers stop short of the bottom edge, same as they do under the title at the top */
 html body #view .dtiles.orbit{padding-bottom:34px!important}
 html body #view .dtiles.orbit .ob-s{display:none!important}/* status words (Slipping, Just started, Within budget…) removed — just the name */
+/* Dashboard top row: the figure panel and the Overview + This week stack end on the same line (This week stretches to fill) */
+html:not(.phone) body #view[data-tab="dash"] .dashtop{align-items:stretch!important}
+html:not(.phone) body #view[data-tab="dash"] .dashtop>.holopanel{align-self:stretch!important;height:auto!important}
+html:not(.phone) body #view[data-tab="dash"] .dashtop>.dstack{display:flex!important;flex-direction:column!important;align-self:stretch!important}
+html:not(.phone) body #view[data-tab="dash"] .dashtop>.dstack>.panel:last-child{flex:1 1 auto!important;display:flex;flex-direction:column}
+html:not(.phone) body #view[data-tab="dash"] .dashtop>.dstack>.panel:last-child>.wa-grid{flex:1 1 auto!important}
+/* bigger Overview rings in the room the status words left — the panel keeps its height */
+html:not(.phone) body #view[data-tab="dash"] .dtiles.orbit .dtile.ob-t{padding:0 4px!important;gap:2px!important}html:not(.phone) body #view[data-tab="dash"] .dtiles.orbit .ob-l{margin-top:0!important}
+html:not(.phone) body #view[data-tab="dash"] .dtiles.orbit .ob-r{width:min(100px,52cqi)!important}
+html:not(.phone) body #view[data-tab="dash"] .dtiles.orbit .ob-p{font-size:clamp(17px,12cqi,25px)!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4661,7 +4671,7 @@ function progressPanel(d){const wk=weekKey(today()),I={pass:passInfo(d),fit:fitI
 /* Orbit ring: faint full circle, arc from 12 o'clock clockwise in the tab colour, a dot riding the arc's end, % in the middle */
 const OBCOL={pass:"#b99cff",fit:"#2ee6c5",diet:"#4cc9ff",budget:"#ffc533"};/* same colours as the Breakdown panel (Nutrition blue, Passions violet, Budget gold) — was amber / teal / blue / green */
 function orbitRing(pct){const r=46,C=2*Math.PI*r,f=pct==null?0:Math.max(0,Math.min(1,pct)),a=-Math.PI/2+f*2*Math.PI,dx=60+r*Math.cos(a),dy=60+r*Math.sin(a),txt=pct==null?"–":Math.round(Math.max(0,pct)*100)+"%";
-  return `<div class="ob-r"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="${r}" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="1"/>${f>0?`<circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--oc)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="${(f*C).toFixed(2)} ${C.toFixed(2)}" transform="rotate(-90 60 60)" style="filter:drop-shadow(0 0 3px var(--oc))"/>`:""}${pct!=null?`<circle cx="${dx.toFixed(2)}" cy="${dy.toFixed(2)}" r="4.2" fill="var(--oc)" style="filter:drop-shadow(0 0 4px var(--oc))"/>`:""}</svg><span class="ob-p">${txt}</span></div>`}
+  return `<div class="ob-r"><svg viewBox="7 7 106 106" aria-hidden="true"><circle cx="60" cy="60" r="${r}" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="1"/>${f>0?`<circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--oc)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="${(f*C).toFixed(2)} ${C.toFixed(2)}" transform="rotate(-90 60 60)" style="filter:drop-shadow(0 0 3px var(--oc))"/>`:""}${pct!=null?`<circle cx="${dx.toFixed(2)}" cy="${dy.toFixed(2)}" r="4.2" fill="var(--oc)" style="filter:drop-shadow(0 0 4px var(--oc))"/>`:""}</svg><span class="ob-p">${txt}</span></div>`}
 function weekAhead(d){const mon=monday(0);const days=WKO.map(i=>{const dn=DAYS[i];const dt=new Date(mon);dt.setDate(dt.getDate()+wkD(i));const ds=ymd(dt),it=[];
     d.passions.forEach(p=>{if(!modesOf(p).includes("schedule"))return;(p.slots||[]).forEach(sl=>{if(isWk(sl)||sl.day!==i)return;const st=slotState(d,p,sl,ds);if(st==="none")return;it.push({k:sl.start||"99",t:sl.dur?slFreq(sl)+" · "+fmtH(sl.dur):fmtTime(sl.start).replace(/\s+/," "),n:p.name,st,go:p.id+":"+sl.id+":"+ds,src:"p"})})});
     d.passions.forEach(p=>{if(!modesOf(p).includes("schedule"))return;(p.slots||[]).filter(isWk).forEach(sl=>{const wk=ymd(mon),st=slotState(d,p,sl,wk);if(st==="none")return;it.push({k:"96",t:slFreq(sl)+" · "+fmtH(sl.dur),n:p.name,st,go:p.id+":"+sl.id+":"+wk,src:"p"})})});
@@ -10069,7 +10079,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="857",APPT="2026-11-25T02:27:57Z";   /* APPT: when this update was made */
+const APPV="858",APPT="2026-11-25T02:30:28Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
