@@ -4020,6 +4020,11 @@ html.phone body #view[data-tab="budget"] .bstick:not(.stuck) .tile.tile.tile>.bs
 html.phone #view[data-tab="budget"] .bd-leg>button{border-bottom:1px solid rgba(255,255,255,.08);padding-block:10px}
 html.phone #view[data-tab="budget"] .bd-leg>button:last-child{border-bottom:0}
 html.phone #view[data-tab="budget"] .bd-leg>button>i{border-radius:50%!important}
+/* ===== stability on iPad/iPhone: Safari stops painting panels (they go blank) when the page asks for more GPU memory than it allows.
+   Each frosted (backdrop-filter) panel and each small scroll box is its own GPU layer, so on touch screens: no frosted blur on panels
+   (they keep their tinted fill), and the calendar day chips clip instead of scrolling. ===== */
+@media (pointer:coarse){html body #view#view#view#view *,html body #view#view#view#view *::before,html body #view#view#view#view *::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html body #view .mcal .mc .chips{overflow:hidden!important}}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -7369,7 +7374,7 @@ function bCal(){const b=B(),T=today(),x=bDate(T);x.setDate(1);x.setMonth(x.getMo
   const tail=(7-(lead+nd)%7)%7;for(let i=0;i<tail;i++)cells+=`<span class="bc-d pad"></span>`;
   const SE=(ev[bSel]||[]),SS=b.spends.filter(s=>s.d===bSel),tot=SE.filter(i=>i.kind!=="inc").reduce((a,i)=>a+fxc(+i.amt||0,i.cur,bHome()),0)+SS.reduce((a,s)=>a+bSpAmt(s),0);
   /* old list under the calendar (before the overview moved here):
-  const day=`<div class="bc-day"><div class="bc-dh"><b>${bSel===T?"Today":bDate(bSel).toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"})}</b>${SE.length||SS.length?(()=>{const t=bDayTot(b,bSel,SE,SS);return `<span class="${bSignC(t.now)}">${bSignM(t.now)}</span>`})():""}</div>${SE.length||SS.length?`<div class="bc-dl">${SE.map(i=>`<button type="button" class="bc-r${bIsPaid(b,i,bSel)?" done":""}" data-bedit="${i.id}" style="--cc:${i.kind==="inc"?"#3ddc84":bCol(bItCat(i))}"><span>${esc(bTitle(i))}<small>${bSubT(i)?esc(bSubT(i))+" · ":""}${BKN[i.kind][0]}</small></span><b class="${i.kind==="inc"?"pos":""}">${i.kind==="inc"?"+":""}${bMoneyI(i)}</b></button>`).join("")}${SS.map(s=>`<button type="button" class="bc-r" data-bsedit="${s.id}" style="--cc:${bCol(s.cat)}"><span>${esc(s.note||s.cat)}<small>Spent · ${esc(s.cat)}</small></span><b>${bMoneyI(s)}</b></button>`).join("")}</div>${SE.length?(()=>{const t=bDayTot(b,bSel,SE,SS);return `<div class="bc-all"><span>Total when everything's paid</span><b class="${bSignC(t.all)}">${bSignM(t.all)}</b></div>`})():""}`:`<p class="note" style="margin:6px 0 0">Nothing charged this day.</p>`}</div>`;
+  const day=`<div class="bc-day"><div class="bc-dh"><b>${bSel===T?"Today":bDate(bSel).toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"})}</b>${SE.length||SS.length?(()=>{const t=bDayTot(b,bSel,SE,SS);return `<span class="${bSignC(t.now)}">${bSignM(t.now)}</span>`})():""}</div>${SE.length||SS.length?`<div class="bc-dl">${SE.map(i=>`<button type="button" class="bc-r${bIsPaid(b,i,bSel)?" done":""}" data-bedit="${i.id}" style="--cc:${i.kind==="inc"?"#3ddc84":bCol(bItCat(i))}"><span>${esc(bTitle(i))}<small>${bSubT(i)?esc(bSubT(i))+" · ":""}${(BKN[i.kind]||BKN.bill)[0]}</small></span><b class="${i.kind==="inc"?"pos":""}">${i.kind==="inc"?"+":""}${bMoneyI(i)}</b></button>`).join("")}${SS.map(s=>`<button type="button" class="bc-r" data-bsedit="${s.id}" style="--cc:${bCol(s.cat)}"><span>${esc(s.note||s.cat)}<small>Spent · ${esc(s.cat)}</small></span><b>${bMoneyI(s)}</b></button>`).join("")}</div>${SE.length?(()=>{const t=bDayTot(b,bSel,SE,SS);return `<div class="bc-all"><span>Total when everything's paid</span><b class="${bSignC(t.all)}">${bSignM(t.all)}</b></div>`})():""}`:`<p class="note" style="margin:6px 0 0">Nothing charged this day.</p>`}</div>`;
   */
   const anim=bDayShown!==bSel;bDayShown=bSel;   /* only animate when a new day is opened, not when a row is ticked */
   const day=`<div class="bc-day${anim?" bdw-open":""}">${bDayPop(b,bSel,SE,SS,T,true)}</div>`;
@@ -7436,8 +7441,8 @@ document.addEventListener("click",e=>{if(!bDayWin||!e.target.closest)return;if(e
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&bDayWin){bDayWin=null;bNoSel=true;render()}});
 function bDayPop(b,ds,SE,SS,T,inl){const H=bHome(),inc=SE.filter(i=>i.kind==="inc"),out=SE.filter(i=>i.kind!=="inc"),
     inT=inc.reduce((a,i)=>a+fxc(+i.amt||0,i.cur,H),0),fxT=out.filter(i=>!i.muted).reduce((a,i)=>a+fxc(+i.amt||0,i.cur,H),0),spT=SS.reduce((a,s)=>a+bSpAmt(s),0),net=inT-fxT-spT;
-  /* was: rows opened the editor — const row=i=>`<button type="button" class="bdw-r${i.muted?" mu":""}" data-bedit="${i.id}" style="--cc:${i.kind==="inc"?"#3ddc84":bCol(bItCat(i))}"><i></i><span><b>${esc(bTitle(i))}</b><small>${[bSubT(i)&&esc(bSubT(i)),BKN[i.kind][0],esc(bItCat(i)),(BCYC.find(x=>x[0]===i.cyc)||[0,""])[1],i.muted?"Excluded":""].filter(Boolean).join(" · ")}</small></span><em class="${i.kind==="inc"?"pos":""}">${i.kind==="inc"?"+":"−"}${bMoneyI(i)}</em></button>`; */
-  const row=i=>{const pd=bIsPaid(b,i,ds),inc=i.kind==="inc";return `<button type="button" class="bdw-r bdw-ck${pd?" done":""}${i.muted?" mu":""}" data-bpaid="${bPaidK(i,ds)}" aria-pressed="${pd}" title="${pd?"Tap to undo":inc?"Tap when you've received it":"Tap when you've paid it"}" style="--cc:${inc?"#3ddc84":bCol(bItCat(i))}"><span class="bdw-box" aria-hidden="true">${pd?'<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>':""}</span><span><b>${esc(bTitle(i))}</b><small>${[bSubT(i)&&esc(bSubT(i)),BKN[i.kind][0],esc(bItCat(i)),(BCYC.find(x=>x[0]===i.cyc)||[0,""])[1],i.muted&&!inc?"Excluded":""].filter(Boolean).join(" · ")}</small></span><em class="${inc?"pos":""}">${inc?"+":"−"}${bMoneyI(i)}</em></button>`};
+  /* was: rows opened the editor — const row=i=>`<button type="button" class="bdw-r${i.muted?" mu":""}" data-bedit="${i.id}" style="--cc:${i.kind==="inc"?"#3ddc84":bCol(bItCat(i))}"><i></i><span><b>${esc(bTitle(i))}</b><small>${[bSubT(i)&&esc(bSubT(i)),(BKN[i.kind]||BKN.bill)[0],esc(bItCat(i)),(BCYC.find(x=>x[0]===i.cyc)||[0,""])[1],i.muted?"Excluded":""].filter(Boolean).join(" · ")}</small></span><em class="${i.kind==="inc"?"pos":""}">${i.kind==="inc"?"+":"−"}${bMoneyI(i)}</em></button>`; */
+  const row=i=>{const pd=bIsPaid(b,i,ds),inc=i.kind==="inc";return `<button type="button" class="bdw-r bdw-ck${pd?" done":""}${i.muted?" mu":""}" data-bpaid="${bPaidK(i,ds)}" aria-pressed="${pd}" title="${pd?"Tap to undo":inc?"Tap when you've received it":"Tap when you've paid it"}" style="--cc:${inc?"#3ddc84":bCol(bItCat(i))}"><span class="bdw-box" aria-hidden="true">${pd?'<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>':""}</span><span><b>${esc(bTitle(i))}</b><small>${[bSubT(i)&&esc(bSubT(i)),(BKN[i.kind]||BKN.bill)[0],esc(bItCat(i)),(BCYC.find(x=>x[0]===i.cyc)||[0,""])[1],i.muted&&!inc?"Excluded":""].filter(Boolean).join(" · ")}</small></span><em class="${inc?"pos":""}">${inc?"+":"−"}${bMoneyI(i)}</em></button>`};
   const srow=x=>`<button type="button" class="bdw-r bdw-sp" style="--cc:${bCol(x.cat)}"><i></i><span><b>${esc(x.note||x.sg||x.cat||"Spent")}</b><small>${["Spent",x.sg||(x.cat&&x.cat!=="undefined"?x.cat:"")].filter(Boolean).map(esc).join(" · ")}${x.time?" · "+fmtTime(x.time):""}</small></span><em>−${bMoneyI(x)}</em></button>`;
   const sec=(t,L,f)=>L.length?`<div class="bdw-s">${t?`<div class="bdw-sh">${t}<span>${L.length}</span></div>`:""}${L.map(f).join("")}</div>`:"";
   return `${inl?`<div class="bdw-in">`:`<div class="bdw" data-bdwbg><div class="bdw-p panel" role="dialog" aria-modal="true" aria-label="Day overview">`}
@@ -10552,7 +10557,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="903",APPT="2026-11-25T19:42:21Z";   /* APPT: when this update was made */
+const APPV="904",APPT="2026-11-25T21:28:26Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -10749,7 +10754,7 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 </script>
 <script>/* (v798–v799 halftone "cloths" version is in git history — reverted to this one) Stipple backdrop: two slow ribbons of fine dots, top-right and bottom-left, drawn only while the Stipple template is on */
 (()=>{const c=document.getElementById("stipbg");if(!c)return;const x=c.getContext("2d");let W=0,H=0,raf=0,last=0,on=false,R=[],R2=[],G=[];
-  const size=()=>{const d=Math.min(2.5,devicePixelRatio||1);W=innerWidth;H=(window.aotFullH?aotFullH():innerHeight);c.width=Math.round(W*d);c.height=Math.round(H*d);x.setTransform(d,0,0,d,0,0);
+  const size=()=>{const d=Math.min(matchMedia("(pointer:coarse)").matches?1.5:2.5/* was 2.5 everywhere: full-screen canvases at 2x+ were most of the iPad's GPU memory */,devicePixelRatio||1);W=innerWidth;H=(window.aotFullH?aotFullH():innerHeight);c.width=Math.round(W*d);c.height=Math.round(H*d);x.setTransform(d,0,0,d,0,0);
     R=[];const cols=Math.round(Math.min(220,Math.max(120,W/6))),rows=44;for(const side of [0,1])for(let i=0;i<cols;i++)for(let j=0;j<rows;j++)R.push([side,i/(cols-1),j/(rows-1),Math.random()*6.28]);
     /* added: two smaller ribbons in the other corners, and a big faint dotted globe with a ring in the centre (the two above are unchanged) */
     R2=[];const c2=Math.round(cols*.6),r2=32;for(const k of [0,1])for(let i=0;i<c2;i++)for(let j=0;j<r2;j++)R2.push([k,i/(c2-1),j/(r2-1)]);
@@ -10772,12 +10777,12 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
         const al=(ring?.2:.06)+(ring?.25:.42)*lit;if(al<.04)continue;const z=.7+1.1*lit;x.fillStyle=`rgba(208,205,226,${(al*.85).toFixed(3)})`;x.fillRect(cx+x1*rad-z/2,cy-y2*rad-z/2,z,z)}}};
   /* slow and light: about 24 frames a second, paused when the app is hidden */
   const loop=n=>{raf=requestAnimationFrame(loop);if(document.hidden||n-last<41)return;last=n;draw(n/1000)};
-  const check=()=>{const h=document.documentElement,want=h.classList.contains("tpl-stipple")&&h.classList.contains("tpl-bg");if(want&&!on){on=true;size();raf=requestAnimationFrame(loop)}else if(!want&&on){on=false;cancelAnimationFrame(raf);x.clearRect(0,0,W,H)}};
+  const check=()=>{const h=document.documentElement,want=h.classList.contains("tpl-stipple")&&h.classList.contains("tpl-bg")&&!h.classList.contains("vt-img")/* was: kept drawing under the picture wallpaper */;if(want&&!on){on=true;size();raf=requestAnimationFrame(loop)}else if(!want&&on){on=false;cancelAnimationFrame(raf);x.clearRect(0,0,W,H);c.width=c.height=1/* frees its memory */}};
   new MutationObserver(check).observe(document.documentElement,{attributes:true,attributeFilter:["class"]});addEventListener("resize",()=>{if(on)size()});check()})();
 </script>
 <script>/* Visual template backdrops: silk/ribbon light drawn as many fine strands that twist and catch the light, and lit golden pyramids. ~24 fps, paused when hidden */
 (()=>{const c=document.getElementById("vtbg");if(!c)return;const x=c.getContext("2d");let W=0,H=0,M=0,raf=0,last=0,cur=null,D=[];
-  const size=()=>{const d=Math.min(2.5,devicePixelRatio||1);W=innerWidth;H=(window.aotFullH?aotFullH():innerHeight);M=Math.min(W,H);c.width=Math.round(W*d);c.height=Math.round(H*d);x.setTransform(d,0,0,d,0,0);
+  const size=()=>{const d=Math.min(matchMedia("(pointer:coarse)").matches?1.5:2.5/* was 2.5 everywhere: full-screen canvases at 2x+ were most of the iPad's GPU memory */,devicePixelRatio||1);W=innerWidth;H=(window.aotFullH?aotFullH():innerHeight);M=Math.min(W,H);c.width=Math.round(W*d);c.height=Math.round(H*d);x.setTransform(d,0,0,d,0,0);
     D=[...Array(Math.round(Math.min(160,W*H/9000)))].map(()=>({x:Math.random()*W,y:Math.random()*H,r:.4+Math.random()*1.1,v:.05+Math.random()*.18,ph:Math.random()*6.28}))};
   /* a ribbon: centre curve P(s), width, twist; drawn as n strands; brightness = facing + a moving specular streak */
   const ribbon=(P,wid,tw,n,col,amp,t)=>{const S=56;for(let k=0;k<n;k++){const o=k/(n-1)*2-1;let px=null,py=null,acc=0,cnt=0;x.beginPath();
@@ -10819,7 +10824,7 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
       for(const p of S.fp){const a=Math.sin(p.x*.0042+t*.12)*1.6+Math.cos(p.y*.0051-t*.09)*1.4+Math.sin((p.x+p.y)*.0017)*.8,nx=p.x+Math.cos(a)*.9,ny=p.y+Math.sin(a)*.9;x.strokeStyle=mono?`hsla(${(248+8*Math.sin(p.y*.004+t*.1))|0},10%,97%,.42)`:`hsla(${(228+22*Math.sin(p.y*.004+t*.1))|0},85%,80%,.36)`;x.beginPath();x.moveTo(p.x,p.y);x.lineTo(nx,ny);x.stroke();p.x=nx;p.y=ny;if(--p.age<0||p.x<0||p.x>W||p.y<0||p.y>H){p.x=Math.random()*W;p.y=Math.random()*H;p.age=80+Math.random()*180}}}};
   const KEEP={flow:1,flowmono:1};let S={};
   const loop=n=>{raf=requestAnimationFrame(loop);if(document.hidden||n-last<(KEEP[cur]?16:41))return;last=n;if(!KEEP[cur])x.clearRect(0,0,W,H);R[cur](n/1000)};
-  const check=()=>{const h=document.documentElement;let want=null;if(h.classList.contains("tpl-bg"))for(const k in R)if(h.classList.contains("tpl-"+k))want=k;
+  const check=()=>{const h=document.documentElement;let want=null;if(h.classList.contains("tpl-bg")&&!h.classList.contains("vt-img")/* was: kept drawing under the picture wallpaper */)for(const k in R)if(h.classList.contains("tpl-"+k))want=k;
     if(want!==cur){cancelAnimationFrame(raf);cur=want;S={};x.clearRect(0,0,W,H);if(cur){size();raf=requestAnimationFrame(loop)}}};
   new MutationObserver(check).observe(document.documentElement,{attributes:true,attributeFilter:["class"]});addEventListener("resize",()=>{if(cur){S={};size()}});check()})();
 </script>
@@ -10828,7 +10833,7 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
   /* touch / mouse: drag sideways to spin it (glides, then settles; speed is capped so it stays smooth), points part around your finger,
      a tap sends a soft pulse through it, two fingers slowly loosen it into a cloud. Up-and-down still scrolls the page */
   const I={ur:0,uv:0,tilt:0,sp:0,pulse:0,px:-1e4,py:-1e4,two:false,lt:0,hold:false,sx:-1e4,sy:-1e4,sk:0};/* hold: first finger keeps it still; sx/sy/sk: the second finger and how hard it is splashing */const N=2200,P=[...Array(N)].map((_,i)=>({u:Math.random(),o:Math.random()*6.28,j:(Math.random()-.5)*.08,a:Math.random()*6.28,r:Math.sqrt(Math.random())*.09}));
-  const size=()=>{const d=Math.min(2.5,devicePixelRatio||1),r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=Math.max(1,Math.round(W*d));cv.height=Math.max(1,Math.round(H*d));x.setTransform(d,0,0,d,0,0)};
+  const size=()=>{const d=Math.min(matchMedia("(pointer:coarse)").matches?1.5:2.5/* was 2.5 everywhere: full-screen canvases at 2x+ were most of the iPad's GPU memory */,devicePixelRatio||1),r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=Math.max(1,Math.round(W*d));cv.height=Math.max(1,Math.round(H*d));x.setTransform(d,0,0,d,0,0)};
   const draw=t=>{const dt=Math.min(.05,Math.max(0,t-(I.lt||t)));I.lt=t;I.uv=Math.max(-1.2,Math.min(1.2,I.uv));if(I.hold){I.uv=0;I.hs=(I.hs||0)+dt}else{I.ur+=I.uv*dt;}I.sk*=Math.pow(.15,dt);I.uv*=Math.pow(.25,dt);I.tilt*=Math.pow(.5,dt);
     {const tg=Math.min(.25,Math.abs(I.uv)*.2);/* was: two fingers = slow spread; now two fingers = hold + splash */I.sp+=(tg-I.sp)*(1-Math.pow(I.two?.7:.45,dt))}I.pulse*=Math.pow(.2,dt);
     x.clearRect(0,0,W,H);const S=Math.min(W,H)*.3,cx=W/2,cy=H/2,ry=(t-(I.hs||0))*.25+I.ur,rx=.5+.25*Math.sin(t*.31)+I.tilt,cR=Math.cos(ry),sR=Math.sin(ry),cX=Math.cos(rx),sX=Math.sin(rx),br=1+.06*Math.sin(t*1.3),hb=(t*12)%360;
@@ -10841,7 +10846,7 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
       const tw=.5+.5*Math.sin(t*2.2+p.o),al=(.18+.45*(z2*.5+.5))*(.45+.55*tw),r=(.5+1.1*(z2*.5+.5))*pr;
       x.fillStyle=`hsla(${(hb+p.u*140)%360},85%,${62+18*tw}%,${al.toFixed(3)})`;x.beginPath();x.arc(px,py,r,0,6.2832);x.fill()}
     x.globalCompositeOperation="source-over"};
-  const loop=n=>{raf=requestAnimationFrame(loop);if(!cv||!cv.isConnected){stop();return}if(document.hidden||n-last<33)return;last=n;draw(n/1000)};
+  const loop=n=>{raf=requestAnimationFrame(loop);if(!cv||!cv.isConnected){stop();return}if(document.hidden||n-last<33)return;last=n;{const r=cv.getBoundingClientRect();if(r.bottom<0||r.top>innerHeight||!r.width)return}/* skip while scrolled out of sight */draw(n/1000)};
   const stop=()=>{cancelAnimationFrame(raf);raf=0;cv=null};
   const hook=c=>{const F=new Map();let d=null;c.style.touchAction="pan-y";c.style.cursor="grab";const loc=e=>{const r=c.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
     /* one finger: spin. Two fingers: the first one holds it still, the second one splashes the points around (was: two fingers loosened it and it kept spinning) */
@@ -10901,7 +10906,7 @@ void main(){vec2 uv=gl_FragCoord.xy/R;float a=R.x/R.y;vec2 p=vec2(uv.x*a,uv.y);f
     const uR=g.getUniformLocation(pr,"R"),uT=g.getUniformLocation(pr,"T"),uM=g.getUniformLocation(pr,"MO");draw=t=>{g.viewport(0,0,cv.width,cv.height);g.uniform2f(uR,cv.width,cv.height);g.uniform1f(uT,t);g.uniform1f(uM,mo);g.drawArrays(g.TRIANGLES,0,3)};return true};
   const size=()=>{const d=Math.min(1,(devicePixelRatio||1)*.5),H=(window.aotFullH?aotFullH():innerHeight);cv.width=Math.round(innerWidth*d);cv.height=Math.round(H*d)};
   const loop=n=>{raf=requestAnimationFrame(loop);if(document.hidden||n-last<33)return;last=n;draw(n/1000-t0)};
-  const check=()=>{const h=document.documentElement,want=(h.classList.contains("tpl-chrome")||h.classList.contains("tpl-bronze"))&&h.classList.contains("tpl-bg");mo=h.classList.contains("tpl-bronze")?1:0;/* was Chrome only */
+  const check=()=>{const h=document.documentElement,want=(h.classList.contains("tpl-chrome")||h.classList.contains("tpl-bronze"))&&h.classList.contains("tpl-bg")&&!h.classList.contains("vt-img");mo=h.classList.contains("tpl-bronze")?1:0;/* was Chrome only */
     if(want&&!on){if(!draw&&!init())return;on=true;size();raf=requestAnimationFrame(loop)}else if(!want&&on){on=false;cancelAnimationFrame(raf)}};
   new MutationObserver(check).observe(document.documentElement,{attributes:true,attributeFilter:["class"]});addEventListener("resize",()=>{if(on)size()});check()})();
 /* one-time: Liquid Chrome was redone to match its mockup — drop old Chrome slider/fine-tune tweaks so the new look shows */
@@ -10921,7 +10926,7 @@ void main(){vec2 uv=gl_FragCoord.xy/R;float a=R.x/R.y;vec2 p=vec2(uv.x*a,uv.y);f
     pr=g.createProgram();g.attachShader(pr,sh(g.VERTEX_SHADER,"attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}"));g.attachShader(pr,sh(g.FRAGMENT_SHADER,FS));g.linkProgram(pr);if(!g.getProgramParameter(pr,g.LINK_STATUS))return false;g.useProgram(pr);
     const b=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,b);g.bufferData(g.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),g.STATIC_DRAW);const l=g.getAttribLocation(pr,"a");g.enableVertexAttribArray(l);g.vertexAttribPointer(l,2,g.FLOAT,false,0,0);
     for(const k of ["R","T","TX","IS","FX"])U[k]=g.getUniformLocation(pr,k);tex=g.createTexture();return true};
-  const size=()=>{const d=Math.min(1.5,devicePixelRatio||1),H=(window.aotFullH?aotFullH():innerHeight);cv.width=Math.round(innerWidth*d);cv.height=Math.round(H*d)};
+  const size=()=>{const d=Math.min(matchMedia("(pointer:coarse)").matches?1:1.5,devicePixelRatio||1),H=(window.aotFullH?aotFullH():innerHeight);cv.width=Math.round(innerWidth*d);cv.height=Math.round(H*d)};
   const draw=t=>{g.viewport(0,0,cv.width,cv.height);g.uniform2f(U.R,cv.width,cv.height);g.uniform1f(U.T,t);g.uniform2f(U.IS,img.width,img.height);g.uniform1f(U.FX,FOC[cur]??.5);g.uniform1i(U.TX,0);g.drawArrays(g.TRIANGLES,0,3)};
   const loop=n=>{raf=requestAnimationFrame(loop);if(document.hidden||n-last<33)return;last=n;draw(n/1000-t0)};
   const stop=()=>{cancelAnimationFrame(raf);raf=0;cur=null;document.documentElement.classList.remove("vt-img")};
