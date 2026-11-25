@@ -3862,6 +3862,128 @@ html.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronz
 @keyframes bzBar{0%,100%{transform:translate(-50%,-50%) rotate(90deg) translateY(-6%) scale(1);filter:brightness(1)}50%{transform:translate(-50%,-50%) rotate(90deg) translateY(6%) scale(1.08);filter:brightness(1.3)}}
 }
 [data-bsav]{touch-action:pan-y}   /* budget top tiles: the browser only scrolls up/down here; sideways belongs to the month ⇄ year swipe */
+/* ===== Passions → Tasks / Projects redesign ===== */
+.tk2,.pj2{--pacc:#b9a6ff;--pacc2:rgba(185,166,255,.16);--pl:rgba(255,255,255,.085);--pl2:rgba(255,255,255,.14);--ptx:#ececf2;--pmu:rgba(236,236,242,.55);padding:4px 24px 8px;color:var(--ptx)}
+.pdetail:has(>.tk2,>.pj2){container-type:inline-size}
+.tk2 button,.pj2 button{font:inherit;color:inherit}
+.tk2-bar{position:relative;display:block;flex:1;height:6px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;min-width:60px}
+.tk2-bar i{position:absolute;inset:0 auto 0 0;border-radius:inherit;background:var(--pacc);transition:width .5s cubic-bezier(.16,1,.3,1)}
+.tk2-bar.ok i{background:#3ddc84}.tk2-bar.big{height:8px}
+.tk2-btn{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:10px;border:1px solid var(--pl2);background:rgba(255,255,255,.04);font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.tk2-btn:hover{border-color:rgba(255,255,255,.26)}
+.tk2-btn.acc{background:var(--pacc);border-color:transparent;color:#140f24}
+.tk2-btn.done{border-color:rgba(255,255,255,.3)}
+.tk2-btn.armed{background:#3ddc84;color:#06140b;border-color:transparent}
+.tk2-btn.armed>span:last-child{margin-left:4px}
+.tk2-ic{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:9px;border:1px solid transparent;background:none;color:var(--pmu);cursor:pointer}
+.tk2-ic:hover{border-color:var(--pl2);color:var(--ptx)}.tk2-ic.del:hover{color:#ff6b78}
+.tk2-ic.armed{width:auto;padding:0 10px;color:#ff6b78;border-color:rgba(255,107,120,.5)}
+.tk2-seg{display:inline-flex;padding:3px;border-radius:99px;border:1px solid var(--pl2);gap:2px}
+.tk2-seg button{height:30px;padding:0 14px;border-radius:99px;border:0;background:none;font-size:13px;font-weight:600;color:var(--pmu);cursor:pointer}
+.tk2-seg button[aria-pressed="true"]{background:var(--pacc);color:#140f24}
+.tk2-empty{padding:28px 6px;color:var(--pmu);font-size:14px}
+/* top band: this week + organize */
+.tk2-top{display:flex;align-items:center;flex-wrap:wrap;gap:12px 20px;padding:4px 0 14px;border-bottom:1px solid var(--pl)}
+.tk2-week{display:flex;align-items:center;gap:12px;flex:1 1 380px;min-width:0}
+.tk2-wl{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--pmu);white-space:nowrap}
+.tk2-week b{font-size:14.5px;font-weight:600;white-space:nowrap}.tk2-week b.mut{color:var(--pmu);font-weight:500}.tk2-week small{color:var(--pmu);font-size:12px}
+.tk2-week em{font-style:normal;font-size:13px;color:var(--pmu);min-width:36px;text-align:right}
+.tk2-org{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.tk2-org>span{font-size:12.5px;color:var(--pmu);margin-right:2px}
+.tk2-org button{height:32px;padding:0 14px;border-radius:99px;border:1px solid var(--pl2);background:none;font-size:13px;cursor:pointer;color:var(--pmu)}
+.tk2-org button[aria-pressed="true"]{background:var(--pacc);border-color:transparent;color:#140f24;font-weight:600}
+.tk2-new{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px;border-radius:99px;border:1px solid rgba(185,166,255,.45);background:var(--pacc2);font-size:13.5px;font-weight:600;cursor:pointer}
+/* body: list, plus the theater on the right when a media task is open */
+.tk2-body{display:grid;grid-template-columns:minmax(0,1fr);gap:22px;padding-top:12px}
+@container (min-width:860px){.tk2.two .tk2-body{grid-template-columns:minmax(300px,.8fr) minmax(0,1.35fr)}.tk2.two .tk2-side{border-left:1px solid var(--pl);padding-left:22px}}
+@container (max-width:859px){.tk2.two .tk2-side{order:-1}}
+.tk2-grp{margin-bottom:6px}
+.tk2-gh{display:flex;align-items:center;gap:8px;width:100%;padding:12px 2px 8px;border:0;background:none;cursor:pointer;font-size:15px;font-weight:700;text-align:left}
+.tk2-gh svg{color:var(--pmu)}
+.tk2-gh i{font-style:normal;font-size:12px;font-weight:700;min-width:22px;height:22px;padding:0 7px;border-radius:99px;display:inline-grid;place-items:center;background:rgba(255,255,255,.1)}
+.g-overdue .tk2-gh i{background:rgba(255,93,108,.22);color:#ff8f9a}.g-today .tk2-gh i,.g-prog .tk2-gh i{background:var(--pacc2);color:var(--pacc)}.g-done .tk2-gh i{background:rgba(61,220,132,.18);color:#5fe39b}
+.tk2-row{border-bottom:1px solid var(--pl);border-radius:12px;transition:background .2s}
+.tk2-row.sel,.tk2-row.open{background:rgba(255,255,255,.045);border:1px solid rgba(185,166,255,.3);margin:4px 0}
+.tk2-main{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:12px;width:100%;min-height:58px;padding:9px 10px;border:0;background:none;text-align:left;cursor:pointer}
+.tk2-ic{flex:none}.tk2-main>.tk2-ic{width:24px;height:24px;border:0;padding:0;display:grid;place-items:center;color:rgba(255,255,255,.55)}
+.tk2-bell{color:var(--pmu)}
+.tk2-tx{min-width:0;display:grid;gap:2px}.tk2-tx b{font-size:15.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tk2-tx small{font-size:12.5px;color:var(--pmu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.b-done .tk2-tx b{text-decoration:line-through;text-decoration-color:rgba(255,255,255,.4);color:var(--pmu)}
+.tk2-meta{display:flex;align-items:center;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.tk2-tag{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.tk2-tag.red{background:rgba(255,93,108,.16);color:#ff8f9a;border:1px solid rgba(255,93,108,.35)}
+.tk2-tag.wk{background:var(--pacc2);color:#d8ccff}
+.tk2-att{display:inline-flex;align-items:center;gap:3px;font-size:12px;color:var(--pmu)}
+.tk2-due{font-size:13px;color:var(--pmu);white-space:nowrap}.tk2-due.red{color:#ff7a86}.tk2-due.acc{color:var(--pacc)}
+.tk2-go{color:var(--pmu);display:grid}
+.tk2-rn{padding:0 10px 10px 46px}
+/* text task, opened inline */
+.tk2-in{padding:2px 12px 14px 46px;display:grid;gap:12px;animation:tk2In .35s cubic-bezier(.16,1,.3,1)}
+@keyframes tk2In{from{opacity:0;transform:translateY(-4px)}}
+.tk2-note{display:grid;gap:6px}.tk2-note>span{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--pmu)}
+.tk2-note textarea{width:100%;box-sizing:border-box;min-height:58px;padding:10px 12px;border-radius:10px;border:1px solid var(--pl2);background:rgba(0,0,0,.25);color:var(--ptx);font:inherit;font-size:14px;resize:vertical}
+.tk2-facts{display:flex;align-items:center;flex-wrap:wrap;gap:10px 18px;padding-top:2px;border-top:1px solid var(--pl)}
+.tk2-f{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:var(--pmu);padding-top:10px}.tk2-f.red{color:#ff7a86}
+.tk2-f input{height:32px;padding:0 8px;border-radius:8px;border:1px solid var(--pl2);background:rgba(0,0,0,.25);color:var(--ptx);font:inherit;font-size:13px;color-scheme:dark}
+.tk2-chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;margin-top:10px;border-radius:99px;border:1px dashed var(--pl2);background:none;font-size:12.5px;color:var(--pmu);cursor:pointer}
+.tk2-chip.on{border-style:solid;border-color:rgba(185,166,255,.45);background:var(--pacc2);color:#d8ccff}
+.tk2-acts{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.tk2-sp{flex:1}
+.tk2-clk{display:inline-flex;align-items:center;gap:8px;color:var(--pmu)}.tk2-clk b{font-variant-numeric:tabular-nums;font-size:15px;font-weight:600;color:var(--ptx)}
+.tk2-wait{font-size:12.5px;color:var(--pmu)}
+.tk2-tools{display:inline-flex;gap:2px}
+/* theater */
+.tk2-thr{display:grid;gap:14px;animation:tk2In .4s cubic-bezier(.16,1,.3,1)}
+.tk2-thr-h{display:flex;align-items:flex-start;gap:12px}.tk2-thr-t{flex:1;min-width:0}
+.tk2-thr-t small{display:block;font-size:13px;color:var(--pmu);margin-bottom:4px}.tk2-thr-t h3{margin:0;font-size:24px;font-weight:700;letter-spacing:-.01em}
+.tk2-thr-hb{display:flex;align-items:center;gap:2px}
+.tk2-media .att{margin:0;border:0;padding:0;background:none}
+.tk2-media .att-h{display:none}
+.tk2-media .att-ic-cmp,.tk2-media .att-tsep{display:none}   /* the big Compare side by side button replaces the small icon here */
+.tk2-media .att-stage{border-radius:14px;overflow:hidden;border:1px solid var(--pl2);background:#000}
+.tk2-cmp{display:flex;align-items:center;justify-content:center;gap:10px;height:44px;border-radius:12px;border:1px solid var(--pl2);background:rgba(255,255,255,.03);font-size:14px;font-weight:600;cursor:pointer}
+.tk2-thr>.tk2-acts{padding-top:12px;border-top:1px solid var(--pl)}
+/* projects */
+.pj2{display:grid;grid-template-columns:minmax(0,1fr);gap:22px;padding-top:12px}
+@container (min-width:760px){.pj2{grid-template-columns:minmax(240px,.62fr) minmax(0,1.6fr)}.pj2-rt{border-left:1px solid var(--pl);padding-left:22px}}
+.pj2-lh{font-size:11.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--pmu);margin:4px 0 10px}
+.pj2-tree{border:1px solid var(--pl2);border-radius:14px;padding:6px;background:rgba(0,0,0,.18)}
+.pj2-node+.pj2-node{border-top:1px solid var(--pl);margin-top:4px;padding-top:4px}
+.pj2-r{display:flex;align-items:center;border-radius:10px}
+.pj2-r.on{background:rgba(185,166,255,.17);box-shadow:inset 0 0 0 1px rgba(185,166,255,.22)}
+.pj2-fold{display:grid;place-items:center;width:26px;height:40px;border:0;background:none;color:var(--pmu);cursor:pointer;flex:none}
+.pj2-sel{display:flex;align-items:center;gap:10px;flex:1;min-width:0;height:40px;padding:0 10px 0 2px;border:0;background:none;cursor:pointer;text-align:left;font-size:15px}
+.pj2-r.top .pj2-sel{font-weight:600;font-size:15.5px}
+.pj2-r.kid .pj2-sel{padding-left:30px;font-size:14.5px}
+.pj2-sel svg{flex:none;color:var(--pmu)}.pj2-sel span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pj2-sel i{font-style:normal;font-size:12.5px;color:var(--pmu)}
+.pj2-new{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;height:44px;margin-top:14px;border-radius:12px;border:1px solid rgba(185,166,255,.45);background:var(--pacc2);font-size:14px;font-weight:600;cursor:pointer}
+.pj2-empty{color:var(--pmu);font-size:14px;margin:6px 2px}
+.pj2-form{margin-top:12px}
+.pj2-h{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}.pj2-h>div:first-child{flex:1;min-width:200px}
+.pj2-crumb{display:block;font-size:13px;color:var(--pmu);margin-bottom:4px}.pj2-h h2{margin:0;font-size:26px;font-weight:700;letter-spacing:-.01em}
+.pj2-hb{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pj2-subf{margin-top:12px}
+.pj2-prog{display:flex;align-items:stretch;gap:20px;flex-wrap:wrap;margin-top:16px;padding:16px 0;border-top:1px solid var(--pl);border-bottom:1px solid var(--pl)}
+.pj2-pm{flex:1 1 300px;display:grid;gap:10px}.pj2-pm b{font-size:22px;font-weight:700}
+.pj2-pb{display:flex;align-items:center;gap:12px}.pj2-pb em{font-style:normal;font-size:14px;color:var(--pmu)}
+.pj2-pt{display:grid;align-content:center;gap:2px;padding-left:20px;border-left:1px solid var(--pl)}.pj2-pt small{color:var(--pmu);font-size:12.5px}.pj2-pt b{font-size:16px;font-weight:600}
+.pj2-thr{margin-top:16px;padding-bottom:16px;border-bottom:1px solid var(--pl)}
+.pj2-rtt{display:flex;justify-content:flex-end;margin-top:14px}
+.pj2-sec{margin-top:14px}.pj2-sec h4{margin:0 0 8px;font-size:16px;font-weight:700}
+.pj2-tl{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}.pj2-tl h4{margin:0}
+.pj2-tbl{border:1px solid var(--pl2);border-radius:12px;overflow:hidden}
+.pj2-th,.pj2-tr{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,.8fr) minmax(0,1.1fr) 24px;align-items:center;gap:12px;padding:0 14px}
+.pj2-th{height:38px;font-size:12.5px;font-weight:600;color:var(--pmu);background:rgba(255,255,255,.04)}
+.pj2-tr{width:100%;height:44px;border:0;border-top:1px solid var(--pl);background:none;text-align:left;cursor:pointer;font-size:14px}
+.pj2-tr:hover{background:rgba(255,255,255,.035)}
+.pj2-tn{display:flex;align-items:center;gap:10px;min-width:0}.pj2-tn svg{color:var(--pmu);flex:none}
+.pj2-tr>span:nth-child(2){color:var(--pmu)}
+.pj2-list{border-top:1px solid var(--pl)}
+.pj2-cont{display:flex;align-items:center;gap:14px;padding:10px;border:1px solid var(--pl2);border-radius:14px;background:rgba(255,255,255,.03)}
+.pj2-cth{width:120px;height:68px;border-radius:9px;overflow:hidden;flex:none;background:#000}.pj2-cth>*{width:100%;height:100%;object-fit:cover}.pj2-cth img{width:100%;height:100%;object-fit:cover}
+.pj2-ctx{flex:1;min-width:0;display:grid;gap:3px}.pj2-ctx b{font-size:16px}.pj2-ctx small{color:var(--pmu)}
+/* new task form additions */
+.tk2-fchk{display:flex;flex-wrap:wrap;gap:8px 18px}.tk2-fchk label{display:inline-flex;align-items:center;gap:8px;font-size:14px}.tk2-fchk small{color:var(--muted)}
+/* phone */
+@container (max-width:520px){.tk2,.pj2{padding:2px 4px 8px}.tk2-main{grid-template-columns:auto minmax(0,1fr) auto;gap:10px}.tk2-meta{grid-column:2;justify-content:flex-start;margin-top:-4px}.tk2-go{grid-row:1;grid-column:3}.tk2-in{padding-left:12px}.pj2-th,.pj2-tr{grid-template-columns:minmax(0,1.3fr) auto 24px}.pj2-th>span:nth-child(3),.pj2-tr>span:nth-child(3){display:none}.pj2-pt{padding-left:0;border-left:0}}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4935,6 +5057,7 @@ const OBCOL={pass:"#b99cff",fit:"#2ee6c5",diet:"#4cc9ff",budget:"#ffc533"};/* sa
    Budget — spending within income scores 100%; past it, 1 − over ÷ income, with the dollars over in red. Passions unchanged for now. */
 const OB_TOL=.10;   /* nutrition target range = calorie limit ± 10% */
 function obScore(k,raw){try{const t=today();
+  if(k==="pass"&&typeof commitWeekly==="function"){const w=commitWeekly();return w==null?{pct:null,over:"",note:"No plan this week"}:{pct:w,over:""}}   /* Weekly commitment: planned tasks done, Priority ×3 · Moderate ×2 · Bonus ×1 */
   /* was: under the limit = eaten/limit, over = 1 − over/limit
   if(k==="diet"){const e=data.meals.filter(m=>m.d===t).reduce((a,m)=>a+(+m.kcal||0),0),L=+kLim(t)||0;if(!L)return {pct:raw,over:""};
     if(e<=L)return {pct:e/L,over:""};const ov=e-L;return {pct:Math.max(0,1-ov/L),over:`${Math.round(ov).toLocaleString()} cal over`}} */
@@ -8660,7 +8783,7 @@ const hmOf=ms=>{const x=new Date(ms);return String(x.getHours()).padStart(2,"0")
 const taskMs=t=>(t.runs||[]).reduce((a,r)=>a+((r.e||Date.now())-r.s),0);
 const taskRunning=t=>(t.runs||[]).some(r=>!r.e);
 function taskState(t){if(t.doneAt)return t.due&&t.doneAt>t.due?"late":"mastered";if(t.due&&Date.now()>t.due)return "overdue";if(t.startOn&&today()<t.startOn&&!(t.runs||[]).length)return "planned";return taskRunning(t)?"running":(t.runs||[]).length?"paused":"new"}
-function taskStats(p){let done=0,missed=0;(p.tasks||[]).forEach(t=>{const st=taskState(t);if(st==="mastered")done++;else if(st==="late"||st==="overdue"){if(t.excused)return;if(t.countDone)done++;else missed++}});return {done,missed}}
+function taskStats(p){let done=0,missed=0;(p.tasks||[]).forEach(t=>{if(t.remOnly)return;/* reminder-only items count nowhere */const st=taskState(t);if(st==="mastered")done++;else if(st==="late"||st==="overdue"){if(t.excused)return;if(t.countDone)done++;else missed++}});return {done,missed}}
 /* ---------- what counts as missed, and fixing it yourself ---------- */
 function missList(d,only){const out=[];(only||d.passions).forEach(p=>{schedStats(d,p).occ.forEach(o=>{if(o.st==="missed")out.push({k:"s",p,sl:o.sl,ds:o.ds,at:slotTimes(o.sl,o.ds).start})});(p.tasks||[]).forEach(t=>{const st=taskState(t);if((st==="late"||st==="overdue")&&!t.excused&&!t.countDone)out.push({k:"t",p,t,st,at:t.due||0})})});return out.sort((a,b)=>b.at-a.at)}
 let missBox=null;
@@ -9198,6 +9321,7 @@ function tkFormHtml(d,p){const PR=prjOrdered(d,p);return `<form class="f addform
      ${PR.length?`<label>Project (optional)<select id="tkP"><option value="">No project</option>${PR.map(x=>`<option value="${x.id}" ${(prjFocus||tkFilter)===x.id?"selected":""}>${esc(prjLabel(x))}</option>`).join("")}</select></label>`:`<p class="note" style="margin:0">Tip: create a project in the Projects tab to group tasks.</p>`}
      <div class="f2"><label>Start date (optional)<input id="tkS" type="date" min="${today()}"></label><label>Hours to put in (optional)<input id="tkH" type="number" step="0.5" min="0" inputmode="decimal" placeholder="e.g. 5"></label></div>
      <div class="f2"><label>Due date (optional)<input id="tkD" type="date" min="${today()}"></label><label>Due time (optional)<input id="tkTm" type="time"></label></div>
+     <div class="tk2-fchk"><label><input id="tkWk" type="checkbox"><span>Plan for this week</span></label><label><input id="tkRo" type="checkbox"><span>Reminder only <small>(doesn't count toward progress)</small></span></label></div>
      <label class="lockbox"><input id="tkAck" type="checkbox"><span><b>No turning back.</b> Once a deadline is set it can't be changed or removed, and the task can't be deleted. Missing it counts against your progress.</span></label>
      <button class="btn">Add task</button>
      <small class="note" style="margin:0">Hit Start when you begin, Pause when you stop, and Mark done when it's finished. Every timed session adds to your hours.</small></form>`}
@@ -9354,7 +9478,7 @@ const treeIds=x=>[x.id,...kidsOf(x).map(k=>k.id)];
 const prjOrdered=(d,p)=>topsOf(d,p).flatMap(x=>[x,...kidsOf(x)]);
 const prjLabel=x=>x.parent&&prjById(x.parent)?"↳ "+x.title:x.title;
 const prjColor=(d,x)=>{x=topOf(x);const i=topsOf(d,{id:x.pid}).indexOf(x);return PRJC[(i<0?0:i)%PRJC.length]};
-function prjStats(p,x){const ids=treeIds(x),T=(p.tasks||[]).filter(t=>ids.includes(t.proj)),done=T.filter(t=>t.doneAt).length,ms=T.reduce((a,t)=>a+taskMs(t),0),missed=T.filter(t=>["late","overdue"].includes(taskState(t))).length,started=T.some(t=>(t.runs||[]).length||t.doneAt);
+function prjStats(p,x){const ids=treeIds(x),T=(p.tasks||[]).filter(t=>ids.includes(t.proj)&&!t.remOnly)/* was: no remOnly filter */,done=T.filter(t=>t.doneAt).length,ms=T.reduce((a,t)=>a+taskMs(t),0),missed=T.filter(t=>["late","overdue"].includes(taskState(t))).length,started=T.some(t=>(t.runs||[]).length||t.doneAt);
   const status=T.length&&done===T.length?"done":started?"doing":"todo";return {T,done,total:T.length,ms,missed,status,next:T.filter(t=>!t.doneAt).sort((a,b)=>(a.due||9e15)-(b.due||9e15)||a.created-b.created)[0]}}
 const PRJS={todo:"Not started",doing:"In progress",done:"Complete"};
 function projView(d,p){
@@ -9410,7 +9534,7 @@ function passDetail(d){
   return `<div class="panel pdetail" style="margin-top:18px">
     <div class="pd-hero">
     <div class="tabs ptabs" role="tablist">${tabs.map(m=>`<button class="tab" role="tab" data-ptab="${m}" aria-selected="${pTab===m}">${PTI[m]||""}<span>${MN[m]}</span>${m==="tasks"&&(p.tasks||[]).some(t=>!t.doneAt)?` <span class="tcount">${(p.tasks||[]).filter(t=>!t.doneAt).length}</span>`:""}${m==="projects"&&topsOf(d,p).some(x=>prjStats(p,x).status!=="done")?` <span class="tcount">${topsOf(d,p).filter(x=>prjStats(p,x).status!=="done").length}</span>`:""}</button>`).join("")}</div></div>
-    ${pTab==="tasks"?taskView(d,p):pTab==="projects"?projView(d,p):schedView(d,p)}
+    ${/* was: pTab==="tasks"?taskView(d,p):pTab==="projects"?projView(d,p):schedView(d,p) */""}${pTab==="tasks"?(window.taskView2?taskView2(d,p):taskView(d,p)):pTab==="projects"?(window.projView2?projView2(d,p):projView(d,p)):schedView(d,p)}
     <div class="pd-danger">${delOpen?`<form class="delform" id="delForm"><p><b>Delete ${esc(p.name)} for good?</b> This removes all of its logged hours, time slots, tasks and projects. It can't be undone.</p><label><span>Type <code>delete</code> to confirm</span><input id="delIn" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="delete"></label><div class="del-btns"><button class="btn red" id="delGo" disabled>Delete passion</button><button type="button" class="mv" data-delopen>Cancel</button></div></form>`:`<button class="del-trigger" data-delopen title="Delete this passion" aria-label="Delete ${esc(p.name)}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>`}</div>
   </div>`;
 }
@@ -10390,7 +10514,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="899",APPT="2026-11-25T05:50:58Z";   /* APPT: when this update was made */
+const APPV="900",APPT="2026-11-25T06:01:49Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -10440,7 +10564,7 @@ document.addEventListener("submit",e=>{
   else if(f==="tkForm"){const p=data.passions.find(x=>x.id===selP);if(!p)return;const dd=$("#tkD").value,tt=$("#tkTm").value;let due=null;
     if(dd){if(!$("#tkAck").checked){toast("Tick the box to lock in a deadline");return}due=+new Date(dd+"T"+(tt||"23:59"));if(due<=Date.now()){toast("Pick a deadline in the future");return}}
     else if(tt){toast("Add a date for the deadline, or clear the time");return}
-    p.tasks=p.tasks||[];const so=$("#tkS").value||"";if(so&&so<today()){toast("Start date can't be in the past");return}if(so&&due&&+new Date(so+"T00:00")>due){toast("Start date must be before the deadline");return}const pj=$("#tkP")?$("#tkP").value:"";p.tasks.push({id:uid(),proj:pj||null,title:$("#tkT").value.trim(),planH:num("#tkH")||0,startOn:so>today()?so:"",created:Date.now(),due,runs:[],doneAt:null});pTab="tasks";prjFocus=null;tkNew=false;toast(due?"Task added · deadline locked":"Task added")}
+    p.tasks=p.tasks||[];const so=$("#tkS").value||"";if(so&&so<today()){toast("Start date can't be in the past");return}if(so&&due&&+new Date(so+"T00:00")>due){toast("Start date must be before the deadline");return}const pj=$("#tkP")?$("#tkP").value:"";p.tasks.push(Object.assign({id:uid(),proj:pj||null,title:$("#tkT").value.trim(),planH:num("#tkH")||0,startOn:so>today()?so:"",created:Date.now(),due,runs:[],doneAt:null},$("#tkWk")&&$("#tkWk").checked?{wk:weekKey(today())}:{},$("#tkRo")&&$("#tkRo").checked?{remOnly:true}:{}));pTab="tasks";prjFocus=null;tkNew=false;toast(due?"Task added · deadline locked":"Task added")}
   else if(f==="slotEditForm"){const p=data.passions.find(x=>x.id===selP);const old=p&&(p.slots||[]).find(x=>x.id===editSlot);if(!old)return;
     if(isWk(old)){const dur=parseHM($("#seH").value);if(!dur||dur>(isMo(old)?44640:10080)){toast("Enter the time as HH:MM, like 08:00");return}old.dur=dur;const u=($("#seU")||{}).value;if(u)old.until=u;else delete old.until;editSlot=null;toast((isMo(old)?"Monthly":"Weekly")+" amount updated");render();save();return}
     const st=$("#seS").value,en=$("#seE").value,fr=$("#seF").value||today(),once=$("#seR").value==="once",isDur=$("#seK").value==="dur",dur=isDur?parseHM($("#seH").value):null;
@@ -10835,4 +10959,150 @@ window.bSavRoll=function(run){const old=[...document.querySelectorAll("#view .bs
     const D=950,t0=performance.now()+k*70,fmt=v=>to.replace(/-?[\d,]+(\.\d+)?/,Math.round(v).toLocaleString()),ease=x=>1-Math.pow(1-x,4);t.nodeValue=fmt(a);
     const step=n=>{if(!t.isConnected)return;const x=Math.min(1,Math.max(0,(n-t0)/D));t.nodeValue=x>=1?to:fmt(a+(z-a)*ease(x));if(x<1)requestAnimationFrame(step)};requestAnimationFrame(step)})};
 </script>
+<script>
+/* ===== Passions → Tasks / Projects (redesign) =====
+   Tasks = the action list for the picked passion: standalone and project tasks together, grouped by urgency.
+   Text-only tasks open inline (note, reminder, due, plan, timer, mark done). Tasks with media open in a wide theater.
+   Projects = a project / sub-project tree on the left, progress and tasks on the right.
+   Both tabs open the same task record. Old views (taskView / projView) are kept above. */
+let tkSel=null,tkOrg="status",pjSel=null,pjRT="progress",pjTL="open";const pjFold=new Set(),tkGrpOpen=new Set();
+const WK=()=>weekKey(today());
+const tkMedia=t=>(t.att||[]).length>0;
+const tkPlanned=t=>!!t.wk&&t.wk===WK();
+function tkBucket(t){if(t.doneAt)return "done";if(t.remOnly)return "rem";const n=Date.now();if(t.due&&n>t.due)return "overdue";if(taskRunning(t)||(t.runs||[]).length)return "prog";
+  if(t.due&&ymd(new Date(t.due))===today())return "today";if(t.due||(t.startOn&&t.startOn>today()))return "up";return "todo"}
+const TKG=[["overdue","Overdue"],["prog","In progress"],["today","Today"],["up","Upcoming"],["todo","To do"],["rem","Reminders"],["done","Completed"]];
+/* the three measures, kept apart:
+   project bar  = done / all tasks in the project tree (backlog and sub-projects included)   → prjStats
+   passion week = done / tasks planned for this passion this week                            → wkStats
+   dashboard    = weighted average of passions that have a plan this week (Priority ×3, Moderate ×2, Bonus ×1) → commitWeekly
+   reminder-only items count in none of them */
+function wkStats(p){const P=(p.tasks||[]).filter(t=>!t.remOnly&&tkPlanned(t)),done=P.filter(t=>t.doneAt).length;return {done,total:P.length,pct:P.length?done/P.length:null}}
+function commitWeekly(){const W={Priority:3,Moderate:2,Bonus:1};let sw=0,ss=0;(data.passions||[]).forEach(p=>{const s=wkStats(p);if(s.pct==null)return;const w=W[p.lvl]||1;sw+=w;ss+=w*s.pct});return sw?ss/sw:null}
+const prjParts=t=>{const pj=t.proj&&prjById(t.proj);if(!pj)return [];const par=pj.parent&&prjById(pj.parent);return par?[par.title,pj.title]:[pj.title]};
+const dtLocal=ms=>{const x=new Date(ms);return new Date(ms-x.getTimezoneOffset()*6e4).toISOString().slice(0,16)};
+const remTxt=ms=>{const ds=ymd(new Date(ms)),tm=new Date(Date.now()+864e5);return (ds===today()?"Today":ds===ymd(tm)?"Tomorrow":fmtDate(ds))+" · "+clock(ms)};
+const I2={
+  circ:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/></svg>',
+  prog:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5" stroke="rgba(255,255,255,.18)"/><path d="M12 3.5a8.5 8.5 0 1 1-8.1 5.9" stroke="var(--pacc)"/></svg>',
+  done:'<svg viewBox="0 0 24 24" width="20" height="20"><rect x="3" y="3" width="18" height="18" rx="4.5" fill="#3ddc84"/><path d="M7.5 12.3l3 3 6-6.4" fill="none" stroke="#06140b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  over:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#ff6b78" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5M12 15.8v.4" stroke-width="2.2" stroke-linecap="round"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></svg>',
+  cal:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
+  clk:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M10 2.5h4"/></svg>',
+  fold:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.6l2 2.2h8.4A1.5 1.5 0 0 1 21 8.7v9.8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/></svg>',
+  chev:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+  down:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
+  cmp:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><rect x="3" y="4.5" width="8" height="15" rx="1.5"/><rect x="13" y="4.5" width="8" height="15" rx="1.5"/></svg>',
+  play:'<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5.5v13l10.5-6.5z"/></svg>',
+  pause:'<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6.5" y="5.5" width="4" height="13" rx="1"/><rect x="13.5" y="5.5" width="4" height="13" rx="1"/></svg>',
+  check:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  undo:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l-5-5 5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>',
+  pen:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>',
+  dup:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/></svg>',
+  del:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  sub:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.6l2 2.2h8.4A1.5 1.5 0 0 1 21 8.7v9.8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/><path d="M12 11v6M9 14h6"/></svg>',
+  x:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'};
+
+/* timer + start/pause, the same buttons the old cards used */
+function tk2Timer(p,t){if(t.remOnly)return "";const st=taskState(t),run=st==="running",ms=taskMs(t);
+  const btn=t.doneAt?"":st==="planned"?`<span class="tk2-wait">Starts ${fmtDate(t.startOn)}</span>`:run?`<button type="button" class="tk2-btn" data-tkpause="${t.id}">${I2.pause}<span>Pause</span></button>`:`<button type="button" class="tk2-btn acc" data-tkstart="${t.id}">${I2.play}<span>${(t.runs||[]).length?"Resume timer":"Start timer"}</span></button>`;
+  return `<span class="tk2-clk">${I2.clk}<b ${run?`data-timer="${p.id}:${t.id}"`:""}>${t.untimed&&!ms&&!run?"Not timed":fmtClock(ms)}</b></span>${btn}`}
+function tk2Tools(t){return `<span class="tk2-tools">${t.doneAt?"":`<button type="button" class="tk2-ic" data-rn="task:${t.id}" aria-label="Rename" title="Rename or move">${I2.pen}</button>`}<button type="button" class="tk2-ic" data-tkdup="${t.id}" aria-label="Duplicate" title="Duplicate">${I2.dup}</button><button type="button" class="tk2-ic del" data-tkdel="${t.id}" aria-label="Delete" title="Delete">${I2.del}</button></span>`}
+function tk2Plan(t){return t.remOnly||t.doneAt?"":`<button type="button" class="tk2-chip${tkPlanned(t)?" on":""}" data-tkwk="${t.id}" aria-pressed="${tkPlanned(t)}">${I2.cal}<span>${tkPlanned(t)?"Planned this week":"Plan this week"}</span></button>`}
+function tk2Done(t){return t.doneAt?`<button type="button" class="tk2-btn" data-tkundo="${t.id}">${I2.undo}<span>Undo</span></button>`:`<button type="button" class="tk2-btn done" data-tkdone="${t.id}">${I2.check}Mark done</button>`}
+function tk2Title(p,t,tag){if(isRn("task",t.id)){const PR=prjOrdered(data,p);return rnForm("task",t.id,t.title,PR.length?`<select id="rnP" class="rn-proj" aria-label="Project or sub-project">${["",...PR.map(x=>x.id)].map(id=>`<option value="${id}" ${(t.proj||"")===id?"selected":""}>${id?esc(prjLabel(PR.find(x=>x.id===id))):"No project"}</option>`).join("")}</select>`:"")}return `<${tag}>${esc(t.title)}</${tag}>`}
+
+/* text-only task: everything opens inline, right under its row */
+function tk2Inline(p,t){return `<div class="tk2-in">
+    <label class="tk2-note"><span>Note</span><textarea data-tknote="${t.id}" rows="2" placeholder="Details, steps, anything to remember">${esc(t.note||"")}</textarea></label>
+    <div class="tk2-facts"><label class="tk2-f">${I2.bell}<span>Reminder</span><input type="datetime-local" data-tkrem="${t.id}" value="${t.remAt?dtLocal(t.remAt):""}" aria-label="Reminder"></label>
+      ${t.due?`<span class="tk2-f${!t.doneAt&&Date.now()>t.due?" red":""}">${LOCK}<span>Due ${fmtDate(ymd(new Date(t.due)))}, ${clock(t.due)}</span></span>`:""}${tk2Plan(t)}</div>
+    <div class="tk2-acts">${tk2Timer(p,t)}<span class="tk2-sp"></span>${tk2Tools(t)}${tk2Done(t)}</div></div>`}
+
+/* task with media: the wide theater (attachment switching, compare, timer, mark done) */
+function tk2Theater(p,t){const parts=prjParts(t);
+  return `<div class="tk2-thr" data-tkthr="${t.id}">
+    <div class="tk2-thr-h"><div class="tk2-thr-t"><small>${esc([p.name,...parts].join("  /  "))}</small>${tk2Title(p,t,"h3")}</div><div class="tk2-thr-hb">${tk2Tools(t)}<button type="button" class="tk2-ic" data-tk2close aria-label="Close theater" title="Close">${I2.x}</button></div></div>
+    <div class="tk2-media">${t.doneAt?tkDoneView(t):attHtml(t)}</div>
+    ${!t.doneAt&&(t.att||[]).length>=2?`<button type="button" class="tk2-cmp" data-cmpopen="${t.id}">${I2.cmp}<span>Compare side by side</span></button>`:""}
+    <div class="tk2-acts">${tk2Timer(p,t)}<span class="tk2-sp"></span>${tk2Plan(t)}${tk2Done(t)}</div>
+    ${t.doneAt?"":`<label class="tk2-note"><span>Notes</span><textarea data-tknote="${t.id}" rows="2" placeholder="What to work on, what felt off, counts, cues">${esc(t.note||"")}</textarea></label>`}</div>`}
+
+/* one row, used by both tabs */
+function tk2Row(p,t){const b=tkBucket(t),m=tkMedia(t),open=!m&&tkOpen.has(t.id),sel=m&&tkSel===t.id,parts=prjParts(t);
+  const ic=b==="done"?I2.done:b==="prog"?I2.prog:b==="overdue"?I2.over:b==="rem"?`<span class="tk2-bell">${I2.bell}</span>`:I2.circ;
+  const due=t.doneAt?`<span class="tk2-due">Done ${fmtDate(ymd(new Date(t.doneAt)))}</span>`:t.due?`<span class="tk2-due${b==="overdue"?" red":b==="today"?" acc":""}">${b==="today"?"Due today":"Due "+fmtDate(ymd(new Date(t.due)))}</span>`:t.remOnly&&t.remAt?`<span class="tk2-due">${remTxt(t.remAt)}</span>`:"";
+  const tags=(b==="overdue"?`<span class="tk2-tag red">Overdue</span>`:"")+(tkPlanned(t)&&!t.doneAt?`<span class="tk2-tag wk">This week</span>`:"")+(m?`<span class="tk2-att">${CLIP}${t.att.length}</span>`:"");
+  return `<div class="tk2-row b-${b}${open?" open":""}${sel?" sel":""}">
+    <button type="button" class="tk2-main" data-tk2="${t.id}" aria-expanded="${m?sel:open}" aria-label="${esc(t.title)}">
+      <span class="tk2-ic">${ic}</span><span class="tk2-tx">${isRn("task",t.id)?"":`<b>${esc(t.title)}</b>`}${parts.length||t.remOnly?`<small>${t.remOnly?"Reminder only":""}${parts.length&&t.remOnly?" · ":""}${esc(parts.join(" › "))}</small>`:""}</span>
+      <span class="tk2-meta">${tags}${due}</span><span class="tk2-go">${m?I2.chev:open?I2.down:I2.chev}</span></button>
+    ${isRn("task",t.id)?`<div class="tk2-rn">${tk2Title(p,t,"b")}</div>`:""}${open?tk2Inline(p,t):""}</div>`}
+
+function tk2Week(p){const w=wkStats(p);
+  return `<div class="tk2-week"><span class="tk2-wl">This week</span>${w.total?`<b>${w.done} of ${w.total} planned task${w.total>1?"s":""} done</b><span class="tk2-bar"><i style="width:${Math.round(w.pct*100)}%"></i></span><em>${Math.round(w.pct*100)}%</em>`:`<b class="mut">No tasks planned this week</b><small>Open a task and tap Plan this week</small>`}</div>`}
+
+function taskView2(d,p){
+  const T=(p.tasks||[]),by={};T.forEach(t=>{const k=tkBucket(t);(by[k]=by[k]||[]).push(t)});
+  const srt={overdue:(a,b)=>a.due-b.due,today:(a,b)=>a.due-b.due,up:(a,b)=>(a.due||+new Date(a.startOn||0))-(b.due||+new Date(b.startOn||0)),done:(a,b)=>b.doneAt-a.doneAt};
+  Object.keys(by).forEach(k=>by[k].sort(srt[k]||((a,b)=>(a.created||0)-(b.created||0))));
+  const show={status:TKG.map(g=>g[0]),today:["overdue","prog","today"],upcoming:["up"],completed:["done"]}[tkOrg]||TKG.map(g=>g[0]);
+  const media=T.filter(t=>tkMedia(t)&&!t.doneAt);
+  if(tkSel&&!T.some(t=>t.id===tkSel&&tkMedia(t)))tkSel=null;   /* tkSel false = theater closed by hand */
+  const cur=tkSel===false?null:tkSel?T.find(t=>t.id===tkSel):(by.prog||[]).concat(by.overdue||[],by.today||[],by.up||[],by.todo||[]).find(tkMedia)||null;
+  const two=!!cur;
+  const groups=TKG.filter(([k])=>show.includes(k)&&(by[k]||[]).length).map(([k,l])=>{const L=by[k],fold=k==="done"&&tkOrg==="status"&&!tkGrpOpen.has("done")||k!=="done"&&tkGrpOpen.has("x"+k);
+    return `<div class="tk2-grp g-${k}"><button type="button" class="tk2-gh" data-tkgrp="${k==="done"?"done":"x"+k}" aria-expanded="${!fold}">${fold?I2.chev:I2.down}<span>${l}</span><i>${L.length}</i></button>${fold?"":L.map(t=>tk2Row(p,t)).join("")}</div>`}).join("");
+  return `<div class="tk2${two?" two":""}">
+    <div class="tk2-top">${tk2Week(p)}<div class="tk2-org"><span>Organize by</span>${[["status","Status"],["today","Today"],["upcoming","Upcoming"],["completed","Completed"]].map(([k,l])=>`<button type="button" data-tkorg="${k}" aria-pressed="${tkOrg===k}">${l}</button>`).join("")}</div><button type="button" class="tk2-new" data-tknew="${p.id}">${I2.plus}New task</button></div>
+    <div class="tk2-body"><div class="tk2-list">${groups||`<div class="tk2-empty">${T.length?"Nothing here":"No tasks yet. Tap New task to add one."}</div>`}</div>
+    ${two?`<div class="tk2-side">${tk2Theater(p,cur)}</div>`:""}</div></div>`}
+
+/* ---------- Projects ---------- */
+function pj2Cnt(p,x){const s=prjStats(p,x);return s.total?`<i>${s.done}/${s.total}</i>`:""}
+function projView2(d,p){
+  const TOPS=topsOf(d,p);if(pjSel&&(!prjById(pjSel)||prjById(pjSel).pid!==p.id))pjSel=null;if(!pjSel&&TOPS[0])pjSel=TOPS[0].id;const x=pjSel&&prjById(pjSel);
+  const tree=TOPS.map(tp=>{const K=kidsOf(tp),open=!pjFold.has(tp.id);
+    return `<div class="pj2-node"><div class="pj2-r top${pjSel===tp.id?" on":""}">${K.length?`<button type="button" class="pj2-fold" data-pjfold="${tp.id}" aria-expanded="${open}" aria-label="${open?"Collapse":"Expand"}">${open?I2.down:I2.chev}</button>`:`<span class="pj2-fold"></span>`}<button type="button" class="pj2-sel" data-pjsel="${tp.id}">${I2.fold}<span>${esc(tp.title)}</span>${pj2Cnt(p,tp)}</button></div>
+      ${open?K.map(k=>`<div class="pj2-r kid${pjSel===k.id?" on":""}"><button type="button" class="pj2-sel" data-pjsel="${k.id}">${I2.fold}<span>${esc(k.title)}</span>${pj2Cnt(p,k)}</button></div>`).join(""):""}</div>`}).join("");
+  const left=`<div class="pj2-l"><div class="pj2-lh">Projects</div>${TOPS.length?`<div class="pj2-tree">${tree}</div>`:`<p class="pj2-empty">No projects yet</p>`}
+    ${addingPrj?`<form class="prjform pj2-form" id="prjForm"><label>Project name<input id="pjT" required placeholder="e.g. Showcase routine" autocomplete="off"></label><label>Due date (optional)<input id="pjD" type="date" min="${today()}"></label><button class="btn">Create project</button></form>`:""}
+    <button type="button" class="pj2-new" data-addprj>${addingPrj?"Close":`${I2.plus}New project`}</button></div>`;
+  if(!x)return `<div class="pj2">${left}<div class="pj2-rt"><div class="tk2-empty">Create a project to group related tasks under one goal.</div></div></div>`;
+  const st=prjStats(p,x),par=x.parent&&prjById(x.parent),K=kidsOf(x),pc=st.total?st.done/st.total:0,ids=treeIds(x);
+  const own=(p.tasks||[]).filter(t=>ids.includes(t.proj)),rem=own.filter(t=>t.remOnly&&!t.doneAt),open=st.T.filter(t=>!t.doneAt).sort((a,b)=>(a.due||9e15)-(b.due||9e15)||(a.created||0)-(b.created||0)),fin=st.T.filter(t=>t.doneAt).sort((a,b)=>b.doneAt-a.doneAt);
+  const selT=tkSel&&own.find(t=>t.id===tkSel&&tkMedia(t));
+  const cont=open.filter(tkMedia).sort((a,b)=>(b.runs||[]).length-(a.runs||[]).length)[0];
+  const subs=K.length?`<div class="pj2-sec"><h4>Sub-projects</h4><div class="pj2-tbl"><div class="pj2-th"><span>Name</span><span>Tasks done</span><span>Progress</span><span></span></div>${K.map(k=>{const s=prjStats(p,k),q=s.total?s.done/s.total:0;
+      return `<button type="button" class="pj2-tr" data-pjsel="${k.id}"><span class="pj2-tn">${I2.fold}${esc(k.title)}</span><span>${s.total?`${s.done} / ${s.total}`:"No tasks"}</span><span>${s.total?`<span class="tk2-bar${q>=1?" ok":""}"><i style="width:${q*100}%"></i></span>`:"—"}</span><span class="tk2-go">${I2.chev}</span></button>`}).join("")}</div></div>`:"";
+  const list=L=>L.length?`<div class="pj2-list">${L.map(t=>tk2Row(p,t)).join("")}</div>`:`<div class="tk2-empty">Nothing here</div>`;
+  const body=pjRT==="progress"
+    ?`${subs}${open.length?`<div class="pj2-sec"><h4>Next tasks</h4>${list(open.slice(0,4))}</div>`:""}${rem.length?`<div class="pj2-sec"><h4>Reminders</h4>${list(rem)}</div>`:""}
+      ${cont&&!selT?`<div class="pj2-sec"><h4>Continue practicing</h4><div class="pj2-cont"><span class="pj2-cth">${attThumb(cont.att[0])}</span><span class="pj2-ctx"><b>${esc(cont.title)}</b><small>${esc(prjParts(cont).slice(-1)[0]||"")} · ${({running:"In progress",paused:"Paused",new:"Not started"})[taskState(cont)]||"Open"}</small></span><button type="button" class="tk2-btn" data-tk2="${cont.id}">${I2.cmp}<span>Open theater</span></button></div></div>`:""}`
+    :`<div class="pj2-sec"><div class="pj2-tl"><h4>Tasks</h4><span class="tk2-seg">${[["open",`Open (${open.length})`],["done",`Completed (${fin.length})`]].map(([k,l])=>`<button type="button" data-pjtl="${k}" aria-pressed="${pjTL===k}">${l}</button>`).join("")}</span></div>${list(pjTL==="open"?open.concat(rem):fin)}</div>`;
+  return `<div class="pj2">${left}<div class="pj2-rt">
+    <div class="pj2-h"><div><small class="pj2-crumb">${esc(p.name)}  /  Projects${par?"  /  "+esc(par.title):""}</small>${isRn("prj",x.id)?rnForm("prj",x.id,x.title):`<h2>${esc(x.title)}</h2>`}</div>
+      <div class="pj2-hb"><button type="button" class="tk2-ic" data-rn="prj:${x.id}" aria-label="Rename project" title="Rename">${I2.pen}</button><button type="button" class="tk2-ic del" data-delprj="${x.id}" aria-label="Delete project" title="Delete">${I2.del}</button>${x.parent?"":`<button type="button" class="tk2-btn" data-addsub="${x.id}">${I2.sub}<span>${addingSub===x.id?"Cancel":"Sub-project"}</span></button>`}<button type="button" class="tk2-btn acc" data-prjadd="${x.id}">${I2.plus}<span>Task</span></button></div></div>
+    ${addingSub===x.id?`<form class="pj-subform pj2-subf" id="subForm" data-parent="${x.id}"><input id="sbT" required placeholder="Sub-project name" autocomplete="off" aria-label="Sub-project name"><input id="sbD" type="date" min="${today()}" aria-label="Due date (optional)"><button class="btn">Add</button></form>`:""}
+    <div class="pj2-prog"><div class="pj2-pm"><b>${st.total?`${st.done} of ${st.total} task${st.total>1?"s":""} complete`:"No tasks yet"}</b><span class="pj2-pb"><span class="tk2-bar big${pc>=1?" ok":""}"><i style="width:${pc*100}%"></i></span><em>${Math.round(pc*100)}%</em></span></div><div class="pj2-pt"><small>All time</small><b>${fmtH(Math.round(st.ms/6e4))} logged to this project</b></div></div>
+    ${selT?`<div class="pj2-thr">${tk2Theater(p,selT)}</div>`:""}
+    <div class="pj2-rtt"><span class="tk2-seg">${[["progress","Progress"],["tasks","Tasks"]].map(([k,l])=>`<button type="button" data-pjrt="${k}" aria-pressed="${pjRT===k}">${l}</button>`).join("")}</span></div>
+    ${body}</div></div>`}
+
+/* clicks for the new views (the old handlers still run timer, done, undo, delete, duplicate, rename, project forms) */
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-tk2],[data-tk2close],[data-tkorg],[data-tkgrp],[data-tkwk],[data-pjsel],[data-pjfold],[data-pjrt],[data-pjtl]");if(!b)return;e.preventDefault();e.stopPropagation();const ds=b.dataset;
+  if(ds.tk2){const t=findTaskAny(ds.tk2);if(!t)return;if(tkMedia(t)){tkSel=tkSel===t.id&&!b.classList.contains("tk2-btn")?false:t.id;render();requestAnimationFrame(()=>{const w=document.querySelector(`[data-tkthr="${t.id}"]`);if(w&&innerWidth<900)w.scrollIntoView({behavior:"smooth",block:"start"})})}else{tkOpen.has(t.id)?tkOpen.delete(t.id):tkOpen.add(t.id);render()}return}
+  if(ds.tk2close!==undefined){document.querySelectorAll(".tk2-thr video").forEach(v=>v.pause());tkSel=false;render();return}
+  if(ds.tkorg){tkOrg=ds.tkorg;render();return}
+  if(ds.tkgrp){tkGrpOpen.has(ds.tkgrp)?tkGrpOpen.delete(ds.tkgrp):tkGrpOpen.add(ds.tkgrp);render();return}
+  if(ds.tkwk){const t=findTaskAny(ds.tkwk);if(!t)return;if(tkPlanned(t)){delete t.wk;toast("Moved to backlog")}else{t.wk=WK();toast("Planned for this week")}save();render();return}
+  if(ds.pjsel){pjSel=ds.pjsel;const x=prjById(pjSel);if(x&&x.parent)pjFold.delete(x.parent);addingSub=null;render();return}
+  if(ds.pjfold){pjFold.has(ds.pjfold)?pjFold.delete(ds.pjfold):pjFold.add(ds.pjfold);render();return}
+  if(ds.pjrt){pjRT=ds.pjrt;render();return}
+  if(ds.pjtl){pjTL=ds.pjtl;render();return}},true);
+document.addEventListener("change",e=>{const i=e.target.closest&&e.target.closest("[data-tkrem]");if(!i)return;const t=findTaskAny(i.dataset.tkrem);if(!t)return;if(i.value)t.remAt=+new Date(i.value);else delete t.remAt;save();toast(i.value?"Reminder set · "+remTxt(t.remAt):"Reminder cleared")});
+</script>
+
 </body></html>
