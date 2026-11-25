@@ -3566,10 +3566,10 @@ html body #view .dtiles.orbit .dtile.ob-art canvas{position:absolute;inset:0;wid
 html.phone body #view .dtiles.orbit .dtile.ob-art{min-height:0}
 /* ===== Dashboard layout (iPad / desktop) like the reference: big "Dashboard" title in the page with room above it, compact Overview, figure + Overview/This week on one row, Breakdown full width. Calendar untouched ===== */
 .dhead{display:none}
-html:not(.phone) body #view[data-tab="dash"] .dhead{display:flex;flex-direction:column;gap:4px;padding:30px 4px 22px}
-html:not(.phone) body #view[data-tab="dash"] .dhead b{font-size:40px;font-weight:400;letter-spacing:-.01em;line-height:1.05;color:#f4f4f7}
-html:not(.phone) body #view[data-tab="dash"] .dhead span{font-size:19px;font-weight:400;color:rgba(235,235,240,.78)}
-html:not(.phone):has(#view[data-tab="dash"]) #ttl{visibility:hidden}/* the title now sits in the page */
+html:not(.phone) body #view:is([data-tab="dash"],[data-tab="fuel"],[data-tab="budget"]) .dhead{display:flex;width:100%;box-sizing:border-box;flex:0 0 100%;flex-direction:column;gap:4px;padding:30px 4px 22px}
+html:not(.phone) body #view .dhead b{font-size:40px;font-weight:400;letter-spacing:-.01em;line-height:1.05;color:#f4f4f7}
+html:not(.phone) body #view .dhead span{font-size:19px;font-weight:400;color:rgba(235,235,240,.78)}
+html:not(.phone):has(#view:is([data-tab="dash"],[data-tab="fuel"],[data-tab="budget"])) #ttl{visibility:hidden}/* the title now sits in the page */
 html:not(.phone) body #view[data-tab="dash"] .bdown{max-width:none!important;margin-left:0!important;margin-right:0!important}/* was max 900px centred */
 html:not(.phone) body #view[data-tab="dash"] .dtiles.orbit .dtile.ob-t{gap:4px!important;padding:6px 4px 10px!important;justify-content:center}
 html:not(.phone) body #view[data-tab="dash"] .dtiles.orbit .ob-r{order:1;width:min(78px,48cqi)}
@@ -3745,6 +3745,13 @@ html body #view .bdown .bdn-bud .bdn-bscroll{max-height:calc(28px * 5 + var(--bd
 html body #view .bdown .bdn-bud .bdn-bscroll:has(>.meter:nth-child(5)){min-height:calc(28px * 5 + var(--bdg) * 4 + 2px)}
 html body #view .bdown .bdn-bud .bdn-binc .meter-top>span{font-weight:700}
 html body #view .bdown .bdn-sec.bdn-bud{display:flex!important;flex-direction:column;align-self:stretch}html body #view .bdown .bdn-bud>.bdn-binc{margin-top:auto}
+/* calendar header: month on the left, then ‹ › and the Dots / Details switch in one tidy row on the right — the switch was floating on top of the arrows */
+html body #view .calhead.cal-c{display:flex!important;align-items:center!important;gap:8px!important}
+html body #view .calhead.cal-c>h2{margin-right:auto!important}
+html body #view .calhead.cal-c>.calnav{order:1;position:static!important}
+html body #view .calhead.cal-c>.cal-vsw{order:2;position:static!important;transform:none!important;margin-left:10px!important;inset:auto!important}
+html:not(.phone) body #view[data-tab="budget"]>.dhead{max-width:980px;margin-left:auto;margin-right:auto}@media (max-width:1099px){html:not(.phone) body #view[data-tab="budget"]>.dhead{max-width:none}}
+html:not(.phone) body #view[data-tab="fuel"]>.dhead{max-width:var(--fw,980px);margin-left:auto!important;margin-right:auto!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -5044,7 +5051,7 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(d.lostgo!=null){const L=lostMeals(),pick=L.filter(m=>lostSel.has(m.id));pick.forEach(m=>data.meals.push(JSON.parse(JSON.stringify(m))));data.mealsGone=[...(data.mealsGone||[]),...L.filter(m=>!lostSel.has(m.id)).map(m=>m.id)].slice(-500);lostSel=null;save();sfx("blip");toast(pick.length+" food"+(pick.length===1?"":"s")+" restored");render()}});
 function vFuel(){
   const d=D(),S=fuelStats(d,nD()),g=S.g,T=+g.kcal||0,left=T-S.kcal,day=nD()===today()?"today":nDayLbl(nD()),w=nWater(),W=nWGoal();
-  return banner()+lostPanel()+`<div class="grid tiles">
+  return banner()+lostPanel()+`<div class="dhead"><b>Nutrition</b><span>Meals and macros</span></div><div class="grid tiles">
     <div class="panel tile" style="--c:var(--cyan)">${ic("fire")}<small>Calorie limit${nD()===today()?"":" · "+nDayLbl(nD())}</small><b><input class="tgt-in" id="kcalTgt" inputmode="numeric" value="${T?n0(T):""}" placeholder="Set" aria-label="Daily calorie limit" style="width:${Math.max(3,String(T?n0(T):"Set").length)+.3}ch"></b><em>${T?"tap to change":"tap to set yours"}</em></div>
     <div class="panel tile" style="--c:${(()=>{/* over the limit red; in range (60–100%) green; eating too little orange — for today only once it's 6 PM, so a morning with little eaten isn't flagged */const k=+S.kcal||0,past=nD()<today()||new Date().getHours()>=18;return !T?"var(--violet)":k>T?"#ff5e6c":k>=T*.6?"#3ddc84":past&&k>0?"#ff9f43":"var(--violet)"})()}">${ic("star")}<small>Calories eaten ${day}</small><b>${n0(S.kcal)}</b><em>${T?n0(Math.abs(left))+" kcal "+(left<0?"over":"left"):"no limit set"}</em></div>
     ${nWaterTile()}
@@ -7486,7 +7493,7 @@ function vBudget(){fxLoad();const b=B();b.mode="comb";const S=bStats(),out=S.sub
   const mb=S.mutedN?`<div class="panel bmu"><span class="bmu-i">${BMUTE}</span><span class="bmu-t"><span><b class="bmu-n">${S.mutedN} excluded</b> · saves <b>${bMoney(S.muted)}</b>/mo · <b>${bMoney(S.muted*12,0)}</b>/yr</span><small>Excluded bills and subscriptions are left out of every total so you can see what cutting them would do. Nothing is cancelled.</small></span><button type="button" class="btn ghost" data-bunmute>Include all</button></div>`:"";
   /* measure the top tiles again once the page has settled (measuring too early left no gap above the calendar until you tapped the tab again) */
   setTimeout(bStickInit,0);setTimeout(bStickInit,150);setTimeout(bStickInit,500);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>setTimeout(bStickInit,0));
-  return bModeIn(b,`<div class="bstick-s" id="bStickS"></div><div class="bstick${bStOn?" stuck":""}" id="bStick"${bStOn&&bStH?` style="height:${bStH}px"`:""}><div class="grid tiles">
+  return bModeIn(b,`<div class="dhead"><b>Budget</b><span>Subscriptions, bills and spending</span></div><div class="bstick-s" id="bStickS"></div><div class="bstick${bStOn?" stuck":""}" id="bStick"${bStOn&&bStH?` style="height:${bStH}px"`:""}><div class="grid tiles">
     ${""/* Income and Expenses swipe month ⇄ year like Savings (one swipe switches all three); the captions under them are gone — was: <em>per month</em> and <em>$ subs · $ bills</em> */}${(()=>{const i=bSavI%2,DOTS=`<span class="bsav-dots" aria-hidden="true">${[0,1].map(j=>`<i class="${j===i?"on":""}"></i>`).join("")}</span>`,an=bSavDir?(bSavDir>0?" in-r":" in-l"):"",U=["/mo","/yr"][i],X=v=>i?v*12:v;
       return `<div class="panel tile bsav bsw" style="--c:#ffd54a" data-bsav role="button" tabindex="0" aria-label="Income ${["per month","per year"][i]}: ${bMoney(X(S.inc),0)}. Swipe to switch">${ic("bolt")}<small>Income</small><b class="bsav-v${an}">${bMoney(X(S.inc),0)}<s>${U}</s></b>${DOTS}</div>
     <div class="panel tile bsav bsw" style="--c:#e3a82b" data-bsav role="button" tabindex="0" aria-label="Expenses ${["per month","per year"][i]}: ${bMoney(X(S.subs+S.bills),0)}. Swipe to switch">${ic("star")}<small>Expenses</small><b class="bsav-v${an}">${bMoney(X(S.subs+S.bills),0)}<s>${U}</s></b>${DOTS}</div>`})()}
@@ -10234,7 +10241,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="881",APPT="2026-11-25T03:42:44Z";   /* APPT: when this update was made */
+const APPV="882",APPT="2026-11-25T03:45:40Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
