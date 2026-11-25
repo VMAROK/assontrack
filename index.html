@@ -3758,7 +3758,9 @@ html:not(.phone) body #view[data-tab="fuel"]>:is(.nmp,.usp).panel::-webkit-scrol
 html:not(.phone) body #view[data-tab="fuel"]>:is(.nmp,.usp).panel>.ph:first-child{position:sticky;top:-1px;z-index:5;background:rgba(12,13,16,.96)!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 html body #view[data-tab="budget"] .bco .bsecs>.bco-sec{max-height:min(680px,72vh);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 html body #view[data-tab="budget"] .bco .bsecs>.bco-sec::-webkit-scrollbar{display:none}
-html body #view[data-tab="budget"] .bco .bsecs>.bco-sec>.bco-h{position:sticky;top:0;z-index:5}
+html body #view[data-tab="budget"] .bco .bsecs>.bco-sec>.bco-h{position:sticky;top:0;z-index:5;background:#0b0c0e!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:0 1px 0 rgba(255,255,255,.08)}/* solid, so rows never show through the pinned Income / Expenses title */
+/* while dragging an item, the column stops scrolling under your finger */
+body.bdragging #view[data-tab="budget"] .bco .bsecs>.bco-sec{touch-action:none!important;overscroll-behavior:none}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -7587,7 +7589,7 @@ function bDragMove(x,y){const d=bDrag;if(!d)return;d.x=x;d.y=y;d.g.style.left=((
   if(gp){const [cn,gn]=JSON.parse(gp.dataset.bdg);t={cat:cn,grp:gn};node=gp}else if(ct){t={cat:ct.dataset.bkcat,grp:""};node=ct}
   if(t){const di=B().items.find(i=>i.id===d.id),tc=bCat(t.cat);if(!di||!tc||!!tc.inc!==(di.kind==="inc")){t=null;node=null}}
   document.querySelectorAll(".bdrop").forEach(n=>{if(n!==node)n.classList.remove("bdrop")});if(node)node.classList.add("bdrop");d.tgt=t}
-function bDragLoop(){const d=bDrag;if(!d)return;const v=document.getElementById("view");if(v){const r=v.getBoundingClientRect(),e=70;let dy=0;if(d.y<r.top+e)dy=-Math.ceil((r.top+e-d.y)/5);else if(d.y>r.bottom-e)dy=Math.ceil((d.y-(r.bottom-e))/5);if(dy){v.scrollTop+=dy;bDragMove(d.x,d.y)}}d.raf=requestAnimationFrame(bDragLoop)}
+function bDragLoop(){const d=bDrag;if(!d)return;{/* the Income / Expenses columns scroll on their own now: dragging near a column edge scrolls that column too */const el=document.elementFromPoint(d.x,d.y),col=el&&el.closest&&el.closest(".bco-sec");if(col&&col.scrollHeight>col.clientHeight){const r=col.getBoundingClientRect();let cy=0;if(d.y<r.top+60)cy=-Math.ceil((r.top+60-d.y)/5);else if(d.y>r.bottom-60)cy=Math.ceil((d.y-(r.bottom-60))/5);if(cy){col.scrollTop+=cy;bDragMove(d.x,d.y)}}}const v=document.getElementById("view");if(v){const r=v.getBoundingClientRect(),e=70;let dy=0;if(d.y<r.top+e)dy=-Math.ceil((r.top+e-d.y)/5);else if(d.y>r.bottom-e)dy=Math.ceil((d.y-(r.bottom-e))/5);if(dy){v.scrollTop+=dy;bDragMove(d.x,d.y)}}d.raf=requestAnimationFrame(bDragLoop)}
 function bDragEnd(drop){const d=bDrag;if(!d)return;bDrag=null;cancelAnimationFrame(d.raf);document.body.classList.remove("bdragging");const b=B(),it=b.items.find(i=>i.id===d.id),t=drop?d.tgt:null;
   const finish=()=>{d.g.remove();if(d.src)d.src.classList.remove("bdrag-src");const v=document.getElementById("view"),st=v?v.scrollTop:0;render();if(v)v.scrollTop=st;
     if(t){const sel=t.grp?`[data-bdg='${JSON.stringify([t.cat,t.grp]).replace(/'/g,"&#39;")}']`:`[data-bkcat="${t.cat.replace(/"/g,'\\"')}"]`;let n=null;try{n=document.querySelector(sel)}catch(_){}if(!n)n=[...document.querySelectorAll("[data-bkcat]")].find(x=>x.dataset.bkcat===t.cat);if(n){n.classList.add("bdrop-in");setTimeout(()=>n.classList.remove("bdrop-in"),700);try{n.scrollIntoView({block:"nearest",behavior:"smooth"})}catch(_){}}}};
@@ -10257,7 +10259,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="887",APPT="2026-11-25T03:53:21Z";   /* APPT: when this update was made */
+const APPV="888",APPT="2026-11-25T03:58:15Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
