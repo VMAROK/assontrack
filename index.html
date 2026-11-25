@@ -3657,6 +3657,11 @@ html:not(.phone) body #view .nwp>.bc>.nwat .nwat-cups{grid-column:2;grid-row:1;m
 html:not(.phone) body #view .nwp>.bc>.nwat .nwat-h b{grid-column:3;grid-row:1;font-size:17px;margin:0}
 html:not(.phone) body #view .nwp>.bc>.nwat .nwat-m{grid-column:4;grid-row:1;width:36px;height:36px;border-radius:50%;font-size:20px}
 html:not(.phone) body #view .nwp>.bc>.nwat .nwat-c svg{width:24px;height:24px}
+/* Nutrition Macronutrients (Bar view): the row bars slim to 3px like the Dashboard Breakdown; the multicolour bar keeps its own weight but thinner (was 14px / 10px) */
+html body #view .nwp .mv .mbi-t{height:3px!important;min-height:3px!important;border-radius:2px!important}
+html body #view .nwp .mv .mbi-t>*{border-radius:2px!important}
+html body #view .nwp .mv .mbar-b{height:8px!important;min-height:8px!important}
+html body #view .nwp .mv .mbar-b>i{height:8px!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10134,7 +10139,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="866",APPT="2026-11-25T02:57:10Z";   /* APPT: when this update was made */
+const APPV="867",APPT="2026-11-25T03:00:35Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
