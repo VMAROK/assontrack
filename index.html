@@ -2165,6 +2165,7 @@ html.phone #view:has(>.grid.tiles .mgt) .holo canvas{max-height:300px!important}
 html.tpl-plain{--bg0:#121212;--card:#1c1c1e;--card2:#242427;--line:#2c2c30;--fg:#ececf1;--muted:#9a9aa3;--accent:#8ab4ff;--cyan:#8ab4ff}
 html.tpl-midnight{--bg0:#0b1120;--card:#121a2c;--card2:#18223a;--line:#22304d;--fg:#e6ecf7;--muted:#8d9ab3;--accent:#5b9dff;--cyan:#5b9dff}
 html.tpl-grad{--bg0:#1b1c21;--card:#23252b;--card2:#2b2e35;--line:#30333b;--fg:#eceef3;--muted:#80858f;--accent:#3d8bfd;--cyan:#20d9d2;--g1:linear-gradient(90deg,#18e0d0,#3a6dfd);--g2:linear-gradient(90deg,#ff5f8f,#a32cf5)}   /* Gradient: graphite panels, cyan→blue and pink→violet */
+html.tpl-onyx2{--bg0:#050505;--card:#141414;--card2:#1d1d1d;--line:#2b2b2b;--fg:#f2f2f2;--muted:#8f8f8f;--accent:#d6d6d6;--cyan:#d6d6d6}   /* Onyx 2: Onyx plus a dark gradient wallpaper and glossy panels */
 html.tpl-onyx{--bg0:#000000;--card:#111111;--card2:#1b1b1b;--line:#2a2a2a;--fg:#f0f0f0;--muted:#8e8e8e;--accent:#cfcfcf;--cyan:#cfcfcf}   /* Onyx: black and grey only */
 html.tpl-slate{--bg0:#1d2229;--card:#262c35;--card2:#2e3540;--line:#39414d;--fg:#e3e7ec;--muted:#9aa4b1;--accent:#7cc4b8;--cyan:#7cc4b8}
 html.tpl-plain body{color:var(--fg);background:var(--bg0)!important}
@@ -4110,6 +4111,19 @@ html.tpl-grad .navbtn[aria-selected="true"]:not(.nav-done) svg{color:#22d3e6!imp
 html.tpl-grad .ph span,html.tpl-grad .bstrip b{text-shadow:none!important}
 .tpl-pv-grad{background:#1b1c21}.tpl-pv-grad i{position:absolute;left:12%;right:12%;height:16px;border-radius:5px;background:#23252b;border:1px solid #30333b}.tpl-pv-grad i:nth-child(1){top:16%;right:52%}.tpl-pv-grad i:nth-child(2){top:16%;left:52%}.tpl-pv-grad i:nth-child(3){top:42%;height:40px}
 .tpl-pv-grad em{position:absolute;bottom:12%;width:22%;height:8px;border-radius:4px;left:12%;background:linear-gradient(90deg,#18e0d0,#3a6dfd)}.tpl-pv-grad em+em{left:38%;width:18%;background:linear-gradient(90deg,#ff5f8f,#a32cf5)}
+/* ===== Onyx 2: dark gradient wallpaper with a slow soft shine; panels with a graphite gradient, a lit top edge and a faint diagonal sheen ===== */
+html.tpl-onyx2.tpl-onyx2 body,html.tpl-onyx2.tpl-onyx2.tpl-bg #tplbg{background:radial-gradient(120% 80% at 15% 0%,#2a2a2a 0%,#121212 38%,#050505 70%),#050505!important}
+html.tpl-onyx2.tpl-bg #tplbg::after{content:"";position:absolute;inset:-20%;pointer-events:none;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.045) 48%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.045) 52%,transparent 60%);animation:onyxShine 14s ease-in-out infinite}
+@keyframes onyxShine{0%{transform:translateX(-35%)}50%{transform:translateX(35%)}100%{transform:translateX(-35%)}}
+@media (prefers-reduced-motion:reduce){html.tpl-onyx2.tpl-bg #tplbg::after{animation:none}}
+html.tpl-onyx2.tpl-onyx2 #view .panel,html.tpl-onyx2.tpl-onyx2 #view .tile{background:linear-gradient(118deg,rgba(255,255,255,.07) 0%,rgba(255,255,255,0) 28%),linear-gradient(180deg,#1b1b1b 0%,#0e0e0e 100%)!important;border:1px solid #2b2b2b!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 10px 30px rgba(0,0,0,.55)!important}
+html.tpl-onyx2.tpl-onyx2 #view .panel .panel{background:linear-gradient(180deg,#191919,#111)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)!important}
+html.tpl-onyx2.tpl-onyx2 :is(aside,header,.topbar){background:linear-gradient(180deg,#121212,#070707)!important}
+html.tpl-onyx2 .seg2 [aria-pressed="true"],html.tpl-onyx2 [role="tab"][aria-selected="true"]:not(.navbtn){background:linear-gradient(180deg,#e9e9e9,#a9a9a9)!important;color:#0b0b0b!important}
+html.tpl-onyx2 .navbtn[aria-selected="true"]:not(.nav-done){background:linear-gradient(180deg,#262626,#161616)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)!important}
+.tpl-pv-onyx2{background:radial-gradient(120% 90% at 15% 0%,#2a2a2a,#0a0a0a 65%)}.tpl-pv-onyx2 i{position:absolute;left:12%;right:12%;height:16px;border-radius:5px;background:linear-gradient(118deg,rgba(255,255,255,.1),transparent 35%),linear-gradient(180deg,#1d1d1d,#0f0f0f);border:1px solid #2e2e2e;box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
+.tpl-pv-onyx2 i:nth-child(1){top:16%;right:52%}.tpl-pv-onyx2 i:nth-child(2){top:16%;left:52%}.tpl-pv-onyx2 i:nth-child(3){top:42%;height:40px}
+.tpl-pv-onyx2 em{position:absolute;bottom:12%;width:22%;height:8px;border-radius:4px;left:12%;background:linear-gradient(180deg,#eee,#9a9a9a)}.tpl-pv-onyx2 em+em{left:38%;background:#333;width:18%}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10267,6 +10281,7 @@ const TEMPLATES=[{id:"spa",name:"Spa",sub:"Warm orange ambience, soft glass, slo
   {id:"midnight",name:"Midnight",sub:"Flat deep navy, clean blue accents",look:{color:"blue",glass:0,tone:50},bg:true,plain:true},
   {id:"slate",name:"Slate",sub:"Soft grey-blue, low contrast, easy on the eyes",look:{color:"graphite",glass:0,tone:50},bg:true,plain:true},
   {id:"grad",name:"Gradient",sub:"Graphite panels, cyan-to-violet glow on bars and selections",look:{color:"blue",glass:0,tone:50},bg:true,plain:true},
+  {id:"onyx2",name:"Onyx 2",sub:"Black and grey with a dark gradient and a soft shine",look:{color:"graphite",glass:0,tone:50},bg:true,plain:true},
   {id:"onyx",name:"Onyx",sub:"Pure black and soft greys, no colour",look:{color:"graphite",glass:0,tone:50},bg:true,plain:true},
   /* visual templates: a whole designed look (backdrop + surfaces + type); panels and layout stay the same */
   {id:"stipple",name:"Stipple",sub:"Near-black, fine drifting dots, quiet lavender",look:{color:"graphite",glass:0,trans:3,tone:10},bg:true,plain:true,visual:true},
@@ -10644,7 +10659,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="911",APPT="2026-11-25T23:20:27Z";   /* APPT: when this update was made */
+const APPV="912",APPT="2026-11-25T23:23:29Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
