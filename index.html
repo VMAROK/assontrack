@@ -4139,18 +4139,18 @@ html.tpl-spa:not(.tpl-bd-none):not(.tpl-bd-dark) body #view#view .panel.hasStrip
 /* ===== phone Nutrition: the four top tiles in one row of four columns — every tile laid out the same:
    label on top (two lines tall), picture in the middle, number at the bottom; one label size, one number size ===== */
 html.phone body #view#view#view#view[data-tab="fuel"]>.tiles{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
-html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile{display:grid!important;grid-template-rows:24px 50px 22px!important;align-items:center!important;justify-items:center!important;row-gap:4px!important;min-height:0!important;height:auto!important;padding:12px 3px 10px!important;border-radius:14px!important;position:relative}
-html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile>small{grid-row:1!important;align-self:start!important;font-size:8px!important;letter-spacing:.06em!important;line-height:10px!important/* was 9.5px/12px */;font-weight:600!important;text-transform:uppercase!important;text-align:center!important;margin:0!important;padding:0 2px!important;max-width:100%}
+html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile{display:grid!important;grid-template-rows:22px 34px 20px!important/* was 24/50/22, Copilot-compact */;align-items:center!important;justify-items:center!important;row-gap:4px!important;min-height:0!important;height:auto!important;padding:10px 3px 9px!important;border-radius:14px!important;position:relative}
+html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile>small{grid-row:1!important;align-self:start!important;font-size:9px!important;letter-spacing:.04em!important;line-height:11px!important/* was 8px/10px; Copilot label */;font-weight:600!important;text-transform:uppercase!important;text-align:center!important;margin:0!important;padding:0 2px!important;max-width:100%}
 html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile>svg{grid-row:2!important;margin:0!important}
-html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile:not(.wtile):not(.mgt)>svg{width:20px!important;height:20px!important}
-html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.wtile.wtile>svg{width:26px!important;height:36px!important}
-html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.mgt.mgt>svg{width:48px!important;height:48px!important}
-html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile>b,html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile>b *{font-size:14px!important;line-height:22px!important/* was 17px */;letter-spacing:0!important}
+html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile:not(.wtile):not(.mgt)>svg{width:18px!important;height:18px!important}
+html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.wtile.wtile>svg{width:20px!important;height:28px!important}
+html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.mgt.mgt>svg{width:34px!important;height:34px!important}
+html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile>b,html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile>b *{font-size:15px!important;line-height:20px!important/* was 14px; Copilot value */;font-weight:700!important;letter-spacing:0!important}
 html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile>b{grid-row:3!important;margin:0!important;text-shadow:none!important;white-space:nowrap}
 html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile>b small,html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile>b s{font-size:11px!important}
 html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile>em,html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.mgt .mgt-in{display:none!important}
-html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile .kc-ic{position:absolute!important;top:42px!important;right:5px!important;/* in the picture row, clear of the label */width:22px!important;height:22px!important}html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile .kc-ic svg{width:12px!important;height:12px!important}
-html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.wtile .wt-m{position:absolute!important;top:42px!important;right:5px!important;/* in the picture row, clear of the label */width:22px!important;height:22px!important}
+html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile .kc-ic{position:absolute!important;top:38px!important;right:4px!important;/* in the picture row */width:20px!important;height:20px!important}html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile .kc-ic svg{width:12px!important;height:12px!important}
+html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.wtile .wt-m{position:absolute!important;top:38px!important;right:4px!important;/* in the picture row */width:20px!important;height:20px!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10686,7 +10686,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="918",APPT="2026-11-25T23:57:31Z";   /* APPT: when this update was made */
+const APPV="919",APPT="2026-11-25T23:59:14Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
