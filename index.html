@@ -5055,19 +5055,21 @@ const OBCOL={pass:"#b99cff",fit:"#2ee6c5",diet:"#4cc9ff",budget:"#ffc533"};/* sa
 /* Overview score (the ring never passes 100%):
    Nutrition — under the calorie goal the ring fills as you eat (eaten ÷ goal); over it, the score drops by how far over you are: 1 − over ÷ goal (2× the goal or more = 0%), with the exact amount over in red underneath.
    Budget — spending within income scores 100%; past it, 1 − over ÷ income, with the dollars over in red. Passions unchanged for now. */
-const OB_TOL=.10;   /* nutrition target range = calorie limit ± 10% */
+const OB_TOL=.10;   /* nutrition target range = 90% of the calorie limit up to the limit (was ± 10%) */
 function obScore(k,raw){try{const t=today();
   if(k==="pass"&&typeof commitWeekly==="function"){const w=commitWeekly();return w==null?{pct:null,over:"",note:"No plan this week"}:{pct:w,over:""}}   /* Weekly commitment: planned tasks done, Priority ×3 · Moderate ×2 · Bonus ×1 */
   /* was: under the limit = eaten/limit, over = 1 − over/limit
   if(k==="diet"){const e=data.meals.filter(m=>m.d===t).reduce((a,m)=>a+(+m.kcal||0),0),L=+kLim(t)||0;if(!L)return {pct:raw,over:""};
     if(e<=L)return {pct:e/L,over:""};const ov=e-L;return {pct:Math.max(0,1-ov/L),over:`${Math.round(ov).toLocaleString()} cal over`}} */
   if(k==="diet"){const ds=t,e=data.meals.filter(m=>m.d===ds).reduce((a,m)=>a+(+m.kcal||0),0),L=+kLim(ds)||0;if(!L)return {pct:raw,over:""};
-    const lo=Math.round(L*(1-OB_TOL)),hi=Math.round(L*(1+OB_TOL)),f=n=>Math.round(n).toLocaleString();   // target range: the limit ± OB_TOL
+    /* was: range = limit ± 10%, "X cal to reach range" while under today
+    const lo=Math.round(L*(1-OB_TOL)),hi=Math.round(L*(1+OB_TOL)) ... */
+    const lo=Math.round(L*(1-OB_TOL)),hi=L,f=n=>Math.round(n).toLocaleString();   // range: 90% of the limit up to the limit itself
     if(!e)return {pct:null,over:"",note:"No intake logged"};
-    if(e>hi)return {pct:Math.max(0,1-(e-hi)/L),over:`${f(e-hi)} cal above range`};                       // over: red as soon as they cross it
-    if(e>=lo)return {pct:1,over:""};                                                                      // inside the range: 100%
+    if(e>hi)return {pct:Math.max(0,1-(e-hi)/L),over:`${f(e-hi)} cal above limit`};                       // over the limit: red as soon as they cross it
+    if(e>=lo)return {pct:1,over:""};                                                                      // anywhere inside the range: 100%
     if(ds<today())return {pct:Math.max(0,1-(lo-e)/L),over:`${f(lo-e)} cal below range`};                  // a finished day under the range: red too
-    return {pct:e/lo,over:"",note:`${f(lo-e)} cal to reach range`}}                                       // today, still eating: no penalty yet
+    return {pct:e/lo,over:""}}                                                                            // today, still eating: the ring fills, no "to go" message
   if(k==="budget"&&typeof bStats==="function"){const S=bStats(),cap=+S.inc||0,out=(+S.subs||0)+(+S.bills||0)+(+S.spent||0);if(!cap)return {pct:raw,over:""};
     if(out<=cap)return {pct:1,over:""};const ov=out-cap;return {pct:Math.max(0,1-ov/cap),over:`${bMoney(ov,0)} over`}}}catch(e){}
   return {pct:raw==null?raw:Math.min(1,raw),over:""}}
@@ -10514,7 +10516,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="900",APPT="2026-11-25T06:01:49Z";   /* APPT: when this update was made */
+const APPV="901",APPT="2026-11-25T06:04:11Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
