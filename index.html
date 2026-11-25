@@ -3669,6 +3669,24 @@ html:not(.phone) body #view[data-tab="budget"]>.panel.bco .bsecs{grid-template-c
 html:not(.phone) body #view[data-tab="budget"]>.panel.bco .bsecs>.bsec-sum{grid-column:1 / -1;grid-row:1}
 html:not(.phone) body #view[data-tab="budget"]>.panel.bco .bsecs>.bco-sec{grid-row:2;min-width:0}
 }
+/* Nutrition Macronutrients
+   Donut: no box around the legend, just the lines between rows (was a 1px rounded border) */
+html body #view .nwp .bd-leg{border:0!important;border-radius:0!important}
+html body #view .nwp .mviews>.mv{border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important}/* no box around the donut view either */
+html body #view .nwp :is(.bm-r,.mviews,.mv,.mbar,.bd-wrap){min-width:0!important;max-width:100%}html body #view .nwp .mbar-l{max-width:100%;min-width:0}
+/* Bar: legend words in their own colour (no dots), one line that scrolls sideways instead of wrapping */
+html body #view .nwp .mbar-l{flex-wrap:nowrap!important;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:0 18px!important;padding-bottom:2px}
+html body #view .nwp .mbar-l::-webkit-scrollbar{display:none}
+html body #view .nwp .mbar-l>span{flex:none;white-space:nowrap}
+html body #view .nwp .mbar-l>span>i{display:none!important}
+html body #view .nwp .mbar-l>span:nth-child(1){color:#f27fb2}
+html body #view .nwp .mbar-l>span:nth-child(2){color:#a688f2}
+html body #view .nwp .mbar-l>span:nth-child(3){color:#b8875f}
+html body #view .nwp .mbar-l>span:nth-child(4){color:#f2c14e}
+html body #view .nwp .mbar-l>span:nth-child(5){color:#4cc9ff}
+/* Bar rows: the bar takes the middle and the amount sits snug at the end (was a fixed 116px amount column that pushed things apart) */
+html body #view .nwp .mbi{grid-template-columns:64px minmax(0,1fr) auto!important;column-gap:14px!important}
+html body #view .nwp .mbi>b{min-width:52px;text-align:right}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10146,7 +10164,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="868",APPT="2026-11-25T03:04:53Z";   /* APPT: when this update was made */
+const APPV="869",APPT="2026-11-25T03:09:23Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
