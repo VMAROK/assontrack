@@ -3773,6 +3773,8 @@ html body #view[data-tab="budget"] .bco .bsecs>.bco-sec>.bco-h{box-shadow:0 -30p
 /* top bar on iPad / iPhone: the device already shows the time, so the app clock is hidden there (desktop keeps it); the bar starts below the status bar so the logo isn't under the device clock, and stays slim */
 html:is(.tablet,.phone) #clk{display:none!important}
 html:is(.tablet,.phone) .topbar.topbar{padding-top:calc(env(safe-area-inset-top,0px) + 8px)!important;padding-bottom:8px!important}
+/* Overview: when a ring is over its limit, the exact amount over sits under the name in red */
+html body #view .dtiles.orbit .ob-ov{order:4;font-style:normal;font-size:clamp(10.5px,6.5cqi,13px);font-weight:600;color:#ff4d5e;margin-top:-2px;white-space:nowrap}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4835,14 +4837,23 @@ function progressPanel(d){const wk=weekKey(today()),I={pass:passInfo(d),fit:fitI
   /* Overview = "Orbit" design (same on every theme): spaced label, thin full circle, progress arc + end dot in the tab's own colour, big light %, status word under — was: miniRing + name + coloured status + View button
   return `<div class="panel dtiles${dashAnim("tiles")}">${strip}${Object.keys(DCARDS).map(k=>`<div class="dtile">${miniRing(I[k].pct,I[k].col,HAS[k])}<b>${DCARDS[k]}</b><small style="color:${I[k].col}">${I[k].label}</small><button class="dview" data-dopen="${k}" aria-label="View ${DCARDS[k]} breakdown">View</button></div>`).join("")}</div>` */
   /* three rings — Nutrition, Passions, Budget (the Breakdown's order and colours; no Fitness) — and the moving knot art in the fourth spot on the right */
-  return `<div class="panel dtiles orbit${dashAnim("tiles")}">${strip}${obOrder().map(([k,nm])=>`<div class="dtile ob-t" style="--oc:${OBCOL[k]}"><b class="ob-l">${nm}</b>${orbitRing(I[k].pct)}<small class="ob-s">${I[k].label}</small><button class="dview" data-dopen="${k}" aria-label="View ${nm} breakdown">View</button></div>`).join("")}<div class="dtile ob-t ob-art" aria-hidden="true"><canvas></canvas></div></div>`}
+  return `<div class="panel dtiles orbit${dashAnim("tiles")}">${strip}${obOrder().map(([k,nm])=>{const S=obScore(k,I[k].pct);return `<div class="dtile ob-t${S.over?" ob-over":""}" style="--oc:${OBCOL[k]}"><b class="ob-l">${nm}</b>${orbitRing(S.pct,S.over)}<small class="ob-s">${I[k].label}</small>${S.over?`<em class="ob-ov">${S.over}</em>`:""}<button class="dview" data-dopen="${k}" aria-label="View ${nm} breakdown">View</button></div>`}).join("")}<div class="dtile ob-t ob-art" aria-hidden="true"><canvas></canvas></div></div>`}
 /* Orbit ring: faint full circle, arc from 12 o'clock clockwise in the tab colour, a dot riding the arc's end, % in the middle */
 /* Overview cells follow the side-panel tab order (Nutrition / Passions / Budget as the user arranged them) */
 function obOrder(){const NM={fuel:["diet","Nutrition"],pass:["pass","Passions"],budget:["budget","Budget"]};let o=null;try{o=JSON.parse(localStorage.getItem("aot-navord")||"null")}catch(_){}
   if(!Array.isArray(o))o=[];const seq=o.filter(k=>NM[k]);["fuel","pass","budget"].forEach(k=>{if(!seq.includes(k))seq.push(k)});return seq.map(k=>NM[k])}
 const OBCOL={pass:"#b99cff",fit:"#2ee6c5",diet:"#4cc9ff",budget:"#ffc533"};/* same colours as the Breakdown panel (Nutrition blue, Passions violet, Budget gold) — was amber / teal / blue / green */
-function orbitRing(pct){const r=46,C=2*Math.PI*r,f=pct==null?0:Math.max(0,Math.min(1,pct)),a=-Math.PI/2+f*2*Math.PI,dx=60+r*Math.cos(a),dy=60+r*Math.sin(a),txt=pct==null?"–":Math.round(Math.max(0,pct)*100)+"%";
-  return `<div class="ob-r"><svg viewBox="7 7 106 106" aria-hidden="true"><circle cx="60" cy="60" r="${r}" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="1"/>${f>0?`<circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--oc)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="${(f*C).toFixed(2)} ${C.toFixed(2)}" transform="rotate(-90 60 60)" style="filter:drop-shadow(0 0 3px var(--oc))"/>`:""}${pct!=null?`<circle cx="${dx.toFixed(2)}" cy="${dy.toFixed(2)}" r="4.2" fill="var(--oc)" style="filter:drop-shadow(0 0 4px var(--oc))"/>`:""}</svg><span class="ob-p">${txt}</span></div>`}
+/* Overview score (the ring never passes 100%):
+   Nutrition — under the calorie goal the ring fills as you eat (eaten ÷ goal); over it, the score drops by how far over you are: 1 − over ÷ goal (2× the goal or more = 0%), with the exact amount over in red underneath.
+   Budget — spending within income scores 100%; past it, 1 − over ÷ income, with the dollars over in red. Passions unchanged for now. */
+function obScore(k,raw){try{const t=today();
+  if(k==="diet"){const e=data.meals.filter(m=>m.d===t).reduce((a,m)=>a+(+m.kcal||0),0),L=+kLim(t)||0;if(!L)return {pct:raw,over:""};
+    if(e<=L)return {pct:e/L,over:""};const ov=e-L;return {pct:Math.max(0,1-ov/L),over:`${Math.round(ov).toLocaleString()} cal over`}}
+  if(k==="budget"&&typeof bStats==="function"){const S=bStats(),cap=+S.inc||0,out=(+S.subs||0)+(+S.bills||0)+(+S.spent||0);if(!cap)return {pct:raw,over:""};
+    if(out<=cap)return {pct:1,over:""};const ov=out-cap;return {pct:Math.max(0,1-ov/cap),over:`${bMoney(ov,0)} over`}}}catch(e){}
+  return {pct:raw==null?raw:Math.min(1,raw),over:""}}
+function orbitRing(pct,over){const r=46,C=2*Math.PI*r,f=pct==null?0:Math.max(0,Math.min(1,pct)),a=-Math.PI/2+f*2*Math.PI,dx=60+r*Math.cos(a),dy=60+r*Math.sin(a),txt=pct==null?"–":Math.round(Math.max(0,pct)*100)+"%";
+  return `<div class="ob-r"><svg viewBox="7 7 106 106" aria-hidden="true"><circle cx="60" cy="60" r="${r}" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="1"/>${f>0?`<circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--oc)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="${(f*C).toFixed(2)} ${C.toFixed(2)}" transform="rotate(-90 60 60)" style="filter:drop-shadow(0 0 3px var(--oc))"/>`:""}${pct!=null?`<circle cx="${dx.toFixed(2)}" cy="${dy.toFixed(2)}" r="4.2" fill="${over?"#ff4d5e":"var(--oc)"}" style="filter:drop-shadow(0 0 4px ${over?"#ff4d5e":"var(--oc)"})"/>`:""}</svg><span class="ob-p">${txt}</span></div>`}
 function weekAhead(d){const mon=monday(0);const days=WKO.map(i=>{const dn=DAYS[i];const dt=new Date(mon);dt.setDate(dt.getDate()+wkD(i));const ds=ymd(dt),it=[];
     d.passions.forEach(p=>{if(!modesOf(p).includes("schedule"))return;(p.slots||[]).forEach(sl=>{if(isWk(sl)||sl.day!==i)return;const st=slotState(d,p,sl,ds);if(st==="none")return;it.push({k:sl.start||"99",t:sl.dur?slFreq(sl)+" · "+fmtH(sl.dur):fmtTime(sl.start).replace(/\s+/," "),n:p.name,st,go:p.id+":"+sl.id+":"+ds,src:"p"})})});
     d.passions.forEach(p=>{if(!modesOf(p).includes("schedule"))return;(p.slots||[]).filter(isWk).forEach(sl=>{const wk=ymd(mon),st=slotState(d,p,sl,wk);if(st==="none")return;it.push({k:"96",t:slFreq(sl)+" · "+fmtH(sl.dur),n:p.name,st,go:p.id+":"+sl.id+":"+wk,src:"p"})})});
@@ -10271,7 +10282,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="891",APPT="2026-11-25T04:05:47Z";   /* APPT: when this update was made */
+const APPV="892",APPT="2026-11-25T05:23:17Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
