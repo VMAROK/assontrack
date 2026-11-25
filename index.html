@@ -3775,6 +3775,8 @@ html:is(.tablet,.phone) #clk{display:none!important}
 html:is(.tablet,.phone) .topbar.topbar{padding-top:calc(env(safe-area-inset-top,0px) + 8px)!important;padding-bottom:8px!important}
 /* Overview: when a ring is over its limit, the exact amount over sits under the name in red */
 html body #view .dtiles.orbit .ob-ov{position:absolute;top:4px;left:0;right:0;text-align:center;font-style:normal;font-size:clamp(10.5px,6.5cqi,13px);font-weight:600;color:#ff4d5e;white-space:nowrap;pointer-events:none}/* above the ring, without moving it — the rings stay level */
+/* Breakdown: three bar weights — main bar (10px), the multicolour split (6px), each row (3px) */
+html body #view .bdown .bdn-all{height:6px!important;min-height:6px!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10282,7 +10284,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="893",APPT="2026-11-25T05:27:42Z";   /* APPT: when this update was made */
+const APPV="894",APPT="2026-11-25T05:29:33Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
