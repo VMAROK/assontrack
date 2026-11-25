@@ -3515,7 +3515,7 @@ html.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bg as
 @keyframes bzSide{0%,100%{background-position:50% 70%;background-size:auto 112%;filter:brightness(1)}50%{background-position:38% 30%;background-size:auto 124%;filter:brightness(1.25)}}
 /* panels measured against the mockups pixel by pixel (v839): near-solid like the mockups (Chrome stays frosted), each template's exact fill steps top -> middle -> bottom and its exact border brightness */
 html.tpl-chrome{--p1:31,31,32;--p2:20,20,21;--p3:20,21,21;--pbd:rgba(255,255,255,.17);--pbt:rgba(255,255,255,.14);--pin:rgba(255,255,255,.06)}
-html.tpl-silk{--p1:19,20,29;--p2:16,17,25;--p3:12,13,20;--pbd:rgba(195,200,235,.16);--pbt:rgba(210,212,235,.13);--pin:rgba(190,190,255,.06)}
+html.tpl-silk{--p1:19,20,29;--p2:16,17,25;--p3:12,13,20;--pbd:rgba(255,255,255,.12);--pbt:rgba(255,255,255,.11);/* was lavender-tinted borders */--pin:rgba(190,190,255,.06)}
 html.tpl-pyramid{--p1:29,26,23;--p2:22,20,18;--p3:18,16,15;--pbd:rgba(255,225,195,.09);--pbt:rgba(255,225,200,.13);--pin:rgba(255,225,190,.05)}
 html.tpl-bronze{--p1:19,16,14;--p2:16,13,12;--p3:15,13,11;--pbd:rgba(255,210,185,.115);--pbt:rgba(255,210,185,.12);--pin:rgba(255,220,195,.04)}
 html:is(.tpl-stipple,.tpl-flowmono){--p1:12,13,15;--p2:12,13,15;--p3:12,13,15;--pbd:rgba(255,255,255,.135);--pbt:rgba(255,255,255,.13);--pin:rgba(255,255,255,.025)}
@@ -3856,7 +3856,7 @@ html.tpl-sharp:is(.tpl-chrome,.tpl-flow,.tpl-pyramid,.tpl-bronze) body #view .dt
 html.tpl-flow #view :is(.panel>b,.bsum-c b,.bdw-tot b,.cs-txt>b){font-weight:600!important}
 html:is(.tpl-chrome,.tpl-flow) #view .panel>.ph:first-child>span{font-size:16.5px!important;font-weight:600!important;color:#f2f2f6!important;letter-spacing:-.005em}
 html:is(.tpl-chrome,.tpl-flow) body #view :is(.bstrip>b,.bc-h>b,.calhead.cal-c>h2,.panel>.ph:first-child>span:first-child,.panel .ph:first-child>span:first-child:not(:only-child)){font-size:17px!important;font-weight:600!important;color:#f3f3f7!important;letter-spacing:-.005em!important;text-transform:none!important}
-html.tpl-flow{--p1:19,20,29;--p2:16,17,25;--p3:12,13,20;--pbd:rgba(195,200,235,.16);--pbt:rgba(210,212,235,.13);--pin:rgba(190,190,255,.06)}
+html.tpl-flow{--p1:19,20,29;--p2:16,17,25;--p3:12,13,20;--pbd:rgba(255,255,255,.12);--pbt:rgba(255,255,255,.11);/* was lavender-tinted borders */--pin:rgba(190,190,255,.06)}
 /* Bronze side-panel picture on the bottom bar (tablet/phone portrait): the portrait image is turned on its side so the ribbon runs along the bar, and it slowly flows left↔right (was: the tall picture squeezed into a sliver in the middle) */
 @media (orientation:portrait){
 html.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bronze.tpl-bg:is(.tablet,.phone) aside{background:#0c0907!important;animation:none!important;overflow:hidden;isolation:isolate}
@@ -4124,6 +4124,10 @@ html.tpl-onyx2 .navbtn[aria-selected="true"]:not(.nav-done){background:linear-gr
 .tpl-pv-onyx2{background:radial-gradient(120% 90% at 15% 0%,#2a2a2a,#0a0a0a 65%)}.tpl-pv-onyx2 i{position:absolute;left:12%;right:12%;height:16px;border-radius:5px;background:linear-gradient(118deg,rgba(255,255,255,.1),transparent 35%),linear-gradient(180deg,#1d1d1d,#0f0f0f);border:1px solid #2e2e2e;box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
 .tpl-pv-onyx2 i:nth-child(1){top:16%;right:52%}.tpl-pv-onyx2 i:nth-child(2){top:16%;left:52%}.tpl-pv-onyx2 i:nth-child(3){top:42%;height:40px}
 .tpl-pv-onyx2 em{position:absolute;bottom:12%;width:22%;height:8px;border-radius:4px;left:12%;background:linear-gradient(180deg,#eee,#9a9a9a)}.tpl-pv-onyx2 em+em{left:38%;background:#333;width:18%}
+/* panel borders: neutral grey in every theme (they were tinted blue — the default look, Midnight, Slate — or lavender in Silk/Threads).
+   Themes with a deliberate warm border keep theirs: Spa, Bronze, Pyramids */
+html:not(.tpl-spa):not(.tpl-bronze):not(.tpl-pyramid) body #view .panel:not(.panel .panel),html:not(.tpl-spa):not(.tpl-bronze):not(.tpl-pyramid) body #view .panel .panel{border-color:rgba(255,255,255,.11)!important}
+html.tpl-midnight{--line:#262a31}html.tpl-slate{--line:#353a40}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10659,7 +10663,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="913",APPT="2026-11-25T23:25:42Z";   /* APPT: when this update was made */
+const APPV="914",APPT="2026-11-25T23:30:33Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
