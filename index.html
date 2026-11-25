@@ -3764,6 +3764,12 @@ body.bdragging #view[data-tab="budget"] .bco .bsecs>.bco-sec{touch-action:none!i
 /* Meals / Usuals scroll inside: their drawn-on outline and shade layers (::before / ::after) scrolled with the content and cut across the cards — drop them and use the panel's real border, which stays put */
 html:not(.phone) body #view[data-tab="fuel"]>:is(.nmp,.usp).panel.panel.panel::before,html:not(.phone) body #view[data-tab="fuel"]>:is(.nmp,.usp).panel.panel.panel::after{display:none!important;content:none!important}
 html:not(.phone):not(.tpl-bd-none) body #view[data-tab="fuel"]>:is(.nmp,.usp).panel.panel.panel{border:1px solid var(--pbd,rgba(255,255,255,.12))!important}
+/* cleanup before launch (user): no Log meal / Log passion pills, no red update stamp (updates still install on their own), no debug labels or dashed boxes */
+.topbar [data-go="fuel"].pill,.topbar [data-go="pass"].pill,#updTop,#dbgTog{display:none!important}
+.dbg-n{display:none!important}.dbg-box{outline:0!important}
+/* Income / Expenses columns: nothing shows above the pinned title — the column has no top padding and the title covers the gap */
+html body #view[data-tab="budget"] .bco .bsecs>.bco-sec{padding-top:0!important}
+html body #view[data-tab="budget"] .bco .bsecs>.bco-sec>.bco-h{box-shadow:0 -30px 0 #0b0c0e,0 1px 0 rgba(255,255,255,.08)!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10099,7 +10105,7 @@ function eqCards(){const cs=[...document.querySelectorAll("#view .wk-catc .tp-ca
     if(!r.dataset.mw){r.dataset.mw=1;r.addEventListener("scroll",()=>{const d=r.nextElementSibling;if(d&&d.classList.contains("sc-dots")){const ks=[...r.children].filter(x=>x.offsetWidth),st=ks.length>1?ks[1].offsetLeft-ks[0].offsetLeft:r.clientWidth,i=Math.round(r.scrollLeft/(st||1));d.querySelectorAll("button").forEach((b,k)=>b.classList.toggle("on",k===Math.min(d.children.length-1,i)))}},{passive:true})}})}
 addEventListener("resize",()=>eqCards());
 /* TEMPORARY: numbered labels on the Training and Budget tabs so panels can be referred to by number. Delete this block and the dbgLabels() call above to remove. */
-const DBG_LABELS=true;
+const DBG_LABELS=false;/* labels retired (user, Nov 24) — was true */
 let dbgOff=false;try{dbgOff=localStorage.getItem("aot-dbg-off")==="1"}catch(e){}
 function dbgToggle(){let b=document.getElementById("dbgTog");if(!b){b=document.createElement("button");b.id="dbgTog";b.type="button";b.addEventListener("click",()=>{dbgOff=!dbgOff;try{localStorage.setItem("aot-dbg-off",dbgOff?"1":"0")}catch(e){}dbgToggle();render()});document.body.appendChild(b)}
   b.hidden=!DBG_LABELS||(tab!=="train"&&tab!=="budget"&&tab!=="fuel"&&tab!=="pass");b.style.top=tab==="budget"||tab==="fuel"?"auto":"";b.style.bottom=tab==="budget"||tab==="fuel"?"calc(env(safe-area-inset-bottom,0px) + 18px)":"";b.textContent=dbgOff?"Labels: off":"Labels: on";b.setAttribute("aria-pressed",!dbgOff);document.body.classList.toggle("dbg-off",dbgOff)}
@@ -10262,7 +10268,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="889",APPT="2026-11-25T03:59:55Z";   /* APPT: when this update was made */
+const APPV="890",APPT="2026-11-25T04:02:17Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
