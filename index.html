@@ -7381,9 +7381,12 @@ document.addEventListener("submit",e=>{const f=e.target;if(!f.matches||!f.matche
     const sibs=[...d.box.querySelectorAll(":scope>[data-bsec]")].filter(x=>x!==d.el);
     for(const x of sibs){const q=x.getBoundingClientRect();if(e.clientX<q.left||e.clientX>q.right||e.clientY<q.top||e.clientY>q.bottom)continue;
       const b0=d.el.getBoundingClientRect(),t0=b0.left-(e.clientX-d.x0),u0=b0.top-(e.clientY-d.y0);
+      if(d.lock&&performance.now()<d.lock)break;d.lock=performance.now()+260;/* wait for the slide to finish before swapping again */
+      const F=sibs.map(y=>[y,y.getBoundingClientRect()]);/* FLIP: the other sections glide to their new spot instead of jumping */
       if(d.el.compareDocumentPosition(x)&Node.DOCUMENT_POSITION_PRECEDING)d.box.insertBefore(d.el,x);else d.box.insertBefore(d.el,x.nextSibling);
+      F.forEach(([y,r])=>{const q=y.getBoundingClientRect(),dx=r.left-q.left,dy=r.top-q.top;if(!dx&&!dy)return;y.style.transition="none";y.style.transform=`translate(${dx}px,${dy}px)`;y.offsetWidth;y.style.transition="transform .28s cubic-bezier(.2,.8,.2,1)";y.style.transform="";setTimeout(()=>{y.style.transition=""},300)});
       d.el.style.transform="";const b1=d.el.getBoundingClientRect();d.x0+=b1.left-t0;d.y0+=b1.top-u0;d.el.style.transform=`translate(${e.clientX-d.x0}px,${e.clientY-d.y0}px)`;break}},true);
-  const up=e=>{if(!d||e.pointerId!==d.id)return;const ids=[...d.box.querySelectorAll(":scope>[data-bsec]")].map(x=>x.dataset.bsec),b=B(),S=bSecs(b);d.el.style.transform="";d.el.classList.remove("bsec-drag");d=null;
+  const up=e=>{if(!d||e.pointerId!==d.id)return;const ids=[...d.box.querySelectorAll(":scope>[data-bsec]")].map(x=>x.dataset.bsec),b=B(),S=bSecs(b);{const el=d.el,box=d.box;el.style.transition="transform .25s cubic-bezier(.2,.8,.2,1)";el.style.transform="";d=null;el.classList.remove("bsec-drag");setTimeout(()=>{b.secs=ids.map(id=>S.find(x=>x.id===id)).filter(Boolean);render();save()},260);return}/* the dropped section glides home, then saves */d.el.style.transform="";d.el.classList.remove("bsec-drag");d=null;
     b.secs=ids.map(id=>S.find(x=>x.id===id)).filter(Boolean);render();save()};
   document.addEventListener("pointerup",up,true);document.addEventListener("pointercancel",up,true)})();
 
@@ -10241,7 +10244,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="882",APPT="2026-11-25T03:45:40Z";   /* APPT: when this update was made */
+const APPV="883",APPT="2026-11-25T03:46:51Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
