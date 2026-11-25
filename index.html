@@ -3777,6 +3777,33 @@ html:is(.tablet,.phone) .topbar.topbar{padding-top:calc(env(safe-area-inset-top,
 html body #view .dtiles.orbit .ob-ov{position:absolute;top:4px;left:0;right:0;text-align:center;font-style:normal;font-size:clamp(10.5px,6.5cqi,13px);font-weight:600;color:#ff4d5e;white-space:nowrap;pointer-events:none}/* above the ring, without moving it — the rings stay level */
 /* Breakdown: three bar weights — main bar (10px), the multicolour split (6px), each row (3px) */
 html body #view .bdown .bdn-all{height:6px!important;min-height:6px!important}
+/* Budget tiles line up: every tile keeps the same bottom space, and Spent this month's caption ("4 expenses") sits where the dots sit on the others — so the icons, names and amounts all share one line */
+html body #view[data-tab="budget"] .bstick:not(.stuck) .tile.tile{position:relative;justify-content:center!important;padding-bottom:30px!important;min-height:118px}
+html body #view[data-tab="budget"] .bstick:not(.stuck) .tile:not(.bsav)>em{position:absolute!important;left:0;right:0;top:auto!important;bottom:8px!important;font-size:11.5px!important;margin:0!important;padding:0!important;text-align:center;line-height:13px!important;height:13px!important}
+html body #view[data-tab="budget"] .bstick:not(.stuck) .tile:not(.bsav)>em>i[style*="hidden"]{display:none!important}/* the hidden second line made the caption two lines tall and pushed it into the amount */
+/* real site footer: a black bar across the bottom of every tab, under the wallpaper (the wallpaper is never cropped — the bar is just the end of the page) */
+html body #view{padding-bottom:0!important}
+html body #view>.sitefoot.sitefoot{margin:56px 0 0!important;padding:34px 8px calc(28px + env(safe-area-inset-bottom,0px))!important;border-top:1px solid rgba(255,255,255,.08)!important;background:#000!important;box-shadow:0 0 0 100vmax #000;clip-path:inset(0 -100vmax -100vmax -100vmax);text-align:left;color:rgba(235,235,240,.62);font-size:13px;line-height:1.55;flex:0 0 100%;width:100%;max-width:none!important;grid-column:1/-1}
+html.tablet body #view>.sitefoot.sitefoot{padding-bottom:calc(28px + env(safe-area-inset-bottom,0px))!important}@media (orientation:portrait){html.tablet body #view>.sitefoot.sitefoot{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))!important}}
+html.phone body #view>.sitefoot.sitefoot{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}
+.sitefoot .sf-in{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:22px 40px}
+.sitefoot .sf-brand b{display:block;font-size:18px;color:#f2f2f5;font-weight:700}.sitefoot .sf-brand b span{color:#8fb8ff}.sitefoot .sf-brand small{font-size:12.5px;color:rgba(235,235,240,.55)}
+.sitefoot .sf-links{display:flex;flex-wrap:wrap;gap:6px 22px}.sitefoot .sf-links button{background:none;border:0;padding:4px 0;color:rgba(235,235,240,.82);font:inherit;font-size:14px;cursor:pointer}.sitefoot .sf-links button:hover{color:#fff}
+.sitefoot .sf-legal{display:flex;gap:18px;font-size:13px;color:rgba(235,235,240,.5)}
+.sitefoot .sf-note{margin:24px 0 0;max-width:640px;font-size:12.5px}
+.sitefoot .sf-copy{margin:14px 0 0;padding-top:14px;border-top:1px solid rgba(255,255,255,.07);font-size:12px;color:rgba(235,235,240,.42)}
+/* Add an event panel: its top edge follows the Borders setting like its other sides (it was missing) */
+html:not(.tpl-bd-none) body #view .dcal-row>.cal-evp.cal-evp{border-top-width:1px!important;border-top-style:solid!important;border-top-color:var(--pbd,rgba(255,255,255,.13))!important}
+/* calendar follows the theme on every theme (today stays gold, the picked day keeps its soft white highlight):
+   visual templates use their own panel shades and border colour; every other theme uses its accent line colour (--lr) for the weekday row and grid */
+html.tpl-vt:not(.tpl-stipple):not(.tpl-flow):not(.tpl-flowmono) body #view .mcal{background:rgb(var(--p3))!important;border:1px solid var(--pbd)!important;overflow:hidden}
+html.tpl-vt:not(.tpl-stipple):not(.tpl-flow):not(.tpl-flowmono) body #view .mcal .cw{background:rgb(var(--p1))!important;color:#ececf0!important;border-color:var(--pbd)!important}
+html.tpl-vt:not(.tpl-stipple):not(.tpl-flow):not(.tpl-flowmono) body #view .mcal .mc:not(.today):not(.pick){background:rgb(var(--p3))!important;border-color:var(--pbd)!important;box-shadow:none!important}
+html.tpl-vt:not(.tpl-stipple):not(.tpl-flow):not(.tpl-flowmono) body #view .mcal .mc:not(.today)::before{background:transparent!important}
+html:not(.tpl-vt):not(.tpl-stipple):not(.tpl-flow):not(.tpl-flowmono) body #view .mcal{border:1px solid rgba(var(--lr),.22)!important;overflow:hidden}
+html:not(.tpl-vt):not(.tpl-stipple):not(.tpl-flow):not(.tpl-flowmono) body #view .mcal .cw{background:rgba(var(--lr),.16)!important;border-color:rgba(var(--lr),.2)!important}
+html:not(.tpl-vt):not(.tpl-stipple):not(.tpl-flow):not(.tpl-flowmono) body #view .mcal .mc:not(.today):not(.pick){background:rgba(0,0,0,.22)!important;border-color:rgba(var(--lr),.16)!important}
+html:not(.tpl-vt):not(.tpl-stipple):not(.tpl-flow):not(.tpl-flowmono) body #view .mcal .mc:not(.today)::before{background:rgba(var(--lr),.08)!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10104,7 +10131,7 @@ document.documentElement.classList.add("launch");
 function render(){if(LAUNCH_HIDE.includes(tab))tab="dash";try{nwSync()}catch(_){}
   const v=$("#view"),y=v.scrollTop,tabNew=v.dataset.tab!==tab&&!!v.dataset.tab;v.dataset.tab=tab;if(tabNew){/* switching tabs: panels fade and rise in, one after another */v.classList.remove("tab-in");clearTimeout(window.__tabInT);requestAnimationFrame(()=>{v.classList.add("tab-in");window.__tabInT=setTimeout(()=>v.classList.remove("tab-in"),900)})}
   const SCR=".theme-strip,.fd-list,.lk-row,.cat-bar,.wgrid,.avbg,.av-tabs,.wa-grid,.rows",keep=[];SCR.split(",").forEach(q=>v.querySelectorAll(q).forEach((el,i)=>{if(el.scrollLeft||el.scrollTop)keep.push([q,i,el.scrollLeft,el.scrollTop])}));
-  v.innerHTML={dash:vDash,fuel:vFuel,kitchen:vKitchen,body:vBody,train:vTrain,pass:vPass,budget:vBudget,rem:vRem,set:vSet}[tab]()+`<footer class="foot">This is not a replacement for measuring your true progress away from the screen. This app is designed for those preferring organization.<br>Inspired by Lose It!</footer>`;
+  v.innerHTML={dash:vDash,fuel:vFuel,kitchen:vKitchen,body:vBody,train:vTrain,pass:vPass,budget:vBudget,rem:vRem,set:vSet}[tab]()+`<footer class="foot sitefoot"><div class="sf-in"><div class="sf-brand"><b>Ass<span>On</span>Track</b><small>Progress &amp; diet tracker</small></div><nav class="sf-links" aria-label="Footer"><button type="button" data-go="dash">Dashboard</button><button type="button" data-go="fuel">Nutrition</button><button type="button" data-go="pass">Passions</button><button type="button" data-go="budget">Budget</button><button type="button" data-go="set">Settings</button></nav><div class="sf-legal"><span>Privacy</span><span>Terms</span><span>Support</span></div></div><p class="sf-note">This is not a replacement for measuring your true progress away from the screen. This app is designed for those preferring organization. Inspired by Lose It!</p><p class="sf-copy">© ${new Date().getFullYear()} AssOnTrack · Your data stays on this device · v${APPV}</p></footer>`;
   v.scrollTop=y;keep.forEach(([q,i,x,t])=>{const el=v.querySelectorAll(q)[i];if(el){const sb=el.style.scrollBehavior;el.style.scrollBehavior="auto";el.scrollLeft=x;el.scrollTop=t;el.style.scrollBehavior=sb}});
   $("#ttl").innerHTML=`${TITLES[tab][0]}<small>${TITLES[tab][1]}</small>`;
   document.querySelectorAll(".navbtn").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab));navGrpSet();try{rBadge()}catch(_){}
@@ -10284,7 +10311,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="895",APPT="2026-11-25T05:30:42Z";   /* APPT: when this update was made */
+const APPV="896",APPT="2026-11-25T05:36:02Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
