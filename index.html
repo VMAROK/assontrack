@@ -3716,6 +3716,17 @@ html body #view[data-tab="budget"] .bsum:not(:has(.bsum-c:not(.bsum-off))){displ
 html body #view[data-tab="budget"] .bsum-c.bsum-off.bsum-off{display:inline-flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;width:auto!important;min-height:0!important;height:auto!important;padding:9px 14px!important;text-align:left!important;border:1px dashed rgba(255,255,255,.22)!important;border-radius:99px!important;background:rgba(0,0,0,.35)!important;justify-self:start!important;align-self:center!important}
 html body #view[data-tab="budget"] .bsum-c.bsum-off>.bsec-grip{position:static!important;transform:none!important;order:-1;margin:-4px 0!important;width:18px!important;height:18px!important;padding:0!important;border:0!important;background:none!important}
 html body #view[data-tab="budget"] .bsum-c.bsum-off>span{display:inline!important;font-size:12.5px!important;padding:0!important}
+/* Nutrition (iPad / desktop): Meals · Today and Your usuals side by side, together as wide as the panels above; everything else full width */
+html:not(.phone) body #view[data-tab="fuel"]{display:flex!important;flex-wrap:wrap;align-content:flex-start;align-items:stretch;--fw:980px}
+@media (max-width:1099px){html:not(.phone) body #view[data-tab="fuel"]{--fw:9999px}}
+html:not(.phone) body #view[data-tab="fuel"]>*{flex:0 0 100%;min-width:0;box-sizing:border-box}
+html:not(.phone) body #view[data-tab="fuel"]>.nmp.panel.panel.panel{flex:0 0 calc(min(100%,var(--fw)) / 2 - 8px)!important;width:auto!important;max-width:none!important;margin-left:auto!important;margin-right:8px!important}
+html:not(.phone) body #view[data-tab="fuel"]>.usp.panel.panel.panel{flex:0 0 calc(min(100%,var(--fw)) / 2 - 8px)!important;width:auto!important;max-width:none!important;margin-left:8px!important;margin-right:auto!important}
+html:not(.phone) body #view[data-tab="fuel"]>.nmp.panel .nm-secs:not(.list){grid-template-columns:repeat(2,minmax(0,1fr))!important}
+html:not(.phone) body #view[data-tab="fuel"]>.wtr.panel.panel.panel{flex:0 0 min(100%,var(--fw))!important;width:auto!important;max-width:none!important;margin-left:auto!important;margin-right:auto!important}/* Calories trend as wide as the panels above */
+/* Budget · Where it goes: no lines between the legend rows — the colour dots already separate them */
+html body #view[data-tab="budget"] .bd-leg>*{border-top:0!important;border-bottom:0!important;box-shadow:none!important}
+html body #view[data-tab="budget"] .bd-leg{border-top:0!important;border-bottom:0!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10196,7 +10207,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="875",APPT="2026-11-25T03:27:55Z";   /* APPT: when this update was made */
+const APPV="876",APPT="2026-11-25T03:31:48Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
