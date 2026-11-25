@@ -3542,6 +3542,24 @@ html.tablet.nav-mini.nav-mini.nav-mini.nav-mini.nav-mini.nav-mini.nav-mini.nav-m
 html.tablet.nav-mini.nav-mini.nav-mini.nav-mini.nav-mini.nav-mini.nav-mini.nav-mini.nav-mini aside .navbtn>:not(svg){display:none!important}
 /* iPad: the page stopped short of the bottom (the home-screen app can report a taller screen than it shows), so the calendar at the end was cut off — extra room at the bottom of every tab (was 31px) */
 html.tablet body #view{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))!important}
+/* ===== Dashboard Overview: Orbit design — independent of theme ===== */
+html body #view .dtiles.orbit{height:auto!important;min-height:0!important;align-items:stretch}
+html body #view .dtiles.orbit .dtile.ob-t{position:relative;display:flex!important;flex-direction:column;align-items:center;justify-content:flex-start;gap:10px!important;padding:14px 6px 16px!important;height:auto!important;border:0!important;border-left:1px solid rgba(255,255,255,.12)!important;background:none!important;box-shadow:none!important;border-radius:0!important}
+html body #view .dtiles.orbit .dtile.ob-t:first-of-type,html body #view .dtiles.orbit .bstrip+.dtile.ob-t{border-left:0!important}
+html body #view .dtiles.orbit .ob-l{font-size:clamp(9.5px,5.6cqi,13px)!important;font-weight:600!important;letter-spacing:.32em!important;text-transform:uppercase!important;color:#f2f2f5!important;margin-right:-.32em;white-space:nowrap}
+html body #view .dtiles.orbit .dtile.ob-t{container-type:inline-size}
+html body #view .dtiles.orbit .ob-r{position:relative;width:min(138px,62cqi);aspect-ratio:1}
+html body #view .dtiles.orbit .ob-r svg{width:100%;height:100%;display:block;overflow:visible}
+html body #view .dtiles.orbit .ob-p{position:absolute;inset:0;display:grid;place-items:center;font-size:clamp(17px,17cqi,36px);font-weight:300;color:#fff;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+html body #view .dtiles.orbit .ob-s{font-size:clamp(11px,7.2cqi,16px)!important;font-weight:400!important;color:#e6e6ea!important;text-align:center;line-height:1.2}
+html body #view .dtiles.orbit .dview{position:absolute;inset:0;opacity:0;font-size:0;border:0;background:none;padding:0;margin:0;cursor:pointer}
+html body #view .dstack .dtiles.orbit .dtile.ob-t{border-top:0!important;padding:10px 2px 12px!important;gap:6px!important}
+html.phone body #view .dtiles.orbit .dtile.ob-t>.ob-l{grid-row:auto!important;width:auto!important;height:auto!important;align-self:center!important}
+html.phone body #view .dtiles.orbit .dtile.ob-t{padding:14px 6px 14px!important;gap:8px!important}
+html.phone body #view .dtiles.orbit .dtile.ob-t>small{text-align:center!important;align-self:center!important}
+html.phone body #view .dtiles.orbit .dtile.ob-t{border-left:0!important}html.phone body #view .dtiles.orbit .dtile.ob-t:nth-child(odd){border-left:1px solid rgba(255,255,255,.12)!important}html.phone body #view .dtiles.orbit .dtile.ob-t:nth-child(n+4){border-top:0!important}
+html body #view .dstack .dtiles.orbit .ob-l{letter-spacing:.24em!important;margin-right:-.24em}
+
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -4601,7 +4619,13 @@ function progressPanel(d){const wk=weekKey(today()),I={pass:passInfo(d),fit:fitI
   /* both views keep the donut view's height (measured each time the donuts show) */
   if(dtView()!=="bar")setTimeout(()=>{const p=document.querySelector(".dtiles:not(.dt-prog)");if(p&&p.offsetHeight)dtRingH=p.offsetHeight},0);
   if(dtView()==="bar")return `<div class="panel dtiles dt-prog${dashAnim("tiles")}" style="height:${dtRingH||184}px!important;min-height:${dtRingH||184}px">${strip}<div class="dt-pb">${dashProg(d,today(),true)}</div></div>`;
-  return `<div class="panel dtiles${dashAnim("tiles")}">${strip}${Object.keys(DCARDS).map(k=>`<div class="dtile">${miniRing(I[k].pct,I[k].col,HAS[k])}<b>${DCARDS[k]}</b><small style="color:${I[k].col}">${I[k].label}</small><button class="dview" data-dopen="${k}" aria-label="View ${DCARDS[k]} breakdown">View</button></div>`).join("")}</div>`}
+  /* Overview = "Orbit" design (same on every theme): spaced label, thin full circle, progress arc + end dot in the tab's own colour, big light %, status word under — was: miniRing + name + coloured status + View button
+  return `<div class="panel dtiles${dashAnim("tiles")}">${strip}${Object.keys(DCARDS).map(k=>`<div class="dtile">${miniRing(I[k].pct,I[k].col,HAS[k])}<b>${DCARDS[k]}</b><small style="color:${I[k].col}">${I[k].label}</small><button class="dview" data-dopen="${k}" aria-label="View ${DCARDS[k]} breakdown">View</button></div>`).join("")}</div>` */
+  return `<div class="panel dtiles orbit${dashAnim("tiles")}">${strip}${Object.keys(DCARDS).map(k=>`<div class="dtile ob-t" style="--oc:${OBCOL[k]}"><b class="ob-l">${DCARDS[k]}</b>${orbitRing(I[k].pct)}<small class="ob-s">${I[k].label}</small><button class="dview" data-dopen="${k}" aria-label="View ${DCARDS[k]} breakdown">View</button></div>`).join("")}</div>`}
+/* Orbit ring: faint full circle, arc from 12 o'clock clockwise in the tab colour, a dot riding the arc's end, % in the middle */
+const OBCOL={pass:"#ffb648",fit:"#2ee6c5",diet:"#4c8dff",budget:"#3ddc84"};
+function orbitRing(pct){const r=46,C=2*Math.PI*r,f=pct==null?0:Math.max(0,Math.min(1,pct)),a=-Math.PI/2+f*2*Math.PI,dx=60+r*Math.cos(a),dy=60+r*Math.sin(a),txt=pct==null?"–":Math.round(Math.max(0,pct)*100)+"%";
+  return `<div class="ob-r"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="${r}" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="1"/>${f>0?`<circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--oc)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="${(f*C).toFixed(2)} ${C.toFixed(2)}" transform="rotate(-90 60 60)" style="filter:drop-shadow(0 0 3px var(--oc))"/>`:""}${pct!=null?`<circle cx="${dx.toFixed(2)}" cy="${dy.toFixed(2)}" r="4.2" fill="var(--oc)" style="filter:drop-shadow(0 0 4px var(--oc))"/>`:""}</svg><span class="ob-p">${txt}</span></div>`}
 function weekAhead(d){const mon=monday(0);const days=WKO.map(i=>{const dn=DAYS[i];const dt=new Date(mon);dt.setDate(dt.getDate()+wkD(i));const ds=ymd(dt),it=[];
     d.passions.forEach(p=>{if(!modesOf(p).includes("schedule"))return;(p.slots||[]).forEach(sl=>{if(isWk(sl)||sl.day!==i)return;const st=slotState(d,p,sl,ds);if(st==="none")return;it.push({k:sl.start||"99",t:sl.dur?slFreq(sl)+" · "+fmtH(sl.dur):fmtTime(sl.start).replace(/\s+/," "),n:p.name,st,go:p.id+":"+sl.id+":"+ds,src:"p"})})});
     d.passions.forEach(p=>{if(!modesOf(p).includes("schedule"))return;(p.slots||[]).filter(isWk).forEach(sl=>{const wk=ymd(mon),st=slotState(d,p,sl,wk);if(st==="none")return;it.push({k:"96",t:slFreq(sl)+" · "+fmtH(sl.dur),n:p.name,st,go:p.id+":"+sl.id+":"+wk,src:"p"})})});
@@ -10009,7 +10033,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="850",APPT="2026-11-25T01:57:47Z";   /* APPT: when this update was made */
+const APPV="851",APPT="2026-11-25T02:06:16Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
