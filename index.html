@@ -3609,6 +3609,9 @@ html:not(.phone) body #view[data-tab="dash"] .dtiles.orbit .ob-p{font-size:clamp
 html body #view .dtiles.orbit{padding-bottom:0!important}
 html body #view .dtiles.orbit>.bstrip.bstrip.bstrip{margin-bottom:0!important;box-shadow:inset 0 -1px 0 rgba(255,255,255,.14)!important}
 html body #view[data-tab] .dtiles.orbit.orbit .dtile.ob-t.ob-t{align-self:stretch!important;padding-top:18px!important;padding-bottom:18px!important}
+/* Dashboard calendar row: as wide as the Breakdown (was max 900px centred); calendar + Add an event side by side, panels the same height (was 900px max-width) */
+html:not(.phone) body #view[data-tab="dash"]>.dcal-row{max-width:none!important;margin-left:0!important;margin-right:0!important;align-items:stretch!important;grid-template-columns:minmax(0,1fr) 320px!important}
+html:not(.phone) body #view[data-tab="dash"]>.dcal-row>.cal-evp{align-self:stretch!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10083,7 +10086,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="860",APPT="2026-11-25T02:35:42Z";   /* APPT: when this update was made */
+const APPV="861",APPT="2026-11-25T02:38:35Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
