@@ -4025,6 +4025,41 @@ html.phone #view[data-tab="budget"] .bd-leg>button>i{border-radius:50%!important
    (they keep their tinted fill), and the calendar day chips clip instead of scrolling. ===== */
 @media (pointer:coarse){html body #view#view#view#view *,html body #view#view#view#view *::before,html body #view#view#view#view *::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 html body #view .mcal .mc .chips{overflow:hidden!important}}
+/* ===== phone Budget: one card with Recurring | Extras tabs (replaces the two long panels on phones only) ===== */
+.bpx{margin-top:18px;padding:14px 14px 16px!important}
+.bpx-seg{display:grid;grid-template-columns:1fr 1fr;padding:3px;border-radius:12px;border:1px solid rgba(255,255,255,.16);margin-bottom:6px}
+.bpx-seg button{height:40px;border:0;border-radius:9px;background:none;color:rgba(255,255,255,.75);font:inherit;font-size:15.5px;font-weight:500;cursor:pointer}
+.bpx-seg button[aria-pressed="true"]{background:rgba(255,255,255,.12);color:#fff;font-weight:600}
+.bpx-sum{display:flex;align-items:center;gap:12px;padding:16px 4px;border-bottom:1px solid rgba(255,255,255,.09);font-size:15.5px}
+.bpx-sum>span{flex:1;color:rgba(255,255,255,.82)}.bpx-sum>b{font-family:var(--mono);font-size:16px}.bpx-sum>b.neg{color:#ff7a86}.bpx-sum>b.pos{color:#3ddc84}
+.bpx-sum .bpx-bud{display:inline-flex;align-items:center;gap:6px;padding-left:12px;border:0;border-left:1px solid rgba(255,255,255,.14);background:none;color:#fff;font:inherit;font-size:15px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.bpx-h{display:flex;align-items:baseline;justify-content:space-between;padding:18px 4px 10px;border-bottom:1px solid rgba(255,255,255,.09)}
+.bpx-h>span{font-size:12px;font-weight:700;letter-spacing:.24em;text-transform:uppercase}.bpx-h>b{font-family:var(--mono);font-size:13px;font-weight:600;color:rgba(255,255,255,.6)}
+.bpx-r{display:grid;grid-template-columns:auto minmax(0,1fr) auto 16px;align-items:center;gap:12px;width:100%;min-height:62px;padding:8px 4px;border:0;border-bottom:1px solid rgba(255,255,255,.08);background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.bpx-r .bpx-av{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:14px;color:#06140b;background:var(--cc)}
+.bpx-r .bpx-dot{width:12px;height:12px;border-radius:50%;background:var(--cc);margin:0 9px}
+.bpx-r .bpx-t{min-width:0;display:grid;gap:2px}.bpx-r .bpx-t b{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bpx-r .bpx-t small{font-size:13.5px;color:rgba(255,255,255,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bpx-r.inc .bpx-t b{color:#3ddc84}.bpx-r .bpx-a{font-family:var(--mono);font-size:15px;font-weight:600;white-space:nowrap}.bpx-r .bpx-a.pos{color:#3ddc84}
+.bpx-r.off{opacity:.5}.bpx-r svg{color:rgba(255,255,255,.5)}
+.bpx-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:10px 2px;margin:0 -2px}.bpx-chips::-webkit-scrollbar{display:none}
+.bpx-chips button{flex:none;display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 13px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:none;color:rgba(255,255,255,.85);font:inherit;font-size:14.5px;cursor:pointer}
+.bpx-chips button i{width:10px;height:10px;border-radius:50%;background:var(--cc)}
+.bpx-chips button[aria-pressed="true"]{background:rgba(255,255,255,.13);border-color:transparent;color:#fff;font-weight:600}
+.bpx-add{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:52px;margin-top:18px;border-radius:13px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.07);color:#fff;font:inherit;font-size:16.5px;font-weight:600;cursor:pointer}
+.bpx-empty{padding:16px 4px;color:rgba(255,255,255,.55);font-size:14px}
+.bpx-vw{display:grid;grid-template-columns:repeat(3,1fr);padding:3px;border-radius:12px;border:1px solid rgba(255,255,255,.16);margin:14px 0 12px}
+.bpx-vw button{height:36px;border:0;border-radius:9px;background:none;color:rgba(255,255,255,.75);font:inherit;font-size:15px;cursor:pointer}.bpx-vw button[aria-pressed="true"]{background:rgba(255,255,255,.12);color:#fff;font-weight:600}
+.bpx-ext .bs-vwrow{display:none!important}
+.bpx-ext #bsForm{display:none!important}
+html.bpx-sheet .bpx-ext #bsForm{display:grid!important;position:fixed;left:0;right:0;bottom:calc(68px + env(safe-area-inset-bottom,0px));z-index:80;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px 12px;padding:44px 18px 20px;border-radius:22px 22px 0 0;background:#141519;border:1px solid rgba(255,255,255,.12);border-bottom:0;box-shadow:0 -20px 50px rgba(0,0,0,.6);animation:bpxUp .3s cubic-bezier(.16,1,.3,1)}
+html.bpx-sheet .bpx-ext #bsForm>:first-child{grid-column:1/-1}
+html.bpx-sheet .bpx-ext #bsForm .bs-plus{grid-column:1/-1;width:100%!important;height:52px!important;border-radius:13px!important;font-size:0}
+html.bpx-sheet .bpx-ext #bsForm .bs-plus::after{content:"Save expense";font-size:16.5px;font-weight:600}
+html.bpx-sheet .bpx-ext #bsForm .bs-plus svg{display:none}
+html.bpx-sheet .bpx-ext #bsForm::before{content:"Add expense";position:absolute;left:18px;top:14px;font-size:19px;font-weight:700;color:#fff}
+.bpx-shx{display:none}html.bpx-sheet .bpx-shx{display:grid;place-items:center;position:fixed;right:14px;bottom:calc(68px + env(safe-area-inset-bottom,0px) + var(--bpxh,300px) - 44px);z-index:81;width:36px;height:36px;border:0;background:none;color:#fff;cursor:pointer}
+html.bpx-sheet .bpx-scrim{position:fixed;inset:0;z-index:79;background:rgba(0,0,0,.45)}
+@keyframes bpxUp{from{transform:translateY(40%);opacity:0}}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -7818,10 +7853,10 @@ function vBudget(){fxLoad();const b=B();b.mode="comb";const S=bStats(),out=S.sub
   ${(()=>{const WG=`<div class="ph"><span>Where it goes</span><label class="bhome" title="Currency for totals">Totals in<select data-bhome aria-label="Currency for totals">${BCUR.map(c=>`<option value="${c}"${c===b.home?" selected":""}>${c} ${curSym(c)}</option>`).join("")}</select></label></div>${bDonut(S)}${bExtrasMix(b)}`;
     /* narrow screens (iPad portrait, phone): "Where it goes" is its own panel right under the four tiles; wide screens: unchanged, beside the calendar */
     return `<div class="panel bwg-solo" style="margin-top:18px">${WG}</div><div class="panel bm bstrip-p bm-has" style="margin-top:18px">${""/* "Overview" strip removed — the month + arrows are the strip now */}${bCal()}<div class="bm-sep"></div><div class="bm-r">${WG}</div></div>`})()}
-  <!--BMODE-->${b.mode==="comb"?bCombined(S):(b.porder||["bills","inc"]).map(k=>k==="inc"?`<div class="panel bpan" data-bpanel="inc" style="margin-top:18px"><div class="ph bp-h"><button type="button" class="bp-grip" data-bpgrip aria-label="Drag to move this panel" title="Drag to move"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></button><span>Income</span><div class="seg2 bview" role="group" aria-label="View"><button data-bview="cards" data-bvk="i" aria-pressed="${b.viewI!=="list"}">Cards</button><button data-bview="list" data-bvk="i" aria-pressed="${b.viewI==="list"}">List</button></div><span class="bp-add"><i>${bMoney(S.inc)}/mo</i><button type="button" data-bnew="inc">＋ Income</button><button type="button" data-bnewcat="inc">＋ Category</button></span></div>${b.viewI==="list"?bList(S,"i"):bAll(S,null,"i")}</div>`:`<div class="panel bpan" data-bpanel="bills" style="margin-top:18px"><div class="ph bp-h"><button type="button" class="bp-grip" data-bpgrip aria-label="Drag to move this panel" title="Drag to move"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></button><span>Bills &amp; subscriptions</span><div class="seg2 bview" role="group" aria-label="View"><button data-bview="cards" aria-pressed="${b.view!=="list"}">Cards</button><button data-bview="list" aria-pressed="${b.view==="list"}">List</button></div><span class="bp-add"><button type="button" data-bnew="sub">＋ Subscription</button><button type="button" data-bnew="bill">＋ Bill</button><button type="button" data-bnewcat>＋ Category</button></span></div>
+  <!--BMODE-->${window.bPhone&&document.documentElement.classList.contains("phone")?bPhone(S):b.mode==="comb"?bCombined(S):(b.porder||["bills","inc"]).map(k=>k==="inc"?`<div class="panel bpan" data-bpanel="inc" style="margin-top:18px"><div class="ph bp-h"><button type="button" class="bp-grip" data-bpgrip aria-label="Drag to move this panel" title="Drag to move"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></button><span>Income</span><div class="seg2 bview" role="group" aria-label="View"><button data-bview="cards" data-bvk="i" aria-pressed="${b.viewI!=="list"}">Cards</button><button data-bview="list" data-bvk="i" aria-pressed="${b.viewI==="list"}">List</button></div><span class="bp-add"><i>${bMoney(S.inc)}/mo</i><button type="button" data-bnew="inc">＋ Income</button><button type="button" data-bnewcat="inc">＋ Category</button></span></div>${b.viewI==="list"?bList(S,"i"):bAll(S,null,"i")}</div>`:`<div class="panel bpan" data-bpanel="bills" style="margin-top:18px"><div class="ph bp-h"><button type="button" class="bp-grip" data-bpgrip aria-label="Drag to move this panel" title="Drag to move"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></button><span>Bills &amp; subscriptions</span><div class="seg2 bview" role="group" aria-label="View"><button data-bview="cards" aria-pressed="${b.view!=="list"}">Cards</button><button data-bview="list" aria-pressed="${b.view==="list"}">List</button></div><span class="bp-add"><button type="button" data-bnew="sub">＋ Subscription</button><button type="button" data-bnew="bill">＋ Bill</button><button type="button" data-bnewcat>＋ Category</button></span></div>
     <div class="bi-sum"><span><b>${bMoney(S.subs)}</b>/mo subscriptions · <b>${bMoney(S.bills)}</b>/mo bills</span>${S.paused?`<span class="bi-save">Paused ones save ${bMoney(S.paused*12,0)}/yr</span>`:""}</div>${b.view==="list"?bList(S):bAll(S)}</div>`).join("")}
   ${kBudPanel()}${mb?mb.replace('class="panel bmu"','class="panel bmu" style="margin-top:18px"'):""}
-  <div class="panel bpan bstrip-p" style="margin-top:18px"><div class="bstrip"><b>Extras</b><small>Day-to-day, non-essential spending</small><i class="bstrip-amt">${bMoney(S.spent)} this month</i></div><!-- was: <span>Spending</span> title row -->${bSpend(S)}</div>`)}
+  ${window.bPhone&&document.documentElement.classList.contains("phone")?"":`<div class="panel bpan bstrip-p" style="margin-top:18px"><div class="bstrip"><b>Extras</b><small>Day-to-day, non-essential spending</small><i class="bstrip-amt">${bMoney(S.spent)} this month</i></div><!-- was: <span>Spending</span> title row -->${bSpend(S)}</div>`}`)}
 /* popup sheet: edits an item, an expense or a category */
 const bHoldBtn=`<button type="button" class="btn ghost bh-del" data-bhold="sheet"><i></i><span>Hold to delete</span></button>`;
 function bSheet(){let o=document.getElementById("bSheet");if(!bEdit){if(o){o.classList.add("out");setTimeout(()=>o.remove(),180)}return}if(!o){o=document.createElement("div");o.id="bSheet";o.className="wp-sheet";document.body.appendChild(o)}const b=B(),e=bEdit,v=e.v,isNew=e.isNew;let h="",acts="";
@@ -10557,7 +10592,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="904",APPT="2026-11-25T21:28:26Z";   /* APPT: when this update was made */
+const APPV="905",APPT="2026-11-25T21:43:55Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -11160,5 +11195,33 @@ document.addEventListener("change",e=>{const i=e.target.closest&&e.target.closes
   const r0=window.render;if(typeof r0==="function"){window.render=function(){const out=r0.apply(this,arguments);head();return out};try{render=window.render}catch(e){}}
   new MutationObserver(()=>{const v=document.getElementById("view");if(v&&!v.querySelector(":scope>.phead"))head()}).observe(document.getElementById("view")||document.body,{childList:true});
   head()})();
+</script>
+<script>
+/* phone Budget card: Recurring | Extras. Rows open the same edit sheets as before; Extras reuses the existing list and add form */
+let bPT="rec",bPChip="all";
+function bPhone(S){const b=B(),CY=c=>((BCYC.find(x=>x[0]===c)||BCYC[1])[1]),chev='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+  const seg=`<div class="bpx-seg" role="group" aria-label="Section">${[["rec","Recurring"],["ext","Extras"]].map(([k,n])=>`<button type="button" data-bpt="${k}" aria-pressed="${bPT===k}">${n}</button>`).join("")}</div>`;
+  if(bPT==="ext"){const v=b.spView||"grp";
+    return `<div class="panel bpan bpx bpx-ext">${seg}<div class="bpx-sum"><span>Extras total</span><b>${bMoney(S.spent)}</b><button type="button" class="bpx-bud" data-bspv="${v==="what"?"grp":"what"}" aria-pressed="${v==="what"}"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/></svg>Budget</button></div>
+      <div class="bpx-vw" role="group" aria-label="View">${[["day","By day"],["grp","By group"],["grps","Groups"]].map(([k,n])=>`<button type="button" data-bspv="${k}" aria-pressed="${v===k}">${n}</button>`).join("")}</div>
+      ${v==="grps"?`<button type="button" class="bpx-add" style="margin:0 0 12px;height:44px;font-size:15px" data-bsgnewbtn>＋ Add group</button>`:""}
+      ${bSpend(S)}<button type="button" class="bpx-add" data-bpadd>＋ Add expense</button><div class="bpx-scrim" data-bpaddx></div><button type="button" class="bpx-shx" data-bpaddx aria-label="Close"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`}
+  const act=b.items.filter(i=>bActiveMonth?bActiveMonth(i,today().slice(0,7))||i.paused:true),inc=b.items.filter(i=>i.kind==="inc"),exp=b.items.filter(i=>i.kind!=="inc");
+  const cats=[...new Set(exp.map(i=>bItCat(i)))],chip=bPChip!=="all"&&!cats.includes(bPChip)?"all":bPChip,E=chip==="all"?exp:exp.filter(i=>bItCat(i)===chip);
+  const row=(i,isInc)=>{const c=bCol?bCol(bItCat(i)):"#888",nm=bTitle(i),sub=[CY(i.cyc),!isInc&&chip==="all"?bItCat(i):"",i.paused?"Paused":"",i.muted?"Excluded":""].filter(Boolean).join(" · ");
+    return `<button type="button" class="bpx-r${isInc?" inc":""}${i.paused||i.muted?" off":""}" data-bedit="${i.id}" style="--cc:${isInc?"#3ddc84":c}">${isInc?`<span class="bpx-av">${esc((nm||"?").trim().charAt(0).toUpperCase())}</span>`:`<span class="bpx-dot"></span>`}<span class="bpx-t"><b>${esc(nm)}</b><small>${esc(sub)}</small></span><span class="bpx-a${isInc?" pos":""}">${isInc?"+":"−"}${bMoneyI(i)}</span>${chev}</button>`};
+  return `<div class="panel bpan bpx">${seg}<div class="bpx-sum"><span>Left over this month</span><b class="${S.left<0?"neg":"pos"}">${bMoney(S.left)}</b></div>
+    <div class="bpx-h"><span>Income</span><b>+${bMoney(S.inc)}/mo</b></div>${inc.length?inc.map(i=>row(i,true)).join(""):`<div class="bpx-empty">No income yet</div>`}
+    <div class="bpx-h"><span>Expenses</span><b>−${bMoney(S.subs+S.bills)}/mo</b></div>
+    ${cats.length>1?`<div class="bpx-chips" role="group" aria-label="Expense group"><button type="button" data-bpchip="all" aria-pressed="${chip==="all"}">All</button>${cats.map(c=>`<button type="button" data-bpchip="${esc(c)}" aria-pressed="${chip===c}" style="--cc:${bCol?bCol(c):"#888"}"><i></i>${esc(c)}</button>`).join("")}</div>`:""}
+    ${E.length?E.map(i=>row(i,false)).join(""):`<div class="bpx-empty">No expenses yet</div>`}
+    <button type="button" class="bpx-add" data-bnew="exp">＋ Add recurring</button></div>`}
+window.bPhone=bPhone;
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-bpt],[data-bpchip],[data-bpadd],[data-bpaddx]");if(!t)return;e.preventDefault();e.stopPropagation();const d=t.dataset,H=document.documentElement;
+  if(d.bpt){bPT=d.bpt;H.classList.remove("bpx-sheet");render();return}
+  if(d.bpchip){bPChip=d.bpchip;render();return}
+  if(d.bpadd!==undefined){bpxN=B().spends.length;H.classList.add("bpx-sheet");requestAnimationFrame(()=>{const f=document.getElementById("bsForm");if(f)H.style.setProperty("--bpxh",f.offsetHeight+"px");const a=document.getElementById("bsAmt");if(a)a.focus()});return}
+  if(d.bpaddx!==undefined){H.classList.remove("bpx-sheet");return}},true);
+let bpxN=0;document.addEventListener("submit",e=>{if(e.target.id!=="bsForm"||!document.documentElement.classList.contains("bpx-sheet"))return;setTimeout(()=>{if(B().spends.length>bpxN)document.documentElement.classList.remove("bpx-sheet")},60)});   /* closes once the expense is saved (count taken when the sheet opened) */
 </script>
 </body></html>
