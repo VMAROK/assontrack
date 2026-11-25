@@ -3808,6 +3808,26 @@ html:not(.tpl-vt):not(.tpl-stipple):not(.tpl-flow):not(.tpl-flowmono) body #view
 .fd-r.fd-sel{background:rgba(143,184,255,.12)!important;box-shadow:inset 0 0 0 1.5px rgba(143,184,255,.7)!important;border-radius:12px}
 .fd-r .fd-logbtn{margin-left:auto;flex:none;padding:8px 14px;border-radius:999px;border:0;background:#8fb8ff;color:#0b0c10;font:inherit;font-size:13px;font-weight:700;cursor:pointer;animation:fdIn .18s ease-out}
 @keyframes fdIn{from{opacity:0;transform:translateX(6px)}to{opacity:1;transform:none}}
+/* Usuals list view: each group's items as compact rows — picture, name, calories, ＋ Log */
+html body #view .usp .us-list.us-list .us2-shelf{display:flex!important;flex-direction:column!important;gap:0!important;overflow:visible!important}
+html body #view .usp .us-list.us-list .us2-c{display:grid!important;grid-template-columns:40px minmax(0,1fr) auto auto;align-items:center;column-gap:12px;width:100%!important;min-height:0!important;height:auto!important;padding:10px 4px!important;border:0!important;border-bottom:1px solid rgba(255,255,255,.07)!important;border-radius:0!important;background:none!important;box-shadow:none!important;text-align:left}
+html body #view .usp .us-list.us-list .us2-c .us2-pic{grid-row:1 / span 2;width:36px!important;height:36px!important;margin:0!important}
+html body #view .usp .us-list.us-list .us2-c .us2-n{grid-column:2;font-size:14px}.us-list .us2-c .us2-sub{grid-column:2;grid-row:2;margin:0}
+html body #view .usp .us-list.us-list .us2-c .us2-k{grid-column:3;grid-row:1 / span 2;font-size:16px}
+html body #view .usp .us-list.us-list .us2-c .us2-log{grid-column:4;grid-row:1 / span 2;position:static!important;width:auto!important;padding:7px 12px!important}
+html body #view .usp .us-list.us-list .us2-c :is(.us2-b,.us2-star,.us2-strip,.mstrip){display:none!important}
+html body #view .usp .us-list.us-list .us2-add{grid-template-columns:40px 1fr!important;opacity:.8}
+html body #view .usp .us-list.us-list .us2-c{grid-template-rows:auto auto!important;row-gap:1px;flex:none!important;aspect-ratio:auto!important;min-width:0!important}
+html body #view .usp .us-list.us-list .us2-c .nm-mc{display:none!important}
+html body #view .usp .us-list.us-list .us2-c .us2-pic{grid-area:1/1/3/2!important;display:grid!important;place-items:center;font-size:22px!important;border-radius:10px;overflow:hidden}
+html body #view .usp .us-list.us-list .us2-c .us2-pic :is(img,.fpic){width:36px!important;height:36px!important;max-height:none!important;max-width:none!important;object-fit:cover;object-position:center;inset:auto!important;transform:none!important;position:static!important}
+html body #view .usp .us-list.us-list .us2-c .us2-n{grid-area:1/2/2/3!important;align-self:end;margin:0!important}
+html body #view .usp .us-list.us-list .us2-c .us2-sub{grid-area:2/2/3/3!important;align-self:start;margin:0!important;text-align:left}
+html body #view .usp .us-list.us-list .us2-c .us2-k{grid-area:1/3/3/4!important;align-self:center;margin:0!important;white-space:nowrap}
+html body #view .usp .us-list.us-list .us2-c .us2-log{grid-area:1/4/3/5!important;align-self:center;margin:0!important;white-space:nowrap}
+html body #view .usp .us-list.us-list .us2-add .us2-pic{height:36px!important;font-size:22px!important;margin:0!important}
+html body #view .usp .us-list.us-list .us2-add .us2-n{grid-area:1/2/3/3!important;align-self:center}
+.usp .bp-add .bvsw{margin-right:6px}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -5156,9 +5176,11 @@ const US=()=>{if(!data.usuals||!Array.isArray(data.usuals.groups))data.usuals={g
 const usFind=id=>{for(const g of US().groups){const it=(g.items||[]).find(x=>x.id===id);if(it)return [g,it]}return [null,null]};
 function foodEntry(f,qty,unit,cz){const m=foodCalcZ(f,qty,unit,cz),czt=czTxt(f,cz);return {img:f.img||"",name:((String(f.id||"").startsWith("ff:")&&f.brand?f.brand+" ":"")+(cz&&cz.milk&&cz.milk!=="2%"&&czMilk(f)?f.name.replace(/, (2%|whole) milk/i,""):f.name)+(m.txt?" ("+m.txt.replace(/ × $/,"×")+")":"")).slice(0,90)+(czt?" · "+czt:""),kcal:Math.round(m.kcal),protein:Math.round(m.p),carbs:Math.round(m.c),fat:Math.round(m.f),fiber:Math.round(m.fb||0),fid:f.id}}
 function usLog(it,type){return nLogCopy(it,type||fType||mealNow());}
+/* the calculator view is retired: Nutrition always shows the meals */
+try{setTimeout(()=>{try{const P=nPro();if(P&&P.nMode==="calc"){P.nMode="sep";save();render()}}catch(_){}},800)}catch(_){}
 function usPanel(){const G=US().groups,t=fType||mealNow();
-  return `<div class="panel bpan usp" style="margin-top:18px"><div class="ph bp-h"><span>Usuals</span><span class="bp-add">${/* (was) <i>tap a card to log it</i> */""}<button type="button" data-usadd="">＋ Add</button><button type="button" data-usgnew>＋ Group</button></span></div>
-    ${G.length?`<div class="us-grid us2">${G.map((g,gi)=>usGroupCard(g,gi)).join("")}</div>`
+  return `<div class="panel bpan usp" style="margin-top:18px"><div class="ph bp-h"><span>Usuals</span><span class="bp-add"><div class="bmode bvsw" role="group" aria-label="View"><button type="button" data-usview="cards" aria-pressed="${US().view!=="list"}" title="Cards" aria-label="Cards view">${BICO.cards}</button><button type="button" data-usview="list" aria-pressed="${US().view==="list"}" title="List" aria-label="List view">${BICO.list}</button></div>${/* (was) <i>tap a card to log it</i> */""}<button type="button" data-usadd="">＋ Add</button><button type="button" data-usgnew>＋ Group</button></span></div>
+    ${G.length?`<div class="us-grid us2${US().view==="list"?" us-list":""}">${G.map((g,gi)=>usGroupCard(g,gi)).join("")}</div>`
     :`<button type="button" class="us-empty" data-usadd=""><b>＋ Add your go-to foods and drinks</b><span>Pick from what you've logged recently and put them in groups like "Starbucks run" or "Gym breakfast". Then log them with one tap. You can also save straight from Add food with <b>☆ Save to Usuals</b>.</span></button>`}</div>`}
 /* usuals, new look: picture cards on a shelf, a macro colour strip, how often you've logged each, ★ favourites first,
    and a header with the group's macro ring, which meal it logs to, and Log all. Tap the group name to rename it or pick its colour. */
@@ -5180,7 +5202,7 @@ function usGroupCard(g,gi){const c=g.c||UPAL[gi%UPAL.length],I=(g.items||[]).sli
       ${I.length?`<button type="button" class="us-all" data-usall="${g.id}">Log all</button>`:""}</div>
     <div class="us2-shelf">${order.map(([x,n])=>{const on=fl&&(fl.id===x.id||fl.g===g.id);return `<button type="button" class="us-it us2-c${on?" logged":""}" data-usit="${x.id}">
         ${n?`<span class="us2-b">logged ${n}×</span>`:""}<span class="us2-star${x.fav?" on":""}" data-usfav="${x.id}" role="button" aria-label="${x.fav?"Unpin favourite":"Pin as favourite"}">${x.fav?"★":"☆"}</span>
-        <span class="us2-pic">${fPic(x)}</span>${(sp=>`<span class="us2-n" title="${esc(x.name)}">${esc(sp.t)}</span><small class="us2-sub">${sp.br?`<em class="nm-br">${esc(sp.br)}</em>`:""}${esc(sp.d)||"&nbsp;"}</small>`)(nSplit(x.name))}<span class="us2-k">${n0(x.kcal)}<i>cal</i></span>${usStrip(x)}<span class="us2-log" role="button" tabindex="0" data-uslog="${x.id}" aria-label="Log ${esc(x.name)}">＋ Log</span>
+        <span class="us2-pic">${fPic(x)}</span>${(sp=>`<span class="us2-n" title="${esc(x.name)}">${esc(String(sp.t).replace(/^[\s·•\-–—]+/,""))}</span><small class="us2-sub">${sp.br?`<em class="nm-br">${esc(sp.br)}</em>`:""}${esc(sp.d)||"&nbsp;"}</small>`)(nSplit(x.name))}<span class="us2-k">${n0(x.kcal)}<i>cal</i></span>${usStrip(x)}<span class="us2-log" role="button" tabindex="0" data-uslog="${x.id}" aria-label="Log ${esc(x.name)}">＋ Log</span>
         ${on?`<span class="us2-tick" style="animation-delay:-${Math.max(0,4000-(fl.until-Date.now()))}ms">✓ Logged to ${esc(fl.meal)}<span class="us2-undo" role="button" tabindex="0" data-usundo>Undo</span></span>`:""}</button>`}).join("")}
       <button type="button" class="us2-c us2-add" data-usadd="${g.id}"><span class="us2-pic">＋</span><span class="us2-n">Add a usual</span></button></div></section>`}
 /* window: pick a group to save into (or make one), rename/delete a group, edit an item */
@@ -5360,7 +5382,7 @@ function nSplit(nm){nm=String(nm||"Food");let br="";const B=[...(typeof FFCHAINS
 function nRow(m){const x=nSplit(m.name),G=[["P",m.protein,"#a688f2"],["C",m.carbs,"#f27fb2"],["F",m.fat,"#f2c14e"],["Fb",m.fiber,"#b8875f"]].filter(g=>+g[1]>0);
   return `<button type="button" class="nm-row${nSelM&&nSelM.has(m.id)?" nm-sel":""}" data-nm="${m.id}" style="--cc:${NMC[m.type]||NMC.Snack}">${fPic(m,"nm-ic sm")}<span class="nm-t"><b>${esc(x.t)}</b>${x.br||x.d?`<small class="nm-sub">${x.br?`<em class="nm-br">${esc(x.br)}</em>`:""}${esc(x.d)}</small>`:""}<span class="nm-mc">${G.length?G.map(g=>`<i style="--mc:${g[2]}"><s>${g[0]}</s>${n0(g[1])}g</i>`).join(""):`<i class="nm-nomac">no macros</i>`}</span></span><span class="nm-v"><b>${n0(m.kcal)}</b><small>cal</small></span></button>`}
 function nMeals(S){const list=nPro().nView==="list",tm=S.tm,T=+S.g.kcal||0;
-  return `<div class="panel bpan nmp" style="margin-top:12px"><div class="ph bp-h"><span>Meals · ${nDayLbl(nD())}</span><div class="seg2 bview" role="group" aria-label="View"><button data-nview="cards" aria-pressed="${!list}">Cards</button><button data-nview="list" aria-pressed="${list}">List</button></div><span class="bp-add"><i>${n0(S.kcal)}${T?" / "+n0(T):""} kcal</i></span>${nModeBar()}</div>${""/* v671: selection bar was here, at the top of the panel */}
+  return `<div class="panel bpan nmp" style="margin-top:12px"><div class="ph bp-h"><span>Meals · ${nDayLbl(nD())}</span>${""/* Cards / List as icons (like Budget); the Meals ⇄ Calculator switch is gone — was: <div class="seg2 bview">Cards | List</div> … ${nModeBar()} */}<span class="bp-add"><i>${n0(S.kcal)}${T?" / "+n0(T):""} kcal</i></span><div class="bmode bvsw" role="group" aria-label="View"><button type="button" data-nview="cards" aria-pressed="${!list}" title="Cards" aria-label="Cards view">${BICO.cards}</button><button type="button" data-nview="list" aria-pressed="${list}" title="List" aria-label="List view">${BICO.list}</button></div></div>${""/* v671: selection bar was here, at the top of the panel */}
     ${(()=>{const tot=+S.kcal||0,mx=Math.max(T,tot)||1;return tot||T?`<div class="nm-prog${T&&tot>T?" over":""}"><div class="nm-pb">${MEALT.map(t=>{const k=tm.filter(m=>(m.type||"Snack")===t).reduce((a,m)=>a+(+m.kcal||0),0);return k?`<i style="width:${(k/mx*100).toFixed(2)}%;--cc:${NMC[t]}" title="${t} ${n0(k)} kcal"></i>`:""}).join("")}${T&&tot<T?`<u style="left:${(T/mx*100).toFixed(2)}%"></u>`:""}</div><small>${T?tot>T?`${n0(tot-T)} kcal over`:`${n0(T-tot)} kcal left`:`${n0(tot)} kcal`}</small></div>`:""})()}<div class="nm-secs${list?" list":""}">${MEALT.map(t=>{const L=tm.filter(m=>(m.type||"Snack")===t),k=L.reduce((a,m)=>a+(+m.kcal||0),0),p=L.reduce((a,m)=>a+(+m.protein||0),0);
       return `<section class="nm-sec${L.length?"":" nm-empty"}" data-nsec="${t}" style="--cc:${NMC[t]}"><div class="nm-h"><span class="nm-ht"><i></i>${t}</span><span class="nm-hv">${L.length?`${n0(k)} kcal${p?` · ${n0(p)} g protein`:""}`:"nothing yet"}</span><button type="button" class="nm-add" data-nadd="${t}">＋ Add</button></div>${nSelM&&nSelSec===t?nSelBar():""}
         ${L.length?(list?`<div class="nm-rows">${L.map(nRow).join("")}</div>`:`<div class="nm-grid">${L.map(nCard).join("")}</div>`):list?"":`<button type="button" class="nm-none" data-nadd="${t}">＋ Add ${t.toLowerCase()}</button>`}</section>`}).join("")}</div></div>`}
@@ -5521,7 +5543,7 @@ document.addEventListener("pointerup",e=>{if(e.pointerType==="mouse")nSwEnd()},t
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest(".nm-swdel");if(t){e.preventDefault();e.stopPropagation();const id=t.dataset.id,m=data.meals.find(x=>x.id===id);if(!m)return;
     aotConfirm({title:"Delete this food?",text:"“"+(m.name||"Food")+"” will be removed from your log.",ok:"Yes, delete",danger:true}).then(y=>{if(!y){nSwClose();return}nSwOpen=null;data.meals=data.meals.filter(x=>x.id!==id);data.mealsGone=[...(data.mealsGone||[]),id].slice(-500);toast(m.name+" deleted");const v=$("#view"),st=v.scrollTop;render();v.scrollTop=st;save()});return}
   if(Date.now()-nSwJust<350&&e.target.closest&&e.target.closest(".nm-card[data-nm],.nm-row[data-nm]")){e.preventDefault();e.stopPropagation()}},true);
-document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-nday],[data-ntrv],[data-nwk],[data-ndon],[data-nmacv],[data-nmode],[data-nview],[data-nadd],[data-nmt],[data-nq],[data-nwat],[data-nwatset],[data-nm],[data-nmedit],[data-nmdup],[data-nmmv],[data-nclose],[data-nemt],[data-nsave],[data-nhold],#nSheet");if(!t)return;const d=t.dataset;
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-nday],[data-ntrv],[data-nwk],[data-ndon],[data-nmacv],[data-nmode],[data-nview],[data-usview],[data-nadd],[data-nmt],[data-nq],[data-nwat],[data-nwatset],[data-nm],[data-nmedit],[data-nmdup],[data-nmmv],[data-nclose],[data-nemt],[data-nsave],[data-nhold],#nSheet");if(!t)return;const d=t.dataset;
   if(t.id==="nSheet"){if(e.target.id==="nSheet"){nEdit=null;nSheet()}return}
   if(d.nhold!=null){e.stopPropagation();return}
   if(d.nday){nDay=d.nday===today()||(d.nday<today()&&d.nday===nD())?null:d.nday;render();return}   /* tapping an open past day again closes it and goes back to today */
@@ -5530,6 +5552,7 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(d.nmacv){nPro().nMacV=d.nmacv;nPro().macV=d.nmacv;render();save();return}if(d.ntrv){nPro().trV=d.ntrv;render();save();return}
   if(d.nmode){nPro().nMode=d.nmode;render();save();return}
   if(d.nview){nPro().nView=d.nview;render();save();return}
+  if(d.usview){US().view=d.usview==="list"?"list":"cards";render();save();return}
   if(d.nmt){fType=d.nmt;render();return}
   if(d.nadd){fType=d.nadd;fOpen=true;render();setTimeout(()=>{const i=$("#fdQ");if(i){i.scrollIntoView({behavior:"smooth",block:"center"});i.focus({preventScroll:true})}},60);return}
   if(d.nq){const m=data.meals.find(x=>x.id===d.nq);if(!m)return;nLogCopy(m,fType||mealNow());sfx("blip");toast(m.name+" added to "+(fType||mealNow()).toLowerCase());render();save();return}
@@ -10318,7 +10341,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="897",APPT="2026-11-25T05:38:11Z";   /* APPT: when this update was made */
+const APPV="898",APPT="2026-11-25T05:44:59Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
