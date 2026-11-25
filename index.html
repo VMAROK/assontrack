@@ -3219,7 +3219,7 @@ html.tablet.tablet .navbtn:is([data-tab="dash"],[data-tab="fuel"],[data-tab="bud
 @media (max-width:1099px){html.tablet:not(.phone) #view[data-tab="budget"]>:is(.bstick,.bstick-s,.bwg-solo){margin-left:144px!important;margin-right:144px!important;max-width:none}
 html.tablet:not(.phone) #view[data-tab="budget"]>.bm-has{zoom:var(--calz,.74);margin-left:auto!important;margin-right:auto!important;max-width:none!important;box-sizing:border-box}}
 /* iPad portrait Nutrition: everything from the top tiles down to Your body + Add food = same width as Budget's tiles (100px in each side on screen) */
-@media (max-width:1099px){html.tablet:not(.phone) #view[data-tab="fuel"]>:not(.nmp):not(.usp):not(.wtr):not(.foot){margin-left:144px!important;margin-right:144px!important;max-width:none}}
+/* iPad portrait now uses the landscape widths (user) — was: @media (max-width:1099px)[html.tablet:not(.phone) #view[data-tab="fuel"]>:not(.nmp):not(.usp):not(.wtr):not(.foot)[margin-left:144px!important;margin-right:144px!important;max-width:none] */}
 /* Nutrition week: each day below its top band is a perfect square; thin solid dividers (were dashed) */
 html body #view .nwp .nw-tix{container-type:inline-size}
 html body #view .nwp .nw-tix>.nw-d{height:calc(100cqw / 7 + var(--nwband,34px))!important;min-height:0!important;max-height:none!important;box-sizing:border-box}
@@ -3689,6 +3689,25 @@ html body #view .nwp .mbi{grid-template-columns:64px minmax(0,1fr) auto!importan
 html body #view .nwp .mbi>b{min-width:52px;text-align:right}
 /* Budget: each group total in its group colour (matches its dot and its slice in Where it goes); item amounts keep green in / red out */
 html body #view[data-tab="budget"] .bco-c>b{color:var(--cc)!important}
+/* ===== iPad portrait = the landscape layout (user): every panel the full content width, calendar + Add an event side by side, Income | Expenses side by side, Budget calendar unzoomed ===== */
+@media (max-width:1099px){
+html.tablet:not(.phone) body #view[data-tab="dash"]>.dcal-row.dcal-row{display:grid!important;grid-template-columns:minmax(0,1fr) 270px!important;gap:16px;align-items:stretch!important;margin:16px 0 0!important;max-width:none!important;width:100%}
+html.tablet:not(.phone) body #view[data-tab="dash"]>.dcal-row>.panel.panel{margin:0!important;width:auto!important;max-width:none!important;zoom:1!important}
+html.tablet:not(.phone) body #view[data-tab="dash"]>.dcal-row>.cal-evp{align-self:stretch!important}
+html.tablet:not(.phone) body #view[data-tab="dash"]>.dcal-row>.cal-evp .f2{grid-template-columns:minmax(0,1fr)!important}
+html.tablet:not(.phone) body #view[data-tab="budget"]>:is(.bstick,.bstick-s,.bwg-solo,.bm-has,.panel.bpan,.panel){margin-left:0!important;margin-right:0!important;max-width:none!important;width:auto!important}
+html.tablet:not(.phone) body #view[data-tab="budget"]>.bm-has{zoom:1!important}
+html.tablet:not(.phone) body #view[data-tab="budget"]>.panel.bco .bsecs{grid-template-columns:minmax(0,1fr) minmax(0,1.45fr)!important;align-items:start;column-gap:16px!important}
+html.tablet:not(.phone) body #view[data-tab="budget"]>.panel.bco .bsecs>.bsec-sum{grid-column:1 / -1;grid-row:1}
+html.tablet:not(.phone) body #view[data-tab="budget"]>.panel.bco .bsecs>.bco-sec{min-width:0}
+html.tablet:not(.phone) body #view[data-tab="fuel"]>:is(.nmp,.usp,.wtr).panel{margin-left:0!important;margin-right:0!important}
+html.tablet:not(.phone) body #view .bm.bm{grid-template-columns:minmax(0,1.55fr) 1px minmax(0,1fr)!important}
+html.tablet:not(.phone) body #view[data-tab="budget"] .bm.bm{grid-template-columns:minmax(0,1.25fr) 1px minmax(0,1fr)!important}html.tablet:not(.phone) body #view[data-tab="budget"] .bm-has>.bm-r>.ph:first-child{flex-wrap:nowrap}html.tablet:not(.phone) body #view[data-tab="budget"] .bm-has>.bm-r .bd-wrap.bd-wrap{display:flex!important;flex-direction:column!important;align-items:center!important;gap:14px!important}html.tablet:not(.phone) body #view[data-tab="budget"] .bm-has>.bm-r .bd-wrap>.bd-leg{width:100%!important}
+html.tablet:not(.phone) body #view .bm.bm>.bm-sep{display:block!important}
+html.tablet:not(.phone) body #view[data-tab] .bwg-solo.bwg-solo{display:none!important}
+html.tablet:not(.phone) body #view[data-tab] .bm-has.bm-has>.bm-sep{display:block!important}html.tablet:not(.phone) body #view[data-tab] .bm-has.bm-has>.bm-r{display:flex!important;flex-direction:column!important}
+html.tablet:not(.phone) body #view[data-tab="fuel"]>:is(.grid.tiles,.bm,.passtop,.panel){margin-left:0!important;margin-right:0!important;max-width:none!important;width:auto!important;zoom:1!important}
+}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10169,7 +10188,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="871",APPT="2026-11-25T03:11:46Z";   /* APPT: when this update was made */
+const APPV="872",APPT="2026-11-25T03:19:08Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
