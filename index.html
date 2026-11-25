@@ -3761,6 +3761,9 @@ html body #view[data-tab="budget"] .bco .bsecs>.bco-sec::-webkit-scrollbar{displ
 html body #view[data-tab="budget"] .bco .bsecs>.bco-sec>.bco-h{position:sticky;top:0;z-index:5;background:#0b0c0e!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:0 1px 0 rgba(255,255,255,.08)}/* solid, so rows never show through the pinned Income / Expenses title */
 /* while dragging an item, the column stops scrolling under your finger */
 body.bdragging #view[data-tab="budget"] .bco .bsecs>.bco-sec{touch-action:none!important;overscroll-behavior:none}
+/* Meals / Usuals scroll inside: their drawn-on outline and shade layers (::before / ::after) scrolled with the content and cut across the cards — drop them and use the panel's real border, which stays put */
+html:not(.phone) body #view[data-tab="fuel"]>:is(.nmp,.usp).panel.panel.panel::before,html:not(.phone) body #view[data-tab="fuel"]>:is(.nmp,.usp).panel.panel.panel::after{display:none!important;content:none!important}
+html:not(.phone):not(.tpl-bd-none) body #view[data-tab="fuel"]>:is(.nmp,.usp).panel.panel.panel{border:1px solid var(--pbd,rgba(255,255,255,.12))!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10259,7 +10262,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="888",APPT="2026-11-25T03:58:15Z";   /* APPT: when this update was made */
+const APPV="889",APPT="2026-11-25T03:59:55Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
