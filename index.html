@@ -5889,7 +5889,7 @@ function foodLogPanel(S){const rec=fForm&&fForm.kind==="recipe",man=fForm&&fForm
     ${""/* quick re-log list removed here: the meals panel below already shows your logs. was: <div class="flog">${nQuick()}</div> */}</div>`}
 function fuelTrend(S){const g=S.g,T=+g.kcal||0,D14=S.days,mx=Math.max(T*1.15,...D14.map(x=>x.kcal),600),UN="#3ddc84",OV="#ff5e6c";   /* over the limit is red (was orange #ffb648) */
   if(!D14.some(x=>x.n))return `<div class="panel wtr" style="margin-top:18px"><div class="ph"><span>Calories trend</span><i>Last 14 days</i></div><div class="empty">Your graph starts with the first thing you log</div></div>`;
-  const X0=46,X1=588,Y0=14,Y1=document.documentElement.classList.contains("phone")?290:160,VH=Y1+22,/* phone: a taller chart */bw=(X1-X0)/14,py=v=>Y1-v/mx*(Y1-Y0);
+  const X0=46,X1=588,Y0=14,Y1=document.documentElement.classList.contains("phone")?290:235,VH=Y1+22,/* taller chart: phone, and iPad + computer (was 160) */bw=(X1-X0)/14,py=v=>Y1-v/mx*(Y1-Y0);
   const bars=D14.map((x,i)=>{const cx=X0+bw*i+bw*.18,w=bw*.64,over=T&&x.kcal>T,c=over?OV:UN,h=x.n?Math.max(3,Y1-py(x.kcal)):2,dn=new Date(x.ds+"T12:00").getDate(),td=x.ds===today();
     return `<rect x="${cx.toFixed(1)}" y="${(Y1-h).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${x.n?c:"rgba(160,190,255,.18)"}" ${x.n?`opacity="${td?1:.82}"`:""}><title>${fmtDate(x.ds)}: ${x.n?n0(x.kcal)+" kcal, "+n0(x.pro)+" g protein":"nothing logged"}</title></rect><text x="${(cx+w/2).toFixed(1)}" y="${Y1+16}" text-anchor="middle" font-size="10" font-family="Inter,sans-serif" fill="${td?"#e6eeff":"#8fa3c8"}" ${td?'font-weight="700"':""}>${dn}</text>`}).join("");
   const grid=[0,.5,1].map(k=>{const v=mx*k*.9,y=py(v);return `<line x1="${X0}" x2="${X1}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="rgba(160,190,255,.12)" stroke-width="1"/><text x="${X0-8}" y="${(y+3.5).toFixed(1)}" text-anchor="end" font-size="10.5" fill="#8fa3c8" font-family="Inter,sans-serif">${n0(Math.round(v/50)*50)}</text>`}).join("");
@@ -11227,7 +11227,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="975",APPT="2026-11-27T00:38:00Z";   /* APPT: when this update was made */
+const APPV="976",APPT="2026-11-27T00:42:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
