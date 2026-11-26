@@ -4302,6 +4302,18 @@ html.phone body #view#view#view#view#view .ntop .ntop-w>b.ntop-wn{grid-area:n!im
 html.phone body #view#view#view#view#view .ntop .ntop-c{position:relative}
 html.phone body #view#view#view#view#view .ntop .ntop-c .kc-ic{position:absolute!important;top:-3px;left:auto!important;right:14px!important}/* was top left */
 html.phone body #view#view#view#view#view .ntop .ntop-c .ntop-h{padding-left:0}
+/* ===== phone weekly schedule: no empty strip on top, slimmer month bar, days edge to edge and bigger ===== */
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.nwp{padding-top:0!important}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.nwp .bc-h{margin:0 -14px 0!important;padding:4px 12px!important;min-height:0!important;height:auto!important;border-radius:0!important}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.nwp .bc-h :is(.bc-nav,.bc-eye){width:28px!important;height:28px!important;min-height:0!important;padding:0!important;border-radius:8px!important}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.nwp .bc-h :is(.bc-nav,.bc-eye) svg{width:15px!important;height:15px!important}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.nwp .bc-h>b{font-size:15px!important}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.nwp .nw-clip{margin:0 -14px 0!important;padding:0!important;border-radius:0!important}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.nwp .nw-row.nw-tix{border-radius:0!important;gap:0!important}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.nwp .nw-row.nw-tix .nw-d{border-radius:0!important}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.nwp .nw-row.nw-tix .nw-t{height:36px!important}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.nwp .nw-row.nw-tix .nw-gw,html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.nwp .nw-row.nw-tix .nw-gate{height:64px!important}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.nwp .nw-row.nw-tix .nw-ring{width:42px!important;height:42px!important;max-width:none!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10859,7 +10871,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="928",APPT="2026-11-26T00:43:47Z";   /* APPT: when this update was made */
+const APPV="929",APPT="2026-11-26T00:49:01Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
