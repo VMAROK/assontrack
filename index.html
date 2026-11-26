@@ -4293,15 +4293,15 @@ html.phone body #view#view#view#view#view .ntop .mgb .mgb-ov .mgb-v b{color:var(
 html body #view .ntop .wt-p{display:none}
 html.phone body #view#view#view#view#view .ntop .ntop-w{grid-template-columns:auto auto!important;grid-template-rows:auto auto auto!important;grid-template-areas:"g p" "g m" "n n";justify-content:start!important;justify-items:start!important;column-gap:26px!important;row-gap:8px!important}
 html.phone body #view#view#view#view#view .ntop .ntop-w>svg.wt-g{grid-area:g!important;align-self:center}
-html.phone body #view#view#view#view#view .ntop .ntop-w>.wt-p,html.phone body #view#view#view#view#view .ntop .ntop-w>.wt-m{display:grid!important;place-items:center;position:static!important;width:24px!important;height:24px!important;border-radius:50%!important;padding:0!important;font-size:15px!important;line-height:1!important;color:#4cc9ff!important;background:none!important;border:1.5px solid rgba(76,201,255,.45)!important;box-shadow:none!important}
+html.phone body #view#view#view#view#view .ntop .ntop-w>.wt-p,html.phone body #view#view#view#view#view .ntop .ntop-w>.wt-m{display:grid!important;place-items:center;position:static!important;width:18px!important;height:18px!important;border-radius:50%!important;padding:0!important;font-size:12px!important/* was 24px/15px */;line-height:1!important;color:#4cc9ff!important;background:none!important;border:1.5px solid rgba(76,201,255,.45)!important;box-shadow:none!important}
 html.phone body #view#view#view#view#view .ntop .ntop-w>.wt-p{grid-area:p!important;align-self:end}
 html.phone body #view#view#view#view#view .ntop .ntop-w>.wt-m{grid-area:m!important;align-self:start}
 html.phone body #view#view#view#view#view .ntop .ntop-w>.wt-m:disabled{opacity:.4}
 html.phone body #view#view#view#view#view .ntop .ntop-w>b.ntop-wn{grid-area:n!important;justify-self:start!important;text-align:left!important}
 /* phone calculator: top left of the Calories section, label beside it */
 html.phone body #view#view#view#view#view .ntop .ntop-c{position:relative}
-html.phone body #view#view#view#view#view .ntop .ntop-c .kc-ic{position:absolute!important;top:-3px;left:4px}
-html.phone body #view#view#view#view#view .ntop .ntop-c .ntop-h{padding-left:28px}
+html.phone body #view#view#view#view#view .ntop .ntop-c .kc-ic{position:absolute!important;top:-3px;left:auto!important;right:14px!important}/* was top left */
+html.phone body #view#view#view#view#view .ntop .ntop-c .ntop-h{padding-left:0}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10859,7 +10859,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="926",APPT="2026-11-26T00:40:29Z";   /* APPT: when this update was made */
+const APPV="927",APPT="2026-11-26T00:42:19Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
