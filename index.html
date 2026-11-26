@@ -4560,6 +4560,13 @@ html.phone body #view#view#view#view#view[data-tab="fuel"] .hs-slide>.panel.holo
 .holo3d.h3wait>canvas{visibility:hidden!important}
 .holopanel .fitsex{display:flex;justify-content:center;margin:10px auto 4px;width:max-content}
 html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.holopanel .avfoot{grid-area:auto;grid-column:1/-1}
+/* ===== phone Nutrition: hologram alone at the top; Calories + Water sit in the week panel; target macros are the day view's third page ===== */
+html.phone body #view#view#view#view#view#view[data-tab="fuel"] .ntop.nh-cw{display:grid!important;grid-template-columns:minmax(0,1fr) 1px minmax(0,1fr)!important;grid-template-areas:"c s1 w"!important;padding:2px 4px 14px!important;margin:0 0 12px!important;border:0!important;border-bottom:1px solid rgba(255,255,255,.08)!important;border-radius:0!important;background:none!important;box-shadow:none!important}
+html.phone body #view#view#view#view#view#view[data-tab="fuel"] .ntop.nh-cw .ntop-sep:nth-of-type(2){display:none!important}
+html.phone body #view#view#view#view#view#view[data-tab="fuel"] .ntop.nh-tgt{display:block!important;flex:0 0 100%;padding:6px 2px 0!important;margin:0!important;border:0!important;border-radius:0!important;background:none!important;box-shadow:none!important;min-height:0!important}
+html.phone body #view#view#view#view#view#view[data-tab="fuel"] .ntop.nh-tgt::before,html.phone body #view#view#view#view#view#view[data-tab="fuel"] .ntop.nh-tgt::after,html.phone body #view#view#view#view#view#view[data-tab="fuel"] .ntop.nh-cw::before,html.phone body #view#view#view#view#view#view[data-tab="fuel"] .ntop.nh-cw::after{display:none!important}
+html.phone body #view#view#view#view#view#view[data-tab="fuel"] .ntop.nh-tgt .ntop-m{padding:0!important}
+html.phone body #view#view#view#view#view#view[data-tab="fuel"] .grid.tiles.ntop-g{display:none!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -6152,7 +6159,7 @@ function nWeekPhone(cells,lab,S,M,sum,bar){
     <div class="nw-clip"><div class="nw-row nw-tix" id="nwStrip" data-off="${14+nwOff}">${cells}</div></div>
     <div class="nh-card">
       <div class="nh-ch"><b>${dt}</b>${""/* was the Bar/Donut switch: now swipe between them */}<span class="nh-dots" aria-hidden="true"><i class="${bar?"on":""}"></i><i class="${bar?"":"on"}"></i></span></div>
-      ${""/* was: bar view showed the 2-column number legend; only the picked view was rendered, so the card changed height */}<div class="nh-vw" data-start="${bar?0:1}" aria-label="Swipe for the bar or donut view">
+      ${""/* was: bar view showed the 2-column number legend; only the picked view was rendered, so the card changed height */}<div class="nh-vw" data-start="${nPro().macV==="target"?2:bar?0:1}" aria-label="Swipe for the bar or donut view">
       <div class="nh-bar${bar?"":" nh-off"}" aria-hidden="${!bar}">${""/* was: "Macro mix" heading with the total grams */}<div class="nh-st">${sum?M.filter(x=>x[1]>0).map(x=>{const pc=Math.round(x[1]/sum*100);return `<i style="flex:${x[1]};background:${x[2]}">${pc>=9?`<b>${pc}%</b>`:""}</i>`}).join(""):""}</div>
         <div class="nh-mb">${M.map((x,i)=>{const gv=gl[i],e=x[1],pc=gv?Math.min(100,e/gv*100):0,ov=gv&&e>gv?(e-gv)/e*100:0;/* over the goal: its colour up to the goal, the heavier shade for the extra */return `<div class="nh-r" style="--mc:${x[2]}"><span>${x[0]}</span><i class="nh-t">${ov?`<i style="width:${(100-ov).toFixed(1)}%"></i><i style="width:${ov.toFixed(1)}%;background:color-mix(in srgb,${x[2]} 62%,#000)"></i>`:`<i style="width:${pc.toFixed(1)}%"></i>`}</i><b>${n0(e)}${gv?`<s> / ${n0(gv)}</s>`:""} g</b></div>`}).join("")}</div></div>
       <div class="nh-don${bar?" nh-off":""}" aria-hidden="${bar}"><div class="nh-dl">${donut}<small>Outer · Goal<i></i>Inner · Logged</small></div><div class="nh-dr">${[0,1,2,3].map(leg).join("")}</div></div>
@@ -11143,7 +11150,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="959",APPT="2026-11-26T22:37:46Z";   /* APPT: when this update was made */
+const APPV="960",APPT="2026-11-26T22:40:49Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -11805,21 +11812,24 @@ addEventListener("resize",sync);sync();setTimeout(sync,800)})();
 (function(){function init(){const v=document.querySelector(".nh .nh-vw");if(!v||v.dataset.sw)return;v.dataset.sw="1";
   v.scrollLeft=(+v.dataset.start||0)*v.clientWidth;let t;
   v.addEventListener("scroll",()=>{const i=Math.round(v.scrollLeft/Math.max(1,v.clientWidth));const d=document.querySelectorAll(".nh .nh-dots i");d.forEach((x,k)=>x.classList.toggle("on",k===i));
-    clearTimeout(t);t=setTimeout(()=>{try{const want=i?"donut":"bar";if(nPro().macV!==want){nPro().macV=want;save()}}catch(_){}},200)},{passive:true})}
+    clearTimeout(t);t=setTimeout(()=>{try{const want=["bar","donut","target"][i]||"bar";if(nPro().macV!==want){nPro().macV=want;save()}}catch(_){}},200)},{passive:true})}
 const r0=window.render;if(typeof r0==="function"){window.render=function(){const o=r0.apply(this,arguments);try{init()}catch(_){}return o};try{render=window.render}catch(_){}}
 new MutationObserver(()=>{try{init()}catch(_){}}).observe(document.getElementById("view")||document.body,{childList:true,subtree:true});init()})();
 </script>
 <script>
 /* phone Nutrition: the "Your body" hologram goes first, right under the tab title */
 (function(){function mv(){try{const h=document.documentElement;if(!h.classList.contains("phone"))return;const v=document.getElementById("view");if(!v||v.dataset.tab!=="fuel")return;const hp=v.querySelector(".holopanel");if(!hp)return;/* the panel alone (its wrapper also holds Add food, which stays put) */const ph=v.querySelector(":scope>.phead");
-  /* was: hologram moved to the top on its own. Now it shares one slide view with the Calories / Water / Macros panel: swipe between them, dots underneath */
-  const tp=v.querySelector(":scope>.grid.tiles.ntop-g");if(!tp)return;let w=v.querySelector(":scope>.hs-wrap");
-  if(!w){w=document.createElement("div");w.className="hs-wrap";w.innerHTML='<div class="hs-track"></div><div class="hs-dots" aria-hidden="true"><i></i><i></i></div>';const anchor=ph?ph.nextElementSibling:v.firstElementChild;v.insertBefore(w,anchor)}
-  const tr=w.firstElementChild;if(tp.parentElement!==tr){const s1=document.createElement("div");s1.className="hs-slide";s1.appendChild(tp);tr.appendChild(s1)}
-  if(hp.parentElement.parentElement!==tr){const s2=document.createElement("div");s2.className="hs-slide";hp.style.marginTop="0";s2.appendChild(hp);tr.appendChild(s2)}
-  [...tr.children].forEach(x=>{if(!x.firstElementChild)x.remove()});
-  const idx=(()=>{try{return nPro().hsI===1?1:0}catch(_){return 0}})(),dots=w.querySelectorAll(".hs-dots i");dots.forEach((d,k)=>d.classList.toggle("on",k===idx));
-  if(!tr.dataset.sw){tr.dataset.sw="1";requestAnimationFrame(()=>{tr.scrollLeft=idx*tr.clientWidth});let t;tr.addEventListener("scroll",()=>{const i=Math.round(tr.scrollLeft/Math.max(1,tr.clientWidth));dots.forEach((d,k)=>d.classList.toggle("on",k===i));clearTimeout(t);t=setTimeout(()=>{try{if(nPro().hsI!==i){nPro().hsI=i;save()}}catch(_){}},200)},{passive:true})}
+  /* (was: hologram and the Calories/Water/Macros panel shared one swipe view — removed:   / * was: hologram moved to the top on its own. Now it shar…) */
+  /* now: the hologram stands alone at the top; Calories + Water move into the week panel above its day view, and the target-bar macros become that view's third swipe page */
+  const first=ph?ph.nextElementSibling:v.firstElementChild;if(first!==hp){v.insertBefore(hp,first);hp.style.marginTop="0"}
+  const tp=v.querySelector(".grid.tiles.ntop-g"),nh=v.querySelector(".panel.nwp.nh"),card=nh&&nh.querySelector(".nh-card"),vw=card&&card.querySelector(".nh-vw");if(!tp||!vw)return;
+  const top=tp.querySelector(".ntop");const mac=tp.querySelector(".ntop-m")||vw.querySelector(".ntop-m");
+  if(mac&&mac.parentElement.parentElement!==vw){const sl=document.createElement("div");sl.className="ntop nh-tgt";sl.appendChild(mac);vw.appendChild(sl)}
+  if(top&&top.parentElement!==card){top.classList.add("nh-cw");card.insertBefore(top,card.firstElementChild)}
+  tp.style.display="none";
+  const dots=card.querySelector(".nh-dots");if(dots&&dots.children.length<3){const d=document.createElement("i");dots.appendChild(d)}
+  const want=(()=>{try{const m=nPro().macV;return m==="target"?2:m==="donut"?1:0}catch(_){return 0}})();
+  if(!vw.dataset.s3){vw.dataset.s3="1";requestAnimationFrame(()=>{vw.scrollLeft=want*vw.clientWidth;dots&&[...dots.children].forEach((x,k)=>x.classList.toggle("on",k===want))})}
 }catch(_){}}
 const r0=window.render;if(typeof r0==="function"){window.render=function(){const o=r0.apply(this,arguments);mv();return o};try{render=window.render}catch(_){}}
 const v=document.getElementById("view");if(v)new MutationObserver(mv).observe(v,{childList:true});mv()})();
