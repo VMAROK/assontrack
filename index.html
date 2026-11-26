@@ -4175,13 +4175,13 @@ html .tile .mgb-v input{background:transparent!important;box-shadow:none!importa
 /* macros: name on the left, numbers inside the bar */
 html body .mgb .mgb-r{grid-template-columns:auto minmax(0,1fr)!important;align-items:center!important;column-gap:10px!important;row-gap:0!important}
 html body .mgb .mgb-n{grid-column:1;grid-row:1;min-width:58px}
-html body .mgb .mgb-t{grid-column:2!important;grid-row:1;height:22px;border-radius:7px}
-html body .mgb .mgb-f{border-radius:7px;min-width:6px}
-html body .mgb .mgb-f[style*="width:0.0%"]{width:6px!important}
-html body .mgb .mgb-k{top:0;bottom:0;background:rgba(255,255,255,.4)}
+html body .mgb .mgb-t{grid-column:2!important;grid-row:1;height:15px;border-radius:5px}/* was 22px */
+html body .mgb .mgb-f{border-radius:5px;min-width:5px}
+html body .mgb .mgb-f[style*="width:0.0%"]{width:5px!important}
+html body .mgb .mgb-k{top:-3px;bottom:-3px;width:2px;z-index:2;background:rgba(255,255,255,.85)}/* the goal line */
 html body .mgb :is(.mgb-v,.mgb-x){grid-column:2;grid-row:1;position:relative;z-index:1;pointer-events:auto;text-shadow:0 1px 2px rgba(0,0,0,.65)}
-html body .mgb .mgb-v{justify-self:start;padding-left:8px;font-size:11.5px}
-html body .mgb .mgb-x{justify-self:end;padding-right:8px;color:#fff;font-size:10.5px}
+html body .mgb .mgb-v{justify-self:start;padding-left:7px;font-size:9.5px}
+html body .mgb .mgb-x{justify-self:end;padding-right:6px;color:#fff;font-size:9px}
 /* phone: four columns, so the bars go compact */
 html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.mgt.mgt{grid-template-rows:22px 54px!important;justify-items:stretch!important;padding:10px 5px 9px!important;grid-template-columns:minmax(0,1fr)!important}
 html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.mgt.mgt>small{justify-self:center}
@@ -4198,11 +4198,14 @@ html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb-k{top:-2px;botto
 html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb{gap:5px!important}
 html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb .mgb-r{column-gap:2px!important}
 html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb .mgb-n{min-width:0;width:19px;font-size:6.5px!important;letter-spacing:0!important}
-html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb .mgb-t{height:11px!important;border-radius:4px}
-html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb .mgb-f{border-radius:4px;min-width:3px}
+html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb .mgb-t{height:8px!important;border-radius:3px}/* was 11px */
+html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb .mgb-f{border-radius:3px;min-width:3px}
 html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb .mgb-f[style*="width:0.0%"]{width:3px!important}
-html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb .mgb-k{display:none!important}
-html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb .mgb-v{padding-left:3px;padding-right:0;font-size:7px!important}
+html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb .mgb-k{top:-2px!important;bottom:-2px!important;width:1.5px!important}/* goal line back on phone */
+html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb .mgb-v{padding-left:3px;padding-right:0;font-size:5.5px!important;line-height:8px}
+html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb .mgb-v{align-self:center!important;height:8px;align-items:center!important}
+html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb .mgb-v :is(b,span,input){line-height:8px!important}
+html.phone .tile .mgb-v input{border-bottom:0!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -5620,10 +5623,12 @@ function mgDonut(V){const q=mgGeo(V),c=(r,w,col,[len,off],C,k)=>`<circle data-mg
 /* macros as target bars: name, eaten / goal, the overshoot, and a bar with a tick where the goal sits */
 const MGT=78;/* was 68 *//* the goal tick sits at 68% of the track so going over still has room to show */
 function mgRow(k,l,c,e){const gv=mgGoal(k),f=gv?Math.min(100,e/gv*MGT):(e?100:0),ov=gv&&e>gv?e-gv:0;
-  return `<div class="mgb-r${ov?" mgb-ov":""}" data-mgb="${k}" style="--mc:${c}"><span class="mgb-n">${l}</span><span class="mgb-v"><b>${n0(e)}</b><span class="mgb-sl">/</span><input data-mgin="${k}" inputmode="numeric" enterkeyhint="done" placeholder="–" value="${gv||""}" style="width:${gv?String(gv).length+.4:2.2}ch" aria-label="${l} goal in grams"><span class="mgb-g">g</span></span><span class="mgb-x">${ov?"+"+n0(ov)+" g":""}</span><i class="mgb-t"><i class="mgb-f" style="width:${f.toFixed(1)}%"></i>${gv?`<i class="mgb-k" style="left:${MGT}%"></i>`:""}</i></div>`}
+  return `<div class="mgb-r${ov?" mgb-ov":""}" data-mgb="${k}" style="--mc:${c}"><span class="mgb-n">${l}</span><span class="mgb-v"><b>${n0(e)}</b><span class="mgb-sl">/</span><input data-mgin="${k}" inputmode="numeric" enterkeyhint="done" placeholder="–" value="${gv||""}" style="width:${gv?String(gv).length+.4:2.2}ch" aria-label="${l} goal in grams"><span class="mgb-g">g</span></span><span class="mgb-x">${ov?"+"+n0(ov)+" g":""}</span><i class="mgb-t"><i class="mgb-f" style="width:${f.toFixed(1)}%;${mgFillBg(c,f)}"></i>${gv?`<i class="mgb-k" style="left:${MGT}%"></i>`:""}</i></div>`}
+/* over the goal: the macro's colour up to the tick, the heavier shade (62% colour, 38% black, as in Breakdown) for the part past it */
+function mgFillBg(c,f){if(f<=MGT)return `background:${c};`;const x=(MGT/f*100).toFixed(1);return `background:linear-gradient(90deg,${c} 0 ${x}%,color-mix(in srgb,${c} 62%,#000) ${x}% 100%);`}
 function mgBars(V){const ph=document.documentElement.classList.contains("phone");return `<div class="mgb">${[["carbs",ph?"Carb":"Carbs"],["protein",ph?"Pro":"Protein"],["fiber",ph?"Fib":"Fiber"],["fat","Fat"]].map(([k,l],i)=>mgRow(k,l,MGCL[i],+V[i]||0)).join("")}</div>`}
 /* while a goal is being typed, move the bars without re-rendering */
-function mgBarsUpd(V){document.querySelectorAll(".mgb-r[data-mgb]").forEach(r=>{const k=r.dataset.mgb,i=["carbs","protein","fiber","fat"].indexOf(k),e=+V[i]||0,gv=mgGoal(k),f=gv?Math.min(100,e/gv*MGT):(e?100:0),ov=gv&&e>gv?e-gv:0;const F=r.querySelector(".mgb-f");if(F)F.style.width=f.toFixed(1)+"%";const X=r.querySelector(".mgb-x");if(X)X.textContent=ov?"+"+n0(ov)+" g":"";r.classList.toggle("mgb-ov",!!ov);let K=r.querySelector(".mgb-k");if(gv&&!K){K=document.createElement("i");K.className="mgb-k";K.style.left=MGT+"%";r.querySelector(".mgb-t").appendChild(K)}else if(!gv&&K)K.remove()})}
+function mgBarsUpd(V){document.querySelectorAll(".mgb-r[data-mgb]").forEach(r=>{const k=r.dataset.mgb,i=["carbs","protein","fiber","fat"].indexOf(k),e=+V[i]||0,gv=mgGoal(k),f=gv?Math.min(100,e/gv*MGT):(e?100:0),ov=gv&&e>gv?e-gv:0;const F=r.querySelector(".mgb-f");if(F){F.style.width=f.toFixed(1)+"%";F.style.background=mgFillBg(MGCL[i],f).replace(/^background:|;$/g,"")}const X=r.querySelector(".mgb-x");if(X)X.textContent=ov?"+"+n0(ov)+" g":"";r.classList.toggle("mgb-ov",!!ov);let K=r.querySelector(".mgb-k");if(gv&&!K){K=document.createElement("i");K.className="mgb-k";K.style.left=MGT+"%";r.querySelector(".mgb-t").appendChild(K)}else if(!gv&&K)K.remove()})}
 /* change the rings in place so they animate */
 function mgUpd(V){mgBarsUpd(V);const d=document.querySelector(".mgt-d");if(!d)return;const q=mgGeo(V);[["o",q.O,q.Co],["i",q.I,q.Ci]].forEach(([k,A,C])=>A.forEach(([len,off],i)=>{const e=d.querySelector(`[data-mg="${k}${i}"]`);if(e){e.setAttribute("stroke-dasharray",len.toFixed(2)+" "+C.toFixed(2));e.setAttribute("stroke-dashoffset",(-off).toFixed(2))}}))}
 document.addEventListener("input",e=>{const t=e.target;if(!t.dataset||t.dataset.mgin==null)return;const dg=t.value.replace(/\D/g,"").slice(0,4);if(t.value!==dg)t.value=dg;t.style.width=(dg.length?dg.length+.4:4.2)+"ch";const v=+String(t.value).replace(/\D/g,"");data.goals=data.goals||{};if(v>0)data.goals[t.dataset.mgin]=v;else delete data.goals[t.dataset.mgin];mgUpd(mgV);clearTimeout(mgT);mgT=setTimeout(()=>save(),600)});
@@ -10745,7 +10750,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="922",APPT="2026-11-26T00:21:16Z";   /* APPT: when this update was made */
+const APPV="923",APPT="2026-11-26T00:25:21Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
