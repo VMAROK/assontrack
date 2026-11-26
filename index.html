@@ -4518,19 +4518,9 @@ html.phone body #view#view#view#view#view .panel.nwp.nh .nh-mb{margin-top:14px!i
 #view#view[data-tab="fuel"] .mu-tabs button{all:unset;cursor:pointer;padding:6px 14px;border-radius:99px;font-size:14px;font-weight:600;color:var(--muted)}
 #view#view[data-tab="fuel"] .mu-tabs button[aria-selected="true"]{background:rgba(255,255,255,.92);color:#111}
 #view#view[data-tab="fuel"] .bodytop>.stack>:is(.nmp,.usp){margin-top:0!important}
-/* Nutrition · Calories trend: the 4 cards stay in one row of 4 on every screen; on narrow screens the text gets smaller instead of the cards wrapping */
-/* phone Nutrition: shorter title strips */
-html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .panel>.ph:first-child{min-height:0!important;padding-top:10px!important;padding-bottom:8px!important}
-html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .panel.mu-p.usp>.ph:first-child{padding-bottom:10px!important}
-html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .panel:has(>.ph:first-child){padding-top:0!important}
-html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .mu-tabs button{padding:4px 12px!important;font-size:13px!important}
-html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .panel.mu-p>.ph>.mu-plus{width:30px!important;height:30px!important;font-size:17px!important;top:10px!important}
-html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .panel>.ph:first-child .seg2 button{padding-top:4px!important;padding-bottom:4px!important}
-html.phone body #view#view#view[data-tab="fuel"] .panel.wtr>.wtr-sum{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
-html.phone body #view#view#view[data-tab="fuel"] .panel.wtr>.wtr-sum>div{height:auto!important;min-height:60px;padding:7px 3px;gap:2px}
-html.phone body #view#view#view[data-tab="fuel"] .panel.wtr>.wtr-sum small{font-size:9.5px!important;white-space:nowrap}
-html.phone body #view#view#view[data-tab="fuel"] .panel.wtr>.wtr-sum b{font-size:12.5px!important;white-space:nowrap}
-html.phone body #view#view#view[data-tab="fuel"] .panel.wtr>.wtr-sum em{font-size:8.5px!important;white-space:normal!important;line-height:1.2}
+/* Nutrition · Calories trend: two cards (Today, 7-day average) side by side on every device; the week's under/over count sits quietly, centred, above the chart */
+html body #view#view#view[data-tab="fuel"] .panel.wtr>.wtr-sum{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;margin-bottom:4px!important}
+#view[data-tab="fuel"] .panel.wtr>.wtr-ud{display:flex;justify-content:center;gap:12px;font-size:12px;font-weight:600;opacity:.75;margin:2px 0 4px;line-height:1}
 html body #view#view#view#view#view#view[data-tab="fuel"] .panel.mu-p>.ph{position:relative!important;padding-right:60px!important}
 html body #view#view#view#view#view#view[data-tab="fuel"] .panel.mu-p>.ph>.mu-plus{all:unset;box-sizing:border-box;position:absolute;top:50%;right:12px;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;display:grid;place-items:center;cursor:pointer;font-size:20px;font-weight:600;line-height:1;color:#fff;background:rgba(var(--tL),.22);border:1px solid rgba(var(--tL),.55)}
 html.phone body #view#view#view#view#view#view[data-tab="fuel"] .panel.mu-p>.ph>.mu-plus{top:8px;transform:none}
@@ -5899,7 +5889,7 @@ function fuelTrend(S){const g=S.g,T=+g.kcal||0,D14=S.days,mx=Math.max(T*1.15,...
     <div class="wtr-sum">${(()=>{/* way over (>125% of the limit) glows red; eating too little (<60%) glows orange */const LO="#ff9f43",lvl=k=>!T||k==null?"":k>T*1.25?"hi":k<T*.6?"lo":"",gl=(h,L)=>L?h.replace("<div>",`<div class="wtr-${L}">`):h;
       const tl=S.tm.length?lvl(S.kcal):"",al=S.avg==null?"":lvl(S.avg);
       return gl(cell("Today",n0(S.kcal)+" kcal",T?(tl==="hi"?"way over target":tl==="lo"?"eating too little":S.kcal>T?n0(S.kcal-T)+" over target":n0(T-S.kcal)+" under target"):"no target set",tl==="lo"?LO:T&&S.kcal>T?OV:S.tm.length?UN:""),tl)
-        +gl(cell("7-day average",S.avg==null?"--":n0(S.avg)+" kcal",S.avg==null?"nothing logged this week":al==="hi"?"way over target":al==="lo"?"eating too little":dv==null?wk.length+" days logged":(dv>0?"↑ "+n0(dv)+" over target":"↓ "+n0(-dv)+" under target"),al==="lo"?LO:dv==null?"":dv>0?OV:UN),al)})()}${cell("This week",`<span style="color:#ff9f43">↓ ${under}</span> <span style="color:${OV}">↑ ${over}</span>`,"days under · over")}${cell("Protein average",S.avgP==null?"--":n0(S.avgP)+" g",g.protein?"target "+n0(g.protein)+" g":"per logged day")}</div>
+        +gl(cell("7-day average",S.avg==null?"--":n0(S.avg)+" kcal",S.avg==null?"nothing logged this week":al==="hi"?"way over target":al==="lo"?"eating too little":dv==null?wk.length+" days logged":(dv>0?"↑ "+n0(dv)+" over target":"↓ "+n0(-dv)+" under target"),al==="lo"?LO:dv==null?"":dv>0?OV:UN),al)})()}</div>${""/* was cards: This week (days under · over) and Protein average — the week's count is now the quiet arrows below */}<div class="wtr-ud" role="img" aria-label="This week: ${under} day${under===1?"":"s"} under target, ${over} over"><span style="color:#ff9f43">↓ ${under}</span><span style="color:${OV}">↑ ${over}</span></div>
     ${(()=>{if(nPro().trV!=="line")return `<svg class="wtr-svg" viewBox="0 0 600 182" role="img" aria-label="Calories for each of the last 14 days against your target.">${grid}${bars}${tl}</svg>`;
       const P=D14.map((x,i)=>({x:X0+bw*i+bw/2,y:py(x.kcal),n:x.n,o:T&&x.kcal>T,x0:x})),L=P.filter(q=>q.n);
       const path=L.length>1?L.map((q,i)=>{if(!i)return `M${q.x.toFixed(1)} ${q.y.toFixed(1)}`;const a=L[i-1],m=(q.x-a.x)/2;return `C${(a.x+m).toFixed(1)} ${a.y.toFixed(1)} ${(q.x-m).toFixed(1)} ${q.y.toFixed(1)} ${q.x.toFixed(1)} ${q.y.toFixed(1)}`}).join(" "):"";
@@ -11229,7 +11219,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="968",APPT="2026-11-26T23:55:00Z";   /* APPT: when this update was made */
+const APPV="969",APPT="2026-11-27T00:02:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
