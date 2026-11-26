@@ -4556,6 +4556,8 @@ html.phone body #view#view#view#view#view[data-tab="fuel"]>.hs-wrap{position:rel
 html.phone body #view#view#view#view#view[data-tab="fuel"] .hs-dots{position:absolute;left:0;right:0;bottom:12px;margin:0!important;z-index:3;pointer-events:none}
 html.phone body #view#view#view#view#view[data-tab="fuel"] .hs-slide>.grid.tiles.ntop-g>.ntop{padding-bottom:34px!important}
 html.phone body #view#view#view#view#view[data-tab="fuel"] .hs-slide>.panel.holopanel{padding-bottom:30px!important}
+/* hologram hidden until the right figure has drawn */
+.holo3d.h3wait>canvas{visibility:hidden!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -9122,7 +9124,10 @@ let musLoad=null;function musEnsure(){if(musLoad||!window.H3ecoPut)return;
 function fitEnsure(g){if(tab==="train")musEnsure();if(!H3||H3.fitHas(g)||fitLoad[g])return;fitLoad[g]=fetch("lib/body2-"+g+".txt").then(r=>{if(!r.ok)throw 0;return r.text()}).then(t=>{const q=atob(t.trim()),u=new Uint8Array(q.length);for(let i=0;i<q.length;i++)u[i]=q.charCodeAt(i);H3.fitPut(g,u.buffer);if(figFit())holoMount()}).catch(()=>{setTimeout(()=>{fitLoad[g]=null;if(figFit())holoMount()},6000)})}
 function holoMount(){const el=document.querySelector("[data-h3]");if(!el||!H3){if(H3)H3.stop();return}
   const fit=figFit(),a=fit?fitAv():figAv();let hs=fit?"real":holoStage();
-  if(fit){const g=a.body==="woman"?"f":a.body==="man"?"m":"n";if(g==="n"){fitEnsure("m");fitEnsure("f")}else fitEnsure(g);a.useModel=false;if(H3.fitHas(g)){a.fitMesh=g;hs="holo"}}
+  if(fit){const g=a.body==="woman"?"f":a.body==="man"?"m":"n";if(g==="n"){fitEnsure("m");fitEnsure("f")}else fitEnsure(g);a.useModel=false;if(H3.fitHas(g)){a.fitMesh=g;hs="holo"}
+    /* body hologram only: never show the customised figure while the body mesh loads, nor the last frame left on the canvas from another tab */
+    else{el.classList.add("h3wait","loading");return}}
+  el.classList.add("h3wait");requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.remove("h3wait")));
   const m=a.useModel&&a.model;
   if(m){const k=mKey(m);if(mdl.key!==k)loadModel(m);if(mdl.key===k&&mdl.obj){mdl.mtl=m.mtl||null;H3.set(a,hs,mdl);el.classList.remove("loading")}else{H3.set(a,hs);el.classList.toggle("loading",!mdl.fail)}}
   else{H3.set(a,hs);el.classList.remove("loading")}
@@ -11134,7 +11139,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="958",APPT="2026-11-26T07:17:23Z";   /* APPT: when this update was made */
+const APPV="958",APPT="2026-11-26T22:32:56Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
