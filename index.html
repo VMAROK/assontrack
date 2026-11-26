@@ -4442,6 +4442,12 @@ html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.holopanel .hfi
 html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.holopanel .hfit-steps::before{content:"";position:absolute;left:11px;top:10px;bottom:10px;width:2px;z-index:0;background:linear-gradient(#4cc9ff 0 calc(var(--fi,0) / 3 * 100%),#4a4e57 calc(var(--fi,0) / 3 * 100%) 100%)}
 html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.holopanel .hfit-steps>span::before{background-color:var(--card,#16171a)!important}
 html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.holopanel .hfit-steps>span.on::before{background:radial-gradient(circle,#4cc9ff 0 45%,var(--card,#16171a) 50%)!important}
+/* ===== no scroll bars anywhere in the app (scrolling still works: finger, wheel, trackpad) ===== */
+html,html *{scrollbar-width:none!important;-ms-overflow-style:none!important}
+html::-webkit-scrollbar,html *::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;background:transparent!important}
+/* ===== in the app (phone, or installed to the home screen): no site footer or its link bar ===== */
+html.phone body #view>.sitefoot.sitefoot{display:none!important}
+@media (display-mode:standalone){html body #view>.sitefoot.sitefoot{display:none!important}}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -11020,7 +11026,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="938",APPT="2026-11-26T03:13:01Z";   /* APPT: when this update was made */
+const APPV="939",APPT="2026-11-26T03:35:09Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
