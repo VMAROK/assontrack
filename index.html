@@ -4448,6 +4448,9 @@ html::-webkit-scrollbar,html *::-webkit-scrollbar{display:none!important;width:0
 /* ===== in the app (phone, or installed to the home screen): no site footer or its link bar ===== */
 html.phone body #view>.sitefoot.sitefoot{display:none!important}
 @media (display-mode:standalone){html body #view>.sitefoot.sitefoot{display:none!important}}
+/* ===== phone top: every tab's title row (logo | tab name) starts below the status bar, and the status bar band is solid so scrolled content is cut off at its edge ===== */
+html.phone body #view#view#view#view#view#view{padding-top:calc(env(safe-area-inset-top,0px) + 8px)!important}
+html.phone body::after{background:var(--topsolid,#050505)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;z-index:60!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -11026,7 +11029,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="939",APPT="2026-11-26T03:35:09Z";   /* APPT: when this update was made */
+const APPV="940",APPT="2026-11-26T03:39:06Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -11678,7 +11681,7 @@ let bpxN=0;document.addEventListener("submit",e=>{if(e.target.id!=="bsForm"||!do
 /* paint the page canvas (what shows under the tab bar on iPhone/iPad) in the tab bar's colour, kept in step with the theme */
 (function(){function sync(){try{const h=document.documentElement;if(!h.classList.contains("phone")&&!h.classList.contains("tablet")){h.style.backgroundColor="";return}const a=document.querySelector("aside");if(!a)return;/* the canvas must be solid: a see-through colour there is laid over white. Lay the bar's colour over near-black instead */
 const solid=c=>{const m=String(c).match(/rgba?\(([^)]+)\)/);if(!m)return c;const v=m[1].split(/[ ,\/]+/).filter(Boolean).map(Number),al=v.length>3?v[3]:1,k=x=>Math.round(5+(x-5)*al);return `rgb(${k(v[0])},${k(v[1])},${k(v[2])})`};
-let c=getComputedStyle(a).backgroundColor;h.style.backgroundColor=solid(c);h.style.setProperty("--navsolid",solid(c))}catch(_){}}
+let c=getComputedStyle(a).backgroundColor;h.style.backgroundColor=solid(c);h.style.setProperty("--navsolid",solid(c));h.style.setProperty("--topsolid",solid(getComputedStyle(document.body).backgroundColor))}catch(_){}}
 const r0=window.render;if(typeof r0==="function"){window.render=function(){const o=r0.apply(this,arguments);sync();return o};try{render=window.render}catch(_){}}
 const l0=window.applyLook;if(typeof l0==="function"){window.applyLook=function(){const o=l0.apply(this,arguments);sync();return o};try{applyLook=window.applyLook}catch(_){}}
 addEventListener("resize",sync);sync();setTimeout(sync,800)})();
