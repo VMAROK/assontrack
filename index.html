@@ -4510,7 +4510,14 @@ html.phone body #view#view#view#view#view .panel.nwp.nh .nh-mb{margin-top:14px!i
 #view#view[data-tab="fuel"] .mu-tabs button[aria-selected="true"]{background:rgba(255,255,255,.92);color:#111}
 #view#view[data-tab="fuel"] .bodytop>.stack>:is(.nmp,.usp){margin-top:0!important}
 /* Nutrition · Calories trend: the 4 cards stay in one row of 4 on every screen; on narrow screens the text gets smaller instead of the cards wrapping */
-html body #view#view#view[data-tab="fuel"] .panel.wtr>.wtr-sum{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
+/* phone Nutrition: shorter title strips */
+html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .panel>.ph:first-child{min-height:0!important;padding-top:4px!important;padding-bottom:4px!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .panel.mu-p.usp>.ph:first-child{padding-bottom:6px!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .panel:has(>.ph:first-child){padding-top:0!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .mu-tabs button{padding:4px 12px!important;font-size:13px!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .panel.mu-p>.ph>.mu-plus{width:30px!important;height:30px!important;font-size:17px!important;top:4px!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .panel>.ph:first-child .seg2 button{padding-top:4px!important;padding-bottom:4px!important}
+html.phone body #view#view#view[data-tab="fuel"] .panel.wtr>.wtr-sum{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
 html.phone body #view#view#view[data-tab="fuel"] .panel.wtr>.wtr-sum>div{height:auto!important;min-height:60px;padding:7px 3px;gap:2px}
 html.phone body #view#view#view[data-tab="fuel"] .panel.wtr>.wtr-sum small{font-size:9.5px!important;white-space:nowrap}
 html.phone body #view#view#view[data-tab="fuel"] .panel.wtr>.wtr-sum b{font-size:12.5px!important;white-space:nowrap}
@@ -5912,6 +5919,7 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   if(d.lostno!=null){data.mealsGone=[...(data.mealsGone||[]),...lostMeals().filter(m=>!lostSel||!lostSel.has(m.id)).map(m=>m.id)].slice(-500);lostSel=null;render();save();return}
   if(d.lostgo!=null){const L=lostMeals(),pick=L.filter(m=>lostSel.has(m.id));pick.forEach(m=>data.meals.push(JSON.parse(JSON.stringify(m))));data.mealsGone=[...(data.mealsGone||[]),...L.filter(m=>!lostSel.has(m.id)).map(m=>m.id)].slice(-500);lostSel=null;save();sfx("blip");toast(pick.length+" food"+(pick.length===1?"":"s")+" restored");render()}});
 function vFuel(){
+  const PH=document.documentElement.classList.contains("phone");/* phone only: Meals/Usuals beside the body, Add food from the ＋ */
   const d=D(),S=fuelStats(d,nD()),g=S.g,T=+g.kcal||0,left=T-S.kcal,day=nD()===today()?"today":nDayLbl(nD()),w=nWater(),W=nWGoal();
   return banner()+lostPanel()+`<div class="dhead"><b>Nutrition</b><span>Meals and macros</span></div><div class="grid tiles ntop-g">${nTop(S,T)}${false?`
     <div class="panel tile" style="--c:var(--cyan)">${ic("fire")}<small>Calorie limit${nD()===today()?"":" · "+nDayLbl(nD())}</small><b><input class="tgt-in" id="kcalTgt" inputmode="numeric" value="${T?n0(T):""}" placeholder="Set" aria-label="Daily calorie limit" style="width:${Math.max(3,String(T?n0(T):"Set").length)+.3}ch"></b>${""/* was: <em>tap to change / tap to set yours</em> with a Calculate button */}<button type="button" class="kc-ic" data-kcalc aria-label="Calculate my calorie limit" title="Calculate my calorie limit"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2.5"/><rect x="8" y="5.5" width="8" height="3.5" rx=".8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 15.5h.01M12 15.5h.01M15.5 15.5h.01M8.5 18.5h.01M12 18.5h3.5"/></svg></button></div>
@@ -5922,9 +5930,9 @@ function vFuel(){
   ${nWeekPanel(d,S)}
   <div class="passtop figtop bodytop fueltop" style="margin-top:18px">${figurePanel()}
    <div class="stack">
-    ${nPro().nMode==="calc"?nCalc(S):nMeals(S)}${usPanel()}
+    ${PH?(nPro().nMode==="calc"?nCalc(S):nMeals(S))+usPanel():foodLogPanel(S)}
    </div></div>
-  ${fuelTrend(S)}${flSheet(S)}`;
+  ${PH?"":(nPro().nMode==="calc"?nCalc(S):nMeals(S))+usPanel()}${fuelTrend(S)}${PH?flSheet(S):""}`;
 }
 /* Add food opens as a window from the ＋ on the Meals / Usuals panel */
 let flOpen=false;
@@ -6309,7 +6317,7 @@ function nPaintAt(x,y){if(!nPaint||!nSelM)return;const el=document.elementFromPo
 function nPaintDown(x,y,tg){if(!nSelM)return false;const c=tg.closest&&tg.closest(".nm-card[data-nm],.nm-row[data-nm]");if(!c)return false;const on=!nSelM.has(c.dataset.nm);nPaint={add:on,last:c.dataset.nm,anchor:c.dataset.nm,base:new Set(nSelM)};nSelSet(c,on);nSwJust=Date.now();return true}
 /* while selecting: a quick tap toggles one item; press, hold a moment, then drag = select across items; press and move up/down right away = scroll (no selecting); move sideways right away = select */
 let nPend=null;
-document.addEventListener("touchstart",e=>{if(e.touches.length!==1||!nSelM||nPaint)return;const t=e.touches[0],tg=e.target,c=tg.closest&&tg.closest(".nm-card[data-nm],.nm-row[data-nm]");if(!c)return;
+document.addEventListener("touchstart",e=>{if(e.touches.length!==1||!nSelM||nPaint)return;if(!document.documentElement.classList.contains("phone")){nPaintDown(e.touches[0].clientX,e.touches[0].clientY,e.target);return}const t=e.touches[0],tg=e.target,c=tg.closest&&tg.closest(".nm-card[data-nm],.nm-row[data-nm]");if(!c)return;
   clearTimeout(nPend&&nPend.tm);nPend={x:t.clientX,y:t.clientY,tg,armed:false};nPend.tm=setTimeout(()=>{if(nPend&&!nPend.moved&&nSelM){nPend.armed=true;nPaintDown(nPend.x,nPend.y,nPend.tg);try{navigator.vibrate&&navigator.vibrate(10)}catch(_){}}},260)},{capture:true,passive:true});
 document.addEventListener("touchmove",e=>{if(!nSelM)return;const t=e.touches[0];
   if(nPaint){if(e.cancelable)e.preventDefault();nPaintAt(t.clientX,t.clientY);return}
@@ -11205,7 +11213,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="962",APPT="2026-11-26T23:20:00Z";   /* APPT: when this update was made */
+const APPV="964",APPT="2026-11-26T23:12:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -11893,7 +11901,7 @@ const v=document.getElementById("view");if(v)new MutationObserver(mv).observe(v,
 /* Nutrition: Meals and Usuals are one panel — two tabs in its header switch between them (all screen sizes); opens on Meals; ＋ opens Add food */
 (function(){let cur="meals";const get=()=>cur;
 function tabs(on){return `<div class="mu-tabs" role="tablist"><button type="button" role="tab" data-mutab="meals" aria-selected="${on==="meals"}">Meals</button><button type="button" role="tab" data-mutab="us" aria-selected="${on==="us"}">Usuals</button></div>`}
-function apply(){try{const h=document.documentElement,v=document.getElementById("view");if(!v||v.dataset.tab!=="fuel")return;const m=v.querySelector(".panel.nmp"),u=v.querySelector(".panel.usp");if(!m||!u)return;
+function apply(){try{const h=document.documentElement,v=document.getElementById("view");if(!h.classList.contains("phone")||!v||v.dataset.tab!=="fuel")return;const m=v.querySelector(".panel.nmp"),u=v.querySelector(".panel.usp");if(!m||!u)return;
   if(m.nextElementSibling!==u)m.after(u);const on=get();
   [m,u].forEach(P=>{P.classList.add("mu-p");const t=P.querySelector(":scope>.ph>span:first-child");if(t&&!t.classList.contains("mu-t")){t.classList.add("mu-t");t.dataset.old=t.textContent;t.innerHTML=tabs(on)}else if(t)t.querySelectorAll("[data-mutab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.mutab===on))});
   [m,u].forEach(P=>{const ph=P.querySelector(":scope>.ph");if(ph&&!ph.querySelector(":scope>.mu-plus"))ph.insertAdjacentHTML("beforeend",`<button type="button" class="mu-plus" data-flopen aria-label="Add food" title="Add food">＋</button>`)});
