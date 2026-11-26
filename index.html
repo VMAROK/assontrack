@@ -4372,6 +4372,18 @@ html.phone body #view#view#view#view#view .panel.nwp.nh .nh-t{position:relative;
 html.phone body #view#view#view#view#view .panel.nwp.nh .nh-t>i{display:block;height:100%;background:var(--mc)}
 html.phone body #view#view#view#view#view .panel.nwp.nh .nh-r>b{text-align:right;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
 html.phone body #view#view#view#view#view .panel.nwp.nh .nh-r>b s{text-decoration:none;color:var(--muted);font-weight:500}
+/* ===== phone Budget calendar: slim month strip, grid edge to edge, smaller text, total right under it ===== */
+html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid){padding-top:0!important}
+html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bc-h{margin:0 -14px 0!important;padding:4px 12px!important;min-height:0!important;border-radius:0!important}
+html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bc-h>b{font-size:16px!important;line-height:1.2!important}
+html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bc-h .bc-nav{width:28px!important;height:28px!important;min-height:0!important;padding:0!important;border-radius:8px!important;font-size:15px!important}
+html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bc-grid{margin:0 -14px!important;border-radius:0!important;border-left:0!important;border-right:0!important}
+html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bc-wd{font-size:9px!important;padding:5px 4px!important;letter-spacing:.06em!important}
+html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bc-d .bc-n{font-size:12px!important}
+html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bc-d.td .bc-n{font-size:11px!important}
+html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bc-day{margin-top:0!important}
+html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bdw-in{margin-top:0!important;padding-top:10px!important;border-top:0!important}html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bdw-in>.bdw-h+*{margin-top:0!important}html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bc-day{border-top:0!important}html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bc-day::before{display:none!important}
+html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bdw-h{display:none!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10950,7 +10962,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="931",APPT="2026-11-26T01:04:04Z";   /* APPT: when this update was made */
+const APPV="932",APPT="2026-11-26T01:34:50Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
