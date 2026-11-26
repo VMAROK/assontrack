@@ -4404,6 +4404,17 @@ html.phone .shell{height:100%!important}
 html.phone body aside{padding-bottom:max(12px,calc(env(safe-area-inset-bottom,0px) * 1.45))!important}/* ~16pt: just clears the home line */
 /* and a band in the bar's colour hanging below the screen box, for iPhones that end the page box above the real bottom */
 html.phone body::before{content:"";position:fixed;left:0;right:0;bottom:-120px;height:calc(120px + env(safe-area-inset-bottom,0px));background:var(--navsolid,#050505);z-index:0;pointer-events:none}
+/* ===== phone/tablet tab bar: the picked tab lights its icon and word instead of getting a background box (themes had their own boxes, so this has to outweigh them) ===== */
+html.phone.phone.phone.phone.phone.phone.phone.phone.phone body aside .navbtn.navbtn.navbtn,html.phone.phone.phone.phone.phone.phone.phone.phone.phone body aside .navbtn.navbtn.navbtn[aria-selected]:not(.nav-done),html.phone.phone.phone.phone.phone.phone.phone.phone.phone body aside .navbtn.navbtn.navbtn[aria-selected="true"]:not(.nav-done){background:none!important;background-image:none!important;box-shadow:none!important;border-color:transparent!important}
+html.phone.phone.phone.phone.phone.phone.phone.phone.phone body aside .navbtn.navbtn.navbtn::before,html.phone.phone.phone.phone.phone.phone.phone.phone.phone body aside .navbtn.navbtn.navbtn::after{display:none!important}
+html.phone.phone.phone.phone.phone.phone.phone.phone.phone body aside .navbtn.navbtn.navbtn:not([aria-selected="true"]){opacity:.5;transition:opacity .2s}
+html.phone.phone.phone.phone.phone.phone.phone.phone.phone body aside .navbtn.navbtn.navbtn[aria-selected="true"]{opacity:1!important;color:#fff!important;text-shadow:0 0 10px rgba(255,255,255,.55)}
+html.phone.phone.phone.phone.phone.phone.phone.phone.phone body aside .navbtn.navbtn.navbtn[aria-selected="true"]>svg{filter:brightness(1.25) drop-shadow(0 0 5px currentColor) drop-shadow(0 0 12px currentColor)!important}
+html.tablet.tablet.tablet.tablet.tablet.tablet.tablet.tablet.tablet body aside .navbtn.navbtn.navbtn,html.tablet.tablet.tablet.tablet.tablet.tablet.tablet.tablet.tablet body aside .navbtn.navbtn.navbtn[aria-selected]:not(.nav-done),html.tablet.tablet.tablet.tablet.tablet.tablet.tablet.tablet.tablet body aside .navbtn.navbtn.navbtn[aria-selected="true"]:not(.nav-done){background:none!important;background-image:none!important;box-shadow:none!important;border-color:transparent!important}
+html.tablet.tablet.tablet.tablet.tablet.tablet.tablet.tablet.tablet body aside .navbtn.navbtn.navbtn::before,html.tablet.tablet.tablet.tablet.tablet.tablet.tablet.tablet.tablet body aside .navbtn.navbtn.navbtn::after{display:none!important}
+html.tablet.tablet.tablet.tablet.tablet.tablet.tablet.tablet.tablet body aside .navbtn.navbtn.navbtn:not([aria-selected="true"]){opacity:.5;transition:opacity .2s}
+html.tablet.tablet.tablet.tablet.tablet.tablet.tablet.tablet.tablet body aside .navbtn.navbtn.navbtn[aria-selected="true"]{opacity:1!important;color:#fff!important;text-shadow:0 0 10px rgba(255,255,255,.55)}
+html.tablet.tablet.tablet.tablet.tablet.tablet.tablet.tablet.tablet body aside .navbtn.navbtn.navbtn[aria-selected="true"]>svg{filter:brightness(1.25) drop-shadow(0 0 5px currentColor) drop-shadow(0 0 12px currentColor)!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -10982,7 +10993,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="936",APPT="2026-11-26T02:42:50Z";   /* APPT: when this update was made */
+const APPV="937",APPT="2026-11-26T02:48:56Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
