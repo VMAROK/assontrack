@@ -4503,6 +4503,12 @@ html.phone body #view#view#view#view#view .panel.nwp.nh .nh-st{height:18px!impor
 html.phone body #view#view#view#view#view .panel.nwp.nh .nh-st>i{display:flex;align-items:center;justify-content:center;min-width:0;overflow:hidden}
 html.phone body #view#view#view#view#view .panel.nwp.nh .nh-st>i>b{font:700 10.5px var(--mono);color:#141414;letter-spacing:0;white-space:nowrap}
 html.phone body #view#view#view#view#view .panel.nwp.nh .nh-mb{margin-top:14px!important}
+/* phone: Meals | Usuals tabs */
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.mu-p.mu-off{display:none!important}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.mu-p{margin-top:14px!important}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .mu-tabs{display:inline-flex;gap:4px;padding:3px;border-radius:99px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .mu-tabs button{all:unset;cursor:pointer;padding:6px 14px;border-radius:99px;font-size:14px;font-weight:600;color:var(--muted)}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .mu-tabs button[aria-selected="true"]{background:rgba(255,255,255,.92);color:#111}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -11081,7 +11087,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="952",APPT="2026-11-26T06:34:13Z";   /* APPT: when this update was made */
+const APPV="953",APPT="2026-11-26T06:40:03Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -11752,5 +11758,17 @@ new MutationObserver(()=>{try{init()}catch(_){}}).observe(document.getElementByI
 (function(){function mv(){try{const h=document.documentElement;if(!h.classList.contains("phone"))return;const v=document.getElementById("view");if(!v||v.dataset.tab!=="fuel")return;const hp=v.querySelector(".holopanel");if(!hp)return;/* the panel alone (its wrapper also holds Add food, which stays put) */const ph=v.querySelector(":scope>.phead");const anchor=ph?ph.nextElementSibling:v.firstElementChild;if(anchor===hp)return;v.insertBefore(hp,anchor);hp.style.marginTop="0"}catch(_){}}
 const r0=window.render;if(typeof r0==="function"){window.render=function(){const o=r0.apply(this,arguments);mv();return o};try{render=window.render}catch(_){}}
 const v=document.getElementById("view");if(v)new MutationObserver(mv).observe(v,{childList:true});mv()})();
+</script>
+<script>
+/* phone Nutrition: Meals and Usuals are one panel — two tabs in its header switch between them */
+(function(){const K="muTab";const get=()=>{try{return nPro()[K]==="us"?"us":"meals"}catch(_){return "meals"}};
+function tabs(on){return `<div class="mu-tabs" role="tablist"><button type="button" role="tab" data-mutab="meals" aria-selected="${on==="meals"}">Meals</button><button type="button" role="tab" data-mutab="us" aria-selected="${on==="us"}">Usuals</button></div>`}
+function apply(){try{const h=document.documentElement,v=document.getElementById("view");if(!h.classList.contains("phone")||!v||v.dataset.tab!=="fuel")return;const m=v.querySelector(".panel.nmp"),u=v.querySelector(".panel.usp");if(!m||!u)return;
+  if(m.nextElementSibling!==u)m.after(u);const on=get();
+  [m,u].forEach(P=>{P.classList.add("mu-p");const t=P.querySelector(":scope>.ph>span:first-child");if(t&&!t.classList.contains("mu-t")){t.classList.add("mu-t");t.dataset.old=t.textContent;t.innerHTML=tabs(on)}else if(t)t.querySelectorAll("[data-mutab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.mutab===on))});
+  m.classList.toggle("mu-off",on!=="meals");u.classList.toggle("mu-off",on!=="us")}catch(_){}}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-mutab]");if(!b)return;e.preventDefault();e.stopPropagation();try{nPro()[K]=b.dataset.mutab;save()}catch(_){}apply()},true);
+const r0=window.render;if(typeof r0==="function"){window.render=function(){const o=r0.apply(this,arguments);apply();return o};try{render=window.render}catch(_){}}
+const v=document.getElementById("view");if(v)new MutationObserver(apply).observe(v,{childList:true,subtree:false});apply()})();
 </script>
 </body></html>
