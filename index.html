@@ -4498,6 +4498,11 @@ html.phone body #view#view#view#view#view .panel.nwp.nh .nh-bar,html.phone body 
 html.phone body #view#view#view#view#view .panel.nwp.nh .nh-w{display:none!important}
 html.phone body #view#view#view#view#view .panel.nwp.nh .nh-ch{padding-bottom:2px!important}
 html.phone body #view#view#view#view#view[data-tab="fuel"]>.holopanel+*{margin-top:14px!important}
+/* the mix bar carries each macro's share as a percentage inside it */
+html.phone body #view#view#view#view#view .panel.nwp.nh .nh-st{height:18px!important;margin-top:2px}
+html.phone body #view#view#view#view#view .panel.nwp.nh .nh-st>i{display:flex;align-items:center;justify-content:center;min-width:0;overflow:hidden}
+html.phone body #view#view#view#view#view .panel.nwp.nh .nh-st>i>b{font:700 10.5px var(--mono);color:#141414;letter-spacing:0;white-space:nowrap}
+html.phone body #view#view#view#view#view .panel.nwp.nh .nh-mb{margin-top:14px!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -6091,7 +6096,7 @@ function nWeekPhone(cells,lab,S,M,sum,bar){
     <div class="nh-card">
       <div class="nh-ch"><b>${dt}</b>${""/* was the Bar/Donut switch: now swipe between them */}<span class="nh-dots" aria-hidden="true"><i class="${bar?"on":""}"></i><i class="${bar?"":"on"}"></i></span></div>
       ${""/* was: bar view showed the 2-column number legend; only the picked view was rendered, so the card changed height */}<div class="nh-vw" data-start="${bar?0:1}" aria-label="Swipe for the bar or donut view">
-      <div class="nh-bar${bar?"":" nh-off"}" aria-hidden="${!bar}"><div class="nh-mh"><span>Macro mix</span><b>${n0(sum)} g</b></div><div class="nh-st">${sum?M.filter(x=>x[1]>0).map(x=>`<i style="flex:${x[1]};background:${x[2]}"></i>`).join(""):""}</div>
+      <div class="nh-bar${bar?"":" nh-off"}" aria-hidden="${!bar}">${""/* was: "Macro mix" heading with the total grams */}<div class="nh-st">${sum?M.filter(x=>x[1]>0).map(x=>{const pc=Math.round(x[1]/sum*100);return `<i style="flex:${x[1]};background:${x[2]}">${pc>=9?`<b>${pc}%</b>`:""}</i>`}).join(""):""}</div>
         <div class="nh-mb">${M.map((x,i)=>{const gv=gl[i],e=x[1],pc=gv?Math.min(100,e/gv*100):0,ov=gv&&e>gv?(e-gv)/e*100:0;/* over the goal: its colour up to the goal, the heavier shade for the extra */return `<div class="nh-r" style="--mc:${x[2]}"><span>${x[0]}</span><i class="nh-t">${ov?`<i style="width:${(100-ov).toFixed(1)}%"></i><i style="width:${ov.toFixed(1)}%;background:color-mix(in srgb,${x[2]} 62%,#000)"></i>`:`<i style="width:${pc.toFixed(1)}%"></i>`}</i><b>${n0(e)}${gv?`<s> / ${n0(gv)}</s>`:""} g</b></div>`}).join("")}</div></div>
       <div class="nh-don${bar?" nh-off":""}" aria-hidden="${bar}"><div class="nh-dl">${donut}<small>Outer · Goal<i></i>Inner · Logged</small></div><div class="nh-dr">${[0,1,2,3].map(leg).join("")}</div></div>
       </div>
@@ -11076,7 +11081,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="951",APPT="2026-11-26T06:32:00Z";   /* APPT: when this update was made */
+const APPV="952",APPT="2026-11-26T06:34:13Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
