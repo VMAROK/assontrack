@@ -4257,6 +4257,38 @@ html body #view .ntop input,html body #view .ntop input:focus{background:transpa
 html body #view .ntop .ntop-l input.tgt-in{border-bottom:1px dashed rgba(201,198,232,.35)!important}
 html body #view .ntop .mgb-v input{border-bottom:1px dashed color-mix(in srgb,var(--mc) 55%,transparent)!important;color:var(--fg,#eef3ff)!important;-webkit-text-fill-color:currentColor!important}
 html.phone body #view .ntop .mgb-v input{border-bottom:0!important}
+/* ===== phone top panel per mockup: Calories | Water on top, a rule, then Macros full width ===== */
+html.phone body #view#view#view#view#view .ntop{grid-template-columns:minmax(0,1fr) 1px minmax(0,1fr)!important;grid-template-areas:"c s1 w" "s2 s2 s2" "m m m";padding:14px 14px 14px!important;border-radius:18px!important;row-gap:0!important}
+html.phone body #view#view#view#view#view .ntop .ntop-c{grid-area:c;padding:0 14px 0 4px!important}
+html.phone body #view#view#view#view#view .ntop .ntop-sep:nth-of-type(1){grid-area:s1;margin:2px 0 8px}
+html.phone body #view#view#view#view#view .ntop .ntop-ws{grid-area:w;padding:0 4px 0 18px!important}
+html.phone body #view#view#view#view#view .ntop .ntop-sep:nth-of-type(2){grid-area:s2;width:auto;height:1px;margin:14px 0 12px}
+html.phone body #view#view#view#view#view .ntop .ntop-m{grid-area:m;padding:0 4px!important}
+html.phone body #view#view#view#view#view .ntop .ntop-h{font-size:9.5px!important;letter-spacing:.24em!important;margin:0 0 6px!important;text-align:left!important}
+html.phone body #view#view#view#view#view .ntop .ntop-k{font-size:30px!important}
+html.phone body #view#view#view#view#view .ntop .ntop-l{justify-content:space-between;font-size:11px!important;gap:6px;margin-top:4px}
+html.phone body #view#view#view#view#view .ntop .ntop-l .ntop-sl{display:none}
+html.phone body #view#view#view#view#view .ntop .ntop-l i{font-style:normal}
+html.phone body #view#view#view#view#view .ntop .kc-ic{width:20px!important;height:20px!important;border-radius:5px!important}
+html.phone body #view#view#view#view#view .ntop .kc-ic svg{width:12px!important;height:12px!important}
+html.phone body #view#view#view#view#view .ntop .ntop-bar{height:5px!important;margin-top:10px!important}
+html.phone body #view#view#view#view#view .ntop .ntop-w{column-gap:16px!important;row-gap:4px!important}
+html.phone body #view#view#view#view#view .ntop .ntop-w>svg.wt-g{width:28px!important;height:42px!important}
+html.phone body #view#view#view#view#view .ntop .ntop-w>.wt-m{width:22px!important;height:22px!important}
+html.phone body #view#view#view#view#view .ntop .ntop-w>b.ntop-wn{font-size:12px!important}
+/* macros rows: name | thin bar with the goal line | eaten / goal */
+html.phone body #view#view#view#view#view .ntop .mgb{gap:6px!important}
+html.phone body #view#view#view#view#view .ntop .mgb .mgb-r{grid-template-columns:62px minmax(0,1fr) 64px!important;column-gap:10px!important;align-items:center!important}
+html.phone body #view#view#view#view#view .ntop .mgb .mgb-n{width:auto!important;font-size:12px!important;font-weight:600!important;text-transform:none!important;letter-spacing:0!important;color:var(--fg,#eef3ff)!important}
+html.phone body #view#view#view#view#view .ntop .mgb .mgb-t{grid-column:2!important;height:7px!important;border-radius:99px!important}
+html.phone body #view#view#view#view#view .ntop .mgb .mgb-f{border-radius:99px!important;min-width:7px!important}
+html.phone body #view#view#view#view#view .ntop .mgb .mgb-f[style*="width:0.0%"]{width:7px!important}
+html.phone body #view#view#view#view#view .ntop .mgb .mgb-k{display:block!important;top:-3px!important;bottom:-3px!important;width:2px!important}
+html.phone body #view#view#view#view#view .ntop .mgb .mgb-v{grid-column:3!important;justify-self:end!important;padding:0!important;height:auto!important;font:600 12px var(--mono)!important;text-shadow:none!important;gap:2px!important}
+html.phone body #view#view#view#view#view .ntop .mgb .mgb-v :is(b,span,input){line-height:1.2!important}
+html.phone body #view#view#view#view#view .ntop .mgb .mgb-v .mgb-g{display:inline!important;color:inherit}
+html.phone body #view#view#view#view#view .ntop .mgb .mgb-sl{color:inherit!important}
+html.phone body #view#view#view#view#view .ntop .mgb .mgb-ov .mgb-v b{color:var(--mc)!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -5677,7 +5709,7 @@ function mgRow(k,l,c,e){const gv=mgGoal(k),f=gv?Math.min(100,e/gv*MGT):(e?100:0)
   return `<div class="mgb-r${ov?" mgb-ov":""}" data-mgb="${k}" style="--mc:${c}"><span class="mgb-n">${l}</span><span class="mgb-v"><b>${n0(e)}</b><span class="mgb-sl">/</span><input data-mgin="${k}" inputmode="numeric" enterkeyhint="done" placeholder="–" value="${gv||""}" style="width:${gv?String(gv).length+.4:2.2}ch" aria-label="${l} goal in grams"><span class="mgb-g">g</span></span><span class="mgb-x"></span><i class="mgb-t"><i class="mgb-f" style="width:${f.toFixed(1)}%;${mgFillBg(c,f)}"></i>${gv?`<i class="mgb-k" style="left:${MGT}%"></i>`:""}</i></div>`}
 /* over the goal: the macro's colour up to the tick, the heavier shade (62% colour, 38% black, as in Breakdown) for the part past it */
 function mgFillBg(c,f){if(f<=MGT)return `background:${c};`;const x=(MGT/f*100).toFixed(1);return `background:linear-gradient(90deg,${c} 0 ${x}%,color-mix(in srgb,${c} 62%,#000) ${x}% 100%);`}
-function mgBars(V){const ph=document.documentElement.classList.contains("phone");return `<div class="mgb">${[["carbs",ph?"Carb":"Carbs"],["protein",ph?"Pro":"Protein"],["fiber",ph?"Fib":"Fiber"],["fat","Fat"]].map(([k,l],i)=>mgRow(k,l,MGCL[i],+V[i]||0)).join("")}</div>`}
+function mgBars(V){const ph=false;/* was: short names on phone */return `<div class="mgb">${[["carbs",ph?"Carb":"Carbs"],["protein",ph?"Pro":"Protein"],["fiber",ph?"Fib":"Fiber"],["fat","Fat"]].map(([k,l],i)=>mgRow(k,l,MGCL[i],+V[i]||0)).join("")}</div>`}
 /* while a goal is being typed, move the bars without re-rendering */
 function mgBarsUpd(V){document.querySelectorAll(".mgb-r[data-mgb]").forEach(r=>{const k=r.dataset.mgb,i=["carbs","protein","fiber","fat"].indexOf(k),e=+V[i]||0,gv=mgGoal(k),f=gv?Math.min(100,e/gv*MGT):(e?100:0),ov=gv&&e>gv?e-gv:0;const F=r.querySelector(".mgb-f");if(F){F.style.width=f.toFixed(1)+"%";F.style.background=mgFillBg(MGCL[i],f).replace(/^background:|;$/g,"")}r.classList.toggle("mgb-ov",!!ov);let K=r.querySelector(".mgb-k");if(gv&&!K){K=document.createElement("i");K.className="mgb-k";K.style.left=MGT+"%";r.querySelector(".mgb-t").appendChild(K)}else if(!gv&&K)K.remove()})}
 /* Nutrition top: one panel, three sections — Calories (eaten, / limit, bar), Water (glass, − , cups), Macros (target bars) */
@@ -5686,7 +5718,7 @@ function nTop(S,T){const k=+S.kcal||0,col=T&&k>T?"#ff5e6c":"#ff9f43",f=T?Math.mi
   const wt=nWaterTile().replace('class="panel tile wtile','class="ntop-w wtile').replace(/<small>Water[^<]*<\/small>/,"").replace(/<em>[\s\S]*?<\/em>/,"").replace(/<b>(\d+)<i>\/(\d+)<\/i><\/b>/,'<b class="ntop-wn"><span>$1</span> / $2 cups</b>');
   return `<div class="panel ntop" style="--kc:${col}">
     <div class="ntop-s ntop-c"><small class="ntop-h">Calories${od}</small><b class="ntop-k">${n0(k)}</b>
-      <div class="ntop-l"><span>/ <input class="tgt-in" id="kcalTgt" inputmode="numeric" value="${T?n0(T):""}" placeholder="Set" aria-label="Daily calorie limit" style="width:${Math.max(3,String(T?n0(T):"Set").length)+.3}ch"> cal limit</span><button type="button" class="kc-ic" data-kcalc aria-label="Calculate my calorie limit" title="Calculate my calorie limit"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2.5"/><rect x="8" y="5.5" width="8" height="3.5" rx=".8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 15.5h.01M12 15.5h.01M15.5 15.5h.01M8.5 18.5h.01M12 18.5h3.5"/></svg></button></div>
+      <div class="ntop-l"><span><i class="ntop-sl">/ </i><input class="tgt-in" id="kcalTgt" inputmode="numeric" value="${T?n0(T):""}" placeholder="Set" aria-label="Daily calorie limit" style="width:${Math.max(3,String(T?n0(T):"Set").length)+.3}ch"> cal limit</span><button type="button" class="kc-ic" data-kcalc aria-label="Calculate my calorie limit" title="Calculate my calorie limit"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2.5"/><rect x="8" y="5.5" width="8" height="3.5" rx=".8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 15.5h.01M12 15.5h.01M15.5 15.5h.01M8.5 18.5h.01M12 18.5h3.5"/></svg></button></div>
       <i class="ntop-bar"><i style="width:${f.toFixed(1)}%"></i></i></div>
     <div class="ntop-sep"></div>
     <div class="ntop-s ntop-ws"><small class="ntop-h">Water${od}</small>${wt}</div>
@@ -10814,7 +10846,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="924",APPT="2026-11-26T00:30:27Z";   /* APPT: when this update was made */
+const APPV="925",APPT="2026-11-26T00:36:48Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
