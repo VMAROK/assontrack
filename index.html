@@ -4511,11 +4511,11 @@ html.phone body #view#view#view#view#view .panel.nwp.nh .nh-mb{margin-top:14px!i
 #view#view[data-tab="fuel"] .bodytop>.stack>:is(.nmp,.usp){margin-top:0!important}
 /* Nutrition · Calories trend: the 4 cards stay in one row of 4 on every screen; on narrow screens the text gets smaller instead of the cards wrapping */
 /* phone Nutrition: shorter title strips */
-html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .panel>.ph:first-child{min-height:0!important;padding-top:4px!important;padding-bottom:4px!important}
-html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .panel.mu-p.usp>.ph:first-child{padding-bottom:6px!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .panel>.ph:first-child{min-height:0!important;padding-top:10px!important;padding-bottom:8px!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .panel.mu-p.usp>.ph:first-child{padding-bottom:10px!important}
 html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .panel:has(>.ph:first-child){padding-top:0!important}
 html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .mu-tabs button{padding:4px 12px!important;font-size:13px!important}
-html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .panel.mu-p>.ph>.mu-plus{width:30px!important;height:30px!important;font-size:17px!important;top:4px!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .panel.mu-p>.ph>.mu-plus{width:30px!important;height:30px!important;font-size:17px!important;top:10px!important}
 html.phone body #view#view#view#view#view#view#view[data-tab="fuel"] .panel>.ph:first-child .seg2 button{padding-top:4px!important;padding-bottom:4px!important}
 html.phone body #view#view#view[data-tab="fuel"] .panel.wtr>.wtr-sum{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
 html.phone body #view#view#view[data-tab="fuel"] .panel.wtr>.wtr-sum>div{height:auto!important;min-height:60px;padding:7px 3px;gap:2px}
@@ -11213,7 +11213,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="964",APPT="2026-11-26T23:12:00Z";   /* APPT: when this update was made */
+const APPV="965",APPT="2026-11-26T23:16:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
