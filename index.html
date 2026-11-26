@@ -4289,6 +4289,19 @@ html.phone body #view#view#view#view#view .ntop .mgb .mgb-v :is(b,span,input){li
 html.phone body #view#view#view#view#view .ntop .mgb .mgb-v .mgb-g{display:inline!important;color:inherit}
 html.phone body #view#view#view#view#view .ntop .mgb .mgb-sl{color:inherit!important}
 html.phone body #view#view#view#view#view .ntop .mgb .mgb-ov .mgb-v b{color:var(--mc)!important}
+/* phone water: glass on the left, count under it, + over − beside it */
+html body #view .ntop .wt-p{display:none}
+html.phone body #view#view#view#view#view .ntop .ntop-w{grid-template-columns:auto auto!important;grid-template-rows:auto auto auto!important;grid-template-areas:"g p" "g m" "n n";justify-content:start!important;justify-items:start!important;column-gap:26px!important;row-gap:8px!important}
+html.phone body #view#view#view#view#view .ntop .ntop-w>svg.wt-g{grid-area:g!important;align-self:center}
+html.phone body #view#view#view#view#view .ntop .ntop-w>.wt-p,html.phone body #view#view#view#view#view .ntop .ntop-w>.wt-m{display:grid!important;place-items:center;position:static!important;width:24px!important;height:24px!important;border-radius:50%!important;padding:0!important;font-size:15px!important;line-height:1!important;color:#4cc9ff!important;background:none!important;border:1.5px solid rgba(76,201,255,.45)!important;box-shadow:none!important}
+html.phone body #view#view#view#view#view .ntop .ntop-w>.wt-p{grid-area:p!important;align-self:end}
+html.phone body #view#view#view#view#view .ntop .ntop-w>.wt-m{grid-area:m!important;align-self:start}
+html.phone body #view#view#view#view#view .ntop .ntop-w>.wt-m:disabled{opacity:.4}
+html.phone body #view#view#view#view#view .ntop .ntop-w>b.ntop-wn{grid-area:n!important;justify-self:start!important;text-align:left!important}
+/* phone calculator: top left of the Calories section, label beside it */
+html.phone body #view#view#view#view#view .ntop .ntop-c{position:relative}
+html.phone body #view#view#view#view#view .ntop .ntop-c .kc-ic{position:absolute!important;top:-3px;left:4px}
+html.phone body #view#view#view#view#view .ntop .ntop-c .ntop-h{padding-left:28px}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -5715,7 +5728,7 @@ function mgBarsUpd(V){document.querySelectorAll(".mgb-r[data-mgb]").forEach(r=>{
 /* Nutrition top: one panel, three sections — Calories (eaten, / limit, bar), Water (glass, − , cups), Macros (target bars) */
 function nTop(S,T){const k=+S.kcal||0,col=T&&k>T?"#ff5e6c":"#ff9f43",f=T?Math.min(100,k/T*100):0,od=nD()===today()?"":" · "+nDayLbl(nD());
   const V=[+S.carbs||0,+S.pro||0,+S.fiber||0,+S.fat||0];mgV=V;
-  const wt=nWaterTile().replace('class="panel tile wtile','class="ntop-w wtile').replace(/<small>Water[^<]*<\/small>/,"").replace(/<em>[\s\S]*?<\/em>/,"").replace(/<b>(\d+)<i>\/(\d+)<\/i><\/b>/,'<b class="ntop-wn"><span>$1</span> / $2 cups</b>');
+  const wt=nWaterTile().replace('class="panel tile wtile','class="ntop-w wtile').replace(/<small>Water[^<]*<\/small>/,"").replace(/<em>[\s\S]*?<\/em>/,"").replace(/<b>(\d+)<i>\/(\d+)<\/i><\/b>/,'<b class="ntop-wn"><span>$1</span> / $2 cups</b>').replace('<button type="button" class="wt-m"','<button type="button" class="wt-p" data-nwat="1" aria-label="Add a cup">+</button><button type="button" class="wt-m"');
   return `<div class="panel ntop" style="--kc:${col}">
     <div class="ntop-s ntop-c"><small class="ntop-h">Calories${od}</small><b class="ntop-k">${n0(k)}</b>
       <div class="ntop-l"><span><i class="ntop-sl">/ </i><input class="tgt-in" id="kcalTgt" inputmode="numeric" value="${T?n0(T):""}" placeholder="Set" aria-label="Daily calorie limit" style="width:${Math.max(3,String(T?n0(T):"Set").length)+.3}ch"> cal limit</span><button type="button" class="kc-ic" data-kcalc aria-label="Calculate my calorie limit" title="Calculate my calorie limit"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2.5"/><rect x="8" y="5.5" width="8" height="3.5" rx=".8"/><path d="M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 15.5h.01M12 15.5h.01M15.5 15.5h.01M8.5 18.5h.01M12 18.5h3.5"/></svg></button></div>
@@ -10846,7 +10859,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="925",APPT="2026-11-26T00:36:48Z";   /* APPT: when this update was made */
+const APPV="926",APPT="2026-11-26T00:40:29Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
