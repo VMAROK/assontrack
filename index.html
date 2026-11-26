@@ -7414,7 +7414,7 @@ const MUSEX={chest:["Bench press","Incline dumbbell press","Push-up","Cable fly"
  traps:["Shrug","Upright row","Face pull"],upperback:["Barbell row","Seated cable row","Face pull"],lats:["Pull-up","Lat pulldown","Barbell row"],lowerback:["Back extension","Deadlift","Good morning"],glutes:["Hip thrust","Squat","Romanian deadlift"],
  abductors:["Hip abduction","Side-lying leg raise","Banded walk"],adductors:["Hip adduction","Copenhagen plank","Sumo squat"],quads:["Squat","Leg press","Leg extension","Lunge"],hamstrings:["Romanian deadlift","Leg curl","Nordic curl"],calves:["Standing calf raise","Seated calf raise"]};
 function musLast(d,k){const pl=d.plans||[];const W=byDate(d.workouts).reverse();for(const w of W){const p=w.plan&&pl.find(x=>x.id===w.plan),m=musNorm((p&&p.mus&&Object.keys(p.mus).length?p.mus:null)||exMus(w.name)||{});if(m[k])return w.d}return null}
-function musPick(g){musSel=g;if(H3&&H3.setSel)H3.setSel(g);const box=document.getElementById("musCard");if(box)box.outerHTML=musCard();else{const h=document.querySelector(".holopanel .hfit");h&&h.insertAdjacentHTML("beforebegin",musCard())}}
+function musPick(g){musSel=g;if(H3F&&H3F.setSel)H3F.setSel(g);const box=document.getElementById("musCard");if(box)box.outerHTML=musCard();else{const h=document.querySelector(".holopanel .hfit");h&&h.insertAdjacentHTML("beforebegin",musCard())}}
 function musCard(){if(musSel==null||!MUS[musSel])return `<div id="musCard" hidden></div>`;const d=D(),[k,nm]=MUS[musSel],S=musWeek(d),sets=Math.round(S[k]||0),last=musLast(d,k);
   return `<div id="musCard" class="mus-card" style="--mc:${MUSC[musSel]}"><div class="mc-top"><i></i><b>${nm}</b><button class="x" data-muscx aria-label="Close">×</button></div>
     <div class="mc-stats"><span><b>${sets}</b> set${sets===1?"":"s"} this week</span><span>${last?"Last trained "+(last===today()?"today":fmtDate(last)):"Not trained yet"}</span></div>
@@ -9051,8 +9051,8 @@ float musAt(vec3 c,out float ed,out float dep,out vec3 mc){float id=-1.;ed=99.;d
   function stop(){cancelAnimationFrame(raf);raf=0}
   return {canvas,cam,set,start,stop,fitPut,pick,setSel,fitHas:g=>!!fitData[g],mount(el){host=el;if(canvas.parentNode!==el)el.appendChild(canvas);size();start()},renderNow(){size();last=0;frame(performance.now());cancelAnimationFrame(raf);raf=0}}}
 
-let H3=null,h3Load=null,h3Fail=false,holoPreview=null,holoPrevTimer=0;
-function h3Ensure(){if(h3Load||h3Fail)return;h3Load=import("./lib/three-r160.module.js").then(T=>{H3=h3Init(T);if(!H3)h3Fail=true;if(tab!=="set")render()}).catch(()=>{h3Fail=true})}
+let H3=null,H3F=null/* the body hologram's own engine */,h3Load=null,h3Fail=false,holoPreview=null,holoPrevTimer=0;
+function h3Ensure(){if(h3Load||h3Fail)return;h3Load=import("./lib/three-r160.module.js").then(T=>{H3=h3Init(T);H3F=H3&&h3Init(T);/* was: one engine for both figures */if(!H3||!H3F)h3Fail=true;if(tab!=="set")render()}).catch(()=>{h3Fail=true})}
 function commitScore(only){const d=D(),P=only||d.passions,W={Priority:3,Moderate:2,Bonus:1};let sw=0,ss=0;
   P.forEach(p=>{const sc0=schedStats(d,p),tk=taskStats(p),dn=sc0.done+tk.done,ms=sc0.missed+tk.missed,gm=(p.goal||0)*60,tot=d.sessions.filter(s=>s.pid===p.id&&!s.planned).reduce((a,s)=>a+(+s.mins||0),0);
     const pct=dn+ms>0?dn/(dn+ms):(gm?tot/gm:null);if(pct==null)return;const w=W[p.lvl]||2;sw+=w;ss+=w*Math.min(pct,1)});return sw?Math.round(ss/sw*100):null}
@@ -9124,7 +9124,9 @@ function fitLevel(d){const days=new Set(d.workouts.filter(w=>{const a=(Date.now(
   if(nx){const need=Math.max(1,Math.ceil((b==null?nx[1]:(nx[1]-b*.2)/.8)*8-days));cap=`${days} training day${days===1?"":"s"} in the last 2 weeks. ${need} more to reach ${nx[0]}.`}
   return {m,name:FITST[i][0],cap,days,i}}
 /* the body hologram (Nutrition/Training/Body) has its own plain figure: only man/woman (its own setting) and the level — nothing from the custom figure */
-const fitBody=()=>{const pr=data.profile||{};if(pr.fitBody==="man"||pr.fitBody==="woman")return pr.fitBody;const b=avatarOf().body;return b==="man"?"man":"woman"};
+const fitBody=()=>{const pr=data.profile||{};/* condition: the hologram takes the user's own sex (the one the calorie calculator uses, data.profile.body.sex) — only when it's set as man or woman */
+  const sx=(pr.body||{}).sex;if(sx==="m")return "man";if(sx==="f")return "woman";
+  return pr.fitBody==="man"?"man":"woman"/* not set yet: the gear choice, else woman. (was: fell back to the custom figure's body) */};
 const fitAv=()=>{const a={body:fitBody()};for(const k in AV_ITEMS)a[k]=AV_DEF[k];a.colors={};a.fx={kind:"none",color:"#4cc9ff",amount:0};a.useModel=false;/* was: const a=avatarOf(); */a.hat=a.top=a.shoes="none";a.wings="";a.cmode="solid";a.fit=fitLevel(D()).m;if(tab==="train")a.mheat=musHeat(D());const bm=bmiInfo(D());a.fitW=bm.bmi==null?null:Math.round(bmiW(bm.bmi)*40)/40;return a};
 const figAv=()=>{const a=avatarOf();if(realStage()!=="real")a.cmode="figure";return a};
 const fitLoad={};
@@ -9132,17 +9134,30 @@ let musLoad=null;function musEnsure(){if(musLoad||!window.H3ecoPut)return;
   musLoad=Promise.all([import("./lib/jsm/loaders/GLTFLoader.js"),import("./lib/jsm/libs/meshopt_decoder.module.js"),fetch("lib/ecorche-map-1.json").then(r=>{if(!r.ok)throw 0;return r.json()})])
     .then(([{GLTFLoader},{MeshoptDecoder},map])=>new Promise((ok,no)=>{const l=new GLTFLoader();l.setMeshoptDecoder(MeshoptDecoder);l.load("lib/ecorche-1.glb",g=>ok([g.scene,map]),undefined,no)}))
     .then(([root,map])=>{window.H3ecoPut(root,map);if(figFit())holoMount()}).catch(e=>{console.warn("anatomy model",e);setTimeout(()=>{musLoad=null},8000)})}
-function fitEnsure(g){if(tab==="train")musEnsure();if(!H3||H3.fitHas(g)||fitLoad[g])return;fitLoad[g]=fetch("lib/body2-"+g+".txt").then(r=>{if(!r.ok)throw 0;return r.text()}).then(t=>{const q=atob(t.trim()),u=new Uint8Array(q.length);for(let i=0;i<q.length;i++)u[i]=q.charCodeAt(i);H3.fitPut(g,u.buffer);if(figFit())holoMount()}).catch(()=>{setTimeout(()=>{fitLoad[g]=null;if(figFit())holoMount()},6000)})}
+function fitEnsure(g){if(tab==="train")musEnsure();if(!H3F||H3F.fitHas(g)||fitLoad[g])return;fitLoad[g]=fetch("lib/body2-"+g+".txt").then(r=>{if(!r.ok)throw 0;return r.text()}).then(t=>{const q=atob(t.trim()),u=new Uint8Array(q.length);for(let i=0;i<q.length;i++)u[i]=q.charCodeAt(i);H3F.fitPut(g,u.buffer);if(figFit())holoMount()}).catch(()=>{setTimeout(()=>{fitLoad[g]=null;if(figFit())holoMount()},6000)})}
+function holoMount(){const el=document.querySelector("[data-h3]");if(!el||!H3||!H3F){if(H3)H3.stop();if(H3F)H3F.stop();return}
+  const fit=figFit(),E=fit?H3F:H3;(fit?H3:H3F).stop();/* only the engine on screen runs */
+  if(fit){/* body hologram: its own figure, its own engine — nothing from the custom figure */
+    const a=fitAv(),g=a.body==="man"?"m":"f";fitEnsure(g);
+    if(!E.fitHas(g)){el.classList.add("h3wait","loading");return}
+    a.fitMesh=g;E.set(a,"holo");el.classList.remove("loading")}
+  else{const a=figAv(),hs=holoStage(),m=a.useModel&&a.model;
+    if(m){const k=mKey(m);if(mdl.key!==k)loadModel(m);if(mdl.key===k&&mdl.obj){mdl.mtl=m.mtl||null;E.set(a,hs,mdl);el.classList.remove("loading")}else{E.set(a,hs);el.classList.toggle("loading",!mdl.fail)}}
+    else{E.set(a,hs);el.classList.remove("loading")}}
+  el.classList.add("h3wait");requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.remove("h3wait")));
+  E.mount(el);if(heavyPaused)E.stop()}
+/* was (one engine for both figures):
 function holoMount(){const el=document.querySelector("[data-h3]");if(!el||!H3){if(H3)H3.stop();return}
   const fit=figFit(),a=fit?fitAv():figAv();let hs=fit?"real":holoStage();
   if(fit){const g=a.body==="woman"?"f":a.body==="man"?"m":"n";if(g==="n"){fitEnsure("m");fitEnsure("f")}else fitEnsure(g);a.useModel=false;if(H3.fitHas(g)){a.fitMesh=g;hs="holo"}
-    /* body hologram only: never show the customised figure while the body mesh loads, nor the last frame left on the canvas from another tab */
+    /* body hologram only: never show the customised figure while the body mesh loads, nor the last frame left on the canvas from another tab * /
     else{el.classList.add("h3wait","loading");return}}
   el.classList.add("h3wait");requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.remove("h3wait")));
   const m=a.useModel&&a.model;
   if(m){const k=mKey(m);if(mdl.key!==k)loadModel(m);if(mdl.key===k&&mdl.obj){mdl.mtl=m.mtl||null;H3.set(a,hs,mdl);el.classList.remove("loading")}else{H3.set(a,hs);el.classList.toggle("loading",!mdl.fail)}}
   else{H3.set(a,hs);el.classList.remove("loading")}
   H3.mount(el);if(heavyPaused)H3.stop()}
+*/
 function parseMtl(t){const out={};let cur=null;t.split(/\r?\n/).forEach(l=>{const a=l.trim().split(/\s+/);if(a[0]==="newmtl")cur=a.slice(1).join(" ");else if(a[0]==="Kd"&&cur)out[cur]=a.slice(1,4).map(Number)});return out}
 async function addModel(f,mtlFile){const ext=(f.name.split(".").pop()||"").toLowerCase();
   if(!MODEL_EXT.includes(ext)){toast("Use a .glb, .gltf, .fbx or .obj file");return}
@@ -9248,7 +9263,7 @@ const holoGo=()=>{if(!holoRAF)holoRAF=requestAnimationFrame(holoTick)};
 document.addEventListener("pointerdown",e=>{const h=e.target.closest&&e.target.closest(".holo");if(!h)return;holoDrag={x0:e.clientX,x:e.clientX,t0:performance.now(),moved:false,id:e.pointerId};holoV=0;h.classList.add("grab");try{h.setPointerCapture(e.pointerId)}catch(_){}holoGo()});
 document.addEventListener("pointermove",e=>{if(!holoDrag||e.pointerId!==holoDrag.id)return;const dx=e.clientX-holoDrag.x;holoDrag.x=e.clientX;if(Math.abs(e.clientX-holoDrag.x0)>4)holoDrag.moved=true;if(holoDrag.moved){holoRot+=dx*.9;holoV=dx*.9;holoApply()}});
 const holoUp=e=>{if(!holoDrag||e.pointerId!==holoDrag.id)return;
-  if(!holoDrag.moved&&tab==="train"&&H3&&H3.pick&&performance.now()-holoDrag.t0<450){const g=H3.pick(e.clientX,e.clientY);if(g!=null){musPick(g>=0&&g!==musSel?g:null);holoDrag=null;const h=document.querySelector(".holo");h&&h.classList.remove("grab");return}}
+  if(!holoDrag.moved&&tab==="train"&&H3F&&H3F.pick&&performance.now()-holoDrag.t0<450){const g=H3F.pick(e.clientX,e.clientY);if(g!=null){musPick(g>=0&&g!==musSel?g:null);holoDrag=null;const h=document.querySelector(".holo");h&&h.classList.remove("grab");return}}
   if(!holoDrag.moved)holoV=4.5;holoDrag=null;const h=document.querySelector(".holo");h&&h.classList.remove("grab");holoGo()};
 document.addEventListener("pointerup",holoUp);document.addEventListener("pointercancel",holoUp);
 document.addEventListener("contextmenu",e=>{if(e.target.closest&&e.target.closest(".holo"))e.preventDefault()});
@@ -10559,7 +10574,7 @@ function liveOn(key){const c=$("#bglive");if(!c||liveFail)return false;if(!liveE
   if(liveKey!==key){liveEng.setPal(key);liveKey=key}cancelAnimationFrame(liveRAF);const loop=now=>{liveRAF=requestAnimationFrame(loop);if(now-liveLast<32)return;liveLast=now;liveEng.draw((now-liveT0)/1000*1.4)};liveRAF=requestAnimationFrame(loop);c.classList.add("on");return true}
 /* while typing (and on the sign-in screen) pause the live wallpaper and the 3D figure, so the phone has room for its keyboard */
 let heavyPaused=false;const isField=el=>el&&el.matches&&el.matches("input:not([type=range]):not([type=file]):not([type=checkbox]):not([type=radio]),textarea,select");
-function pauseHeavy(on){if(on===heavyPaused)return;heavyPaused=on;if(on){cancelAnimationFrame(liveRAF);liveRAF=0;if(typeof H3!=="undefined"&&H3)H3.stop()}else{const c=$("#bglive");if(liveKey&&c&&c.classList.contains("on"))liveOn(liveKey);if(typeof holoMount==="function")holoMount()}}
+function pauseHeavy(on){if(on===heavyPaused)return;heavyPaused=on;if(on){cancelAnimationFrame(liveRAF);liveRAF=0;if(typeof H3!=="undefined"&&H3)H3.stop();if(typeof H3F!=="undefined"&&H3F)H3F.stop()}else{const c=$("#bglive");if(liveKey&&c&&c.classList.contains("on"))liveOn(liveKey);if(typeof holoMount==="function")holoMount()}}
 document.addEventListener("focusin",e=>{if(isField(e.target))pauseHeavy(true)});
 document.addEventListener("focusout",()=>{setTimeout(()=>{if(!isField(document.activeElement)&&!document.body.classList.contains("authing"))pauseHeavy(false)},150)});
 function liveOff(){const c=$("#bglive");if(c)c.classList.remove("on");const k=liveRAF;setTimeout(()=>{if(liveRAF===k)cancelAnimationFrame(k)},450)}
@@ -11150,7 +11165,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="960",APPT="2026-11-26T22:40:49Z";   /* APPT: when this update was made */
+const APPV="961",APPT="2026-11-26T22:45:56Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -11849,6 +11864,6 @@ const v=document.getElementById("view");if(v)new MutationObserver(apply).observe
 <script>
 /* body hologram's own settings: open/close, and man/woman */
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-fitedit],[data-fitsex]");if(!t)return;e.preventDefault();e.stopPropagation();
-  if(t.dataset.fitsex){data.profile=Object.assign({},data.profile,{fitBody:t.dataset.fitsex});save()}else fitEdit=!fitEdit;render()},true);
+  if(t.dataset.fitsex){const pr=data.profile=Object.assign({},data.profile,{fitBody:t.dataset.fitsex});pr.body=Object.assign({unit:"us",act:"mod",goal:"keep"},pr.body||{},{sex:t.dataset.fitsex==="man"?"m":"f"});/* one source: the same man/woman the calorie calculator uses */save()}else fitEdit=!fitEdit;render()},true);
 </script>
 </body></html>
