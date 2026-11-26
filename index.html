@@ -4504,6 +4504,26 @@ html.phone body #view#view#view#view#view .panel.nwp.nh .nh-st>i{display:flex;al
 html.phone body #view#view#view#view#view .panel.nwp.nh .nh-st>i>b{font:700 10.5px var(--mono);color:#141414;letter-spacing:0;white-space:nowrap}
 html.phone body #view#view#view#view#view .panel.nwp.nh .nh-mb{margin-top:14px!important}
 /* phone: Meals | Usuals tabs */
+#view#view[data-tab="fuel"] .panel.mu-p.mu-off{display:none!important}
+#view#view[data-tab="fuel"] .mu-tabs{display:inline-flex;gap:4px;padding:3px;border-radius:99px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+#view#view[data-tab="fuel"] .mu-tabs button{all:unset;cursor:pointer;padding:6px 14px;border-radius:99px;font-size:14px;font-weight:600;color:var(--muted)}
+#view#view[data-tab="fuel"] .mu-tabs button[aria-selected="true"]{background:rgba(255,255,255,.92);color:#111}
+#view#view[data-tab="fuel"] .bodytop>.stack>:is(.nmp,.usp){margin-top:0!important}
+/* Nutrition · Calories trend: the 4 cards stay in one row of 4 on every screen; on narrow screens the text gets smaller instead of the cards wrapping */
+html body #view#view#view[data-tab="fuel"] .panel.wtr>.wtr-sum{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
+html.phone body #view#view#view[data-tab="fuel"] .panel.wtr>.wtr-sum>div{height:auto!important;min-height:60px;padding:7px 3px;gap:2px}
+html.phone body #view#view#view[data-tab="fuel"] .panel.wtr>.wtr-sum small{font-size:9.5px!important;white-space:nowrap}
+html.phone body #view#view#view[data-tab="fuel"] .panel.wtr>.wtr-sum b{font-size:12.5px!important;white-space:nowrap}
+html.phone body #view#view#view[data-tab="fuel"] .panel.wtr>.wtr-sum em{font-size:8.5px!important;white-space:normal!important;line-height:1.2}
+html body #view#view#view#view#view#view[data-tab="fuel"] .panel.mu-p>.ph{position:relative!important;padding-right:60px!important}
+html body #view#view#view#view#view#view[data-tab="fuel"] .panel.mu-p>.ph>.mu-plus{all:unset;box-sizing:border-box;position:absolute;top:50%;right:12px;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;display:grid;place-items:center;cursor:pointer;font-size:20px;font-weight:600;line-height:1;color:#fff;background:rgba(var(--tL),.22);border:1px solid rgba(var(--tL),.55)}
+html.phone body #view#view#view#view#view#view[data-tab="fuel"] .panel.mu-p>.ph>.mu-plus{top:8px;transform:none}
+.fl-sheet{position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top,0px)) 16px max(16px,env(safe-area-inset-bottom,0px))}
+html.fl-open,html.fl-open body{overflow:hidden!important}
+.fl-box{position:relative;width:min(760px,100%);height:min(720px,100%);display:flex;flex-direction:column}
+#view .fl-box>.flogp.flogp{flex:1 1 auto;min-height:0;height:auto;margin:0!important;display:flex;flex-direction:column;overflow:hidden}
+#view .fl-box>.flogp>.ph:first-child{padding-right:56px!important}
+.fl-x{all:unset;position:absolute;top:6px;right:8px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;cursor:pointer;font-size:16px;color:#fff;background:rgba(255,255,255,.12);z-index:3}
 html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.mu-p.mu-off{display:none!important}
 html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.mu-p{margin-top:14px!important}
 html.phone body #view#view#view#view#view[data-tab="fuel"] .mu-tabs{display:inline-flex;gap:4px;padding:3px;border-radius:99px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
@@ -5902,10 +5922,24 @@ function vFuel(){
   ${nWeekPanel(d,S)}
   <div class="passtop figtop bodytop fueltop" style="margin-top:18px">${figurePanel()}
    <div class="stack">
-    ${foodLogPanel(S)}
+    ${nPro().nMode==="calc"?nCalc(S):nMeals(S)}${usPanel()}
    </div></div>
-  <!-- the Meals / Calculator switch now sits inside the panel header -->${nPro().nMode==="calc"?nCalc(S):nMeals(S)}${usPanel()}${fuelTrend(S)}`;
+  ${fuelTrend(S)}${flSheet(S)}`;
 }
+/* Add food opens as a window from the ＋ on the Meals / Usuals panel */
+let flOpen=false;
+function flSheet(S){if(!flOpen&&!fForm)return "";return `<div class="fl-sheet" data-flbg><div class="fl-box">${foodLogPanel(S)}<button type="button" class="fl-x" data-flclose aria-label="Close Add food">✕</button></div></div>`}
+document.addEventListener("click",e=>{const t=e.target;if(!t.closest)return;
+  if(t.closest("[data-flopen]")){e.preventDefault();e.stopPropagation();flOpen=true;render();return}
+  if(t.closest("[data-flclose]")||(t.matches&&t.matches(".fl-sheet"))){e.preventDefault();e.stopPropagation();flOpen=false;fForm=null;render()}},true);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.querySelector(".fl-sheet")){flOpen=false;fForm=null;render()}});
+/* the page is drawn scaled inside .shell, so "fixed" sits relative to it: place the window over exactly what's on screen, and hold the page still while it's open */
+function flPlace(){const sh=document.querySelector(".fl-sheet"),H=document.documentElement;if(!sh){if(H.classList.contains("fl-open")){H.classList.remove("fl-open")}return}
+  H.classList.add("fl-open");let a=sh.parentElement;while(a&&a!==H&&getComputedStyle(a).transform==="none")a=a.parentElement;
+  if(!a||a===H){sh.style.cssText="";return}const R=a.getBoundingClientRect(),k=(R.width/a.offsetWidth)||1;
+  sh.style.cssText=`inset:auto;top:${-R.top/k}px;left:${-R.left/k}px;width:${innerWidth/k}px;height:${innerHeight/k}px`}
+(function(){const r0=window.render;if(typeof r0==="function"){window.render=function(){const o=r0.apply(this,arguments);try{flPlace()}catch(_){}return o};try{render=window.render}catch(_){}}
+  addEventListener("resize",()=>{try{flPlace()}catch(_){}});const v=document.getElementById("view");if(v)new MutationObserver(()=>{try{flPlace()}catch(_){}}).observe(v,{childList:true})})();
 /* ---------- nutrition: day picker, meals as sections, quick re-log, water, donut, calculator ---------- */
 const NMC={Breakfast:"#ffd166",Lunch:"#3ddc84",Dinner:"#7c8cff",Snack:"#ff6fb5"};
 let nwOff=0,nDay=null,nWk=0,nDon="meal",nEdit=null,nDrag=null,nHeld=null,nCmT=null,nHoldT=null;
@@ -6273,9 +6307,15 @@ const nItems=()=>[...document.querySelectorAll(".nm-card[data-nm],.nm-row[data-n
 function nPaintAt(x,y){if(!nPaint||!nSelM)return;const el=document.elementFromPoint(x,y),c=el&&el.closest&&el.closest(".nm-card[data-nm],.nm-row[data-nm]");if(!c||c.dataset.nm===nPaint.last)return;nPaint.last=c.dataset.nm;
   const L=nItems(),a=L.findIndex(n=>n.dataset.nm===nPaint.anchor),b=L.indexOf(c);if(a<0){nSelSet(c,nPaint.add);return}const lo=Math.min(a,b),hi=Math.max(a,b);L.forEach((n,i)=>{const id=n.dataset.nm,want=i>=lo&&i<=hi?nPaint.add:nPaint.base.has(id);if(nSelM.has(id)!==want)nSelSet(n,want)})}
 function nPaintDown(x,y,tg){if(!nSelM)return false;const c=tg.closest&&tg.closest(".nm-card[data-nm],.nm-row[data-nm]");if(!c)return false;const on=!nSelM.has(c.dataset.nm);nPaint={add:on,last:c.dataset.nm,anchor:c.dataset.nm,base:new Set(nSelM)};nSelSet(c,on);nSwJust=Date.now();return true}
-document.addEventListener("touchstart",e=>{if(e.touches.length===1&&nSelM)nPaintDown(e.touches[0].clientX,e.touches[0].clientY,e.target)},{capture:true,passive:true});
-document.addEventListener("touchmove",e=>{if(!nPaint||!nSelM)return;if(e.cancelable)e.preventDefault();const t=e.touches[0];nPaintAt(t.clientX,t.clientY)},{capture:true,passive:false});
-["touchend","touchcancel"].forEach(k=>document.addEventListener(k,()=>{if(nPaint){nPaint=null;nSwJust=Date.now()}},true));
+/* while selecting: a quick tap toggles one item; press, hold a moment, then drag = select across items; press and move up/down right away = scroll (no selecting); move sideways right away = select */
+let nPend=null;
+document.addEventListener("touchstart",e=>{if(e.touches.length!==1||!nSelM||nPaint)return;const t=e.touches[0],tg=e.target,c=tg.closest&&tg.closest(".nm-card[data-nm],.nm-row[data-nm]");if(!c)return;
+  clearTimeout(nPend&&nPend.tm);nPend={x:t.clientX,y:t.clientY,tg,armed:false};nPend.tm=setTimeout(()=>{if(nPend&&!nPend.moved&&nSelM){nPend.armed=true;nPaintDown(nPend.x,nPend.y,nPend.tg);try{navigator.vibrate&&navigator.vibrate(10)}catch(_){}}},260)},{capture:true,passive:true});
+document.addEventListener("touchmove",e=>{if(!nSelM)return;const t=e.touches[0];
+  if(nPaint){if(e.cancelable)e.preventDefault();nPaintAt(t.clientX,t.clientY);return}
+  if(!nPend)return;const dx=t.clientX-nPend.x,dy=t.clientY-nPend.y;if(Math.abs(dx)<8&&Math.abs(dy)<8)return;nPend.moved=true;clearTimeout(nPend.tm);
+  if(Math.abs(dx)>Math.abs(dy)&&e.cancelable){e.preventDefault();nPaintDown(nPend.x,nPend.y,nPend.tg);nPend=null;nPaintAt(t.clientX,t.clientY)}else nPend=null},{capture:true,passive:false});
+["touchend","touchcancel"].forEach(k=>document.addEventListener(k,e=>{if(nPend){clearTimeout(nPend.tm);if(k==="touchend"&&!nPend.moved&&!nPend.armed&&nSelM&&nPaintDown(nPend.x,nPend.y,nPend.tg))nPaint=null;nPend=null}if(nPaint){nPaint=null;nSwJust=Date.now()}},true));
 document.addEventListener("pointerdown",e=>{if(e.pointerType==="mouse"&&nSelM)nPaintDown(e.clientX,e.clientY,e.target)},true);
 document.addEventListener("pointermove",e=>{if(e.pointerType==="mouse"&&nPaint&&e.buttons)nPaintAt(e.clientX,e.clientY)},true);
 document.addEventListener("pointerup",e=>{if(e.pointerType==="mouse"&&nPaint){nPaint=null;nSwJust=Date.now()}},true);
@@ -11165,7 +11205,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="961",APPT="2026-11-26T22:45:56Z";   /* APPT: when this update was made */
+const APPV="962",APPT="2026-11-26T23:20:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -11850,14 +11890,15 @@ const r0=window.render;if(typeof r0==="function"){window.render=function(){const
 const v=document.getElementById("view");if(v)new MutationObserver(mv).observe(v,{childList:true});mv()})();
 </script>
 <script>
-/* phone Nutrition: Meals and Usuals are one panel — two tabs in its header switch between them */
-(function(){const K="muTab";const get=()=>{try{return nPro()[K]==="us"?"us":"meals"}catch(_){return "meals"}};
+/* Nutrition: Meals and Usuals are one panel — two tabs in its header switch between them (all screen sizes); opens on Meals; ＋ opens Add food */
+(function(){let cur="meals";const get=()=>cur;
 function tabs(on){return `<div class="mu-tabs" role="tablist"><button type="button" role="tab" data-mutab="meals" aria-selected="${on==="meals"}">Meals</button><button type="button" role="tab" data-mutab="us" aria-selected="${on==="us"}">Usuals</button></div>`}
-function apply(){try{const h=document.documentElement,v=document.getElementById("view");if(!h.classList.contains("phone")||!v||v.dataset.tab!=="fuel")return;const m=v.querySelector(".panel.nmp"),u=v.querySelector(".panel.usp");if(!m||!u)return;
+function apply(){try{const h=document.documentElement,v=document.getElementById("view");if(!v||v.dataset.tab!=="fuel")return;const m=v.querySelector(".panel.nmp"),u=v.querySelector(".panel.usp");if(!m||!u)return;
   if(m.nextElementSibling!==u)m.after(u);const on=get();
   [m,u].forEach(P=>{P.classList.add("mu-p");const t=P.querySelector(":scope>.ph>span:first-child");if(t&&!t.classList.contains("mu-t")){t.classList.add("mu-t");t.dataset.old=t.textContent;t.innerHTML=tabs(on)}else if(t)t.querySelectorAll("[data-mutab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.mutab===on))});
+  [m,u].forEach(P=>{const ph=P.querySelector(":scope>.ph");if(ph&&!ph.querySelector(":scope>.mu-plus"))ph.insertAdjacentHTML("beforeend",`<button type="button" class="mu-plus" data-flopen aria-label="Add food" title="Add food">＋</button>`)});
   m.classList.toggle("mu-off",on!=="meals");u.classList.toggle("mu-off",on!=="us")}catch(_){}}
-document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-mutab]");if(!b)return;e.preventDefault();e.stopPropagation();try{nPro()[K]=b.dataset.mutab;save()}catch(_){}apply()},true);
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-mutab]");if(!b)return;e.preventDefault();e.stopPropagation();cur=b.dataset.mutab==="us"?"us":"meals";apply()},true);
 const r0=window.render;if(typeof r0==="function"){window.render=function(){const o=r0.apply(this,arguments);apply();return o};try{render=window.render}catch(_){}}
 const v=document.getElementById("view");if(v)new MutationObserver(apply).observe(v,{childList:true,subtree:false});apply()})();
 </script>
