@@ -4450,7 +4450,13 @@ html.phone body #view>.sitefoot.sitefoot{display:none!important}
 @media (display-mode:standalone){html body #view>.sitefoot.sitefoot{display:none!important}}
 /* ===== phone top: every tab's title row (logo | tab name) starts below the status bar, and the status bar band is solid so scrolled content is cut off at its edge ===== */
 html.phone body #view#view#view#view#view#view{padding-top:calc(env(safe-area-inset-top,0px) + 8px)!important}
-html.phone body::after{background:var(--topsolid,#050505)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;z-index:60!important}
+/* html.phone body::after{background:var(--topsolid,#050505)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;z-index:60!important} */
+/* no band behind the status bar: the page itself fills the whole top, round the island */
+html.phone body::after{display:none!important}
+/* ===== phone tab title: just the tab's name (Dashboard, Nutrition…) as the heading over the panels — no AssOnTrack logo ===== */
+html.phone body .phead .ph-logo,html.phone body .phead .ph-sep{display:none!important}
+html.phone body .phead{padding:4px 4px 14px!important}
+html.phone body .phead .ph-t{font-size:28px!important;font-weight:700!important;letter-spacing:-.02em!important;color:var(--fg,#f2f2f5)}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -11029,7 +11035,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="940",APPT="2026-11-26T03:39:06Z";   /* APPT: when this update was made */
+const APPV="941",APPT="2026-11-26T03:43:49Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
