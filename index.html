@@ -4172,10 +4172,20 @@ html .tile .mgb-v input{background:transparent!important;box-shadow:none!importa
 .mgb-f{position:absolute;left:0;top:0;bottom:0;min-width:8px;border-radius:99px;background:var(--mc);transition:width .55s cubic-bezier(.34,1.2,.64,1)}
 .mgb-f[style*="width:0.0%"]{min-width:8px;width:8px!important}
 .mgb-k{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;border-radius:1px;background:rgba(255,255,255,.55)}
+/* macros: name on the left, numbers inside the bar */
+html body .mgb .mgb-r{grid-template-columns:auto minmax(0,1fr)!important;align-items:center!important;column-gap:10px!important;row-gap:0!important}
+html body .mgb .mgb-n{grid-column:1;grid-row:1;min-width:58px}
+html body .mgb .mgb-t{grid-column:2!important;grid-row:1;height:22px;border-radius:7px}
+html body .mgb .mgb-f{border-radius:7px;min-width:6px}
+html body .mgb .mgb-f[style*="width:0.0%"]{width:6px!important}
+html body .mgb .mgb-k{top:0;bottom:0;background:rgba(255,255,255,.4)}
+html body .mgb :is(.mgb-v,.mgb-x){grid-column:2;grid-row:1;position:relative;z-index:1;pointer-events:auto;text-shadow:0 1px 2px rgba(0,0,0,.65)}
+html body .mgb .mgb-v{justify-self:start;padding-left:8px;font-size:11.5px}
+html body .mgb .mgb-x{justify-self:end;padding-right:8px;color:#fff;font-size:10.5px}
 /* phone: four columns, so the bars go compact */
-html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.mgt.mgt{grid-template-rows:22px 54px!important;justify-items:stretch!important;padding:10px 7px 9px!important}
+html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.mgt.mgt{grid-template-rows:22px 54px!important;justify-items:stretch!important;padding:10px 5px 9px!important;grid-template-columns:minmax(0,1fr)!important}
 html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.mgt.mgt>small{justify-self:center}
-html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb{grid-row:2!important;align-self:center;gap:4px;margin:0}
+html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb{grid-row:2!important;grid-column:1/-1!important;justify-self:stretch!important;width:100%!important;align-self:center;gap:4px;margin:0}
 html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb-r{column-gap:2px;row-gap:2px}
 html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb-n{font-size:7.5px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;color:var(--muted)}
 html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb-v{font-size:7.5px;gap:1px}
@@ -4184,6 +4194,15 @@ html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb-t{height:3px}
 html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb-f{min-width:3px}
 html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb-f[style*="width:0.0%"]{width:3px!important}
 html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb-k{top:-2px;bottom:-2px;width:1.5px}
+/* phone: name and bar share one line */
+html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb{gap:5px!important}
+html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb .mgb-r{column-gap:2px!important}
+html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb .mgb-n{min-width:0;width:19px;font-size:6.5px!important;letter-spacing:0!important}
+html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb .mgb-t{height:11px!important;border-radius:4px}
+html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb .mgb-f{border-radius:4px;min-width:3px}
+html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb .mgb-f[style*="width:0.0%"]{width:3px!important}
+html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb .mgb-k{display:none!important}
+html.phone body #view#view#view#view[data-tab="fuel"] .mgt .mgb .mgb-v{padding-left:3px;padding-right:0;font-size:7px!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -5599,10 +5618,10 @@ function mgGeo(V){const G=data.goals||{},g=["carbs","protein","fiber","fat"].map
 function mgDonut(V){const q=mgGeo(V),c=(r,w,col,[len,off],C,k)=>`<circle data-mg="${k}" cx="40" cy="40" r="${r}" fill="none" stroke="${col}" stroke-width="${w}" stroke-dasharray="${len.toFixed(2)} ${C.toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 40 40)"/>`;
   return `<svg class="mgt-d" viewBox="0 0 80 80" aria-hidden="true"><defs>${MGCL.map((cl,i)=>`<linearGradient id="mgm${i}" gradientUnits="userSpaceOnUse" x1="10" y1="12" x2="70" y2="68"><stop offset="0" stop-color="${cl}"/><stop offset=".2" stop-color="${cl}"/><stop offset=".27" stop-color="${mgMix(cl,"#ffffff",.5)}"/><stop offset=".34" stop-color="${cl}"/><stop offset=".6" stop-color="${mgMix(cl,"#000000",.18)}"/><stop offset=".74" stop-color="${cl}"/><stop offset=".79" stop-color="${mgMix(cl,"#ffffff",.35)}"/><stop offset=".85" stop-color="${cl}"/><stop offset="1" stop-color="${cl}"/></linearGradient>`).join("")}<filter id="mgglow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="40" cy="40" r="34" fill="none" stroke="rgba(150,180,240,.14)" stroke-width="8"/><circle cx="40" cy="40" r="24" fill="none" stroke="rgba(150,180,240,.10)" stroke-width="7"/><g filter="url(#mgglow)">${q.O.map((a,i)=>c(34,8,MGCL[i],a,q.Co,"o"+i)).join("")}</g>${q.I.map((a,i)=>c(24,7,`url(#mgm${i})`,a,q.Ci,"i"+i)).join("")}<text x="40" y="44" text-anchor="middle">${n0(q.t)}g</text></svg>`}
 /* macros as target bars: name, eaten / goal, the overshoot, and a bar with a tick where the goal sits */
-const MGT=68;/* the goal tick sits at 68% of the track so going over still has room to show */
+const MGT=78;/* was 68 *//* the goal tick sits at 68% of the track so going over still has room to show */
 function mgRow(k,l,c,e){const gv=mgGoal(k),f=gv?Math.min(100,e/gv*MGT):(e?100:0),ov=gv&&e>gv?e-gv:0;
   return `<div class="mgb-r${ov?" mgb-ov":""}" data-mgb="${k}" style="--mc:${c}"><span class="mgb-n">${l}</span><span class="mgb-v"><b>${n0(e)}</b><span class="mgb-sl">/</span><input data-mgin="${k}" inputmode="numeric" enterkeyhint="done" placeholder="–" value="${gv||""}" style="width:${gv?String(gv).length+.4:2.2}ch" aria-label="${l} goal in grams"><span class="mgb-g">g</span></span><span class="mgb-x">${ov?"+"+n0(ov)+" g":""}</span><i class="mgb-t"><i class="mgb-f" style="width:${f.toFixed(1)}%"></i>${gv?`<i class="mgb-k" style="left:${MGT}%"></i>`:""}</i></div>`}
-function mgBars(V){return `<div class="mgb">${[["carbs","Carbs"],["protein","Protein"],["fiber","Fiber"],["fat","Fat"]].map(([k,l],i)=>mgRow(k,l,MGCL[i],+V[i]||0)).join("")}</div>`}
+function mgBars(V){const ph=document.documentElement.classList.contains("phone");return `<div class="mgb">${[["carbs",ph?"Carb":"Carbs"],["protein",ph?"Pro":"Protein"],["fiber",ph?"Fib":"Fiber"],["fat","Fat"]].map(([k,l],i)=>mgRow(k,l,MGCL[i],+V[i]||0)).join("")}</div>`}
 /* while a goal is being typed, move the bars without re-rendering */
 function mgBarsUpd(V){document.querySelectorAll(".mgb-r[data-mgb]").forEach(r=>{const k=r.dataset.mgb,i=["carbs","protein","fiber","fat"].indexOf(k),e=+V[i]||0,gv=mgGoal(k),f=gv?Math.min(100,e/gv*MGT):(e?100:0),ov=gv&&e>gv?e-gv:0;const F=r.querySelector(".mgb-f");if(F)F.style.width=f.toFixed(1)+"%";const X=r.querySelector(".mgb-x");if(X)X.textContent=ov?"+"+n0(ov)+" g":"";r.classList.toggle("mgb-ov",!!ov);let K=r.querySelector(".mgb-k");if(gv&&!K){K=document.createElement("i");K.className="mgb-k";K.style.left=MGT+"%";r.querySelector(".mgb-t").appendChild(K)}else if(!gv&&K)K.remove()})}
 /* change the rings in place so they animate */
@@ -10726,7 +10745,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="921",APPT="2026-11-26T00:16:34Z";   /* APPT: when this update was made */
+const APPV="922",APPT="2026-11-26T00:21:16Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
