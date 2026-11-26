@@ -4536,6 +4536,15 @@ html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.holopanel .hfi
 html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.holopanel .holo{margin:8px auto 0!important;align-self:center}
 html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.holopanel{padding-bottom:10px!important;min-height:0!important;height:auto!important}
 html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.holopanel::after{margin:14px 0 6px!important}
+/* phone Nutrition: Calories/Water/Macros and the hologram share one swipe view */
+html.phone body #view#view#view#view#view[data-tab="fuel"]>.hs-wrap{margin:0 0 4px}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .hs-track{display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;touch-action:pan-x pan-y;align-items:flex-start;gap:0}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .hs-slide{flex:0 0 100%;min-width:0;scroll-snap-align:start;scroll-snap-stop:always}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .hs-slide>*{margin-top:0!important;margin-bottom:0!important}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .hs-dots{display:flex;justify-content:center;gap:6px;margin:10px 0 2px}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .hs-dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.25);transition:width .2s,background .2s}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .hs-dots i.on{width:18px;border-radius:99px;background:#fff}
+html.phone body #view#view#view#view#view[data-tab="fuel"]>.hs-wrap+*{margin-top:12px!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -11782,7 +11791,16 @@ new MutationObserver(()=>{try{init()}catch(_){}}).observe(document.getElementByI
 </script>
 <script>
 /* phone Nutrition: the "Your body" hologram goes first, right under the tab title */
-(function(){function mv(){try{const h=document.documentElement;if(!h.classList.contains("phone"))return;const v=document.getElementById("view");if(!v||v.dataset.tab!=="fuel")return;const hp=v.querySelector(".holopanel");if(!hp)return;/* the panel alone (its wrapper also holds Add food, which stays put) */const ph=v.querySelector(":scope>.phead");const anchor=ph?ph.nextElementSibling:v.firstElementChild;if(anchor===hp)return;v.insertBefore(hp,anchor);hp.style.marginTop="0"}catch(_){}}
+(function(){function mv(){try{const h=document.documentElement;if(!h.classList.contains("phone"))return;const v=document.getElementById("view");if(!v||v.dataset.tab!=="fuel")return;const hp=v.querySelector(".holopanel");if(!hp)return;/* the panel alone (its wrapper also holds Add food, which stays put) */const ph=v.querySelector(":scope>.phead");
+  /* was: hologram moved to the top on its own. Now it shares one slide view with the Calories / Water / Macros panel: swipe between them, dots underneath */
+  const tp=v.querySelector(":scope>.grid.tiles.ntop-g");if(!tp)return;let w=v.querySelector(":scope>.hs-wrap");
+  if(!w){w=document.createElement("div");w.className="hs-wrap";w.innerHTML='<div class="hs-track"></div><div class="hs-dots" aria-hidden="true"><i></i><i></i></div>';const anchor=ph?ph.nextElementSibling:v.firstElementChild;v.insertBefore(w,anchor)}
+  const tr=w.firstElementChild;if(tp.parentElement!==tr){const s1=document.createElement("div");s1.className="hs-slide";s1.appendChild(tp);tr.appendChild(s1)}
+  if(hp.parentElement.parentElement!==tr){const s2=document.createElement("div");s2.className="hs-slide";hp.style.marginTop="0";s2.appendChild(hp);tr.appendChild(s2)}
+  [...tr.children].forEach(x=>{if(!x.firstElementChild)x.remove()});
+  const idx=(()=>{try{return nPro().hsI===1?1:0}catch(_){return 0}})(),dots=w.querySelectorAll(".hs-dots i");dots.forEach((d,k)=>d.classList.toggle("on",k===idx));
+  if(!tr.dataset.sw){tr.dataset.sw="1";requestAnimationFrame(()=>{tr.scrollLeft=idx*tr.clientWidth});let t;tr.addEventListener("scroll",()=>{const i=Math.round(tr.scrollLeft/Math.max(1,tr.clientWidth));dots.forEach((d,k)=>d.classList.toggle("on",k===i));clearTimeout(t);t=setTimeout(()=>{try{if(nPro().hsI!==i){nPro().hsI=i;save()}}catch(_){}},200)},{passive:true})}
+}catch(_){}}
 const r0=window.render;if(typeof r0==="function"){window.render=function(){const o=r0.apply(this,arguments);mv();return o};try{render=window.render}catch(_){}}
 const v=document.getElementById("view");if(v)new MutationObserver(mv).observe(v,{childList:true});mv()})();
 </script>
