@@ -4020,7 +4020,11 @@ html body #view .bper.bper{all:unset;box-sizing:border-box;display:inline-flex;a
 html body #view .bper.bper:hover{background:rgba(255,255,255,.1)}
 html body #view .bco>.ph.bp-h>.bper{margin-left:auto}
 html body #view .bpx-per{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:6px 0 -2px}
-html body #view .bpx-v{margin:6px 0 4px}html.phone.bpriv .phead .ph-eye .bp-x{display:inline}
+html body #view .bpx-v{margin:6px 0 4px}
+html body #view .bpx-ch{display:flex;align-items:center;gap:8px;margin:14px 0 2px;padding:0 2px 6px;font-size:14px;font-weight:700;color:var(--cc);border-bottom:1px solid rgba(255,255,255,.08)}
+html body #view .bpx-ch>i{width:8px;height:8px;border-radius:50%;background:var(--cc);flex:none}
+html body #view .bpx-ch>span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html body #view .bpx-ch>b{font-size:13px;font-weight:600;color:var(--muted)}html.phone.bpriv .phead .ph-eye .bp-x{display:inline}
 html.phone.on-budget #bPriv{display:none!important}   /* the floating eye is replaced by the one in the header */
 html.phone body #view[data-tab="budget"] .bstick:not(.stuck) .tiles{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important}
 html.phone body #view[data-tab="budget"] .bstick:not(.stuck) .tile.tile.tile{min-height:96px!important;padding:12px 4px 26px!important;gap:4px!important;justify-content:flex-start!important;border-radius:14px!important}
@@ -4521,7 +4525,8 @@ html.phone body #view#view#view#view#view .panel.nwp.nh .nh-mb{margin-top:14px!i
 #view#view[data-tab="fuel"] .bodytop>.stack>:is(.nmp,.usp){margin-top:0!important}
 /* Nutrition · Calories trend: two cards (Today, 7-day average) side by side on every device; the week's under/over count sits quietly, centred, above the chart */
 html body #view#view#view[data-tab="fuel"] .panel.wtr>.wtr-sum{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;margin-bottom:4px!important}
-#view[data-tab="fuel"] .panel.wtr>.wtr-ud{display:flex;justify-content:center;gap:12px;font-size:12px;font-weight:600;opacity:.75;margin:2px 0 4px;line-height:1}
+#view[data-tab="fuel"] .panel.wtr>.wtr-ud{display:flex;justify-content:center;align-items:center;gap:12px;font-size:12px;font-weight:600;opacity:.75;margin:2px 0 6px;line-height:1}
+#view[data-tab="fuel"] .panel.wtr>.wtr-ud>.wtr-avg{padding-left:12px;border-left:1px solid rgba(255,255,255,.18)}
 html body #view#view#view#view#view#view[data-tab="fuel"] .panel.mu-p>.ph{position:relative!important;padding-right:60px!important}
 html body #view#view#view#view#view#view[data-tab="fuel"] .panel.mu-p>.ph>.mu-plus{all:unset;box-sizing:border-box;position:absolute;top:50%;right:12px;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;display:grid;place-items:center;cursor:pointer;font-size:20px;font-weight:600;line-height:1;color:#fff;background:rgba(var(--tL),.22);border:1px solid rgba(var(--tL),.55)}
 html.phone body #view#view#view#view#view#view[data-tab="fuel"] .panel.mu-p>.ph>.mu-plus{top:8px;transform:none}
@@ -5887,10 +5892,7 @@ function fuelTrend(S){const g=S.g,T=+g.kcal||0,D14=S.days,mx=Math.max(T*1.15,...
   const wk=S.wk,under=wk.filter(x=>T&&x.kcal<=T).length,over=wk.filter(x=>T&&x.kcal>T).length,dv=S.avg==null||!T?null:S.avg-T;
   const cell=(l,v,sub,c)=>`<div><small>${l}</small><b${c?` style="color:${c}"`:""}>${v}</b><em>${sub}</em></div>`;
   return `<div class="panel wtr" style="margin-top:18px"><div class="ph"><span>Calories trend</span><span class="mg-hr" style="display:flex;align-items:center;gap:10px"><i>Last 14 days</i><span class="seg2" role="group" aria-label="Show as"><button data-ntrv="bar" aria-pressed="${nPro().trV!=="line"}">Bars</button><button data-ntrv="line" aria-pressed="${nPro().trV==="line"}">Graph</button></span></span></div>
-    <div class="wtr-sum">${(()=>{/* way over (>125% of the limit) glows red; eating too little (<60%) glows orange */const LO="#ff9f43",lvl=k=>!T||k==null?"":k>T*1.25?"hi":k<T*.6?"lo":"",gl=(h,L)=>L?h.replace("<div>",`<div class="wtr-${L}">`):h;
-      const tl=S.tm.length?lvl(S.kcal):"",al=S.avg==null?"":lvl(S.avg);
-      return gl(cell("Today",n0(S.kcal)+" kcal",T?(tl==="hi"?"way over target":tl==="lo"?"eating too little":S.kcal>T?n0(S.kcal-T)+" over target":n0(T-S.kcal)+" under target"):"no target set",tl==="lo"?LO:T&&S.kcal>T?OV:S.tm.length?UN:""),tl)
-        +gl(cell("7-day average",S.avg==null?"--":n0(S.avg)+" kcal",S.avg==null?"nothing logged this week":al==="hi"?"way over target":al==="lo"?"eating too little":dv==null?wk.length+" days logged":(dv>0?"↑ "+n0(dv)+" over target":"↓ "+n0(-dv)+" under target"),al==="lo"?LO:dv==null?"":dv>0?OV:UN),al)})()}</div>${""/* was cards: This week (days under · over) and Protein average — the week's count is now the quiet arrows below */}<div class="wtr-ud" role="img" aria-label="This week: ${under} day${under===1?"":"s"} under target, ${over} over"><span style="color:#ff9f43">↓ ${under}</span><span style="color:${OV}">↑ ${over}</span></div>
+    ${""/* Today and 7-day average cards removed: Today repeats the Calories number in the week panel; the average is the quiet line below */}${""/* was cards: This week (days under · over) and Protein average — the week's count is now the quiet arrows below */}<div class="wtr-ud" role="img" aria-label="This week: ${under} day${under===1?"":"s"} under target, ${over} over${S.avg==null?"":". 7-day average "+n0(S.avg)+" calories"}"><span style="color:#ff9f43">↓ ${under}</span><span style="color:${OV}">↑ ${over}</span>${S.avg==null?"":`<span class="wtr-avg" style="color:${T&&S.avg>T?OV:T?"#3ddc84":"var(--muted)"}">avg ${n0(S.avg)}</span>`}</div>
     ${(()=>{if(nPro().trV!=="line")return `<svg class="wtr-svg" viewBox="0 0 600 182" role="img" aria-label="Calories for each of the last 14 days against your target.">${grid}${bars}${tl}</svg>`;
       const P=D14.map((x,i)=>({x:X0+bw*i+bw/2,y:py(x.kcal),n:x.n,o:T&&x.kcal>T,x0:x})),L=P.filter(q=>q.n);
       const path=L.length>1?L.map((q,i)=>{if(!i)return `M${q.x.toFixed(1)} ${q.y.toFixed(1)}`;const a=L[i-1],m=(q.x-a.x)/2;return `C${(a.x+m).toFixed(1)} ${a.y.toFixed(1)} ${(q.x-m).toFixed(1)} ${q.y.toFixed(1)} ${q.x.toFixed(1)} ${q.y.toFixed(1)}`}).join(" "):"";
@@ -11220,7 +11222,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="970",APPT="2026-11-27T00:10:00Z";   /* APPT: when this update was made */
+const APPV="972",APPT="2026-11-27T00:24:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -11841,14 +11843,18 @@ function bPhone(S){const b=B(),CY=c=>((BCYC.find(x=>x[0]===c)||BCYC[1])[1]),chev
       ${v==="grps"?`<button type="button" class="bpx-add" style="margin:0 0 12px;height:44px;font-size:15px" data-bsgnewbtn>＋ Add group</button>`:""}
       ${bSpend(S)}<button type="button" class="bpx-add" data-bpadd>＋ Add expense</button><div class="bpx-scrim" data-bpaddx></div><button type="button" class="bpx-shx" data-bpaddx aria-label="Close"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`}
   const pv=["cards","rich","list"].includes(b.viewC)?b.viewC:"list";/* same Cards / Detailed / List choice as iPad and computer */const act=b.items.filter(i=>bActiveMonth?bActiveMonth(i,today().slice(0,7))||i.paused:true),inc=b.items.filter(i=>i.kind==="inc"),exp=b.items.filter(i=>i.kind!=="inc");
-  const cats=[...new Set(exp.map(i=>bItCat(i)))],chip=bPChip!=="all"&&!cats.includes(bPChip)?"all":bPChip,E=chip==="all"?exp:exp.filter(i=>bItCat(i)===chip);
-  const row=(i,isInc)=>{const c=bCol?bCol(bItCat(i)):"#888",nm=bTitle(i),sub=[CY(i.cyc)+(bPAlt(i,bMo(i))?" · ≈"+bPAlt(i,bMo(i)):""),!isInc&&chip==="all"?bItCat(i):"",i.paused?"Paused":"",i.muted?"Excluded":""].filter(Boolean).join(" · ");
+  const cats=(()=>{const h=[...new Set(exp.map(i=>bItCat(i)))];let o=[];try{o=bCatsShown(S,"x").map(c=>c.n)}catch(_){}return [...o.filter(n=>h.includes(n)),...h.filter(n=>!o.includes(n))]})(),chip=bPChip!=="all"&&!cats.includes(bPChip)?"all":bPChip,E=chip==="all"?exp:exp.filter(i=>bItCat(i)===chip);
+  const row=(i,isInc)=>{const c=bCol?bCol(bItCat(i)):"#888",nm=bTitle(i),sub=[CY(i.cyc)+(bPAlt(i,bMo(i))?" · ≈"+bPAlt(i,bMo(i)):""),i.paused?"Paused":"",i.muted?"Excluded":""].filter(Boolean).join(" · ");
     return `<button type="button" class="bpx-r${isInc?" inc":""}${i.paused||i.muted?" off":""}" data-bedit="${i.id}" style="--cc:${isInc?"#3ddc84":c}">${isInc?`<span class="bpx-av">${esc((nm||"?").trim().charAt(0).toUpperCase())}</span>`:`<span class="bpx-dot"></span>`}<span class="bpx-t"><b>${esc(nm)}</b><small>${esc(sub)}</small></span><span class="bpx-a${isInc?" pos":""}">${isInc?"+":"−"}${bMoneyI(i)}</span>${chev}</button>`};
+  /* List · All: one titled section per group (same order as iPad), not one mixed list */
+  const grp=(L,m,isInc)=>{let order=[];try{order=bCatsShown(S,m).map(c=>c.n)}catch(_){}const have=[...new Set(L.map(i=>bItCat(i)))];have.forEach(n=>{if(!order.includes(n))order.push(n)});
+    return order.filter(n=>have.includes(n)).map(n=>{const G=L.filter(i=>bItCat(i)===n),t=G.filter(i=>!i.paused&&!i.muted).reduce((a,i)=>a+bMo(i),0),c=isInc?"#3ddc84":(bCol?bCol(n):"#888");
+      return `<div class="bpx-ch" style="--cc:${c}"><i></i><span>${esc(n)}</span><b>${isInc?"+":"−"}${bMoney(bPX(t))}${bPU()}</b></div>${G.map(i=>row(i,isInc)).join("")}`}).join("")};
   return `<div class="panel bpan bpx">${seg}<div class="bpx-sum"><span>Left over this month</span><b class="${S.left<0?"neg":"pos"}">${bMoney(S.left)}</b></div>
-    <div class="bpx-per">${bViewSw("data-bpview",pv)}${bPerBtn()}</div><div class="bpx-h"><span>Income</span><b>+${bMoney(bPX(S.inc))}${bPU()}</b></div>${pv!=="list"?`<div class="bpx-v">${pv==="cards"?bAll(S,null,"i"):bList(S,"i")}</div>`:inc.length?inc.map(i=>row(i,true)).join(""):`<div class="bpx-empty">No income yet</div>`}
+    <div class="bpx-per">${bViewSw("data-bpview",pv)}${bPerBtn()}</div><div class="bpx-h"><span>Income</span><b>+${bMoney(bPX(S.inc))}${bPU()}</b></div>${pv!=="list"?`<div class="bpx-v">${pv==="cards"?bAll(S,null,"i"):bList(S,"i")}</div>`:inc.length?(new Set(inc.map(i=>bItCat(i))).size>1?grp(inc,"i",true):inc.map(i=>row(i,true)).join("")):`<div class="bpx-empty">No income yet</div>`}
     <div class="bpx-h"><span>Expenses</span><b>−${bMoney(bPX(S.subs+S.bills))}${bPU()}</b></div>
     ${pv!=="list"?`<div class="bpx-v">${pv==="cards"?bAll(S):bList(S)}</div>`:""}${pv==="list"&&cats.length>1?`<div class="bpx-chips" role="group" aria-label="Expense group"><button type="button" data-bpchip="all" aria-pressed="${chip==="all"}">All</button>${cats.map(c=>`<button type="button" data-bpchip="${esc(c)}" aria-pressed="${chip===c}" style="--cc:${bCol?bCol(c):"#888"}"><i></i>${esc(c)}</button>`).join("")}</div>`:""}
-    ${pv!=="list"?"":E.length?E.map(i=>row(i,false)).join(""):`<div class="bpx-empty">No expenses yet</div>`}
+    ${pv!=="list"?"":E.length?(chip==="all"?grp(E,"x",false):E.map(i=>row(i,false)).join("")):`<div class="bpx-empty">No expenses yet</div>`}
     <button type="button" class="bpx-add" data-bnew="exp">＋ Add recurring</button></div>`}
 window.bPhone=bPhone;
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-bpt],[data-bpchip],[data-bpadd],[data-bpaddx]");if(!t)return;e.preventDefault();e.stopPropagation();const d=t.dataset,H=document.documentElement;
