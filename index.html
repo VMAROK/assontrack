@@ -4509,6 +4509,16 @@ html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.mu-p{margin-to
 html.phone body #view#view#view#view#view[data-tab="fuel"] .mu-tabs{display:inline-flex;gap:4px;padding:3px;border-radius:99px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
 html.phone body #view#view#view#view#view[data-tab="fuel"] .mu-tabs button{all:unset;cursor:pointer;padding:6px 14px;border-radius:99px;font-size:14px;font-weight:600;color:var(--muted)}
 html.phone body #view#view#view#view#view[data-tab="fuel"] .mu-tabs button[aria-selected="true"]{background:rgba(255,255,255,.92);color:#111}
+/* phone Meals|Usuals header: tabs on the left, the view icons in the top-right corner, no calorie count */
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.mu-p>.ph{display:flex!important;flex-wrap:wrap;align-items:center;gap:8px 10px;position:relative;padding-right:96px!important}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.mu-p>.ph .bvsw{position:absolute!important;top:50%;right:14px;transform:translateY(-50%);margin:0!important}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.mu-p.nmp>.ph .bp-add{display:none!important}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.mu-p.usp>.ph .bp-add{display:contents!important}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.mu-p.usp>.ph{padding-bottom:12px!important}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.mu-p.usp>.ph .bvsw{top:12px;transform:none}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.mu-p.usp>.ph .bp-add>button{order:3}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.mu-p.usp>.ph .mu-t{flex:1 0 100%}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.mu-p.usp>.ph{justify-content:flex-start!important}html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.mu-p.usp>.ph .bp-add>button{margin:0!important;flex:none!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -11087,7 +11097,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="953",APPT="2026-11-26T06:40:03Z";   /* APPT: when this update was made */
+const APPV="954",APPT="2026-11-26T06:55:10Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
