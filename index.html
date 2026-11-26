@@ -4019,7 +4019,8 @@ html.phone #view[data-tab="budget"] .bstick{position:static!important;height:aut
 html body #view .bper.bper{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 11px;border-radius:99px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);font-size:13px;font-weight:600;color:var(--fg,#eee);cursor:pointer;white-space:nowrap;flex:none}
 html body #view .bper.bper:hover{background:rgba(255,255,255,.1)}
 html body #view .bco>.ph.bp-h>.bper{margin-left:auto}
-html body #view .bpx-per{display:flex;justify-content:flex-end;margin:4px 0 -4px}html.phone.bpriv .phead .ph-eye .bp-x{display:inline}
+html body #view .bpx-per{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:6px 0 -2px}
+html body #view .bpx-v{margin:6px 0 4px}html.phone.bpriv .phead .ph-eye .bp-x{display:inline}
 html.phone.on-budget #bPriv{display:none!important}   /* the floating eye is replaced by the one in the header */
 html.phone body #view[data-tab="budget"] .bstick:not(.stuck) .tiles{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important}
 html.phone body #view[data-tab="budget"] .bstick:not(.stuck) .tile.tile.tile{min-height:96px!important;padding:12px 4px 26px!important;gap:4px!important;justify-content:flex-start!important;border-radius:14px!important}
@@ -11219,7 +11220,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="969",APPT="2026-11-27T00:02:00Z";   /* APPT: when this update was made */
+const APPV="970",APPT="2026-11-27T00:10:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -11823,7 +11824,7 @@ document.addEventListener("change",e=>{const i=e.target.closest&&e.target.closes
       c.classList.add("ph-eye-ph");c.tabIndex=-1;c.setAttribute("aria-hidden","true");
       let w=v.querySelector(":scope>.ph-eyew");if(!w){w=document.createElement("div");w.className="ph-eyew";v.prepend(w)}else if(w!==v.firstElementChild)v.prepend(w);
       w.innerHTML="";const s=c.cloneNode(true);s.classList.remove("ph-eye-ph");s.removeAttribute("aria-hidden");s.tabIndex=0;s.addEventListener("click",()=>eye.click());w.appendChild(s);
-      requestAnimationFrame(()=>{try{const a=c.getBoundingClientRect(),b=w.getBoundingClientRect(),k=(w.offsetWidth&&b.width/w.offsetWidth)||1;s.style.marginTop=((a.top-b.top)/k)+"px";s.style.marginRight=((b.right-a.right)/k)+"px"}catch(_){}})}
+      requestAnimationFrame(()=>{try{/* measure against the header, not the pinned strip: the strip may already be stuck (page scrolled), which pushed the eye off screen */const a=c.getBoundingClientRect(),hb=h.getBoundingClientRect(),b=w.getBoundingClientRect(),k=(w.offsetWidth&&b.width/w.offsetWidth)||1;s.style.marginTop=Math.max(0,(a.top-hb.top)/k+(parseFloat(getComputedStyle(h).marginTop)||0))+"px";s.style.marginRight=((b.right-a.right)/k)+"px"}catch(_){}})}
     else{const w=v.querySelector(":scope>.ph-eyew");if(w)w.remove()}}catch(e){}}   /* a copy that presses the real eye, so its state and handler stay in one place */
   const r0=window.render;if(typeof r0==="function"){window.render=function(){const out=r0.apply(this,arguments);head();return out};try{render=window.render}catch(e){}}
   new MutationObserver(()=>{const v=document.getElementById("view");if(v&&!v.querySelector(":scope>.phead"))head()}).observe(document.getElementById("view")||document.body,{childList:true});
@@ -11839,15 +11840,15 @@ function bPhone(S){const b=B(),CY=c=>((BCYC.find(x=>x[0]===c)||BCYC[1])[1]),chev
       <div class="bpx-vw" role="group" aria-label="View">${[["day","By day"],["grp","By group"],["grps","Groups"]].map(([k,n])=>`<button type="button" data-bspv="${k}" aria-pressed="${v===k}">${n}</button>`).join("")}</div>
       ${v==="grps"?`<button type="button" class="bpx-add" style="margin:0 0 12px;height:44px;font-size:15px" data-bsgnewbtn>＋ Add group</button>`:""}
       ${bSpend(S)}<button type="button" class="bpx-add" data-bpadd>＋ Add expense</button><div class="bpx-scrim" data-bpaddx></div><button type="button" class="bpx-shx" data-bpaddx aria-label="Close"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`}
-  const act=b.items.filter(i=>bActiveMonth?bActiveMonth(i,today().slice(0,7))||i.paused:true),inc=b.items.filter(i=>i.kind==="inc"),exp=b.items.filter(i=>i.kind!=="inc");
+  const pv=["cards","rich","list"].includes(b.viewC)?b.viewC:"list";/* same Cards / Detailed / List choice as iPad and computer */const act=b.items.filter(i=>bActiveMonth?bActiveMonth(i,today().slice(0,7))||i.paused:true),inc=b.items.filter(i=>i.kind==="inc"),exp=b.items.filter(i=>i.kind!=="inc");
   const cats=[...new Set(exp.map(i=>bItCat(i)))],chip=bPChip!=="all"&&!cats.includes(bPChip)?"all":bPChip,E=chip==="all"?exp:exp.filter(i=>bItCat(i)===chip);
   const row=(i,isInc)=>{const c=bCol?bCol(bItCat(i)):"#888",nm=bTitle(i),sub=[CY(i.cyc)+(bPAlt(i,bMo(i))?" · ≈"+bPAlt(i,bMo(i)):""),!isInc&&chip==="all"?bItCat(i):"",i.paused?"Paused":"",i.muted?"Excluded":""].filter(Boolean).join(" · ");
     return `<button type="button" class="bpx-r${isInc?" inc":""}${i.paused||i.muted?" off":""}" data-bedit="${i.id}" style="--cc:${isInc?"#3ddc84":c}">${isInc?`<span class="bpx-av">${esc((nm||"?").trim().charAt(0).toUpperCase())}</span>`:`<span class="bpx-dot"></span>`}<span class="bpx-t"><b>${esc(nm)}</b><small>${esc(sub)}</small></span><span class="bpx-a${isInc?" pos":""}">${isInc?"+":"−"}${bMoneyI(i)}</span>${chev}</button>`};
   return `<div class="panel bpan bpx">${seg}<div class="bpx-sum"><span>Left over this month</span><b class="${S.left<0?"neg":"pos"}">${bMoney(S.left)}</b></div>
-    <div class="bpx-per">${bPerBtn()}</div><div class="bpx-h"><span>Income</span><b>+${bMoney(bPX(S.inc))}${bPU()}</b></div>${inc.length?inc.map(i=>row(i,true)).join(""):`<div class="bpx-empty">No income yet</div>`}
+    <div class="bpx-per">${bViewSw("data-bpview",pv)}${bPerBtn()}</div><div class="bpx-h"><span>Income</span><b>+${bMoney(bPX(S.inc))}${bPU()}</b></div>${pv!=="list"?`<div class="bpx-v">${pv==="cards"?bAll(S,null,"i"):bList(S,"i")}</div>`:inc.length?inc.map(i=>row(i,true)).join(""):`<div class="bpx-empty">No income yet</div>`}
     <div class="bpx-h"><span>Expenses</span><b>−${bMoney(bPX(S.subs+S.bills))}${bPU()}</b></div>
-    ${cats.length>1?`<div class="bpx-chips" role="group" aria-label="Expense group"><button type="button" data-bpchip="all" aria-pressed="${chip==="all"}">All</button>${cats.map(c=>`<button type="button" data-bpchip="${esc(c)}" aria-pressed="${chip===c}" style="--cc:${bCol?bCol(c):"#888"}"><i></i>${esc(c)}</button>`).join("")}</div>`:""}
-    ${E.length?E.map(i=>row(i,false)).join(""):`<div class="bpx-empty">No expenses yet</div>`}
+    ${pv!=="list"?`<div class="bpx-v">${pv==="cards"?bAll(S):bList(S)}</div>`:""}${pv==="list"&&cats.length>1?`<div class="bpx-chips" role="group" aria-label="Expense group"><button type="button" data-bpchip="all" aria-pressed="${chip==="all"}">All</button>${cats.map(c=>`<button type="button" data-bpchip="${esc(c)}" aria-pressed="${chip===c}" style="--cc:${bCol?bCol(c):"#888"}"><i></i>${esc(c)}</button>`).join("")}</div>`:""}
+    ${pv!=="list"?"":E.length?E.map(i=>row(i,false)).join(""):`<div class="bpx-empty">No expenses yet</div>`}
     <button type="button" class="bpx-add" data-bnew="exp">＋ Add recurring</button></div>`}
 window.bPhone=bPhone;
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-bpt],[data-bpchip],[data-bpadd],[data-bpaddx]");if(!t)return;e.preventDefault();e.stopPropagation();const d=t.dataset,H=document.documentElement;
