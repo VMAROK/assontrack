@@ -4144,7 +4144,11 @@ html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile>small{gr
 html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile>svg{grid-row:2!important;margin:0!important}
 html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile:not(.wtile):not(.mgt)>svg{width:18px!important;height:18px!important}
 html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.wtile.wtile>svg{width:20px!important;height:28px!important}
-html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.mgt.mgt>svg{width:34px!important;height:34px!important}
+/* html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.mgt.mgt>svg{width:34px!important;height:34px!important} */
+/* macros donut: bigger (fills the picture and number rows) and thinner rings */
+html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.mgt.mgt>svg{grid-row:2/4!important;width:56px!important;height:56px!important}
+html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.mgt .mgt-d circle[r="34"]{stroke-width:4px!important}html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.mgt .mgt-d circle[r="24"]{stroke-width:3.5px!important}
+html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.mgt .mgt-d text{font-size:12px!important}
 html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile>b,html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile>b *{font-size:15px!important;line-height:20px!important/* was 14px; Copilot value */;font-weight:700!important;letter-spacing:0!important}
 html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile>b{grid-row:3!important;margin:0!important;text-shadow:none!important;white-space:nowrap}
 html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile>b small,html.phone body #view#view#view#view[data-tab="fuel"]>.tiles>.tile.tile>b s{font-size:11px!important}
@@ -10686,7 +10690,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="919",APPT="2026-11-25T23:59:14Z";   /* APPT: when this update was made */
+const APPV="920",APPT="2026-11-26T00:03:18Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
