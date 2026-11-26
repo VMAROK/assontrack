@@ -4447,7 +4447,7 @@ html,html *{scrollbar-width:none!important;-ms-overflow-style:none!important}
 html::-webkit-scrollbar,html *::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;background:transparent!important}
 /* ===== in the app (phone, or installed to the home screen): no site footer or its link bar ===== */
 html.phone body #view>.sitefoot.sitefoot{display:none!important}
-@media (display-mode:standalone){html body #view>.sitefoot.sitefoot{display:none!important}}
+/* was: also hidden when installed on any device — the footer stays on iPad and desktop: @media (display-mode:standalone)[html body #view>.sitefoot.sitefoot[display:none!important]] */
 /* ===== phone top: every tab's title row (logo | tab name) starts below the status bar, and the status bar band is solid so scrolled content is cut off at its edge ===== */
 html.phone body #view#view#view#view#view#view{padding-top:calc(env(safe-area-inset-top,0px) + 8px)!important}
 /* html.phone body::after{background:var(--topsolid,#050505)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;z-index:60!important} */
@@ -11035,7 +11035,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="941",APPT="2026-11-26T03:43:49Z";   /* APPT: when this update was made */
+const APPV="942",APPT="2026-11-26T03:45:16Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
