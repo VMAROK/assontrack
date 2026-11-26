@@ -4384,6 +4384,17 @@ html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>
 html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bc-day{margin-top:0!important}
 html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bdw-in{margin-top:0!important;padding-top:10px!important;border-top:0!important}html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bdw-in>.bdw-h+*{margin-top:0!important}html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bc-day{border-top:0!important}html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bc-day::before{display:none!important}
 html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bdw-h{display:none!important}
+/* phone Budget: the day's items as a list above the total (scrolls when long); the calendar shows only how many */
+.bdw-ls{display:contents}
+.bc-cnt{display:none}
+html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bc-d :is(.bc-ev,.bc-sp){display:none!important}
+html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bc-d .bc-cnt{display:grid;place-items:center;margin:auto auto 2px;min-width:20px;height:20px;padding:0 5px;border-radius:99px;background:rgba(255,255,255,.1);color:var(--fg,#eef3ff);font:600 11px var(--mono);box-sizing:border-box}
+html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bc-d.sel .bc-cnt{background:#f2a93b;color:#111}
+html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bdw-in{display:flex!important;flex-direction:column}
+html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bdw-ls{display:block;order:1;max-height:230px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;margin:0 0 10px;padding-right:2px}
+html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bdw-tot{order:2;margin-top:0!important}
+html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bdw-all{order:3}
+html.phone body #view#view#view#view#view[data-tab="budget"] .panel.bm:has(>.bc>.bc-grid) .bdw-ls .bdw-s:first-child{margin-top:0!important}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -7769,10 +7780,10 @@ function bDonut(S){const byCat=S.byCat,total=Object.values(byCat).reduce((a,v)=>
     <div class="bd-leg">${segs.length?segs.map(([c,v])=>`<button type="button" ${bCat(c)?`data-bcat="${esc(c)}"`:`data-bspv="grp"`} style="--cc:${bNameCol(c)}"><i></i><span>${esc(c)}</span><b>${bMoney(v,0)}</b><em>${total?Math.round(v/total*100):0}%</em></button>`).join(""):`<p class="note" style="margin:0">Add a subscription, bill or expense to see where your money goes.</p>`}</div></div>`}
 /* month calendar: each day shows what gets charged (and paid in) that day, plus what you spent */
 function bCal(){const b=B(),T=today(),x=bDate(T);x.setDate(1);x.setMonth(x.getMonth()+bMon);const y=x.getFullYear(),m=x.getMonth(),from=ymd(x),to=ymd(new Date(y,m+1,0,12)),nd=new Date(y,m+1,0).getDate(),lead=x.getDay();
-  const ev=bEvMap(b,from,to,T);   /* was: each occurrence on its own date only (no grace periods) */const spd={};b.spends.forEach(s=>{if(s.d>=from&&s.d<=to)spd[s.d]=(spd[s.d]||0)+bSpAmt(s)});
+  const ev=bEvMap(b,from,to,T);   /* was: each occurrence on its own date only (no grace periods) */const spd={},spn={};b.spends.forEach(s=>{if(s.d>=from&&s.d<=to){spd[s.d]=(spd[s.d]||0)+bSpAmt(s);spn[s.d]=(spn[s.d]||0)+1}});
   if(!bSel||bSel.slice(0,7)!==from.slice(0,7))bSel=from.slice(0,7)===T.slice(0,7)?T:from;
   let cells="";for(let i=0;i<lead;i++)cells+=`<span class="bc-d pad"></span>`;
-  for(let d=1;d<=nd;d++){const ds=ymd(new Date(y,m,d,12)),E=ev[ds]||[];cells+=`<button type="button" class="bc-d${ds===T?" td":""}${ds===bSel&&!bNoSel?" sel":""}${ds<T?" past":""}" data-bday="${ds}"><span class="bc-n">${d}</span>${bDayMark(b,ds,E,T)}<span class="bc-ev">${E.slice(0,3).map(i=>`<i class="${i.kind==="inc"?"inc":""}${i.muted?" mu":""}" style="--cc:${i.kind==="inc"?"#3ddc84":bCol(bItCat(i))}">${esc(bTitle(i))}</i>`).join("")}${E.length>3?`<i class="more">+${E.length-3}</i>`:""}</span>${spd[ds]?`<span class="bc-sp">${bMoney(spd[ds],0)}</span>`:""}</button>`}
+  for(let d=1;d<=nd;d++){const ds=ymd(new Date(y,m,d,12)),E=ev[ds]||[];cells+=`<button type="button" class="bc-d${ds===T?" td":""}${ds===bSel&&!bNoSel?" sel":""}${ds<T?" past":""}" data-bday="${ds}"><span class="bc-n">${d}</span>${bDayMark(b,ds,E,T)}<span class="bc-ev">${E.slice(0,3).map(i=>`<i class="${i.kind==="inc"?"inc":""}${i.muted?" mu":""}" style="--cc:${i.kind==="inc"?"#3ddc84":bCol(bItCat(i))}">${esc(bTitle(i))}</i>`).join("")}${E.length>3?`<i class="more">+${E.length-3}</i>`:""}</span>${spd[ds]?`<span class="bc-sp">${bMoney(spd[ds],0)}</span>`:""}${E.length+(spn[ds]||0)?`<span class="bc-cnt">${E.length+(spn[ds]||0)}</span>`:""/* phone: how many things that day */}</button>`}
   const tail=(7-(lead+nd)%7)%7;for(let i=0;i<tail;i++)cells+=`<span class="bc-d pad"></span>`;
   const SE=(ev[bSel]||[]),SS=b.spends.filter(s=>s.d===bSel),tot=SE.filter(i=>i.kind!=="inc").reduce((a,i)=>a+fxc(+i.amt||0,i.cur,bHome()),0)+SS.reduce((a,s)=>a+bSpAmt(s),0);
   /* old list under the calendar (before the overview moved here):
@@ -7851,7 +7862,7 @@ function bDayPop(b,ds,SE,SS,T,inl){const H=bHome(),inc=SE.filter(i=>i.kind==="in
     <div class="bdw-h"><div><b>${bDate(ds).toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</b>${ds===T?"<small>Today</small>":""}</div>${inl?"":`<button type="button" class="bdw-x" data-bdwx aria-label="Close">×</button>`}</div>
     <!-- was four totals (In / Charged / Spent / Net): <div class="bdw-t"><div class="pos"><small>In</small><b>+${bMoney(inT)}</b></div><div class="neg"><small>Charged</small><b>−${bMoney(fxT)}</b></div><div class="neg"><small>Spent</small><b>−${bMoney(spT)}</b></div><div class="${net<0?"neg":"pos"}"><small>Net</small><b>${net<0?"−":"+"}${bMoney(Math.abs(net))}</b></div></div> -->
     ${(()=>{const t=bDayTot(b,ds,SE,SS);return `<div class="bdw-tot ${bSignC(t.now)}"><small>Total</small><b>${bSignM(t.now)}</b></div>`})()}
-    ${""/* hint caption removed (Budget + Dashboard) — the checkboxes say it */}${SE.length||SS.length?sec("Income",inc,row)+sec("",out,row)/* "Charged" heading removed */+sec("Spent",SS,srow):`<p class="note" style="margin:14px 2px 4px">Nothing charged, paid in or spent this day.</p>`}
+    ${""/* hint caption removed (Budget + Dashboard) — the checkboxes say it */}${SE.length||SS.length?`<div class="bdw-ls">${sec("Income",inc,row)+sec("",out,row)/* "Charged" heading removed */+sec("Spent",SS,srow)}</div>`:`<p class="note" style="margin:14px 2px 4px">Nothing charged, paid in or spent this day.</p>`}
     ${SE.length?(()=>{const t=bDayTot(b,ds,SE,SS);return `<div class="bdw-all ${bSignC(t.all)}"><small>Total when everything's paid</small><b>${bSignM(t.all)}</b></div>`})():""}
   </div>${inl?"":"</div>"}`}
 function bCard(it){const m=bMo(it),nx=it.paused?null:bNext(it),dd=nx?bDays(nx):null,c=bCol(bItCat(it)),cy=(BCYC.find(x=>x[0]===it.cyc)||BCYC[1])[1];
@@ -10962,7 +10973,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="932",APPT="2026-11-26T01:34:50Z";   /* APPT: when this update was made */
+const APPV="933",APPT="2026-11-26T01:39:35Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
