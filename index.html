@@ -4360,6 +4360,18 @@ html.phone body #view#view#view#view#view .panel.nwp.nh .nh-w svg{margin-right:6
 html.phone body #view#view#view#view#view .panel.nwp.nh .nh-w i{font-style:normal;color:var(--muted)}
 html.phone body #view#view#view#view#view .panel.nwp.nh .nh-w b{color:#4cc9ff;font-weight:700}
 html.phone body #view#view#view#view#view .panel.nwp.nh .nw-row.nw-tix .nw-t{border:0!important;box-shadow:none!important}html.phone body #view#view#view#view#view .panel.nwp.nh .nw-row.nw-tix .nw-t::after,html.phone body #view#view#view#view#view .panel.nwp.nh .nw-row.nw-tix .nw-t::before{display:none!important}
+/* both views sit in the same cell, so switching Bar/Donut keeps the card the same height */
+html.phone body #view#view#view#view#view .panel.nwp.nh .nh-vw{display:grid}
+html.phone body #view#view#view#view#view .panel.nwp.nh .nh-vw>*{grid-area:1/1}
+html.phone body #view#view#view#view#view .panel.nwp.nh .nh-vw>.nh-off{visibility:hidden;pointer-events:none}
+html.phone body #view#view#view#view#view .panel.nwp.nh .nh-bar{align-self:center}
+html.phone body #view#view#view#view#view .panel.nwp.nh .nh-mb{display:grid;gap:11px;margin-top:16px}
+html.phone body #view#view#view#view#view .panel.nwp.nh .nh-r{display:grid;grid-template-columns:58px minmax(0,1fr) 78px;align-items:center;column-gap:10px;font-size:13px}
+html.phone body #view#view#view#view#view .panel.nwp.nh .nh-r>span{font-weight:500}
+html.phone body #view#view#view#view#view .panel.nwp.nh .nh-t{position:relative;display:flex;height:7px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.07)}
+html.phone body #view#view#view#view#view .panel.nwp.nh .nh-t>i{display:block;height:100%;background:var(--mc)}
+html.phone body #view#view#view#view#view .panel.nwp.nh .nh-r>b{text-align:right;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+html.phone body #view#view#view#view#view .panel.nwp.nh .nh-r>b s{text-decoration:none;color:var(--muted);font-weight:500}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -5952,8 +5964,11 @@ function nWeekPhone(cells,lab,S,M,sum,bar){
     <div class="nw-clip"><div class="nw-row nw-tix" id="nwStrip" data-off="${14+nwOff}">${cells}</div></div>
     <div class="nh-card">
       <div class="nh-ch"><b>${dt}</b><div class="seg2" role="group" aria-label="Show as"><button data-nmacv="bar" aria-pressed="${bar}">Bar</button><button data-nmacv="donut" aria-pressed="${!bar}">Donut</button></div></div>
-      ${bar?`<div class="nh-bar"><div class="nh-mh"><span>Macro mix</span><b>${n0(sum)} g</b></div><div class="nh-st">${sum?M.filter(x=>x[1]>0).map(x=>`<i style="flex:${x[1]};background:${x[2]}"></i>`).join(""):""}</div><div class="nh-lg"><div>${leg(0)}${leg(2)}</div><div>${leg(1)}${leg(3)}</div></div></div>`
-      :`<div class="nh-don"><div class="nh-dl">${donut}<small>Outer · Goal<i></i>Inner · Logged</small></div><div class="nh-dr">${[0,1,2,3].map(leg).join("")}</div></div>`}
+      ${""/* was: bar view showed the 2-column number legend; only the picked view was rendered, so the card changed height */}<div class="nh-vw">
+      <div class="nh-bar${bar?"":" nh-off"}" aria-hidden="${!bar}"><div class="nh-mh"><span>Macro mix</span><b>${n0(sum)} g</b></div><div class="nh-st">${sum?M.filter(x=>x[1]>0).map(x=>`<i style="flex:${x[1]};background:${x[2]}"></i>`).join(""):""}</div>
+        <div class="nh-mb">${M.map((x,i)=>{const gv=gl[i],e=x[1],pc=gv?Math.min(100,e/gv*100):0,ov=gv&&e>gv?(e-gv)/e*100:0;/* over the goal: its colour up to the goal, the heavier shade for the extra */return `<div class="nh-r" style="--mc:${x[2]}"><span>${x[0]}</span><i class="nh-t">${ov?`<i style="width:${(100-ov).toFixed(1)}%"></i><i style="width:${ov.toFixed(1)}%;background:color-mix(in srgb,${x[2]} 62%,#000)"></i>`:`<i style="width:${pc.toFixed(1)}%"></i>`}</i><b>${n0(e)}${gv?`<s> / ${n0(gv)}</s>`:""} g</b></div>`}).join("")}</div></div>
+      <div class="nh-don${bar?" nh-off":""}" aria-hidden="${bar}"><div class="nh-dl">${donut}<small>Outer · Goal<i></i>Inner · Logged</small></div><div class="nh-dr">${[0,1,2,3].map(leg).join("")}</div></div>
+      </div>
       <div class="nh-w"><svg viewBox="0 0 24 30" width="16" height="20" aria-hidden="true"><path d="M3 2h18l-2.2 25a2 2 0 01-2 1.8H7.2a2 2 0 01-2-1.8z" fill="none" stroke="#4cc9ff" stroke-width="1.8" stroke-linejoin="round"/></svg><span>Water</span><i>·</i><b>${w} / ${G} cups</b></div>
     </div></div>`}
 /* view switch: meals laid out, or the calculator */
@@ -10935,7 +10950,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="930",APPT="2026-11-26T00:59:17Z";   /* APPT: when this update was made */
+const APPV="931",APPT="2026-11-26T01:04:04Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
