@@ -4010,7 +4010,12 @@ html.phone .phead .ph-t{font-size:21px;font-weight:500;white-space:nowrap;overfl
 html.phone .phead .ph-sp{flex:1}
 html.phone .phead .ph-eye{display:grid;place-items:center;width:46px;height:46px;border-radius:13px;flex:none;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.2);color:#eee;cursor:pointer}
 html.phone.bpriv .phead .ph-eye{background:rgba(255,197,51,.92);color:#151515;border-color:transparent}
-html.phone .phead .ph-eye .bp-x{display:none}html.phone.bpriv .phead .ph-eye .bp-x{display:inline}
+html.phone .phead .ph-eye .bp-x{display:none}html.phone .phead .ph-eye.ph-eye-ph{visibility:hidden;pointer-events:none}
+html.phone #view>.ph-eyew{position:sticky;top:calc(env(safe-area-inset-top,0px) - 4px);z-index:60;height:0;display:flex;justify-content:flex-end;pointer-events:none}
+html.phone #view>.ph-eyew>.ph-eye{pointer-events:auto;display:grid;place-items:center;width:46px;height:46px;border-radius:13px;flex:none;background:rgba(20,22,27,.88);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);color:#eee;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+html.phone.bpriv #view>.ph-eyew>.ph-eye{background:rgba(255,197,51,.92);color:#151515;border-color:transparent}
+html.phone #view>.ph-eyew>.ph-eye .bp-x{display:none}html.phone.bpriv #view>.ph-eyew>.ph-eye .bp-x{display:inline}
+html.phone #view[data-tab="budget"] .bstick{position:static!important;height:auto!important}html.phone.bpriv .phead .ph-eye .bp-x{display:inline}
 html.phone.on-budget #bPriv{display:none!important}   /* the floating eye is replaced by the one in the header */
 html.phone body #view[data-tab="budget"] .bstick:not(.stuck) .tiles{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important}
 html.phone body #view[data-tab="budget"] .bstick:not(.stuck) .tile.tile.tile{min-height:96px!important;padding:12px 4px 26px!important;gap:4px!important;justify-content:flex-start!important;border-radius:14px!important}
@@ -8221,7 +8226,7 @@ let bStSlim=0,bStY=1e9;
 function bStkBg(el){const t=el.querySelector(".tile");if(!t)return;const was=el.classList.contains("stuck");if(was)el.classList.remove("stuck");const c=getComputedStyle(t),base=getComputedStyle(document.body).backgroundColor||"#0b0f1a";
   const solid=/rgba\([^)]*,\s*0\)|transparent/.test(base)?"#0b0f1a":base.replace(/rgba\(([^,]+),([^,]+),([^,]+),[^)]+\)/,"rgb($1,$2,$3)");
   el.style.setProperty("--stk-bg",[c.backgroundImage!=="none"?c.backgroundImage:"",`linear-gradient(${c.backgroundColor},${c.backgroundColor})`,`linear-gradient(${solid},${solid})`].filter(Boolean).join(","));if(was)el.classList.add("stuck")}
-function bStickChk(){const el=document.getElementById("bStick"),sn=document.getElementById("bStickS"),v=document.getElementById("view");if(!el||!sn||!v)return;/* was: stuck as soon as the tiles started to scroll — const on=sn.getBoundingClientRect().top<v.getBoundingClientRect().top+2; */
+function bStickChk(){const el=document.getElementById("bStick"),sn=document.getElementById("bStickS"),v=document.getElementById("view");if(!el||!sn||!v)return;if(document.documentElement.classList.contains("phone")){bStOn=false;if(el.classList.contains("stuck"))el.classList.remove("stuck");el.style.height="";return}/* phone: the tiles scroll with the page; only the eye stays *//* was: stuck as soon as the tiles started to scroll — const on=sn.getBoundingClientRect().top<v.getBoundingClientRect().top+2; */
   const ov=document.querySelector("#view .panel.bm"),vt=v.getBoundingClientRect().top,tl=el.querySelector(".tiles"),was=el.classList.contains("stuck");
   if(!bStSlim&&tl&&!was){el.style.height=el.offsetHeight+"px";el.classList.add("stuck");bStSlim=tl.getBoundingClientRect().bottom-el.getBoundingClientRect().top;el.classList.remove("stuck");el.style.height=""}   /* measure the slim bar once */
   if(was&&tl)bStSlim=tl.getBoundingClientRect().bottom-vt;
@@ -11213,7 +11218,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="966",APPT="2026-11-26T23:36:00Z";   /* APPT: when this update was made */
+const APPV="967",APPT="2026-11-26T23:45:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -11812,7 +11817,13 @@ document.addEventListener("change",e=>{const i=e.target.closest&&e.target.closes
     if(!h){h=document.createElement("div");h.className="phead";v.prepend(h)}
     const logo=document.querySelector(".topbar .logo svg");
     h.innerHTML=`<span class="ph-logo">${logo?logo.outerHTML:""}<b>Ass<span>On</span>Track</b></span><i class="ph-sep" aria-hidden="true"></i><span class="ph-t">${NAMES[t]||""}</span><span class="ph-sp"></span>`;
-    const eye=document.getElementById("bPriv");if(eye&&t==="budget"){const c=document.createElement("button");c.type="button";c.className="ph-eye";c.setAttribute("aria-label",eye.getAttribute("aria-label")||"Hide names and amounts");c.innerHTML=eye.innerHTML;c.addEventListener("click",()=>eye.click());h.appendChild(c)}}catch(e){}}   /* a copy that presses the real eye, so its state and handler stay in one place */
+    const eye=document.getElementById("bPriv");if(eye&&t==="budget"){const c=document.createElement("button");c.type="button";c.className="ph-eye";c.setAttribute("aria-label",eye.getAttribute("aria-label")||"Hide names and amounts");c.innerHTML=eye.innerHTML;c.addEventListener("click",()=>eye.click());h.appendChild(c);
+      /* the header copy stays as an invisible placeholder; the real tap target is pinned, starting exactly over it */
+      c.classList.add("ph-eye-ph");c.tabIndex=-1;c.setAttribute("aria-hidden","true");
+      let w=v.querySelector(":scope>.ph-eyew");if(!w){w=document.createElement("div");w.className="ph-eyew";v.prepend(w)}else if(w!==v.firstElementChild)v.prepend(w);
+      w.innerHTML="";const s=c.cloneNode(true);s.classList.remove("ph-eye-ph");s.removeAttribute("aria-hidden");s.tabIndex=0;s.addEventListener("click",()=>eye.click());w.appendChild(s);
+      requestAnimationFrame(()=>{try{const a=c.getBoundingClientRect(),b=w.getBoundingClientRect(),k=(w.offsetWidth&&b.width/w.offsetWidth)||1;s.style.marginTop=((a.top-b.top)/k)+"px";s.style.marginRight=((b.right-a.right)/k)+"px"}catch(_){}})}
+    else{const w=v.querySelector(":scope>.ph-eyew");if(w)w.remove()}}catch(e){}}   /* a copy that presses the real eye, so its state and handler stay in one place */
   const r0=window.render;if(typeof r0==="function"){window.render=function(){const out=r0.apply(this,arguments);head();return out};try{render=window.render}catch(e){}}
   new MutationObserver(()=>{const v=document.getElementById("view");if(v&&!v.querySelector(":scope>.phead"))head()}).observe(document.getElementById("view")||document.body,{childList:true});
   head()})();
