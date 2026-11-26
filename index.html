@@ -4558,6 +4558,8 @@ html.phone body #view#view#view#view#view[data-tab="fuel"] .hs-slide>.grid.tiles
 html.phone body #view#view#view#view#view[data-tab="fuel"] .hs-slide>.panel.holopanel{padding-bottom:30px!important}
 /* hologram hidden until the right figure has drawn */
 .holo3d.h3wait>canvas{visibility:hidden!important}
+.holopanel .fitsex{display:flex;justify-content:center;margin:10px auto 4px;width:max-content}
+html.phone body #view#view#view#view#view[data-tab="fuel"] .panel.holopanel .avfoot{grid-area:auto;grid-column:1/-1}
 /* launch build: hidden tabs */
 html.launch.phone .navbtn.navbtn{flex:0 0 20%!important;width:20%!important}   /* 5 tabs fit the phone bar without scrolling */
 html.launch .navbtn.navbtn[data-tab="rem"],html.launch .navbtn.navbtn[data-tab="kitchen"],html.launch .navbtn.navbtn[data-tab="train"],html.launch .navbtn.navbtn[data-tab="body"],html.launch .navbtn[data-tab="fuel"] .navcar,html.launch .navbtn[data-tab="train"] .navcar{display:none!important}
@@ -8564,7 +8566,7 @@ const AV_ITEMS={hat:[["none","None"],["fedora","Fedora"]],top:[["none","None"],[
 const AV_DEF={hat:"fedora",top:"trench",shoes:"boots"};
 function avatarOf(){const pr=data.profile||{},av=pr.avatar||{},a={body:av.body||pr.figure||"woman"};
   for(const k in AV_ITEMS)a[k]=AV_ITEMS[k].some(o=>o[0]===av[k])?av[k]:AV_DEF[k];a.colors=Object.assign({},av.colors||{});a.cmode=["solid","glass","figure"].includes(av.cmode)?av.cmode:av.blend?"figure":av.glass?"glass":"solid";if(av.stage)a.stage=av.stage;if(av.skin)a.skin=av.skin;if(av.wings==="white"||av.wings==="dark")a.wings=av.wings;if(av.hair)a.hair=av.hair;if(av.hairColor)a.hairColor=av.hairColor;if(av.flag)a.flag=av.flag;if(av.bg)a.bg=av.bg;a.fx=Object.assign({kind:"auto",color:"#4cc9ff",amount:2},av.fx||{});if(av.model)a.model=av.model;a.useModel=!!(av.useModel&&av.model);return a}
-let avEdit=false,avCat="body",avEditMsg=null,mdlDelArm=false;
+let fitEdit=false,avEdit=false,avCat="body",avEditMsg=null,mdlDelArm=false;
 const AV_COLORS=[["#16171c","Black"],["#3a3d45","Charcoal"],["#e6e4df","White"],["#b0814f","Camel"],["#5a3a26","Brown"],["#6e1a2a","Burgundy"],["#c0282f","Red"],["#d86a9a","Pink"],["#1f2f5a","Navy"],["#2b56c6","Royal blue"],["#1f4a33","Forest"],["#5b5f2e","Olive"],["#4b2a6e","Purple"],["#c8a040","Gold"]];
 const AV_DEFCOL={hat:"#16171c",top:"#16171c",shoes:"#16171c"};
 function modelPane(a){const m=a.model;
@@ -9052,7 +9054,7 @@ const realStage=()=>{const s=commitScore();return s==null?"holo":s>=65?"real":s>
 const pickedStage=()=>{const top=realStage(),c=avatarOf().stage;return c&&SRANK[c]<=SRANK[top]?c:top};
 const holoStage=()=>holoPreview||pickedStage();
 const HSTAGE={shadow:["Disturbed",40],holo:["Ghost",40],real:["Alive",65]};
-function holoView(){const fit=figFit(),a=avatarOf(),st=fit?"real":holoStage(),rs=realStage();
+function holoView(){const fit=figFit(),a=fit?fitAv():avatarOf()/* was avatarOf() for both */,st=fit?"real":holoStage(),rs=realStage();
   const bgw=a.bg&&allWalls().find(w=>w.id===a.bg),bgu=bgw?(bgw.live?thumbOf(bgw):bestSrc(bgw,false)):"";
   const fig=H3?`<div class="holo holo3d${bgw?" hasbg":""}" ${bgw?`style="background-image:linear-gradient(rgba(0,0,0,.15),rgba(0,0,0,.5)),url('${bgu}')"`:""} data-h3 role="img" aria-label="${fit?"Your body":HSTAGE[st][0]+" figure"}. Drag to spin.">${a.flag&&/^[a-z]{2}$/i.test(a.flag)?`<span class="avflagbadge st-${st}" aria-label="Flag">${String.fromCodePoint(...[...a.flag.toUpperCase()].map(c=>127397+c.charCodeAt(0)))}</span>`:""}</div>`:(h3Ensure(),hologram(a));
   const lock=`<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`;
@@ -9114,7 +9116,9 @@ function fitLevel(d){const days=new Set(d.workouts.filter(w=>{const a=(Date.now(
   let i=0;FITST.forEach((x,k)=>{if(m>=x[1])i=k});const nx=FITST[i+1];let cap="Top shape. Keep training to hold it.";
   if(nx){const need=Math.max(1,Math.ceil((b==null?nx[1]:(nx[1]-b*.2)/.8)*8-days));cap=`${days} training day${days===1?"":"s"} in the last 2 weeks. ${need} more to reach ${nx[0]}.`}
   return {m,name:FITST[i][0],cap,days,i}}
-const fitAv=()=>{const a=avatarOf();a.hat=a.top=a.shoes="none";a.wings="";a.cmode="solid";a.fit=fitLevel(D()).m;if(tab==="train")a.mheat=musHeat(D());const bm=bmiInfo(D());a.fitW=bm.bmi==null?null:Math.round(bmiW(bm.bmi)*40)/40;return a};
+/* the body hologram (Nutrition/Training/Body) has its own plain figure: only man/woman (its own setting) and the level — nothing from the custom figure */
+const fitBody=()=>{const pr=data.profile||{};if(pr.fitBody==="man"||pr.fitBody==="woman")return pr.fitBody;const b=avatarOf().body;return b==="man"?"man":"woman"};
+const fitAv=()=>{const a={body:fitBody()};for(const k in AV_ITEMS)a[k]=AV_DEF[k];a.colors={};a.fx={kind:"none",color:"#4cc9ff",amount:0};a.useModel=false;/* was: const a=avatarOf(); */a.hat=a.top=a.shoes="none";a.wings="";a.cmode="solid";a.fit=fitLevel(D()).m;if(tab==="train")a.mheat=musHeat(D());const bm=bmiInfo(D());a.fitW=bm.bmi==null?null:Math.round(bmiW(bm.bmi)*40)/40;return a};
 const figAv=()=>{const a=avatarOf();if(realStage()!=="real")a.cmode="figure";return a};
 const fitLoad={};
 let musLoad=null;function musEnsure(){if(musLoad||!window.H3ecoPut)return;
@@ -10340,7 +10344,7 @@ function commitPanel(d,P,wk){
     <p>${score==null?"Add a schedule, a task or a weekly goal to a passion to start scoring.":"Average across your passions. Priority counts 3×, Moderate 2×, Bonus 1×."}</p>${lvl?`<div class="cs-lvs">${lvl}</div>`:""}</div></div>
     <div class="cs-stats"><div><b style="color:#3ddc84">${done}</b><small>On time</small></div><div${missed?' data-missopen role="button" tabindex="0" class="ms-open" title="See what counts as missed"':""}><b class="${missed?"miss":""}">${missed}</b><small>Missed${missed?" · see why":""}</small></div><div><b>${fmtH(wkM)}</b><small>This week</small></div><div><b>${stk}<span>d</span></b><small>Streak</small></div></div></div>`;
 }
-function figurePanel(){return `<div class="panel holopanel"><div class="ph"><span>${figFit()?"Your body":"Your figure"}</span><button class="addp gear avgear${avEdit?" on":""}" data-avedit aria-expanded="${avEdit}" aria-label="Customize" title="Customize"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button></div>${holoView()}<div class="avfoot">${avEdit?avEditor()+`<div class="av-actions"><button class="btn ghost" data-avcancel>Cancel</button><button class="btn" data-avsave>Save</button></div>`:""}</div></div>`}
+function figurePanel(){const fit=figFit();return `<div class="panel holopanel"><div class="ph"><span>${fit?"Your body":"Your figure"}</span><button class="addp gear avgear${(fit?fitEdit:avEdit)?" on":""}" ${fit?"data-fitedit":"data-avedit"} aria-expanded="${fit?fitEdit:avEdit}" aria-label="Customize" title="Customize"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button></div>${holoView()}<div class="avfoot">${fit?(fitEdit?`<div class="fitsex seg2" role="group" aria-label="Body"><button data-fitsex="woman" aria-pressed="${fitBody()==="woman"}">Woman</button><button data-fitsex="man" aria-pressed="${fitBody()==="man"}">Man</button></div>`:""):avEdit?avEditor()+`<div class="av-actions"><button class="btn ghost" data-avcancel>Cancel</button><button class="btn" data-avsave>Save</button></div>`:""}</div></div>`}
 /* Tasks & Projects next to My passions: the picked passion, or the first one when none is picked (using it picks that one) */
 /* editing categories happens here, in the panel beside My passions (it used to take over My passions itself) */
 function passCatPanel(d){const ALL=sortPass(d.passions||[]);const ed=catMgr&&catThemeOpen&&cats().some(x=>x.id===passCat)&&catDelArm!==passCat;
@@ -11139,7 +11143,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="958",APPT="2026-11-26T22:32:56Z";   /* APPT: when this update was made */
+const APPV="959",APPT="2026-11-26T22:37:46Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -11831,5 +11835,10 @@ function apply(){try{const h=document.documentElement,v=document.getElementById(
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-mutab]");if(!b)return;e.preventDefault();e.stopPropagation();try{nPro()[K]=b.dataset.mutab;save()}catch(_){}apply()},true);
 const r0=window.render;if(typeof r0==="function"){window.render=function(){const o=r0.apply(this,arguments);apply();return o};try{render=window.render}catch(_){}}
 const v=document.getElementById("view");if(v)new MutationObserver(apply).observe(v,{childList:true,subtree:false});apply()})();
+</script>
+<script>
+/* body hologram's own settings: open/close, and man/woman */
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-fitedit],[data-fitsex]");if(!t)return;e.preventDefault();e.stopPropagation();
+  if(t.dataset.fitsex){data.profile=Object.assign({},data.profile,{fitBody:t.dataset.fitsex});save()}else fitEdit=!fitEdit;render()},true);
 </script>
 </body></html>
