@@ -5871,9 +5871,9 @@ function bdBudget(){try{if(typeof bStats!=="function")return "";const S=bStats()
   const out=G.reduce((a,x)=>a+x.v,0),inc=+S.inc||0,left=inc-out;
   if(!G.length&&!inc)return `<p class="note" style="margin:0">No income or expenses yet</p>`;
   /* each group's bar fills against its own budget if it has one, otherwise against income (out of everything only when there's no income yet); past that limit it goes red like Calories — its colour up to the limit, red for the part over, the amount in red */
-  const rows=G.map(x=>{const L=x.lim||inc||out,txt=`${bMoney(x.v,0)} / ${bMoney(L,0)}`;
+  const rows=G.map(x=>{const L=x.lim||inc||out,txt=`${bMoney(x.v,0)}`;/* just the money (was: amount / income) */
     if(!(L&&x.v>L))return bdMeter(x.n,x.v,L,txt,x.c,x.k);const ov=Math.min(99.9,(x.v-L)/x.v*100);
-    return `<div class="meter bd-kov" style="--c:${x.c}"><div class="meter-top"><span>${esc(x.n)}</span><b><span style="color:#ff4d5e">${bMoney(x.v,0)}</span> / ${bMoney(L,0)}</b></div><div class="track"><i data-akw="bd:m${esc(x.k)}" style="width:${(100-ov).toFixed(1)}%;background:${x.c}"></i><i data-akw="bd:mo${esc(x.k)}" style="width:${ov.toFixed(1)}%;background:#ff4d5e"></i></div></div>`}).join("");
+    return `<div class="meter bd-kov" style="--c:${x.c}"><div class="meter-top"><span>${esc(x.n)}</span><b><span style="color:#ff4d5e">${bMoney(x.v,0)}</span></b></div><div class="track"><i data-akw="bd:m${esc(x.k)}" style="width:${(100-ov).toFixed(1)}%;background:${x.c}"></i><i data-akw="bd:mo${esc(x.k)}" style="width:${ov.toFixed(1)}%;background:#ff4d5e"></i></div></div>`}).join("");
   /* over budget: like Calories — green up to the income, red for the part over, and the over amount in red */
   const ovp=left<0&&out>0?Math.min(99.9,(-left)/out*100):0;
   const incRow=left<0?`<div class="meter bd-kov" style="--c:#3ddc84"><div class="meter-top"><span>Income</span><b>${bMoney(inc,0)} · <span style="color:#ff4d5e">${bMoney(-left,0)} over</span></b></div><div class="track"><i data-akw="bd:mbinc" style="width:${(100-ovp).toFixed(1)}%;background:#3ddc84"></i><i data-akw="bd:mbinco" style="width:${ovp.toFixed(1)}%;background:#ff4d5e"></i></div></div>`
@@ -5898,7 +5898,7 @@ function breakdownPanel(d){const DS=dashStats(d,today()),t=today(),tm=d.meals.fi
   return `<div class="panel bdown bstrip-p" style="margin-top:18px" data-akg="bd"><div class="bstrip"><b>Breakdown</b></div><div class="tgrid">
     <section class="bdn-sec">${bdMain(DS[0],"Nutrition")}${bdMulti(mv)}${mv.map(x=>x.g&&x.v>x.g?bdOver(x.n,x.v,x.g,`${n0(x.v)} / ${n0(x.g)} g`,x.c,x.k):bdMeter(x.n,x.v,x.g,`${n0(x.v)}${x.g?" / "+n0(x.g):""} g`,x.c,x.k)).join("")}${bdMeter("Water",nWater(t),nWGoal(),`${n0(nWater(t))} / ${n0(nWGoal())} cups`,"#4cc9ff","water")}${bdKcal(sum("kcal"),kLim(t))}</section>
     <section class="bdn-sec">${bdMain(DS[1],"Passions")}${P.length?bdMulti(P)+`<div class="bdn-scroll">${P.map(x=>bdMeter(x.n,x.v,x.g,x.g?`${fmtH(x.v)} / ${fmtH(x.g)}`:fmtH(x.v),x.c,x.k).replace("</span><b>",x.lvl?`<em class="bd-lv" data-lvl="${esc(x.lvl)}">${esc(x.lvl)}</em></span><b>`:"</span><b>")).join("")}</div>`:`<p class="note" style="margin:0">No passions yet</p>`}</section>
-    <section class="bdn-sec bdn-bud">${bdMain(DS[2],"Budget")}${bdBudget()}</section>
+    <section class="bdn-sec bdn-bud">${bdMain(Array.isArray(DS[2].v)?Object.assign({},DS[2],{v:[DS[2].v[0]]}):DS[2],"Budget")/* header: just the money spent (was: spent / income) */}${bdBudget()}</section>
   </div></div>`}
 function meter(label,v,goal,u,c){const p=goal?Math.min(v/goal,1):0;
   return `<div class="meter" style="--c:${c}"><div class="meter-top"><span>${esc(label)}</span><b>${typeof v==="number"?n0(v):v} / ${n0(goal)} ${u}</b></div><div class="track"><i style="width:${p*100}%"></i></div></div>`}
@@ -11263,7 +11263,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="984",APPT="2026-11-27T18:24:00Z";   /* APPT: when this update was made */
+const APPV="985",APPT="2026-11-27T20:30:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
