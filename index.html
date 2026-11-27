@@ -4128,7 +4128,9 @@ html.phone body #view#view#view[data-tab="dash"] .wahead .wa-it.src-b{border-lef
 /* 1) Overview: name on top, ring, then the red "over" / status line under the ring (was printed over the name) */
 html.phone body #view#view#view[data-tab="dash"] .dtiles.orbit .dtile.ob-t{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:0!important;padding-top:12px!important;padding-bottom:12px!important}
 html.phone body #view#view#view[data-tab="dash"] .dtiles.orbit .ob-l{order:1;margin:0 0 8px!important;position:static!important}
-html.phone body #view#view#view[data-tab="dash"] .dtiles.orbit .ob-r{order:2;position:static!important;margin:0!important}
+html.phone body #view#view#view[data-tab="dash"] .dtiles.orbit .ob-r{order:2;position:relative!important;margin:0!important}
+/* phone: the % sits dead centre inside its own ring, sized to fit (was: ring position:static, so the % centred on the whole cell and was too big for the ring) */
+html.phone body #view#view#view[data-tab="dash"] .dtiles.orbit .ob-p{position:absolute!important;inset:0!important;display:grid!important;place-items:center!important;margin:0!important;padding:0!important;font-size:16px!important;line-height:1!important;text-align:center!important}
 html.phone body #view#view#view[data-tab="dash"] .dtiles.orbit .ob-ov{order:3;position:static!important;margin-top:8px!important;font-size:11.5px!important;line-height:1.2;white-space:normal!important;padding:0 2px}
 html.phone body #view#view#view[data-tab="dash"] .dtiles.orbit .ob-s{order:4;position:static!important}
 html.phone body #view#view#view[data-tab="dash"] .dtiles.orbit{height:auto!important;min-height:0!important}
@@ -11377,7 +11379,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="998",APPT="2026-11-27T23:00:00Z";   /* APPT: when this update was made */
+const APPV="999",APPT="2026-11-27T23:04:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
