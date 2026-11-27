@@ -4161,6 +4161,7 @@ html.phone #view .wahead .wk-cap{font-size:10.5px;font-weight:700;letter-spacing
 html.phone #view .wahead .wk-g{padding:6px 4px 4px}
 html.phone #view .wahead .wk-h{display:flex;align-items:baseline;gap:8px;margin-bottom:7px}
 html.phone #view .wahead .wk-h b{font-size:14.5px;font-weight:650;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html.phone #view .wahead .wk-h b small{font-size:12px;font-weight:500;color:var(--muted);margin-left:4px}
 html.phone #view .wahead .wk-h span{font-size:13.5px;font-weight:700;color:var(--wc)}
 html.phone #view .wahead .wk-h span i{font-style:normal;font-weight:500;color:var(--muted)}
 html.phone #view .wahead .wk-h em{font-style:normal;font-size:11.5px;font-weight:650;padding:2px 8px;border-radius:99px;white-space:nowrap}
@@ -5802,17 +5803,17 @@ function weekAhead(d){const mon=monday(0);const days=WKO.map(i=>{const dn=DAYS[i
     return `<div class="wa-day${ds===today()?" now":""}${ds<today()?" past":""}${nT?" has-don":""}"${nT?` aria-label="${dn} ${dt.getDate()}: ${nD} of ${nT} tasks done${nM?", "+nM+" missed":""}"`:""}><div class="wa-h">${dn}<small>${don}<span class="wd-n">${dt.getDate()}</span></small></div>${it.length?it.map(x=>`<div class="wa-it st-${x.st==="donelocked"?"done":x.st} src-${x.src||"p"}${x.go?" tap":""}${x.wkg?" wa-wkg":""}" title="${esc(x.n)}"${x.go?` data-waslot="${x.go}" role="button" tabindex="0"`:""}><small>${x.t}</small><span>${x.st==="missed"?'<svg class="wa-x" viewBox="0 0 12 12" aria-label="Missed"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="#ff4d5e" stroke-width="2.4" stroke-linecap="round"/></svg>':x.st==="done"||x.st==="donelocked"?'<svg class="wa-x" viewBox="0 0 12 12" aria-label="Done"><path d="M2 6.5l2.6 2.6L10 3.5" fill="none" stroke="#3ddc84" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>':""}${esc(x.n)}</span>${x.a?`<em class="wa-amt${x.inc?" pos":""}">${x.a}</em>`:""}</div>`).join(""):`<div class="wa-none">Free</div>`}</div>`});
   return `<div class="panel wahead bstrip-p"><div class="bstrip"><b>This week</b><i>${fmtDate(ymd(mon))} – ${fmtDate(ymd(new Date(mon.getTime()+6*864e5)))}</i></div>${""/* was: weekly-goal strip above the days ("Xh of 5h this week" chips) — removed; the days now take that space */}<div class="wa-grid">${days.join("")}${wkTracks(d,mon)}</div></div>`}
 /* weekly goals ("5h a week"): a track across the whole week under the day strip — fill = time logged so far, a notch = where you'd need to be by today to stay on pace, dots = the days you logged */
-function wkTracks(d,mon){try{const DS=WKO.map(i=>{const x=new Date(mon);x.setDate(x.getDate()+wkD(i));return ymd(x)}),T=today(),ti=DS.indexOf(T),rows=[];
+function wkTracks(d,mon){try{const DS=WKO.map(i=>{const x=new Date(mon);x.setDate(x.getDate()+wkD(i));return ymd(x)}),T=today(),ti=DS.indexOf(T);let goal=0,got=0,n=0,nDone=0;const per=DS.map(()=>0);
+  /* ONE bar for all weekly goals together (was: a track per goal): time logged ÷ the total of every weekly goal; each goal counts up to its own target */
   (d.passions||[]).forEach(p=>{if(!modesOf(p).includes("schedule"))return;(p.slots||[]).filter(sl=>isWk(sl)&&sl.per==="week").forEach(sl=>{const wk=ymd(mon);if(slotState(d,p,sl,wk)==="none")return;
-    const goal=+sl.dur||0;if(!goal)return;const got=wkLogged(d,p,sl,wk),per=DS.map(ds=>d.sessions.reduce((a,x)=>a+(x.pid===p.id&&x.slotId===sl.id&&!x.planned&&x.d===ds?(+x.mins||0):0),0));
-    let col="#b99cff";try{const k=cats().find(c=>c.id===p.cat);if(k)col=catColor(k)||col}catch(_){}
-    const f=Math.min(1,got/goal),done=got>=goal,pace=ti<0?(T<DS[0]?0:1):(ti+1)/7,need=goal*pace,gap=need-got;
-    const st=done?`<em class="wk-ok">✓ done</em>`:gap>1?`<em class="wk-bh">${fmtH(Math.round(gap))} behind</em>`:`<em class="wk-on">on pace</em>`;
-    rows.push(`<div class="wk-g${done?" done":""}" style="--wc:${done?"#3ddc84":col}" role="img" aria-label="${esc(p.name)}: ${fmtH(got)} of ${fmtH(goal)} this week${done?", done":gap>1?", "+fmtH(Math.round(gap))+" behind pace":", on pace"}">
-      <div class="wk-h"><b>${esc(p.name)}</b><span>${fmtH(got)}<i> / ${fmtH(goal)}</i></span>${st}</div>
-      <div class="wk-bar"><i class="wk-f" style="width:${(f*100).toFixed(1)}%"></i>${[1,2,3,4,5,6].map(k=>`<s style="left:${(k/7*100).toFixed(3)}%"></s>`).join("")}${!done&&pace>0&&pace<1?`<u style="left:${(pace*100).toFixed(2)}%"></u>`:""}</div>
-      <div class="wk-dots">${per.map((m,i)=>`<span${i===ti?' class="td"':""}>${m?`<i style="opacity:${Math.min(1,.45+m/Math.max(30,goal/7)*.55).toFixed(2)}"></i>`:""}</span>`).join("")}</div></div>`)})});
-  return rows.length?`<div class="wk-tracks"><div class="wk-cap">Weekly goals</div>${rows.join("")}</div>`:""}catch(e){return ""}}
+    const g=+sl.dur||0;if(!g)return;const l=wkLogged(d,p,sl,wk);goal+=g;got+=Math.min(l,g);n++;if(l>=g)nDone++;
+    DS.forEach((ds,i)=>{per[i]+=d.sessions.reduce((a,x)=>a+(x.pid===p.id&&x.slotId===sl.id&&!x.planned&&x.d===ds?(+x.mins||0):0),0)})})});
+  if(!goal)return "";const f=Math.min(1,got/goal),done=got>=goal,pace=ti<0?(T<DS[0]?0:1):(ti+1)/7,gap=goal*pace-got,mx=Math.max(1,...per);
+  const st=done?`<em class="wk-ok">✓ all done</em>`:gap>1?`<em class="wk-bh">${fmtH(Math.round(gap))} behind</em>`:`<em class="wk-on">on pace</em>`;
+  return `<div class="wk-tracks"><div class="wk-g${done?" done":""}" style="--wc:${done?"#3ddc84":"#b99cff"}" role="img" aria-label="Weekly goals: ${fmtH(got)} of ${fmtH(goal)} this week, ${nDone} of ${n} goals done${done?"":gap>1?", "+fmtH(Math.round(gap))+" behind pace":", on pace"}">
+    <div class="wk-h"><b>Weekly goals <small>${nDone}/${n} done</small></b><span>${fmtH(got)}<i> / ${fmtH(goal)}</i></span>${st}</div>
+    <div class="wk-bar"><i class="wk-f" style="width:${(f*100).toFixed(1)}%"></i>${[1,2,3,4,5,6].map(k=>`<s style="left:${(k/7*100).toFixed(3)}%"></s>`).join("")}${!done&&pace>0&&pace<1?`<u style="left:${(pace*100).toFixed(2)}%"></u>`:""}</div>
+    <div class="wk-dots">${per.map((m,i)=>`<span>${m?`<i style="opacity:${(.45+.55*m/mx).toFixed(2)}"></i>`:""}</span>`).join("")}</div></div></div>`}catch(e){return ""}}
 function dashTop(d){return `<div class="dhead"><b>Dashboard</b><span>Calendar and breakdown</span></div><div class="passtop dashtop">${figurePanel().replace('<div class="panel holopanel"><div class="ph"><span>','<div class="panel holopanel bstrip-p"><div class="ph bstrip"><span>')}<div class="stack dstack">${progressPanel(d)}${weekAhead(d)}</div></div>`}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-dopen],[data-expdel]");if(!b)return;
   if(b.dataset.expdel){data.expenses=(data.expenses||[]).filter(x=>x.id!==b.dataset.expdel);render();save();return}
@@ -11356,7 +11357,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="994",APPT="2026-11-27T22:10:00Z";   /* APPT: when this update was made */
+const APPV="995",APPT="2026-11-27T22:40:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
