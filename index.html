@@ -4,6 +4,9 @@
 /* Phone Dashboard calendar: no Dots/Details switch and nothing inside the days but the date and its donut (was: event dots / detail list in each day) */
 html.phone body #view#view#view#view#view[data-tab="dash"] .cal-vsw{display:none!important}
 html.phone body #view#view#view#view#view[data-tab="dash"] .mcal .mc>:not(.mn){display:none!important}
+/* Phone Dashboard: the weekly goals bar sits straight in the calendar panel — no rounded inner box around it (was the old week strip's box) */
+html.phone body #view#view#view#view#view[data-tab="dash"] .wahead .wa-grid{border:0!important;border-radius:0!important;background:none!important;box-shadow:none!important;margin:0!important;padding:0!important;outline:0!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .wahead .wa-grid::before,html.phone body #view#view#view#view#view[data-tab="dash"] .wahead .wa-grid::after{display:none!important}
 /* ===== Phone Dashboard: figure (left column) + Overview (right column) side by side; Overview = 2×2 rings with the knot art in the 4th spot; This week full width under both ===== */
 html.phone body #view#view#view#view#view[data-tab="dash"] .dashtop{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;column-gap:8px!important;row-gap:12px!important;align-items:stretch!important}
 html.phone body #view#view#view#view#view[data-tab="dash"] .dashtop>.dstack{display:contents!important}
@@ -11417,7 +11420,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1001",APPT="2026-11-27T23:06:00Z";   /* APPT: when this update was made */
+const APPV="1002",APPT="2026-11-27T23:12:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
