@@ -1,12 +1,15 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<style>html{background:#0a0f1e}/* dark from the first frame, so nothing white shows under the opening screen (later styles set the real background) */
-html:not(.aot-ready) .shell{visibility:hidden!important}/* the app stays hidden until it is fully built (styles, phone/iPad layout, first screen) — on every load and every update reload; was: the tab bar could paint unstyled (giant icons) while the page was still loading */</style>
+<style>html{background:#0a0f1e}/* dark from the first frame, so nothing white shows under the opening screen (later styles set the real background) */</style>
 <script>/* phones: lay the page out exactly like the iPad/desktop (1180px wide, scaled to fit) — only the tabs move to the bottom */
 (function(){try{var w=Math.min(screen.width,screen.height),W=Math.max(screen.width,screen.height);
   /* iPad / tablet: a touch screen that's not a phone → tabs go to a bottom bar (computers keep the side panel) */
   if(w>=700&&W<=1600&&(navigator.maxTouchPoints||0)>0&&matchMedia("(pointer:coarse)").matches)document.documentElement.classList.add('tablet');
-  if(w<700){/* was: setting the viewport to width=1180 — iPhone then left a black band at the bottom */document.documentElement.classList.add('phone')}}catch(e){}})();</script>
+  if(w<700){/* was: setting the viewport to width=1180 — iPhone then left a black band at the bottom */document.documentElement.classList.add('phone');
+    /* the tab bar is sized for the 1180px page and zoomed down by --az; set it now, before the first paint (was only set by fit() at the end of the file, so while loading / after an update reload the bar painted 3× too big) */
+    var de=document.documentElement,vw=de.clientWidth||Math.min(innerWidth||w,w);if(vw&&vw<1180)de.style.setProperty('--az',vw/1180)}
+  /* launch build: hidden tabs (Reminders, Kitchen, …) are hidden from the first paint too (the class was added late, so they flashed in) */
+  document.documentElement.classList.add('launch')}catch(e){}})();</script>
 <!-- phone height script removed (not needed with the scaled shell) -->
 <script>/* phones: mark the page while it's scrolling so animations can pause */
 (function(){var de=document.documentElement;if(!de.classList.contains('phone'))return;var t=0;document.addEventListener('scroll',function(){if(!t)de.classList.add('scrolling');clearTimeout(t);t=setTimeout(function(){de.classList.remove('scrolling');t=0},200)},{capture:true,passive:true})})();</script>
@@ -11270,7 +11273,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="988",APPT="2026-11-27T21:00:00Z";   /* APPT: when this update was made */
+const APPV="989",APPT="2026-11-27T21:05:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -11983,5 +11986,4 @@ const v=document.getElementById("view");if(v)new MutationObserver(apply).observe
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-fitedit],[data-fitsex]");if(!t)return;e.preventDefault();e.stopPropagation();
   if(t.dataset.fitsex){const pr=data.profile=Object.assign({},data.profile,{fitBody:t.dataset.fitsex});pr.body=Object.assign({unit:"us",act:"mod",goal:"keep"},pr.body||{},{sex:t.dataset.fitsex==="man"?"m":"f"});/* one source: the same man/woman the calorie calculator uses */save()}else fitEdit=!fitEdit;render()},true);
 </script>
-<script>/* show the app only once it is fully built */(function(){const H=document.documentElement,t0=Date.now();const ok=()=>{const v=document.getElementById("view");return !!v&&v.children.length>0&&(H.classList.contains("phone")||H.classList.contains("tablet")||innerWidth>1100)};const go=()=>{if(ok()||Date.now()-t0>8000){requestAnimationFrame(()=>requestAnimationFrame(()=>H.classList.add("aot-ready")));return}setTimeout(go,40)};go()})();</script>
 </body></html>
