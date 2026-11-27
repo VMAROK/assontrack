@@ -315,7 +315,11 @@ window.aotFullH=()=>{const sw=screen.width,sh=screen.height,land=innerWidth>inne
       el.addEventListener("pointermove",e=>{const q=P.get(e.pointerId);if(!q)return;if(Math.abs(q.x-e.clientX)+Math.abs(q.y-e.clientY)>3)moved=1;q.x=e.clientX;q.y=e.clientY;sync()});
       /* holding counts as playing, so lifting after a hold doesn't enter the app — only a quick tap does */
       const up=e=>{if(performance.now()-t0p>300)moved=1;P.delete(e.pointerId);sync()};el.addEventListener("pointerup",up);el.addEventListener("pointercancel",up)}
-    let gone=false;const done=()=>{if(gone)return;gone=true;/* closes only on a tap now, so no wait-while-playing check */el.classList.add("out");setTimeout(()=>{cancelAnimationFrame(raf);removeEventListener("resize",size);el.remove()},1000)};
+    let gone=false,waitT0=0;
+    /* the app must be fully built behind it before it fades: page loaded, the first screen drawn, phone/iPad layout applied — otherwise a quick tap on a slow connection showed a half-built page (huge tab bar, empty screen) */
+    const appReady=()=>{const v=document.getElementById("view"),H=document.documentElement;return document.readyState==="complete"&&!!v&&v.children.length>0&&(H.classList.contains("phone")||H.classList.contains("tablet")||innerWidth>1100)};
+    const done=()=>{if(gone)return;if(!appReady()&&(!waitT0||performance.now()-waitT0<10000)){if(!waitT0)waitT0=performance.now();setTimeout(done,80);return}
+      if(!el.__rf){el.__rf=1;requestAnimationFrame(()=>requestAnimationFrame(done));return}gone=true;/* closes only on a tap now, so no wait-while-playing check */el.classList.add("out");setTimeout(()=>{cancelAnimationFrame(raf);removeEventListener("resize",size);el.remove()},1000)};
     const ready=()=>setTimeout(done,Math.max(0,(R?400:min)-(performance.now()-t0)));
     /* stays until the user taps to enter (was: faded out by itself after ~2s — if(manual||document.readyState==="complete")ready();else addEventListener("load",ready,{once:true});setTimeout(done,max);) */
     const hint=()=>{if(gate){setTimeout(hint,400);return}el.classList.add("sp-ready")};if(document.readyState==="complete")setTimeout(hint,1600);else addEventListener("load",()=>setTimeout(hint,1200),{once:true});
@@ -5879,7 +5883,7 @@ function bdBudget(){try{if(typeof bStats!=="function")return "";const S=bStats()
   /* over budget: like Calories — green up to the income, red for the part over, and the over amount in red */
   const ovp=left<0&&out>0?Math.min(99.9,(-left)/out*100):0;
   const incRow=left<0?`<div class="meter bd-kov" style="--c:#3ddc84"><div class="meter-top"><span>Income</span><b>${bMoney(inc,0)} · <span style="color:#ff4d5e">${bMoney(-left,0)} over</span></b></div><div class="track"><i data-akw="bd:mbinc" style="width:${(100-ovp).toFixed(1)}%;background:#3ddc84"></i><i data-akw="bd:mbinco" style="width:${ovp.toFixed(1)}%;background:#ff4d5e"></i></div></div>`
-    :bdMeter("Income",Math.max(0,left),inc,inc?`${bMoney(inc,0)} · ${bMoney(left,0)} left`:"none yet","#3ddc84","binc");
+    :bdMeter("Income",Math.max(0,left),inc,inc?`${bMoney(inc,0)}`/* just the money (was: income · left) */:"none yet","#3ddc84","binc");
   return (G.length?bdMulti(G)+`<div class="bdn-scroll bdn-bscroll">${rows}</div>`:`<p class="note" style="margin:0">No expenses yet</p>`)+`<div class="bdn-binc">${incRow}</div>`}catch(e){return ""}}
 function bdMulti(parts){const t=parts.reduce((a,x)=>a+x.v,0);return `<div class="bdn-all">${t?parts.filter(x=>x.v>0).map(x=>`<i data-akf="bd:${esc(x.k)}" style="flex:${x.v};--c:${x.c}" title="${esc(x.n)}"></i>`).join(""):""}</div><div class="bdn-leg">${parts.map(x=>`<span style="--c:${x.c}"><i></i>${esc(x.n)}<em>${t?Math.round(x.v/t*100):0}%</em></span>`).join("")}</div>`}
 /* Breakdown calories: under the limit = whole bar orange; over = green up to the limit, red for the part over */
@@ -11265,7 +11269,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="986",APPT="2026-11-27T20:40:00Z";   /* APPT: when this update was made */
+const APPV="987",APPT="2026-11-27T20:50:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
