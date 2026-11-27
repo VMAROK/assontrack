@@ -24,7 +24,13 @@ html.phone body #view#view#view#view#view[data-tab="dash"] .holopanel>.hstage>*{
 html.phone body #view#view#view#view#view[data-tab="dash"] .holopanel>.hcap{order:4;text-align:center!important;font-size:12px!important;line-height:1.35}
 html.phone body #view#view#view#view#view[data-tab="dash"] .holopanel>.avfoot{order:5;width:100%}
 /* Overview column: 2 rows × 2 columns, knot art 4th */
-html.phone body #view#view#view#view#view[data-tab="dash"] .dtiles.orbit{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:1fr!important;align-content:stretch!important;gap:4px!important;padding:10px 6px!important;height:auto!important}
+/* Overview title strip on top (spans both columns) + dividers between the 4 cells: one vertical line down the middle, one horizontal line between the rows */
+html.phone body #view#view#view#view#view[data-tab="dash"] .dtiles.orbit>.dt-strip{display:flex!important;grid-column:1/-1!important;margin:0!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .dtiles.orbit{grid-template-rows:auto 1fr 1fr!important;grid-auto-rows:auto!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .dtiles.orbit>.dtile{border:0!important;border-radius:0!important;margin:0!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .dtiles.orbit>.dtile:nth-child(2),html.phone body #view#view#view#view#view[data-tab="dash"] .dtiles.orbit>.dtile:nth-child(4){border-right:1px solid rgba(255,255,255,.12)!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .dtiles.orbit>.dtile:nth-child(2),html.phone body #view#view#view#view#view[data-tab="dash"] .dtiles.orbit>.dtile:nth-child(3){border-bottom:1px solid rgba(255,255,255,.12)!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .dtiles.orbit{grid-template-columns:repeat(2,minmax(0,1fr))!important;align-content:stretch!important;gap:0!important;padding:0!important;height:auto!important}
 html.phone body #view#view#view#view#view[data-tab="dash"] .dtiles.orbit>.dtile{padding:6px 0!important;justify-content:center!important}
 html.phone body #view#view#view#view#view[data-tab="dash"] .dtiles.orbit .ob-l{font-size:9.5px!important;margin:0 0 6px!important;letter-spacing:.16em!important}
 html.phone body #view#view#view#view#view[data-tab="dash"] .dtiles.orbit .ob-r{width:62px!important}
@@ -11411,7 +11417,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1000",APPT="2026-11-27T23:10:00Z";   /* APPT: when this update was made */
+const APPV="1001",APPT="2026-11-27T23:06:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
