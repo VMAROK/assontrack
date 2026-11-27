@@ -5423,6 +5423,28 @@ html body #view#view#view#view#view#view#view .panel .panel,html body #view#view
 /* phone Nutrition: the figure panel's ::after is its middle divider, so its theme border is drawn as an inset line instead */
 html.phone:not(.tpl-bd-none) body #view#view#view#view#view#view[data-tab="fuel"] .panel.holopanel{box-shadow:inset 0 0 0 1px rgba(var(--lr),.24)!important}
 html.phone.tpl-bd-dark body #view#view#view#view#view#view[data-tab="fuel"] .panel.holopanel{box-shadow:inset 0 0 0 1px rgba(0,0,0,.7)!important}
+
+/* ===== Phone: one spacing everywhere — 6px page sides, 12px between every panel (above, below and side by side) on every tab ===== */
+html.phone body #view#view#view#view#view#view#view{padding-left:6px!important;padding-right:6px!important}
+html.phone body #view#view#view#view#view#view#view>:is(.panel,.passtop,.bstick,.grid,.dashtop,.stack){margin-top:12px!important;margin-bottom:0!important}
+html.phone body #view#view#view#view#view#view#view :is(.passtop,.pgrid,.pg-cell,.stack,.grid.tiles,.grid.cols2,.dashtop):not(.panel *){row-gap:12px!important;column-gap:12px!important}
+html.phone body #view#view#view#view#view#view#view .bstick>.panel{margin-top:12px!important}
+html.phone body #view#view#view#view#view#view#view :is(.passtop,.pgrid,.pg-cell,.stack,.grid,.dashtop,.bstick)>.panel:not(.panel *){margin-top:0!important;margin-bottom:0!important}
+html.phone body #view#view#view#view#view#view#view .bstick>.grid.tiles+.panel,html.phone body #view#view#view#view#view#view#view .bstick>.panel+.panel{margin-top:12px!important}
+/* phone Dashboard figure panel: shaded title strip like Overview's (same height), gear inside it */
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .holopanel>.ph{background:rgba(0,0,0,.18)!important;height:44px!important;min-height:44px!important;box-sizing:border-box!important;padding:0 34px!important;margin-bottom:4px!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dtiles.orbit>.dt-strip{height:44px!important;min-height:44px!important;box-sizing:border-box!important;padding-top:0!important;padding-bottom:0!important;align-items:center!important;justify-content:center!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .holopanel>.ph .avgear{top:4px!important;right:2px!important}
+
+/* phone: the page ends 12px under the last panel on every tab (was 90px of empty space; the tab bar sits below the page, not over it) */
+html.phone body #view#view#view#view#view#view#view{padding-bottom:12px!important}
+html.phone body #view#view#view#view#view#view#view>.ptp-below:empty{display:none!important}
+/* phone Dashboard: no empty row under the weekly goals bar when no day has a dot yet, and the panel ends 12px under the bar */
+html.phone body #view#view#view#view#view#view#view .wahead .wk-dots:not(:has(i)){display:none!important}
+html.phone body #view#view#view#view#view#view#view .wahead .wk-tracks{padding-bottom:0!important;margin-bottom:0!important}
+html.phone body #view#view#view#view#view#view#view .wahead{padding-bottom:12px!important}
+/* phone Dashboard figure panel: its title strip spans the full panel width like Overview's */
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .holopanel>.ph{align-self:stretch!important}
 </style>
 
 <div id="bgimg" class="on" aria-hidden="true"></div><div id="bgimg2" aria-hidden="true"></div><canvas id="bglive" aria-hidden="true"></canvas><div id="bgspin" aria-hidden="true"></div>
@@ -11431,7 +11453,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1003",APPT="2026-11-27T23:14:00Z";   /* APPT: when this update was made */
+const APPV="1004",APPT="2026-11-27T23:25:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -11574,7 +11596,11 @@ if("serviceWorker" in navigator&&location.protocol==="https:"){addEventListener(
 </script>
 <script>/* mark panels whose first thing is a title strip, and where the strip ends (for the borderless strip) */
 (()=>{let t=0;const run=()=>{t=0;document.querySelectorAll('#view .bstrip,#view .calhead.cal-c,#view .bm-has>.bc>.bc-h,#view .bwg-solo>.ph:first-child,#view[data-tab="fuel"] :is(.holopanel,.flogp,.nmp,.usp,.wtr)>.ph:first-child').forEach(st=>{const p=st.closest('.panel');if(!p||st.offsetTop>4)return;p.classList.add('hasStrip');p.style.setProperty('--sh',(st.offsetTop+st.offsetHeight)+'px')})/* the figure panel gets the theme's border on every tab, whatever its layout (it was skipped when its title wasn't at the very top) */
-  document.querySelectorAll('#view .panel.holopanel').forEach(p=>{if(!p.classList.contains('hasStrip')){p.classList.add('hasStrip');p.style.setProperty('--sh','0px')}})};
+  document.querySelectorAll('#view .panel.holopanel').forEach(p=>{if(!p.classList.contains('hasStrip')){p.classList.add('hasStrip');p.style.setProperty('--sh','0px')}})
+  /* phone: a shaded title strip always sits flush with its panel's top and sides, whatever padding that panel has (was 11–12px of gap above some strips) */
+  if(document.documentElement.classList.contains('phone'))document.querySelectorAll('#view .panel').forEach(p=>{if(p.parentElement.closest('.panel'))return;const f=p.firstElementChild;if(!f||!f.matches('.ph,.bstrip,.bp-h,.bc-h,.dt-strip'))return;
+    const fc=getComputedStyle(f);if(fc.backgroundColor==='rgba(0, 0, 0, 0)'||fc.position==='absolute')return;const c=getComputedStyle(p);
+    f.style.setProperty('margin-top','-'+c.paddingTop,'important');f.style.setProperty('margin-left','-'+c.paddingLeft,'important');f.style.setProperty('margin-right','-'+c.paddingRight,'important');f.style.setProperty('width','auto','important')})};
   new MutationObserver(()=>{if(!t)t=requestAnimationFrame(run)}).observe(document.documentElement,{childList:true,subtree:true});addEventListener('resize',()=>{if(!t)t=requestAnimationFrame(run)})})();
 </script>
 <script>/* side tabs: remember hidden/shown */
