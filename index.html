@@ -4149,7 +4149,11 @@ html body #view .dcal-ic{width:36px;height:36px;border-radius:10px;background:rg
 html body #view .dcal-t{flex:1;min-width:0}html body #view .dcal-t b{display:block;font-size:16px}html body #view .dcal-t small{color:var(--muted);font-size:13px}
 html body #view .dcal-ch{font-size:22px;color:var(--muted)}
 html body #view .wahead .dcal-in{margin:0!important;border-bottom:1px solid rgba(255,255,255,.08);padding:11px 14px}
-html body #view .wahead .dcal-inrow{border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:4px}
+html body #view .wahead .dcal-inrow{border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:0}
+html body #view#view#view#view#view#view .wahead .dcal-inrow>.panel.panel{padding:0!important;margin:0!important;width:100%!important;max-width:none!important;border-radius:0!important}
+html body #view#view#view .wahead .dcal-inrow .calhead{padding:10px 12px 8px!important;margin:0!important}
+html body #view#view#view .wahead .dcal-inrow .mcal{margin:0!important;border-radius:0!important;width:100%!important;max-width:none!important;border-left:0!important;border-right:0!important}
+html body #view#view#view .wahead .dcal-inrow .calhead>.cal-add{order:3;all:unset;box-sizing:border-box;order:3;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;margin-left:4px;font-size:19px;font-weight:600;line-height:1;color:#fff;background:rgba(91,140,255,.25);border:1px solid rgba(91,140,255,.6);cursor:pointer;flex:none}
 html body #view#view#view .wahead .dcal-inrow .calhead{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:6px!important;grid-template-columns:none!important}
 html body #view#view#view .wahead .dcal-inrow .calhead>h2{order:0;flex:1 1 auto;min-width:0;margin:0!important;font-size:17px!important;white-space:nowrap;text-align:left!important;position:static!important;transform:none!important}
 html body #view#view#view .wahead .dcal-inrow .calhead>.calnav{order:1;position:static!important;transform:none!important;margin:0!important;width:30px!important;height:30px!important;min-width:0!important;padding:0!important;font-size:15px!important}
@@ -5779,7 +5783,18 @@ function todayStrip(d){const t=today(),di=dayIdx(t),now=Date.now();
   const R=RM().filter(r=>!r.done&&r.d===t).sort((a,b)=>rAt(a)-rAt(b)),nx=R.find(r=>rAt(r)>=now)||R[0];
   const rm=nx?tile("rem",`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20a2 2 0 0 0 4 0"/></svg>`,nx.tm?fmtTime(nx.tm):"Today",esc(nx.t||"Reminder"),R.length>1?R.length+" today":rAt(nx)<now?"overdue":"next up",rAt(nx)<now?"miss":""):tile("rem",`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20a2 2 0 0 0 4 0"/></svg>`,"Reminders","All clear","nothing left today","ok");
   return `<div class="tds" role="group" aria-label="Today">${meal}${wo}${ps}${rm}</div>`}
-let dCalOpen=false;
+let dCalOpen=false,evSheet=false;
+/* Add an event window (phone): opened by the ＋ in the calendar header */
+function evSheetPaint(){let h=document.getElementById("evHost");if(!evSheet||tab!=="dash"){if(h)h.remove();return}if(!h){h=document.createElement("div");h.id="evHost";document.body.appendChild(h)}
+  h.innerHTML=`<div class="bdw dov" data-evbg><div class="bdw-p panel" role="dialog" aria-modal="true" aria-label="Add an event"><div class="bdw-h"><div><b>Add an event</b></div><button type="button" class="bdw-x" data-evx aria-label="Close">×</button></div>
+    <form class="f" id="evForm"><label>Event<input id="evT" required placeholder="Dance class" autocomplete="off"></label>
+      <div class="f2"><label>Date<input id="evD" type="date" value="${calSel||today()}" required></label><label>Time<input id="evTm" type="time"></label></div>
+      <button class="btn">Add to calendar</button></form></div></div>`;setTimeout(()=>{const i=document.getElementById("evT");i&&i.focus({preventScroll:true})},80)}
+document.addEventListener("click",e=>{const t=e.target;if(!t.closest)return;
+  if(t.closest("[data-evadd]")){e.preventDefault();e.stopPropagation();evSheet=true;evSheetPaint();return}
+  if(t.closest("[data-evx]")||(t.matches&&t.matches("[data-evbg]"))){e.preventDefault();e.stopPropagation();evSheet=false;evSheetPaint()}},true);
+document.addEventListener("submit",e=>{if(e.target.id==="evForm"&&evSheet)setTimeout(()=>{evSheet=false;evSheetPaint()},0)},true);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&evSheet){evSheet=false;evSheetPaint()}});
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-dcal]");if(!b)return;e.preventDefault();e.stopPropagation();dCalOpen=!dCalOpen;const v=$("#view"),st=v?v.scrollTop:0;render();if(v)v.scrollTop=st},true);
 function vDash(){
   const d=D(),g=d.goals,t=today(),tm=d.meals.filter(m=>m.d===t);
@@ -5787,8 +5802,9 @@ function vDash(){
   const P=d.passions,woT=d.workouts.filter(w=>w.d===t).length;
   const PHd=document.documentElement.classList.contains("phone");/* phone: the month calendar + Add an event sit behind one row */
   /* phone: the calendar lives at the top of the This week panel (same panel) — a month row that opens the full month + Add an event in place. was: its own row under Breakdown */
-  const calIn=!PHd?"":!dCalOpen?`<button type="button" class="dcal-tg dcal-in" data-dcal aria-expanded="false"><span class="dcal-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span><span class="dcal-t"><b>${(calMonth||new Date()).toLocaleDateString(undefined,{month:"long",year:"numeric"})}</b><small>Calendar and add an event</small></span><span class="dcal-ch" aria-hidden="true">›</span></button>`
-    :`<div class="dcal-inrow">${bigCal(d)}<button type="button" class="dcal-hide" data-dcal aria-expanded="true">Hide calendar</button></div>`;
+  /* phone: the full month calendar, edge to edge, at the top of the This week panel; Add an event = the ＋ in its header, which opens a window (was: a fold-up row, then the form under the calendar) */
+  const calIn=!PHd?"":(()=>{const h=bigCal(d),i=h.indexOf('</div><div class="panel cal-tab cal-evp">');let c=i>0?h.slice(0,i+6):h;
+    c=c.replace('</div>\n    <div class="mcal','<button type="button" class="cal-add" data-evadd aria-label="Add an event" title="Add an event">＋</button></div>\n    <div class="mcal');return `<div class="dcal-inrow">${c}</div>`})();
   const top=dashTop(d);
   return banner()+/* Today strip removed: todayStrip(d)+ */(PHd?top.replace('<div class="wa-grid">',calIn+'<div class="wa-grid">'):top)+breakdownPanel(d)+(PHd?"":`<div class="dcal-row">${bigCal(d)}</div>`);
 }
@@ -11283,7 +11299,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="990",APPT="2026-11-27T21:10:00Z";   /* APPT: when this update was made */
+const APPV="991",APPT="2026-11-27T21:15:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
