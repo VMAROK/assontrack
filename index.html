@@ -1,5 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>html{background:#0a0f1e}/* dark from the first frame, so nothing white shows under the opening screen (later styles set the real background) */</style>
 <script>/* phones: lay the page out exactly like the iPad/desktop (1180px wide, scaled to fit) — only the tabs move to the bottom */
 (function(){try{var w=Math.min(screen.width,screen.height),W=Math.max(screen.width,screen.height);
   /* iPad / tablet: a touch screen that's not a phone → tabs go to a bottom bar (computers keep the side panel) */
@@ -143,7 +144,7 @@
 <!-- opening screen: five styles (Settings → Opening screen); drawn at the screen's full pixel density so it stays sharp -->
 <!-- was: a single "Specks" opening screen (v784) — its look is style 1 below -->
 <style>
-#aotSplash{position:fixed;inset:0;bottom:auto;height:var(--apph,100%);z-index:2147483000;overflow:hidden;background:#0a0f1e;transition:opacity .9s cubic-bezier(.4,0,.2,1),visibility 0s linear .9s;-webkit-user-select:none;user-select:none}
+#aotSplash{position:fixed;inset:0;bottom:auto;height:var(--apph,100%);height:max(var(--apph,100%),100lvh);box-shadow:0 0 0 100vmax #0a0f1e;/* always reaches the very bottom (home bar area) — the measured height can come up short at launch on iPhone */z-index:2147483000;overflow:hidden;background:#0a0f1e;transition:opacity .9s cubic-bezier(.4,0,.2,1),visibility 0s linear .9s;-webkit-user-select:none;user-select:none}
 #aotSplash.out{opacity:0;visibility:hidden;pointer-events:none}
 #aotSplash canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 #aotSplash .sp-grain{position:absolute;inset:-50%;opacity:.06;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");animation:spGr 1s steps(4) infinite}
@@ -4131,6 +4132,7 @@ html.phone body #view#view#view#view[data-tab="dash"] .wahead .wa-it>span{grid-a
 html.phone body #view#view#view#view[data-tab="dash"] .wahead .wa-it>.wa-amt{grid-area:a;font-style:normal;font-size:15px;font-weight:700;color:#ff7a88;white-space:nowrap}
 html.phone body #view#view#view#view[data-tab="dash"] .wahead .wa-it>.wa-amt.pos{color:#3ddc84}
 html:not(.phone) #view .wa-amt{display:none}
+html.phone body #view#view#view#view[data-tab="dash"] .dtiles.orbit .dtile.ob-art{display:none!important}
 /* 4) Your figure: shorter */
 html.phone body #view#view#view#view[data-tab="dash"] .holopanel{height:auto!important;min-height:0!important}
 /* 5) calendar row */
@@ -11263,7 +11265,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="985",APPT="2026-11-27T20:30:00Z";   /* APPT: when this update was made */
+const APPV="986",APPT="2026-11-27T20:40:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
