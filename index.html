@@ -1,6 +1,38 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<style>html{background:#0a0f1e}/* dark from the first frame, so nothing white shows under the opening screen (later styles set the real background) */</style>
+<style>html{background:#0a0f1e}/* dark from the first frame, so nothing white shows under the opening screen (later styles set the real background) */
+/* Phone Dashboard calendar: no Dots/Details switch and nothing inside the days but the date and its donut (was: event dots / detail list in each day) */
+html.phone body #view#view#view#view#view[data-tab="dash"] .cal-vsw{display:none!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .mcal .mc>:not(.mn){display:none!important}
+/* ===== Phone Dashboard: figure (left column) + Overview (right column) side by side; Overview = 2×2 rings with the knot art in the 4th spot; This week full width under both ===== */
+html.phone body #view#view#view#view#view[data-tab="dash"] .dashtop{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;column-gap:8px!important;row-gap:12px!important;align-items:stretch!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .dashtop>.dstack{display:contents!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .dashtop>.holopanel{grid-column:1!important;grid-row:1!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .dashtop>.dstack>.dtiles{grid-column:2!important;grid-row:1!important;margin:0!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .dashtop>.dstack>:not(.dtiles){grid-column:1/-1!important;grid-row:2!important}
+/* figure column: title, figure, look switch, caption — stacked and centred */
+html.phone body #view#view#view#view#view[data-tab="dash"] .holopanel{display:flex!important;flex-direction:column!important;align-items:center!important;gap:8px!important;padding:12px 8px!important;height:auto!important;align-self:stretch!important;align-content:normal!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .holopanel>.ph{order:1;width:100%;display:flex!important;align-items:center!important;justify-content:center!important;gap:6px}
+html.phone body #view#view#view#view#view[data-tab="dash"] .holopanel>.ph>span{font-size:15px!important;white-space:nowrap}
+html.phone body #view#view#view#view#view[data-tab="dash"] .holopanel{position:relative!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .holopanel>.ph{padding-right:30px!important;padding-left:30px!important;position:static!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .holopanel>.ph .avgear{position:absolute!important;top:6px!important;right:4px!important;transform:scale(.72);transform-origin:top right;margin:0!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .holopanel>.holo{order:2;width:110px!important;height:140px!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .holopanel>.holo canvas{width:110px!important;height:140px!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .holopanel>.hstage{order:3;transform:none!important;justify-content:center!important;max-width:100%}
+html.phone body #view#view#view#view#view[data-tab="dash"] .holopanel>.hstage>*{font-size:11px!important;padding:5px 7px!important;min-width:0!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .holopanel>.hcap{order:4;text-align:center!important;font-size:12px!important;line-height:1.35}
+html.phone body #view#view#view#view#view[data-tab="dash"] .holopanel>.avfoot{order:5;width:100%}
+/* Overview column: 2 rows × 2 columns, knot art 4th */
+html.phone body #view#view#view#view#view[data-tab="dash"] .dtiles.orbit{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:1fr!important;align-content:stretch!important;gap:4px!important;padding:10px 6px!important;height:auto!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .dtiles.orbit>.dtile{padding:6px 0!important;justify-content:center!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .dtiles.orbit .ob-l{font-size:9.5px!important;margin:0 0 6px!important;letter-spacing:.16em!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .dtiles.orbit .ob-r{width:62px!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .dtiles.orbit .ob-p{font-size:13px!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .dtiles.orbit .ob-ov{font-size:10px!important;margin-top:5px!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .dtiles.orbit>.dtile.ob-art{display:flex!important;align-items:center!important;justify-content:center!important;min-height:0!important;padding-top:22px!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .dtiles.orbit>.dtile.ob-art canvas{position:relative!important;inset:auto!important;width:62px!important;height:62px!important;max-width:100%}
+</style>
 <script>/* phones: lay the page out exactly like the iPad/desktop (1180px wide, scaled to fit) — only the tabs move to the bottom */
 (function(){try{var w=Math.min(screen.width,screen.height),W=Math.max(screen.width,screen.height);
   /* iPad / tablet: a touch screen that's not a phone → tabs go to a bottom bar (computers keep the side panel) */
@@ -11379,7 +11411,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="999",APPT="2026-11-27T23:04:00Z";   /* APPT: when this update was made */
+const APPV="1000",APPT="2026-11-27T23:10:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
