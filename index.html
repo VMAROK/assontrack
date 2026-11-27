@@ -4133,7 +4133,15 @@ html.phone body #view#view#view[data-tab="dash"] .dtiles.orbit .ob-ov{order:3;po
 html.phone body #view#view#view[data-tab="dash"] .dtiles.orbit .ob-s{order:4;position:static!important}
 html.phone body #view#view#view[data-tab="dash"] .dtiles.orbit{height:auto!important;min-height:0!important}
 /* 2) This week: today's label readable on the gold pill; items as compact rows with the amount on the right */
-html.phone body #view#view#view#view[data-tab="dash"] .wahead .wa-day.wsel>.wa-h,html.phone body #view#view#view#view[data-tab="dash"] .wahead .wa-day.now>.wa-h{color:#141414!important}
+/* week strip: each day centred in its column; the picked day = one gold pill with dark text; today (when not picked) keeps its normal label and a gold number */
+html.phone body #view#view#view#view#view[data-tab="dash"] .wahead .wa-day>.wa-h{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;gap:3px!important;padding:7px 0!important;margin:0 2px!important;border-radius:12px!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .wahead .wa-day>.wa-h>small{margin:0!important;display:block!important;text-align:center!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .wahead .wa-day.wsel>.wa-h,html.phone body #view#view#view#view#view[data-tab="dash"] .wahead .wa-day.wsel>.wa-h>small{color:#141414!important;opacity:1!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .wahead .wa-day.now:not(.wsel)>.wa-h{color:inherit!important;background:transparent!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .wahead .wa-day.now:not(.wsel)>.wa-h>small{color:#ffc533!important;opacity:1!important;font-weight:800!important;background:transparent!important;box-shadow:none!important}
+html.phone body #view#view#view#view#view[data-tab="dash"] .wahead .wa-day.wsel.now>.wa-h>small{background:transparent!important;color:#141414!important;box-shadow:none!important}
+/* This week panel: same width as the panels above and below */
+html.phone body #view#view#view#view#view[data-tab="dash"] .dstack>.wahead.panel{margin-left:0!important;margin-right:0!important;width:auto!important;max-width:none!important;align-self:stretch!important}
 html.phone body #view#view#view#view[data-tab="dash"] .wahead .wa-it{grid-template-columns:1fr auto!important;grid-template-areas:"n a" "t a";align-items:center;column-gap:10px!important;row-gap:1px!important;padding:8px 12px!important;border-radius:10px}
 html.phone body #view#view#view#view[data-tab="dash"] .wahead .wa-it>small{grid-area:t;font-size:12px!important}
 html.phone body #view#view#view#view[data-tab="dash"] .wahead .wa-it>span{grid-area:n;font-size:15px!important;font-weight:600}
@@ -11299,7 +11307,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="991",APPT="2026-11-27T21:15:00Z";   /* APPT: when this update was made */
+const APPV="992",APPT="2026-11-27T21:20:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
