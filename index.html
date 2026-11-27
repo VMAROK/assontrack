@@ -4148,6 +4148,13 @@ html body #view .dcal-tg{all:unset;box-sizing:border-box;display:flex;align-item
 html body #view .dcal-ic{width:36px;height:36px;border-radius:10px;background:rgba(91,140,255,.16);color:#5b8cff;display:grid;place-items:center;flex:none}
 html body #view .dcal-t{flex:1;min-width:0}html body #view .dcal-t b{display:block;font-size:16px}html body #view .dcal-t small{color:var(--muted);font-size:13px}
 html body #view .dcal-ch{font-size:22px;color:var(--muted)}
+html body #view .wahead .dcal-in{margin:0!important;border-bottom:1px solid rgba(255,255,255,.08);padding:11px 14px}
+html body #view .wahead .dcal-inrow{border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:4px}
+html body #view#view#view .wahead .dcal-inrow .calhead{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:6px!important;grid-template-columns:none!important}
+html body #view#view#view .wahead .dcal-inrow .calhead>h2{order:0;flex:1 1 auto;min-width:0;margin:0!important;font-size:17px!important;white-space:nowrap;text-align:left!important;position:static!important;transform:none!important}
+html body #view#view#view .wahead .dcal-inrow .calhead>.calnav{order:1;position:static!important;transform:none!important;margin:0!important;width:30px!important;height:30px!important;min-width:0!important;padding:0!important;font-size:15px!important}
+html body #view#view#view .wahead .dcal-inrow .calhead>.cal-vsw{order:2;position:static!important;transform:none!important;margin:0 0 0 2px!important;zoom:.85}
+html body #view .wahead .dcal-inrow>.panel{border:0!important;background:transparent!important;box-shadow:none!important;margin:0!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 html body #view .dcal-hide{all:unset;cursor:pointer;display:block;margin:14px auto 6px;font-size:13px;font-weight:600;color:var(--muted);padding:6px 12px}html.phone body #view#view#view[data-tab="dash"] .wahead .wa-it.src-e{border-left-color:#4cc9ff}html.phone body #view#view#view[data-tab="dash"] .wahead .wa-it.st-missed{border-left-color:#ff4d5e}
 html.phone body #view#view#view[data-tab="dash"] .wahead .wa-it small{font-size:13px!important;opacity:.7}html.phone body #view#view#view[data-tab="dash"] .wahead .wa-it span{font-size:16px!important;font-weight:600;white-space:normal!important}
 html.phone body #view#view#view[data-tab="dash"] .wahead .wa-none{grid-column:1/-1;padding:12px 4px;color:rgba(255,255,255,.55);font-size:14px}
@@ -5779,8 +5786,11 @@ function vDash(){
   const kcal=tm.reduce((s,m)=>s+(+m.kcal||0),0),pro=tm.reduce((s,m)=>s+(+m.protein||0),0);
   const P=d.passions,woT=d.workouts.filter(w=>w.d===t).length;
   const PHd=document.documentElement.classList.contains("phone");/* phone: the month calendar + Add an event sit behind one row */
-  const calRow=PHd&&!dCalOpen?`<button type="button" class="panel dcal-tg" data-dcal aria-expanded="false"><span class="dcal-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span><span class="dcal-t"><b>${(calMonth||new Date()).toLocaleDateString(undefined,{month:"long",year:"numeric"})}</b><small>Calendar and add an event</small></span><span class="dcal-ch" aria-hidden="true">›</span></button>`:`${PHd?`<button type="button" class="dcal-hide" data-dcal aria-expanded="true">Hide calendar</button>`:""}<div class="dcal-row">${bigCal(d)}</div>`;
-  return banner()+/* Today strip removed: todayStrip(d)+ */dashTop(d)+breakdownPanel(d)+calRow;/* calendar + Add an event wrapped: side by side in landscape, stacked as before in portrait *//* was: dashTop(d)+bigCal(d)+breakdownPanel(d) — Breakdown now above the calendar */   /* was "Today's targets" (calories, protein, passion hours, date, workout note) */
+  /* phone: the calendar lives at the top of the This week panel (same panel) — a month row that opens the full month + Add an event in place. was: its own row under Breakdown */
+  const calIn=!PHd?"":!dCalOpen?`<button type="button" class="dcal-tg dcal-in" data-dcal aria-expanded="false"><span class="dcal-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span><span class="dcal-t"><b>${(calMonth||new Date()).toLocaleDateString(undefined,{month:"long",year:"numeric"})}</b><small>Calendar and add an event</small></span><span class="dcal-ch" aria-hidden="true">›</span></button>`
+    :`<div class="dcal-inrow">${bigCal(d)}<button type="button" class="dcal-hide" data-dcal aria-expanded="true">Hide calendar</button></div>`;
+  const top=dashTop(d);
+  return banner()+/* Today strip removed: todayStrip(d)+ */(PHd?top.replace('<div class="wa-grid">',calIn+'<div class="wa-grid">'):top)+breakdownPanel(d)+(PHd?"":`<div class="dcal-row">${bigCal(d)}</div>`);
 }
 let cvV=null;const calView=()=>{if(cvV==null){try{cvV=localStorage.getItem("aot-cview")||"dots"}catch(_){cvV="dots"}}return cvV};
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-cview]");if(!b)return;e.preventDefault();e.stopPropagation();cvV=b.dataset.cview;try{localStorage.setItem("aot-cview",cvV)}catch(_){}const v=$("#view"),st=v?v.scrollTop:0;render();if(v)v.scrollTop=st},true);
@@ -11273,7 +11283,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="989",APPT="2026-11-27T21:05:00Z";   /* APPT: when this update was made */
+const APPV="990",APPT="2026-11-27T21:10:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
