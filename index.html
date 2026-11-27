@@ -5412,6 +5412,17 @@ body.dbg-off .dbg-n{display:none}body.dbg-off .dbg-box{outline:none}
 .pdetail .tkg-h{padding:14px 0 6px!important;margin:0!important;background:none!important;border:0!important}
 .pdetail .tkgroup{border:0!important;background:none!important;box-shadow:none!important;padding:0!important;margin:0!important}
 .pdetail .tkgroup .tkg-b{padding:0!important;border:0!important;background:none!important;margin:0!important}
+
+/* ===== Panel corners follow Settings on every device and tab: Sharp = square everywhere, otherwise one radius (14px) for every panel, its theme border and its title strip (was: phone forced square, some phone panels (Nutrition top, Budget tiles) stayed round in Sharp) ===== */
+html.tpl-sharp body #view#view#view#view#view#view .panel,html.tpl-sharp body #view#view#view#view#view#view .panel::before,html.tpl-sharp body #view#view#view#view#view#view .panel::after,html.tpl-sharp body #view#view#view#view#view#view .panel>:first-child{border-radius:0!important}
+html:not(.tpl-sharp) body #view#view#view#view#view#view .panel{border-radius:14px!important}
+html:not(.tpl-sharp) body #view#view#view#view#view#view .panel.hasStrip::after{border-radius:14px!important}
+html:not(.tpl-sharp) body #view#view#view#view#view#view .panel>:is(.bstrip,.dt-strip,.ph):first-child{border-top-left-radius:14px!important;border-top-right-radius:14px!important}
+/* a panel inside another panel (the calendar inside Calendar) is part of it: square, no second rounded box */
+html body #view#view#view#view#view#view#view .panel .panel,html body #view#view#view#view#view#view#view .panel .panel::after,html body #view#view#view#view#view#view#view .panel .panel>:first-child{border-radius:0!important}
+/* phone Nutrition: the figure panel's ::after is its middle divider, so its theme border is drawn as an inset line instead */
+html.phone:not(.tpl-bd-none) body #view#view#view#view#view#view[data-tab="fuel"] .panel.holopanel{box-shadow:inset 0 0 0 1px rgba(var(--lr),.24)!important}
+html.phone.tpl-bd-dark body #view#view#view#view#view#view[data-tab="fuel"] .panel.holopanel{box-shadow:inset 0 0 0 1px rgba(0,0,0,.7)!important}
 </style>
 
 <div id="bgimg" class="on" aria-hidden="true"></div><div id="bgimg2" aria-hidden="true"></div><canvas id="bglive" aria-hidden="true"></canvas><div id="bgspin" aria-hidden="true"></div>
@@ -11420,7 +11431,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1002",APPT="2026-11-27T23:12:00Z";   /* APPT: when this update was made */
+const APPV="1003",APPT="2026-11-27T23:14:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -11562,7 +11573,8 @@ if("serviceWorker" in navigator&&location.protocol==="https:"){addEventListener(
   new MutationObserver(ms=>{for(const m of ms)m.addedNodes.forEach(n=>{if(n.nodeType===1)run(n)})}).observe(document.documentElement,{childList:true,subtree:true})})();
 </script>
 <script>/* mark panels whose first thing is a title strip, and where the strip ends (for the borderless strip) */
-(()=>{let t=0;const run=()=>{t=0;document.querySelectorAll('#view .bstrip,#view .calhead.cal-c,#view .bm-has>.bc>.bc-h,#view .bwg-solo>.ph:first-child,#view[data-tab="fuel"] :is(.holopanel,.flogp,.nmp,.usp,.wtr)>.ph:first-child').forEach(st=>{const p=st.closest('.panel');if(!p||st.offsetTop>4)return;p.classList.add('hasStrip');p.style.setProperty('--sh',(st.offsetTop+st.offsetHeight)+'px')})};
+(()=>{let t=0;const run=()=>{t=0;document.querySelectorAll('#view .bstrip,#view .calhead.cal-c,#view .bm-has>.bc>.bc-h,#view .bwg-solo>.ph:first-child,#view[data-tab="fuel"] :is(.holopanel,.flogp,.nmp,.usp,.wtr)>.ph:first-child').forEach(st=>{const p=st.closest('.panel');if(!p||st.offsetTop>4)return;p.classList.add('hasStrip');p.style.setProperty('--sh',(st.offsetTop+st.offsetHeight)+'px')})/* the figure panel gets the theme's border on every tab, whatever its layout (it was skipped when its title wasn't at the very top) */
+  document.querySelectorAll('#view .panel.holopanel').forEach(p=>{if(!p.classList.contains('hasStrip')){p.classList.add('hasStrip');p.style.setProperty('--sh','0px')}})};
   new MutationObserver(()=>{if(!t)t=requestAnimationFrame(run)}).observe(document.documentElement,{childList:true,subtree:true});addEventListener('resize',()=>{if(!t)t=requestAnimationFrame(run)})})();
 </script>
 <script>/* side tabs: remember hidden/shown */
