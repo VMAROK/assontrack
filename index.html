@@ -5497,6 +5497,12 @@ html.phone body #view>.ph-eyew{position:fixed!important;top:auto!important;left:
 html.phone body #view>.ph-eyew>.ph-eye{margin:0!important;box-shadow:0 6px 18px rgba(0,0,0,.45)}
 html.phone body .phead .ph-eye.ph-eye-ph{display:none!important}
 html.phone body .phead:has(.ph-eye){justify-content:normal!important}
+
+/* ===== Pop-up windows (day details, event, budget day): centred on screen on phone too; the close X is a perfect circle with the X dead centre ===== */
+html.phone body .bdw.bdw{align-items:center!important;justify-items:center!important;place-items:center!important;padding:16px!important}
+html body .bdw-x.bdw-x{width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;max-width:34px!important;max-height:34px!important;padding:0!important;margin:0!important;border-radius:50%!important;display:grid!important;place-items:center!important;flex:0 0 34px!important;align-self:center!important;box-sizing:border-box!important;line-height:0!important}
+html body .bdw-x.bdw-x svg{display:block;width:16px;height:16px}
+html body .bdw .bdw-h{align-items:center!important}
 </style>
 
 <div id="bgimg" class="on" aria-hidden="true"></div><div id="bgimg2" aria-hidden="true"></div><canvas id="bglive" aria-hidden="true"></canvas><div id="bgspin" aria-hidden="true"></div>
@@ -5990,7 +5996,7 @@ function todayStrip(d){const t=today(),di=dayIdx(t),now=Date.now();
 let dCalOpen=false,evSheet=false;
 /* Add an event window (phone): opened by the ＋ in the calendar header */
 function evSheetPaint(){let h=document.getElementById("evHost");if(!evSheet||tab!=="dash"){if(h)h.remove();return}if(!h){h=document.createElement("div");h.id="evHost";document.body.appendChild(h)}
-  h.innerHTML=`<div class="bdw dov" data-evbg><div class="bdw-p panel" role="dialog" aria-modal="true" aria-label="Add an event"><div class="bdw-h"><div><b>Add an event</b></div><button type="button" class="bdw-x" data-evx aria-label="Close">×</button></div>
+  h.innerHTML=`<div class="bdw dov" data-evbg><div class="bdw-p panel" role="dialog" aria-modal="true" aria-label="Add an event"><div class="bdw-h"><div><b>Add an event</b></div><button type="button" class="bdw-x" data-evx aria-label="Close"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <form class="f" id="evForm"><label>Event<input id="evT" required placeholder="Dance class" autocomplete="off"></label>
       <div class="f2"><label>Date<input id="evD" type="date" value="${calSel||today()}" required></label><label>Time<input id="evTm" type="time"></label></div>
       <button class="btn">Add to calendar</button></form></div></div>`;setTimeout(()=>{const i=document.getElementById("evT");i&&i.focus({preventScroll:true})},80)}
@@ -6027,7 +6033,7 @@ function dashDayOv(d,ds){const it=dayItems(d,ds),T=today(),b=B(),SE=calBud(ds),S
   const evs=it.ev.map(e=>`<div class="bdw-r" style="--cc:var(--cyan)"><i></i><span><b>${esc(e.title)}</b><small>${e.time?fmtTime(e.time):"All day"}</small></span>${del("events",e.id)}</div>`).join("");
   const PX=(data.passX=data.passX||{}),ps=PL.map(l=>{const k=ds+"|"+l.t+"|"+l.s,on=!!PX[k];return `<button type="button" class="bdw-r dpx${on?" done":""}" data-dpx="${esc(k)}" aria-pressed="${on}" style="--cc:${l.c}" title="${on?"Tap to undo":"Tap to cross off"}"><i></i><span><b>${esc(l.t)}</b><small>${esc(l.s)}</small></span><em>${l.v}</em><span class="dpx-ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>`}).join("")/* caption removed — the dashed ring says it */;
   const money=SE.length||SS.length?`<div class="dov-bud">${bDayPop(b,ds,SE,SS,T,true)}</div>`:"";
-  return `<div class="bdw dov" data-ddbg><div class="bdw-p panel" role="dialog" aria-modal="true" aria-label="Day overview"><div class="bdw-h"><div><b>${new Date(ds+"T12:00").toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</b>${ds===T?"<small>Today</small>":""}</div><button type="button" class="bdw-x" data-ddx aria-label="Close">×</button></div>
+  return `<div class="bdw dov" data-ddbg><div class="bdw-p panel" role="dialog" aria-modal="true" aria-label="Day overview"><div class="bdw-h"><div><b>${new Date(ds+"T12:00").toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</b>${ds===T?"<small>Today</small>":""}</div><button type="button" class="bdw-x" data-ddx aria-label="Close"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     ${evs||ps||money?sec("Events","#4cc9ff",evs)+sec("Passions","#b99cff",ps)+(money?`<div class="bdw-s"><div class="bdw-sh" style="color:#ffc533">Budget</div>${money}</div>`:""):`<p class="note" style="margin:10px 2px 4px">Nothing on this day.</p>`}</div></div>`}
 const fmtTime=t=>{const [h,m]=String(t).split(":").map(Number);return new Date(2000,0,1,h||0,m||0).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})};
 /* budget items (paydays, bills, subscriptions) that land on a day, worked out once per calendar view */
@@ -8369,7 +8375,7 @@ function bDayPop(b,ds,SE,SS,T,inl){const H=bHome(),inc=SE.filter(i=>i.kind==="in
   const srow=x=>`<button type="button" class="bdw-r bdw-sp" style="--cc:${bCol(x.cat)}"><i></i><span><b>${esc(x.note||x.sg||x.cat||"Spent")}</b><small>${["Spent",x.sg||(x.cat&&x.cat!=="undefined"?x.cat:"")].filter(Boolean).map(esc).join(" · ")}${x.time?" · "+fmtTime(x.time):""}</small></span><em>−${bMoneyI(x)}</em></button>`;
   const sec=(t,L,f)=>L.length?`<div class="bdw-s">${t?`<div class="bdw-sh">${t}<span>${L.length}</span></div>`:""}${L.map(f).join("")}</div>`:"";
   return `${inl?`<div class="bdw-in">`:`<div class="bdw" data-bdwbg><div class="bdw-p panel" role="dialog" aria-modal="true" aria-label="Day overview">`}
-    <div class="bdw-h"><div><b>${bDate(ds).toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</b>${ds===T?"<small>Today</small>":""}</div>${inl?"":`<button type="button" class="bdw-x" data-bdwx aria-label="Close">×</button>`}</div>
+    <div class="bdw-h"><div><b>${bDate(ds).toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</b>${ds===T?"<small>Today</small>":""}</div>${inl?"":`<button type="button" class="bdw-x" data-bdwx aria-label="Close"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>`}</div>
     <!-- was four totals (In / Charged / Spent / Net): <div class="bdw-t"><div class="pos"><small>In</small><b>+${bMoney(inT)}</b></div><div class="neg"><small>Charged</small><b>−${bMoney(fxT)}</b></div><div class="neg"><small>Spent</small><b>−${bMoney(spT)}</b></div><div class="${net<0?"neg":"pos"}"><small>Net</small><b>${net<0?"−":"+"}${bMoney(Math.abs(net))}</b></div></div> -->
     ${(()=>{const t=bDayTot(b,ds,SE,SS);return `<div class="bdw-tot ${bSignC(t.now)}"><small>Total</small><b>${bSignM(t.now)}</b></div>`})()}
     ${""/* hint caption removed (Budget + Dashboard) — the checkboxes say it */}${SE.length||SS.length?`<div class="bdw-ls">${sec("Income",inc,row)+sec("",out,row)/* "Charged" heading removed */+sec("Spent",SS,srow)}</div>`:`<p class="note" style="margin:14px 2px 4px">Nothing charged, paid in or spent this day.</p>`}
@@ -11511,7 +11517,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1010",APPT="2026-11-28T17:10:00Z";   /* APPT: when this update was made */
+const APPV="1011",APPT="2026-11-28T17:05:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
