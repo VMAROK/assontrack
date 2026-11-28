@@ -4129,6 +4129,10 @@ html body #view .bpx-s>b{font-family:var(--mono);font-size:16px}
 html body #view .bpx-s>b.neg{color:#ff7a86}
 html body #view .bpx-s>b.pos{color:#3ddc84}
 html body #view .bpx-s{position:relative}
+html body #view .bpx{position:relative}
+html body #view#view .bpx-mvb{touch-action:none;cursor:grab}
+html body #view .bpx-s.bpx-drag{z-index:40;background:#262a33;border-radius:10px;box-shadow:0 10px 28px rgba(0,0,0,.55);outline:1px solid rgba(91,140,255,.45)}
+html body #view .bpx-dl{position:absolute;left:14px;right:14px;height:2px;border-radius:2px;background:#5b8cff;z-index:39;pointer-events:none;box-shadow:0 0 8px rgba(91,140,255,.8)}
 html body #view#view .bpx-s .bpx-mvb{margin-left:-6px}
 html body #view .bpx-s.mv-on .bpx-mvb{color:#fff;background:rgba(255,255,255,.1)}
 html body #view .bpx-mv{position:absolute;right:0;top:calc(100% - 2px);z-index:30;min-width:200px;display:grid;padding:5px;border-radius:12px;background:#22252d;border:1px solid rgba(255,255,255,.14);box-shadow:0 12px 30px rgba(0,0,0,.5)}
@@ -11582,7 +11586,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1022",APPT="2026-11-28T18:35:00Z";   /* APPT: when this update was made */
+const APPV="1023",APPT="2026-11-28T18:45:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -12199,11 +12203,34 @@ document.addEventListener("change",e=>{const i=e.target.closest&&e.target.closes
 </script>
 <script>
 /* phone Budget card: Recurring | Extras. Rows open the same edit sheets as before; Extras reuses the existing list and add form */
-let bPT="rec",bPChip="all",bPxMv=null;
+let bPT="rec",bPChip="all",bPxMv=null,bPxDragT=0;
+/* drag a total by its grip: drop it near the top to keep it up there (above or below the other one), lower down to send it to the bottom of the panel. A plain tap still opens the move menu */
+(function(){let d=null;
+  const scroller=()=>{const v=document.getElementById("view");return v&&v.scrollHeight>v.clientHeight+1&&getComputedStyle(v).overflowY!=="visible"?v:null},sTop=()=>{const v=scroller();return v?v.scrollTop:window.scrollY},sBy=y=>{const v=scroller();if(v)v.scrollTop+=y;else window.scrollBy(0,y)};
+  function target(y){const pan=d.row.closest(".bpx");if(!pan)return null;const P=pan.getBoundingClientRect(),hd=pan.querySelector(".bpx-top"),top=hd?hd.getBoundingClientRect().bottom:P.top;
+    const others=[...pan.querySelectorAll(".bpx-s:not(.off)")].filter(r=>r!==d.row);const zone=y>top+(P.bottom-top)*.5?"bot":"top";
+    const o=others.find(r=>(r.closest(".bpx-sums-b")?"bot":"top")===zone);let first=true,line;
+    if(o){const R=o.getBoundingClientRect();first=y<R.top+R.height/2;line=first?R.top:R.bottom}
+    else line=zone==="top"?top+4:P.bottom-(parseFloat(getComputedStyle(pan).paddingBottom)||16)+4;
+    return {zone,first,other:o?o.dataset.bpxk:null,line:line-P.top,pan}}
+  function show(t){if(!t)return;let ln=t.pan.querySelector(".bpx-dl");if(!ln){ln=document.createElement("i");ln.className="bpx-dl";t.pan.appendChild(ln)}ln.style.top=(t.line-1)+"px"}
+  function loop(){if(!d||!d.on)return;const H=innerHeight,e=d.y;let v=0;if(e<90)v=-Math.ceil((90-e)/6);else if(e>H-150)v=Math.ceil((e-(H-150))/6);if(v)sBy(v);move();d.raf=requestAnimationFrame(loop)}
+  function move(){const dy=d.y-d.y0+(sTop()-d.s0);d.row.style.transform=`translateY(${dy}px)`;d.t=target(d.y);show(d.t)}
+  document.addEventListener("pointerdown",e=>{const g=e.target.closest&&e.target.closest("[data-bpxmv]");if(!g)return;const row=g.closest(".bpx-s");if(!row)return;
+    d={row,k:g.dataset.bpxmv,id:e.pointerId,y0:e.clientY,y:e.clientY,s0:sTop(),on:false};try{g.setPointerCapture(e.pointerId)}catch(_){}},true);
+  document.addEventListener("pointermove",e=>{if(!d||e.pointerId!==d.id)return;d.y=e.clientY;
+    if(!d.on){if(Math.abs(d.y-d.y0)<6)return;d.on=true;bPxMv=null;const m=d.row.querySelector(".bpx-mv");if(m)m.remove();d.row.classList.add("bpx-drag");d.raf=requestAnimationFrame(loop)}
+    e.preventDefault();move()},{passive:false,capture:true});
+  const end=e=>{if(!d||e.pointerId!==d.id)return;const q=d;d=null;if(!q.on)return;cancelAnimationFrame(q.raf);bPxDragT=Date.now();
+    const t=q.t;q.row.style.transform="";q.row.classList.remove("bpx-drag");const ln=document.querySelector(".bpx-dl");if(ln)ln.remove();if(!t)return;
+    const x=bSecs(B()).find(z=>z.sum);if(!x)return;x.pp=Object.assign({},x.pp);if(t.zone==="bot")x.pp[q.k]="bot";else delete x.pp[q.k];
+    x.o=Array.isArray(x.o)&&x.o.length===2?x.o.slice():["spent","left"];const other=x.o.find(z=>z!==q.k);
+    if(t.other)x.o=t.first?[q.k,other]:[other,q.k];render();save()};
+  document.addEventListener("pointerup",end,true);document.addEventListener("pointercancel",end,true)})();
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-bpxmv],[data-bpxto]");
   if(!t){if(bPxMv&&!(e.target.closest&&e.target.closest(".bpx-mv"))){bPxMv=null;render()}return}
   e.preventDefault();e.stopImmediatePropagation();const b=B(),x=bSecs(b).find(q=>q.sum);
-  if(t.dataset.bpxmv){bPxMv=bPxMv===t.dataset.bpxmv?null:t.dataset.bpxmv;render();return}
+  if(t.dataset.bpxmv){if(Date.now()-bPxDragT<450)return;bPxMv=bPxMv===t.dataset.bpxmv?null:t.dataset.bpxmv;render();return}
   const [k,a]=t.dataset.bpxto.split(":");bPxMv=null;if(!x){render();return}
   x.o=Array.isArray(x.o)&&x.o.length===2?x.o.slice():["spent","left"];x.pp=Object.assign({},x.pp);
   if(a==="top"||a==="bot"){if(a==="bot")x.pp[k]="bot";else delete x.pp[k]}
@@ -12227,7 +12254,7 @@ function bPhone(S){const b=B(),CY=c=>((BCYC.find(x=>x[0]===c)||BCYC[1])[1]),chev
     mvMenu=k=>{const at=pp[k]==="bot"?"bot":"top",o=so.filter(q=>(pp[q]==="bot"?"bot":"top")===at),ix=o.indexOf(k),L=[];
       if(ix>0)L.push(["up","Move up"]);if(ix<o.length-1)L.push(["down","Move down"]);L.push(at==="bot"?["top","Move to top of panel"]:["bot","Move to bottom of panel"]);
       return `<div class="bpx-mv" role="menu">${L.map(([a,n])=>`<button type="button" role="menuitem" data-bpxto="${k}:${a}">${n}</button>`).join("")}</div>`},
-    sr=(k,nm,val,cls)=>sx[k]?`<button type="button" class="bpx-s off" data-bsumhide="${k}" title="Show ${nm}" aria-label="Show ${nm}">${EYEX}<span>${nm}</span></button>`:`<div class="bpx-s${bPxMv===k?" mv-on":""}"><span>${nm}</span><b class="${cls}">${val}</b><button type="button" class="bpx-sh" data-bsumhide="${k}" title="Hide" aria-label="Hide ${nm}">${EYE}</button><button type="button" class="bpx-sh bpx-mvb" data-bpxmv="${k}" title="Move" aria-label="Move ${nm}" aria-expanded="${bPxMv===k}">${MV}</button>${bPxMv===k?mvMenu(k):""}</div>`,
+    sr=(k,nm,val,cls)=>sx[k]?`<button type="button" class="bpx-s off" data-bsumhide="${k}" title="Show ${nm}" aria-label="Show ${nm}">${EYEX}<span>${nm}</span></button>`:`<div class="bpx-s${bPxMv===k?" mv-on":""}" data-bpxk="${k}"><span>${nm}</span><b class="${cls}">${val}</b><button type="button" class="bpx-sh" data-bsumhide="${k}" title="Hide" aria-label="Hide ${nm}">${EYE}</button><button type="button" class="bpx-sh bpx-mvb" data-bpxmv="${k}" title="Move" aria-label="Move ${nm}" aria-expanded="${bPxMv===k}">${MV}</button>${bPxMv===k?mvMenu(k):""}</div>`,
     S1={spent:()=>sr("spent","Spent "+P,(spY>0?"−":"")+bMoney(spY),spY>0?"neg":""),left:()=>sr("left",(lf<0?"Over ":"Left over ")+P,bMoney(lf),lf<0?"neg":"pos")},
     sT=so.filter(k=>pp[k]!=="bot"),sB=so.filter(k=>pp[k]==="bot"),
     sums=sT.length?`<div class="bpx-sums">${sT.map(k=>S1[k]()).join("")}</div>`:"",sumsB=sB.length?`<div class="bpx-sums bpx-sums-b">${sB.map(k=>S1[k]()).join("")}</div>`:"";   /* both at the top by default; each can be moved up/down or to the bottom of the panel (same order as iPad / computer) */
