@@ -5482,6 +5482,12 @@ html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dfull .dc-
 html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dfull .dc-stats>div{height:42px!important;border-radius:8px}
 html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dfull .dc-stats b{font-size:13px!important}
 html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dfull .dc-stats small{font-size:9.5px!important}
+
+/* ===== Phone Budget: privacy eye floats bottom-right, 12px from the page's right edge and 12px above the tab bar; nothing held for it in the title row ===== */
+html.phone body #view>.ph-eyew{position:fixed!important;top:auto!important;left:auto!important;right:12px!important;bottom:calc(var(--eyeB,64px) + 12px)!important;height:auto!important;display:block!important;z-index:60!important}
+html.phone body #view>.ph-eyew>.ph-eye{margin:0!important;box-shadow:0 6px 18px rgba(0,0,0,.45)}
+html.phone body .phead .ph-eye.ph-eye-ph{display:none!important}
+html.phone body .phead:has(.ph-eye){justify-content:normal!important}
 </style>
 
 <div id="bgimg" class="on" aria-hidden="true"></div><div id="bgimg2" aria-hidden="true"></div><canvas id="bglive" aria-hidden="true"></canvas><div id="bgspin" aria-hidden="true"></div>
@@ -11496,7 +11502,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1008",APPT="2026-11-28T16:55:00Z";   /* APPT: when this update was made */
+const APPV="1009",APPT="2026-11-28T16:58:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -12105,7 +12111,7 @@ document.addEventListener("change",e=>{const i=e.target.closest&&e.target.closes
       c.classList.add("ph-eye-ph");c.tabIndex=-1;c.setAttribute("aria-hidden","true");
       let w=v.querySelector(":scope>.ph-eyew");if(!w){w=document.createElement("div");w.className="ph-eyew";v.prepend(w)}else if(w!==v.firstElementChild)v.prepend(w);
       w.innerHTML="";const s=c.cloneNode(true);s.classList.remove("ph-eye-ph");s.removeAttribute("aria-hidden");s.tabIndex=0;s.addEventListener("click",()=>eye.click());w.appendChild(s);
-      requestAnimationFrame(()=>{try{/* measure against the header, not the pinned strip: the strip may already be stuck (page scrolled), which pushed the eye off screen */const a=c.getBoundingClientRect(),hb=h.getBoundingClientRect(),b=w.getBoundingClientRect(),k=(w.offsetWidth&&b.width/w.offsetWidth)||1;s.style.marginTop=Math.max(0,(a.top-hb.top)/k+(parseFloat(getComputedStyle(h).marginTop)||0))+"px";s.style.marginLeft=((a.left-b.left)/k)+"px";s.style.marginRight="0"/* pinned in the top-left corner, exactly where the header eye sits */}catch(_){}})}
+      requestAnimationFrame(()=>{try{/* phone: the eye floats in the bottom-right corner of the page, 12px above the tab bar (was pinned top-left) */const vb=v.getBoundingClientRect();w.style.setProperty("--eyeB",Math.max(0,innerHeight-vb.bottom)+"px");s.style.margin="0";return;/* old top-left pin, kept for reference: measure against the header, not the pinned strip: the strip may already be stuck (page scrolled), which pushed the eye off screen */const a=c.getBoundingClientRect(),hb=h.getBoundingClientRect(),b=w.getBoundingClientRect(),k=(w.offsetWidth&&b.width/w.offsetWidth)||1;s.style.marginTop=Math.max(0,(a.top-hb.top)/k+(parseFloat(getComputedStyle(h).marginTop)||0))+"px";s.style.marginLeft=((a.left-b.left)/k)+"px";s.style.marginRight="0"/* pinned in the top-left corner, exactly where the header eye sits */}catch(_){}})}
     else{const w=v.querySelector(":scope>.ph-eyew");if(w)w.remove()}}catch(e){}}   /* a copy that presses the real eye, so its state and handler stay in one place */
   const r0=window.render;if(typeof r0==="function"){window.render=function(){const out=r0.apply(this,arguments);head();return out};try{render=window.render}catch(e){}}
   new MutationObserver(()=>{const v=document.getElementById("view");if(v&&!v.querySelector(":scope>.phead"))head()}).observe(document.getElementById("view")||document.body,{childList:true});
