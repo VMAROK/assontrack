@@ -4155,6 +4155,26 @@ html body #view .bpx-s.off{display:inline-flex;align-items:center;gap:6px;height
 .bpx-r .bpx-t{min-width:0;display:grid;gap:2px}.bpx-r .bpx-t b{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bpx-r .bpx-t small{font-size:13.5px;color:rgba(255,255,255,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bpx-r.inc .bpx-t b{color:#3ddc84}.bpx-r .bpx-a{font-family:var(--mono);font-size:15px;font-weight:600;white-space:nowrap}.bpx-r .bpx-a.pos{color:#3ddc84}
 .bpx-r.off{opacity:.5}.bpx-r svg{color:rgba(255,255,255,.5)}
+/* phone: group tabs joined into one compact strip (no gaps, smaller) */
+html.phone body #view#view .bpx-chips{gap:0;width:max-content;max-width:100%;padding:0;margin:10px 0 4px;border:1px solid rgba(255,255,255,.12);border-radius:10px;overflow-x:auto;overflow-y:hidden}
+html.phone body #view#view .bpx-chips button{height:30px;padding:0 11px;gap:6px;border:0;border-left:1px solid rgba(255,255,255,.1);border-radius:0;font-size:13.5px;flex:none}
+html.phone body #view#view .bpx-chips button:first-child{border-left:0}
+html.phone body #view#view .bpx-chips button i{width:7px;height:7px}
+html.phone body #view#view .bpx-chips button[aria-pressed="true"]{background:rgba(255,255,255,.13)}
+/* phone Extras · By group: one joined list, a single line per group with a thin share bar (was 2-up cards with gaps) */
+html.phone body #view#view .bsg-list{display:block;gap:0;border-radius:12px;overflow:hidden;background:rgba(var(--tD),.45);border:1px solid rgba(255,255,255,.08)}
+html.phone body #view#view[data-tab="budget"] .bsg-list .bsg{border:0!important;border-top:1px solid rgba(255,255,255,.07)!important;border-radius:0;background:none!important}
+html.phone body #view#view[data-tab="budget"] .bsg-list .bsg:first-child{border-top:0!important}
+html.phone body #view#view .bsg-list .bsg-h{grid-template-columns:auto minmax(0,1fr) auto auto auto;grid-template-areas:"dot n amt pct car";column-gap:10px;row-gap:0;padding:10px 12px 6px}
+html.phone body #view#view .bsg-list .bsg-h b{font-size:15px}
+html.phone body #view#view .bsg-list .bsg-h em{min-width:34px}
+html.phone body #view#view .bsg-list .bsg-dot{width:9px;height:9px}
+html.phone body #view#view .bsg-list .bsg-dotb{width:12px;height:12px;border-width:2px}
+html.phone body #view#view .bsg-list .bsg-n{font-size:14.5px;font-weight:600}
+html.phone body #view#view .bsg-list .bsg-bar{height:3px;margin:0 12px 8px}
+html.phone body #view#view .bsg-list .bsg-r{grid-template-columns:minmax(0,1fr) auto auto;grid-template-areas:"w d amt";column-gap:10px;align-items:center;padding:7px 12px 7px 33px;min-height:36px}
+html.phone body #view#view .bsg-list .bsg-d{min-width:0;font-size:12px}
+html.phone body #view#view .bpx-chips button{padding:0 9px}
 /* phone list: one compact line per item (dot · name · amount), hairline between rows */
 html body #view#view .bpx-r{grid-template-columns:auto minmax(0,1fr) auto;gap:10px;min-height:36px;padding:3px 4px 3px 6px;border-bottom-color:rgba(255,255,255,.05)}
 html body #view#view .bpx-r .bpx-dot{width:8px;height:8px;margin:0 2px}
@@ -11586,7 +11606,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1023",APPT="2026-11-28T18:45:00Z";   /* APPT: when this update was made */
+const APPV="1024",APPT="2026-11-28T18:55:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
