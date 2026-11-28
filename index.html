@@ -5457,6 +5457,26 @@ html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .holopanel>
 /* Passions "My passions": its title row is collapsed on phone, so the categories gear sits in the panel's top-right corner instead of hanging off the left edge */
 html.phone body #view#view#view#view#view#view#view[data-tab="pass"] .panel.pmine>.ph{position:static!important;min-height:0!important;padding-right:0!important}
 html.phone body #view#view#view#view#view#view#view[data-tab="pass"] .panel.pmine>.ph .gear{top:10px!important;right:10px!important;transform:none!important}
+
+/* ===== Overview detail card (tap a ring): sits exactly where the rings were, same box, same height ===== */
+html body #view .dtiles.orbit .ob-p,html body #view .dtiles.orbit .ob-r,html body #view .dtiles.orbit .ob-r *{pointer-events:none}
+html body #view#view .dtiles.orbit .dview{z-index:3}
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dashtop>.dstack>.dfull{grid-column:2!important;grid-row:1!important;margin:0!important;min-width:0;height:0!important;min-height:100%!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dashtop>.dstack>.dfull>.panel.dcomp{flex:1 1 0!important;height:auto!important;min-height:0!important;margin:0!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dashtop>.dstack>.dfull{padding:0!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dfull .dcomp{display:flex!important;flex-direction:column!important;justify-content:space-between!important;gap:10px!important;padding:46px 10px 10px!important;box-sizing:border-box!important;overflow:hidden!important;border-radius:inherit}
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dfull .dback{top:8px!important;left:8px!important;font-size:11.5px!important;padding:4px 8px 4px 5px!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dfull .ddots{top:auto!important;bottom:8px!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dfull .dmanage{top:8px!important;right:8px!important;font-size:11px!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dfull .dc-main{flex-direction:column!important;align-items:center!important;text-align:center;gap:6px!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dfull .dc-main .dt-ring{width:52px!important;height:52px!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dfull .dc-txt{width:100%}
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dfull .dc-txt b{font-size:15px!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dfull .dc-txt p{display:none!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dfull .dc-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important;margin-bottom:12px}
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dfull .dc-stats>div{height:42px!important;border-radius:8px}
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dfull .dc-stats b{font-size:13px!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .dfull .dc-stats small{font-size:9.5px!important}
 </style>
 
 <div id="bgimg" class="on" aria-hidden="true"></div><div id="bgimg2" aria-hidden="true"></div><canvas id="bglive" aria-hidden="true"></canvas><div id="bgspin" aria-hidden="true"></div>
@@ -5919,6 +5939,11 @@ function dashTop(d){return `<div class="dhead"><b>Dashboard</b><span>Calendar an
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-dopen],[data-expdel]");if(!b)return;
   if(b.dataset.expdel){data.expenses=(data.expenses||[]).filter(x=>x.id!==b.dataset.expdel);render();save();return}
   const k=b.dataset.dopen||null;if(k===dashOpen)return;dashGo(k,k?1:-1)});
+/* Overview detail card is exactly the rings' height (was taller: 479 vs 284 on phone). Rings height is remembered per layout; the card is locked to it and clips inside. */
+(()=>{const H={};const lay=()=>document.documentElement.classList.contains("phone")?"p":"w";let q=0;
+  const sync=()=>{q=0;const v=document.getElementById("view");if(!v)return;const o=v.querySelector(".dtiles.orbit");if(o&&o.offsetHeight&&!o.closest(".dfull"))H[lay()]=o.offsetHeight;
+    const f=v.querySelector(".dfull");if(f){if(lay()==="p"){["height","overflow"].forEach(k=>f.style.removeProperty(k));const c0=f.querySelector(".dcomp");if(c0)c0.style.removeProperty("height");return}/* phone: CSS fits the card to the figure panel's row */const h=H[lay()];if(h){f.style.setProperty("height",h+"px","important");f.style.setProperty("overflow","hidden","important");const c=f.querySelector(".dcomp");if(c)c.style.setProperty("height",h+"px","important")}}};
+  const go=()=>{if(!q)q=requestAnimationFrame(sync)};const start=()=>{const v=document.getElementById("view");if(!v)return setTimeout(start,300);new MutationObserver(go).observe(v,{childList:true,subtree:true});if(window.ResizeObserver){const ro=new ResizeObserver(go);new MutationObserver(()=>{const o=v.querySelector(".dtiles.orbit"),f=v.querySelector('[data-tab="dash"] .holopanel');[o,f].forEach(e=>e&&!e._aotRO&&(e._aotRO=1,ro.observe(e)))}).observe(v,{childList:true,subtree:true})}addEventListener("resize",go);go()};start()})();
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-budopen]");if(!b)return;budOpen=!budOpen;render()});
 document.addEventListener("submit",e=>{const f=e.target.id;if(f!=="budForm"&&f!=="expForm")return;e.preventDefault();const numv=v=>{const n=parseFloat(String(v).replace(/[^0-9.]/g,""));return isFinite(n)?n:NaN};
   if(f==="budForm"){const v=numv($("#budIn").value);data.budget=Object.assign({},data.budget,{monthly:v>0?v:0});toast(v>0?"Budget set":"Budget cleared")}
@@ -11465,7 +11490,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1006",APPT="2026-11-28T16:28:00Z";   /* APPT: when this update was made */
+const APPV="1007",APPT="2026-11-28T16:40:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
