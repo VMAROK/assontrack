@@ -4155,8 +4155,8 @@ html body #view .bpx-s.off{display:inline-flex;align-items:center;gap:6px;height
 .bpx-r .bpx-t{min-width:0;display:grid;gap:2px}.bpx-r .bpx-t b{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bpx-r .bpx-t small{font-size:13.5px;color:rgba(255,255,255,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bpx-r.inc .bpx-t b{color:#3ddc84}.bpx-r .bpx-a{font-family:var(--mono);font-size:15px;font-weight:600;white-space:nowrap}.bpx-r .bpx-a.pos{color:#3ddc84}
 .bpx-r.off{opacity:.5}.bpx-r svg{color:rgba(255,255,255,.5)}
-/* phone, every view: expense amounts in red, each group's total in its group colour */
-html.phone body #view#view#view .bpx .bpx-r:not(.inc) .bpx-a,html.phone body #view#view#view .bpx .bpx-vx .bi-amt,html.phone body #view#view#view .bpx .bpx-vx .bl-v b{color:#ff7a86!important}
+/* phone, every view: expense amounts and each group's total in the group colour (was red: too alarming) */
+html.phone body #view#view#view .bpx .bpx-r:not(.inc) .bpx-a,html.phone body #view#view#view .bpx .bpx-vx .bi-amt,html.phone body #view#view#view .bpx .bpx-vx .bl-v b{color:var(--cc)!important}
 html.phone body #view#view#view .bpx .bpx-ch>b,html.phone body #view#view#view .bpx .bpx-vx .bk-v,html.phone body #view#view#view .bpx .bpx-vx .bl-ch>b{color:var(--cc)!important}
 /* phone list: three shades, darkest to lightest — Income / Expenses strip, group strip, items — all darker than the panel and edge to edge.
    The group tabs sit flush right under the Expenses strip */
@@ -4322,6 +4322,12 @@ html.phone #view .wahead .mcal .mc-don circle{fill:none;stroke-width:3.6;stroke-
 html.phone #view .wahead .mcal .mc-don .wd-t{stroke:rgba(255,255,255,.12)}
 html.phone #view .wahead .mcal .mc-don .wd-d{stroke:#3ddc84;filter:drop-shadow(0 0 3px rgba(61,220,132,.45))}
 html.phone #view .wahead .mcal .mc-don .wd-m{stroke:#ff4d5e}
+html.phone #view .wahead .mcal .mc-dn{position:relative;display:grid;place-items:center;width:29px;height:29px}
+html.phone #view .wahead .mcal .mc-dn>.mc-don{position:absolute!important;inset:0;width:100%!important;height:100%!important}
+html.phone #view .wahead .mcal .mc-dn>b{position:relative;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:-.04em;line-height:1;color:#e9eefb}
+html.phone #view .wahead .mcal .mc-dn.ok>b{color:#3ddc84}
+html.phone #view .wahead .mcal .mc-dn.ms>b{color:#ff7a86}
+html.phone #view .wahead .mcal .mc-dn>b svg{width:14px;height:14px;display:block}
 html.phone body #view#view#view#view#view#view[data-tab="dash"] .wahead .mcal .mc.today{box-shadow:inset 0 0 0 2px #ffc533!important;border-color:transparent!important}
 html.phone body #view#view#view#view#view#view[data-tab="dash"] .wahead .mcal .mc.today .mn{background:#ffc533!important}
 html.phone body #view#view#view#view#view#view[data-tab="dash"] .wahead .mcal .mc.today .mn-n{color:#141414!important;font-weight:800}
@@ -6234,7 +6240,8 @@ function dayDonut(d,ds){try{const di=dayIdx(ds);let n=0,dn=0,ms=0;const add=st=>
   (d.passions||[]).forEach(p=>{if(!modesOf(p).includes("schedule"))return;(p.slots||[]).forEach(sl=>{if(isWk(sl)||sl.day!==di)return;const st=slotState(d,p,sl,ds);if(st!=="none")add(st)})});
   tasksDue(d,ds).forEach(x=>add(x.st));
   if(!n)return "";const C=2*Math.PI*15.5,fd=dn/n,fm=ms/n;
-  return `<svg class="mc-don" viewBox="0 0 36 36" aria-label="${dn} of ${n} tasks done${ms?", "+ms+" missed":""}"><circle class="wd-t" cx="18" cy="18" r="15.5"/>${fd?`<circle class="wd-d" cx="18" cy="18" r="15.5" stroke-dasharray="${(fd*C).toFixed(2)} ${C.toFixed(2)}"/>`:""}${fm?`<circle class="wd-m" cx="18" cy="18" r="15.5" stroke-dasharray="${(fm*C).toFixed(2)} ${C.toFixed(2)}" stroke-dashoffset="${(-fd*C).toFixed(2)}"/>`:""}</svg>`}catch(e){return ""}}
+  /* "2/3" (or a tick when all done) in the middle of the ring */
+  return `<span class="mc-dn${dn===n?" ok":ms?" ms":""}"><svg class="mc-don" viewBox="0 0 36 36" aria-label="${dn} of ${n} tasks done${ms?", "+ms+" missed":""}"><circle class="wd-t" cx="18" cy="18" r="15.5"/>${fd?`<circle class="wd-d" cx="18" cy="18" r="15.5" stroke-dasharray="${(fd*C).toFixed(2)} ${C.toFixed(2)}"/>`:""}${fm?`<circle class="wd-m" cx="18" cy="18" r="15.5" stroke-dasharray="${(fm*C).toFixed(2)} ${C.toFixed(2)}" stroke-dashoffset="${(-fd*C).toFixed(2)}"/>`:""}</svg><b>${dn===n?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>':dn+"/"+n}</b></span>`}catch(e){return ""}}
 function bigCal(d){
   const now=new Date();if(!calMonth)calMonth=new Date(now.getFullYear(),now.getMonth(),1);if(!calSel)calSel=today();
   const y=calMonth.getFullYear(),m=calMonth.getMonth(),off=new Date(y,m,1).getDay(),last=new Date(y,m+1,0);
@@ -11672,7 +11679,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1034",APPT="2026-11-28T20:50:00Z";   /* APPT: when this update was made */
+const APPV="1035",APPT="2026-11-28T21:00:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
