@@ -4112,7 +4112,7 @@ html body #view .mcal .mc .chips{overflow:hidden!important}}
 .bpx{margin-top:18px;padding:14px 14px 16px!important}
 html body #view .bpx-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 6px}
 html body #view .bpx-tr{gap:6px;align-items:center}
-html body #view#view .bpx-top .bpx-plus{width:42px;height:36px;display:grid;place-items:center;border-radius:10px;border:0;background:#5584fc;color:#fff;cursor:pointer;padding:0;margin:0 0 0 4px!important}
+html body #view#view .bpx-top .bpx-plus{width:42px;height:36px;display:grid;place-items:center;border-radius:10px;border:1px solid rgba(85,132,252,.3);background:rgba(10,10,10,.45);color:rgb(141,154,179);cursor:pointer;padding:0;margin:0 0 0 4px!important}   /* same look as the unselected view icons */
 html body #view#view .bpx-sums-b{border-bottom:0;border-top:0;padding:6px 0 0;margin-top:0}
 html.phone body #view#view .panel.bpx{padding-bottom:16px!important}   /* last row clears the floating eye */
 html.phone body .phead .ph-per{margin-left:auto}
@@ -8551,7 +8551,9 @@ function bSpendByGroup(b,L){const tot=L.reduce((a,s)=>a+bSpAmt(s),0),names=[...n
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-bsgcol],[data-bsgset],[data-bspv],[data-bsgo],[data-bsgall]");if(!t)return;if(e.target.closest("[data-bsgcust]"))return;e.preventDefault();e.stopImmediatePropagation();
   if(t.hasAttribute("data-bsgcol")){bSgColFor=bSgColFor===t.dataset.bsgcol?null:t.dataset.bsgcol;render();return}
   if(t.hasAttribute("data-bsgset")){const b=B();b.spCol=b.spCol||{};b.spCol[bSgColFor]=t.dataset.bsgset;bSgColFor=null;save();render();return}
-  if(t.hasAttribute("data-bspv")){B().spView=t.dataset.bspv;save();render();return}
+  if(t.hasAttribute("data-bspv")){/* keep the switch exactly where it is on screen: changing the view must not scroll the page */const sel=`[data-bspv="${t.dataset.bspv}"]${t.classList.contains("bpx-bud")?".bpx-bud":":not(.bpx-bud)"}`,y0=t.getBoundingClientRect().top,v=document.getElementById("view"),
+      keep=()=>{const r=document.querySelector(sel);if(!r)return;const dy=r.getBoundingClientRect().top-y0;if(Math.abs(dy)<.5)return;if(v&&v.scrollHeight>v.clientHeight+1&&getComputedStyle(v).overflowY!=="visible")v.scrollTop+=dy;else window.scrollBy(0,dy)};
+    B().spView=t.dataset.bspv;save();render();keep();requestAnimationFrame(()=>{keep();setTimeout(keep,60);setTimeout(keep,250)});return}
   if(t.hasAttribute("data-bsgall")){const k=t.dataset.bsgall||"\u0000";bSgAll.has(k)?bSgAll.delete(k):bSgAll.add(k);render();return}
   const k=t.dataset.bsgo||"\u0000",was=bSgOpen.has(k);bSgOpen.clear();if(!was)bSgOpen.add(k);render()},true);   /* one group open at a time */
 function bSpend(S){const b=B(),L=b.spends.filter(s=>(s.d||"").slice(0,7)===today().slice(0,7)).sort((a,z)=>a.d<z.d?1:a.d>z.d?-1:0),G=[];L.forEach(s=>{let g=G.find(x=>x[0]===s.d);if(!g)G.push(g=[s.d,[]]);g[1].push(s)});
@@ -11572,7 +11574,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1020",APPT="2026-11-28T18:20:00Z";   /* APPT: when this update was made */
+const APPV="1021",APPT="2026-11-28T18:25:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
