@@ -6239,7 +6239,8 @@ function dashProg(d,ds,bar){const A=dashStats(d,ds),cl=x=>Math.max(0,Math.min(1,
 function dayDonut(d,ds){try{const di=dayIdx(ds);let n=0,dn=0,ms=0;const add=st=>{n++;if(st==="done"||st==="donelocked"||st==="mastered")dn++;else if(st==="missed"||st==="overdue"||st==="late")ms++};
   (d.passions||[]).forEach(p=>{if(!modesOf(p).includes("schedule"))return;(p.slots||[]).forEach(sl=>{if(isWk(sl)||sl.day!==di)return;const st=slotState(d,p,sl,ds);if(st!=="none")add(st)})});
   tasksDue(d,ds).forEach(x=>add(x.st));
-  if(!n)return "";const C=2*Math.PI*15.5,fd=dn/n,fm=ms/n;
+  if(!n)return "";ms=ds<today()?n-dn:0;   /* the ring is progress: green = done, grey = still to do. Red only once the day is over (whatever wasn't done was missed) — was: red on today too, so "0/2" showed half a red ring */
+  const C=2*Math.PI*15.5,fd=dn/n,fm=ms/n;
   /* "2/3" (or a tick when all done) in the middle of the ring */
   return `<span class="mc-dn${dn===n?" ok":ms?" ms":""}"><svg class="mc-don" viewBox="0 0 36 36" aria-label="${dn} of ${n} tasks done${ms?", "+ms+" missed":""}"><circle class="wd-t" cx="18" cy="18" r="15.5"/>${fd?`<circle class="wd-d" cx="18" cy="18" r="15.5" stroke-dasharray="${(fd*C).toFixed(2)} ${C.toFixed(2)}"/>`:""}${fm?`<circle class="wd-m" cx="18" cy="18" r="15.5" stroke-dasharray="${(fm*C).toFixed(2)} ${C.toFixed(2)}" stroke-dashoffset="${(-fd*C).toFixed(2)}"/>`:""}</svg><b>${dn===n?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>':dn+"/"+n}</b></span>`}catch(e){return ""}}
 function bigCal(d){
@@ -11679,7 +11680,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1036",APPT="2026-11-28T21:05:00Z";   /* APPT: when this update was made */
+const APPV="1038",APPT="2026-11-28T21:15:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
