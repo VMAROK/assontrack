@@ -4155,6 +4155,9 @@ html body #view .bpx-s.off{display:inline-flex;align-items:center;gap:6px;height
 .bpx-r .bpx-t{min-width:0;display:grid;gap:2px}.bpx-r .bpx-t b{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bpx-r .bpx-t small{font-size:13.5px;color:rgba(255,255,255,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bpx-r.inc .bpx-t b{color:#3ddc84}.bpx-r .bpx-a{font-family:var(--mono);font-size:15px;font-weight:600;white-space:nowrap}.bpx-r .bpx-a.pos{color:#3ddc84}
 .bpx-r.off{opacity:.5}.bpx-r svg{color:rgba(255,255,255,.5)}
+/* phone, every view: expense amounts in red, each group's total in its group colour */
+html.phone body #view#view#view .bpx .bpx-r:not(.inc) .bpx-a,html.phone body #view#view#view .bpx .bpx-vx .bi-amt,html.phone body #view#view#view .bpx .bpx-vx .bl-v b{color:#ff7a86!important}
+html.phone body #view#view#view .bpx .bpx-ch>b,html.phone body #view#view#view .bpx .bpx-vx .bk-v,html.phone body #view#view#view .bpx .bpx-vx .bl-ch>b{color:var(--cc)!important}
 /* phone list: three shades, darkest to lightest — Income / Expenses strip, group strip, items — all darker than the panel and edge to edge.
    The group tabs sit flush right under the Expenses strip */
 html.phone body #view#view#view .bpx .bpx-h{background:#08090b;margin-bottom:0}
@@ -11663,7 +11666,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1032",APPT="2026-11-28T20:20:00Z";   /* APPT: when this update was made */
+const APPV="1033",APPT="2026-11-28T20:30:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -12356,9 +12359,9 @@ function bPhone(S){const b=B(),CY=c=>((BCYC.find(x=>x[0]===c)||BCYC[1])[1]),chev
   const grp=(L,m,isInc)=>{let order=[];try{order=bCatsShown(S,m).map(c=>c.n)}catch(_){}const have=[...new Set(L.map(i=>bItCat(i)))];have.forEach(n=>{if(!order.includes(n))order.push(n)});
     return order.filter(n=>have.includes(n)).map(n=>{const G=L.filter(i=>bItCat(i)===n),t=G.filter(i=>!i.paused&&!i.muted).reduce((a,i)=>a+bMo(i),0),c=isInc?"#3ddc84":(bCol?bCol(n):"#888");
       return `<div class="bpx-ch" style="--cc:${c}"><i></i><span>${esc(n)}</span><b>${isInc?"+":"−"}${bMoney(bPX(t))}${bPU()}</b></div>${G.map(i=>row(i,isInc)).join("")}`}).join("")};
-  return `<div class="panel bpan bpx">${top(bViewSw("data-bpview",pv),'data-bnew="exp" title="Add recurring" aria-label="Add recurring"')}${sums}<div class="bpx-h pos"><span>Income</span><b>+${bMoney(bPX(S.inc))}${bPU()}</b></div>${pv!=="list"?`<div class="bpx-v">${pv==="cards"?bAll(S,null,"i"):bList(S,"i")}</div>`:inc.length?(new Set(inc.map(i=>bItCat(i))).size>1?grp(inc,"i",true):inc.map(i=>row(i,true)).join("")):`<div class="bpx-empty">No income yet</div>`}
+  return `<div class="panel bpan bpx">${top(bViewSw("data-bpview",pv),'data-bnew="exp" title="Add recurring" aria-label="Add recurring"')}${sums}<div class="bpx-h pos"><span>Income</span><b>+${bMoney(bPX(S.inc))}${bPU()}</b></div>${pv!=="list"?`<div class="bpx-v bpx-vi">${pv==="cards"?bAll(S,null,"i"):bList(S,"i")}</div>`:inc.length?(new Set(inc.map(i=>bItCat(i))).size>1?grp(inc,"i",true):inc.map(i=>row(i,true)).join("")):`<div class="bpx-empty">No income yet</div>`}
     <div class="bpx-h neg"><span>Expenses</span><b>−${bMoney(bPX(S.subs+S.bills))}${bPU()}</b></div>
-    ${pv!=="list"?`<div class="bpx-v">${pv==="cards"?bAll(S):bList(S)}</div>`:""}${pv==="list"&&cats.length>1?`<div class="bpx-chips" role="group" aria-label="Expense group"><button type="button" data-bpchip="all" aria-pressed="${chip==="all"}">All</button>${cats.map(c=>`<button type="button" data-bpchip="${esc(c)}" aria-pressed="${chip===c}" style="--cc:${bCol?bCol(c):"#888"}"><i></i>${esc(c)}</button>`).join("")}</div>`:""}
+    ${pv!=="list"?`<div class="bpx-v bpx-vx">${pv==="cards"?bAll(S):bList(S)}</div>`:""}${pv==="list"&&cats.length>1?`<div class="bpx-chips" role="group" aria-label="Expense group"><button type="button" data-bpchip="all" aria-pressed="${chip==="all"}">All</button>${cats.map(c=>`<button type="button" data-bpchip="${esc(c)}" aria-pressed="${chip===c}" style="--cc:${bCol?bCol(c):"#888"}"><i></i>${esc(c)}</button>`).join("")}</div>`:""}
     ${pv!=="list"?"":E.length?(chip==="all"?grp(E,"x",false):E.map(i=>row(i,false)).join("")):`<div class="bpx-empty">No expenses yet</div>`}
     ${sumsB}</div>`}
 window.bPhone=bPhone;
