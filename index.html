@@ -4897,7 +4897,26 @@ html.phone #bdArr{width:44px;height:56px;bottom:calc(var(--navh,84px) + 16px)}
 html.phone .bc-mk{top:64%;width:26px;height:26px;font-size:16px}html.phone .bc-mk svg{width:16px;height:16px}html.phone .bc-mk.part{min-width:32px;height:20px;padding:0 5px;font-size:11px}
 html.phone body #view#view .bc-mk,html.phone body #view#view .bc-mk.ok,html.phone body #view#view .bc-mk.no,html.phone body #view#view .bc-mk.late{background:none!important;box-shadow:none!important}
 html.phone body #view#view .bc-mk.part{min-width:0;padding:0;font-size:14px;font-weight:700}
-html.phone body #view#view .bc-mk svg{width:20px;height:20px}   /* phone: just the fraction or the tick / cross, no bubble behind it */   /* the date stays sharp above the glass */
+html.phone body #view#view .bc-mk svg{width:20px;height:20px}   /* phone: just the fraction or the tick / cross, no bubble behind it */
+/* budget calendar day donut */
+html body #view#view .bc-mk.bc-dn{background:none!important;box-shadow:none!important;width:54px;height:54px;padding:0;min-width:0;border-radius:50%}
+html body #view#view .bc-mk.bc-dn .bc-ring{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+html body #view#view .bc-mk.bc-dn .bc-ring circle{fill:none;stroke-width:4;stroke-linecap:butt}
+html body #view#view .bc-mk.bc-dn .bc-ring .t{stroke:rgba(255,255,255,.1)}
+html body #view#view .bc-mk.bc-dn .bc-ring .d{stroke:#3ddc84}
+html body #view#view .bc-mk.bc-dn .bc-ring .m{stroke:#ff5e6c}
+html body #view#view .bc-mk.bc-dn.late .bc-ring .m{stroke:#ffa630}
+html body #view#view .bc-mk.bc-dn>b{position:relative;font-family:var(--mono);font-size:15px;font-weight:700;line-height:1;color:#ff5e6c}
+html body #view#view .bc-mk.bc-dn.late>b{color:#ffa630}
+html body #view#view .bc-mk.bc-dn.ok>b{color:#3ddc84}
+html body #view#view .bc-mk.bc-dn>b svg{width:24px;height:24px;display:block}
+html body #view#view .bc-mk.bc-dn.pend .bc-ring .m{stroke:rgba(140,165,225,.4)}
+html body #view#view .bc-mk.bc-dn.pend>b{color:rgba(225,232,250,.8)}
+html.phone body #view#view .bc-mk.bc-dn{width:29px;height:29px;top:auto;bottom:3px;transform:translateX(-50%)}
+html.phone body #view#view .bc-d.td .bc-mk.bc-dn,html.phone body #view#view .bc-d.sel .bc-mk.bc-dn{left:auto;right:3px;bottom:3px;transform:none}
+html.phone body #view#view .bc-mk.bc-dn .bc-ring circle{stroke-width:3.4}
+html.phone body #view#view .bc-mk.bc-dn>b{font-size:10px;letter-spacing:-.03em}
+html.phone body #view#view .bc-mk.bc-dn>b svg{width:15px;height:15px}   /* the date stays sharp above the glass */
 /* past days grey */
 /* grey now comes from the glass layer: .bc-grid .bc-d.past:not(.sel){background:rgba(130,134,144,.2)} */.bc-grid .bc-d.past .bc-n{color:#a3a7b0;opacity:1}
 .bc-grid .bc-d.past>*{position:relative;z-index:1}
@@ -8395,7 +8414,7 @@ function bCal(){const b=B(),T=today(),x=bDate(T);x.setDate(1);x.setMonth(x.getMo
   const ev=bEvMap(b,from,to,T);   /* was: each occurrence on its own date only (no grace periods) */const spd={},spn={};b.spends.forEach(s=>{if(s.d>=from&&s.d<=to){spd[s.d]=(spd[s.d]||0)+bSpAmt(s);spn[s.d]=(spn[s.d]||0)+1}});
   if(!bSel||bSel.slice(0,7)!==from.slice(0,7))bSel=from.slice(0,7)===T.slice(0,7)?T:from;
   let cells="";for(let i=0;i<lead;i++)cells+=`<span class="bc-d pad"></span>`;
-  for(let d=1;d<=nd;d++){const ds=ymd(new Date(y,m,d,12)),E=ev[ds]||[],mk=bDayMark(b,ds,E,T);cells+=`<button type="button" class="bc-d${ds===T?" td":""}${ds===bSel&&!bNoSel?" sel":""}${ds<T?" past":""}" data-bday="${ds}"><span class="bc-n">${d}</span>${mk}<span class="bc-ev">${E.slice(0,3).map(i=>`<i class="${i.kind==="inc"?"inc":""}${i.muted?" mu":""}" style="--cc:${i.kind==="inc"?"#3ddc84":bCol(bItCat(i))}">${esc(bTitle(i))}</i>`).join("")}${E.length>3?`<i class="more">+${E.length-3}</i>`:""}</span>${spd[ds]?`<span class="bc-sp">${bMoney(spd[ds],0)}</span>`:""}${!mk&&E.length+(spn[ds]||0)?`<span class="bc-cnt">${E.length+(spn[ds]||0)}</span>`:""/* phone: how many things that day — not when the day already shows its paid mark (3/4, ✓, ✗): one number per day */}</button>`}
+  for(let d=1;d<=nd;d++){const ds=ymd(new Date(y,m,d,12)),E=ev[ds]||[],mk=bDayMark(b,ds,E,T,spn[ds]);cells+=`<button type="button" class="bc-d${ds===T?" td":""}${ds===bSel&&!bNoSel?" sel":""}${ds<T?" past":""}" data-bday="${ds}"><span class="bc-n">${d}</span>${mk}<span class="bc-ev">${E.slice(0,3).map(i=>`<i class="${i.kind==="inc"?"inc":""}${i.muted?" mu":""}" style="--cc:${i.kind==="inc"?"#3ddc84":bCol(bItCat(i))}">${esc(bTitle(i))}</i>`).join("")}${E.length>3?`<i class="more">+${E.length-3}</i>`:""}</span>${spd[ds]?`<span class="bc-sp">${bMoney(spd[ds],0)}</span>`:""}${!mk&&E.length+(spn[ds]||0)?`<span class="bc-cnt">${E.length+(spn[ds]||0)}</span>`:""/* phone: how many things that day — not when the day already shows its paid mark (3/4, ✓, ✗): one number per day */}</button>`}
   const tail=(7-(lead+nd)%7)%7;for(let i=0;i<tail;i++)cells+=`<span class="bc-d pad"></span>`;
   const SE=(ev[bSel]||[]),SS=b.spends.filter(s=>s.d===bSel),tot=SE.filter(i=>i.kind!=="inc").reduce((a,i)=>a+fxc(+i.amt||0,i.cur,bHome()),0)+SS.reduce((a,s)=>a+bSpAmt(s),0);
   /* old list under the calendar (before the overview moved here):
@@ -8428,12 +8447,20 @@ function bEvMap(b,from,to,T){const ev={},f0=(()=>{const x=bDate(from);x.setDate(
     bOcc(i,has?f0:from,to).forEach(occ=>{const ds=has&&occ>=cut?bPlace(b,i,occ,T):occ;if(ds<from||ds>to)return;const v=has?Object.assign(Object.create(i),{_occ:occ}):i;(ev[ds]=ev[ds]||[]).push(v)})});return ev}
 /* mark for a past day: green check when everything is crossed off, red X when a bill wasn't paid,
    orange ? when only income is missing (delayed), and a count like 2/3 when part of it is done */
-function bDayMark(b,ds,E,T){if(ds>=T||!E.length)return "";const n=E.length,k=E.filter(i=>bIsPaid(b,i,ds)).length,billMiss=E.some(i=>i.kind!=="inc"&&!bIsPaid(b,i,ds));
+function bDayMark(b,ds,E,T,sn){const ph=document.documentElement.classList.contains("phone"),fut=ds>=T;
+  /* phone: every day with income, expenses or spending gets a donut (upcoming ones show what is still to come); iPad / computer: past days only, as before */
+  if(!ph){sn=0;if(fut)return ""}sn=sn||0;if(!E.length&&!sn)return "";
+  const n=E.length+sn,k=E.filter(i=>bIsPaid(b,i,ds)).length+sn,billMiss=!fut&&E.some(i=>i.kind!=="inc"&&!bIsPaid(b,i,ds));
   const OK='<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>',
         NO='<svg viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
+  /* a donut of the day: green = paid / received, red = a bill still unpaid (orange when only income is late); tick in the middle when all done, otherwise "3/4" */
+  const C=2*Math.PI*15.5,fd=k/n,cls=k===n?"ok":fut?"pend":billMiss?"no":"late",
+    ring=`<svg class="bc-ring" viewBox="0 0 36 36" aria-hidden="true"><circle class="t" cx="18" cy="18" r="15.5"/>${k<n?`<circle class="m" cx="18" cy="18" r="15.5" stroke-dasharray="${((1-fd)*C).toFixed(2)} ${C.toFixed(2)}" stroke-dashoffset="${(-fd*C).toFixed(2)}"/>`:""}${k?`<circle class="d" cx="18" cy="18" r="15.5" stroke-dasharray="${(fd*C).toFixed(2)} ${C.toFixed(2)}"/>`:""}</svg>`;
+  return `<span class="bc-mk bc-dn ${cls}" title="${k===n?"All paid / received":k+" of "+n+" done"}">${ring}<b>${k===n?OK:k+"/"+n}</b></span>`;
+  /* was: a plain tick, a cross, "?" or a 3/4 pill:
   if(k===n)return `<span class="bc-mk ok" title="All paid / received">${OK}</span>`;
   if(k===0)return billMiss?`<span class="bc-mk no" title="Not paid">${NO}</span>`:`<span class="bc-mk late" title="Income not received yet">?</span>`;
-  return `<span class="bc-mk part ${billMiss?"no":"late"}" title="${k} of ${n} done">${k}/${n}</span>`}
+  return `<span class="bc-mk part ${billMiss?"no":"late"}" title="${k} of ${n} done">${k}/${n}</span>` */}
 /* after tapping a day: a glowing arrow floats in front of the screen, pointing down to the day's overview.
    It goes away once the overview is on screen; tapping it brings the overview up. */
 function bArrShow(){const ov=document.querySelector(".bc-day");if(!ov||tab!=="budget")return bArrHide();const r=ov.getBoundingClientRect();if(r.top<bArrFloor()-200)return bArrHide();
@@ -11615,7 +11642,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1026",APPT="2026-11-28T19:20:00Z";   /* APPT: when this update was made */
+const APPV="1028",APPT="2026-11-28T19:40:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
