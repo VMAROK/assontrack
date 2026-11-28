@@ -4156,7 +4156,7 @@ html body #view .bpx-s.off{display:inline-flex;align-items:center;gap:6px;height
 .bpx-r.inc .bpx-t b{color:#3ddc84}.bpx-r .bpx-a{font-family:var(--mono);font-size:15px;font-weight:600;white-space:nowrap}.bpx-r .bpx-a.pos{color:#3ddc84}
 .bpx-r.off{opacity:.5}.bpx-r svg{color:rgba(255,255,255,.5)}
 /* phone, every view: expense amounts and each group's total in the group colour (was red: too alarming) */
-html.phone body #view#view#view .bpx .bpx-r:not(.inc) .bpx-a,html.phone body #view#view#view .bpx .bpx-vx .bi-amt,html.phone body #view#view#view .bpx .bpx-vx .bl-v b{color:var(--cc)!important}
+html.phone body #view#view#view .bpx .bpx-r:not(.inc) .bpx-a,html.phone body #view#view#view .bpx .bpx-vx .bi-amt,html.phone body #view#view#view .bpx .bpx-vx .bl-v b{color:#dfe4ee!important;color:color-mix(in srgb,var(--cc) 38%,#f4f6fb)!important}   /* items: a faint tint of the group colour, close to white; the group total keeps the full colour */
 html.phone body #view#view#view .bpx .bpx-ch>b,html.phone body #view#view#view .bpx .bpx-vx .bk-v,html.phone body #view#view#view .bpx .bpx-vx .bl-ch>b{color:var(--cc)!important}
 /* phone list: three shades, darkest to lightest — Income / Expenses strip, group strip, items — all darker than the panel and edge to edge.
    The group tabs sit flush right under the Expenses strip */
@@ -11679,7 +11679,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1035",APPT="2026-11-28T21:00:00Z";   /* APPT: when this update was made */
+const APPV="1036",APPT="2026-11-28T21:05:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
