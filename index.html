@@ -4245,6 +4245,13 @@ html.phone body #view#view#view#view#view#view[data-tab="dash"] .wahead .mcal .m
 #view[data-tab="fuel"] .panel.bmi-fuel{margin-top:18px!important;margin-bottom:0!important;width:auto!important;max-width:none!important}
 html.phone #view[data-tab="fuel"] .panel.bmi-fuel{margin-top:0!important;margin-bottom:10px!important}
 html:not(.phone) body #view#view#view .panel:has(+ .cal-tab)::after{display:none!important}/* was a 1px divider stretched to full height = two light bands down the calendar */
+/* Nutrition macros: a two-colour bar is ONE bar — only its outer ends are rounded (was: each colour had its own rounded ends = a "bone joint") */
+html body #view#view .mbi-t.mbi-ov>i,html body #view#view .nwp .mv .mbi-t.mbi-ov>*{border-radius:0!important;margin:0!important}
+html body #view#view .mbi-t.mbi-ov{border-radius:99px!important;overflow:hidden!important}
+/* iPad / computer: the week strip and the Macronutrients strip are the same height, side by side, no overlap */
+html:not(.phone) body #view#view#view[data-tab="fuel"] .panel.nwp .bc>.bc-h,html:not(.phone) body #view#view#view[data-tab="fuel"] .panel.nwp .bm-r>.ph{height:48px!important;min-height:48px!important;max-height:48px!important;padding-top:0!important;padding-bottom:0!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;margin-top:0!important}
+html:not(.phone) body #view#view#view[data-tab="fuel"] .panel.nwp .bm-r>.ph .mg-hr{height:32px!important;min-height:0!important;align-items:center}
+html:not(.phone) body #view#view#view[data-tab="fuel"] .panel.nwp .bm-r>.ph .mg-hr button{height:26px!important;min-height:0!important;padding-top:0!important;padding-bottom:0!important;line-height:26px!important}
 /* This week panel: same width as the panels above and below */
 html.phone body #view#view#view#view#view[data-tab="dash"] .dstack>.wahead.panel{margin-left:0!important;margin-right:0!important;width:auto!important;max-width:none!important;align-self:stretch!important}
 html.phone body #view#view#view#view[data-tab="dash"] .wahead .wa-it{grid-template-columns:1fr auto!important;grid-template-areas:"n a" "t a";align-items:center;column-gap:10px!important;row-gap:1px!important;padding:8px 12px!important;border-radius:10px}
@@ -11519,7 +11526,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1012",APPT="2026-11-28T17:14:00Z";   /* APPT: when this update was made */
+const APPV="1013",APPT="2026-11-28T17:30:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
