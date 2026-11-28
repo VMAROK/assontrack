@@ -4143,6 +4143,16 @@ html body #view .bpx-s.off{display:inline-flex;align-items:center;gap:6px;height
 .bpx-r .bpx-t{min-width:0;display:grid;gap:2px}.bpx-r .bpx-t b{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bpx-r .bpx-t small{font-size:13.5px;color:rgba(255,255,255,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bpx-r.inc .bpx-t b{color:#3ddc84}.bpx-r .bpx-a{font-family:var(--mono);font-size:15px;font-weight:600;white-space:nowrap}.bpx-r .bpx-a.pos{color:#3ddc84}
 .bpx-r.off{opacity:.5}.bpx-r svg{color:rgba(255,255,255,.5)}
+/* phone list: one compact line per item (dot · name · amount), hairline between rows */
+html body #view#view .bpx-r{grid-template-columns:auto minmax(0,1fr) auto;gap:10px;min-height:36px;padding:3px 4px 3px 6px;border-bottom-color:rgba(255,255,255,.05)}
+html body #view#view .bpx-r .bpx-dot{width:8px;height:8px;margin:0 2px}
+html body #view#view .bpx-r .bpx-av{width:22px;height:22px;border-radius:6px;font-size:12px}
+html body #view#view .bpx-r .bpx-t{display:flex;align-items:baseline;gap:8px}
+html body #view#view .bpx-r .bpx-t b{font-size:15px;font-weight:500;min-width:0}
+html body #view#view .bpx-r .bpx-t small{flex:none;font-size:11.5px;padding:1px 6px;border-radius:5px;background:rgba(255,255,255,.08)}
+html body #view#view .bpx-r .bpx-a{font-size:14.5px}
+html body #view#view .bpx-r:last-child,html body #view#view .bpx-r:has(+ .bpx-ch),html body #view#view .bpx-r:has(+ .bpx-h){border-bottom:0}
+html body #view#view .bpx-ch{margin:10px 0 0;padding:0 2px 4px}
 .bpx-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:10px 2px;margin:0 -2px}.bpx-chips::-webkit-scrollbar{display:none}
 .bpx-chips button{flex:none;display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 13px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:none;color:rgba(255,255,255,.85);font:inherit;font-size:14.5px;cursor:pointer}
 .bpx-chips button i{width:10px;height:10px;border-radius:50%;background:var(--cc)}
@@ -11562,7 +11572,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1018",APPT="2026-11-28T18:05:00Z";   /* APPT: when this update was made */
+const APPV="1019",APPT="2026-11-28T18:15:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -12203,8 +12213,8 @@ function bPhone(S){const b=B(),CY=c=>((BCYC.find(x=>x[0]===c)||BCYC[1])[1]),chev
       ${bSpend(S)}${sumsB}<div class="bpx-scrim" data-bpaddx></div><button type="button" class="bpx-shx" data-bpaddx aria-label="Close"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`}
   const pv=["cards","rich","list"].includes(b.viewC)?b.viewC:"list";/* same Cards / Detailed / List choice as iPad and computer */const act=b.items.filter(i=>bActiveMonth?bActiveMonth(i,today().slice(0,7))||i.paused:true),inc=b.items.filter(i=>i.kind==="inc"),exp=b.items.filter(i=>i.kind!=="inc");
   const cats=(()=>{const h=[...new Set(exp.map(i=>bItCat(i)))];let o=[];try{o=bCatsShown(S,"x").map(c=>c.n)}catch(_){}return [...o.filter(n=>h.includes(n)),...h.filter(n=>!o.includes(n))]})(),chip=bPChip!=="all"&&!cats.includes(bPChip)?"all":bPChip,E=chip==="all"?exp:exp.filter(i=>bItCat(i)===chip);
-  const row=(i,isInc)=>{const c=bCol?bCol(bItCat(i)):"#888",nm=bTitle(i),sub=[bPerLbl(),i.paused?"Paused":"",i.muted?"Excluded":""].filter(Boolean).join(" · ");
-    return `<button type="button" class="bpx-r${isInc?" inc":""}${i.paused||i.muted?" off":""}" data-bedit="${i.id}" style="--cc:${isInc?"#3ddc84":c}">${isInc?`<span class="bpx-av">${esc((nm||"?").trim().charAt(0).toUpperCase())}</span>`:`<span class="bpx-dot"></span>`}<span class="bpx-t"><b>${esc(nm)}</b><small>${esc(sub)}</small></span><span class="bpx-a${isInc?" pos":""}">${isInc?"+":"−"}${(i.cur||bHome())!==bHome()?"≈":""}${bMoney(bPX(bMo(i)))}</span>${chev}</button>`};
+  const row=(i,isInc)=>{const c=bCol?bCol(bItCat(i)):"#888",nm=bTitle(i),sub=[i.paused?"Paused":"",i.muted?"Excluded":""].filter(Boolean).join(" · ");   /* one line per item: "Monthly" under every name repeated the header (/mo) */
+    return `<button type="button" class="bpx-r${isInc?" inc":""}${i.paused||i.muted?" off":""}" data-bedit="${i.id}" style="--cc:${isInc?"#3ddc84":c}">${isInc?`<span class="bpx-av">${esc((nm||"?").trim().charAt(0).toUpperCase())}</span>`:`<span class="bpx-dot"></span>`}<span class="bpx-t"><b>${esc(nm)}</b>${sub?`<small>${esc(sub)}</small>`:""}</span><span class="bpx-a${isInc?" pos":""}">${isInc?"+":"−"}${(i.cur||bHome())!==bHome()?"≈":""}${bMoney(bPX(bMo(i)))}</span></button>`};
   /* List · All: one titled section per group (same order as iPad), not one mixed list */
   const grp=(L,m,isInc)=>{let order=[];try{order=bCatsShown(S,m).map(c=>c.n)}catch(_){}const have=[...new Set(L.map(i=>bItCat(i)))];have.forEach(n=>{if(!order.includes(n))order.push(n)});
     return order.filter(n=>have.includes(n)).map(n=>{const G=L.filter(i=>bItCat(i)===n),t=G.filter(i=>!i.paused&&!i.muted).reduce((a,i)=>a+bMo(i),0),c=isInc?"#3ddc84":(bCol?bCol(n):"#888");
