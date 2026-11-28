@@ -5518,6 +5518,15 @@ html.phone body .bdw.bdw{align-items:center!important;justify-items:center!impor
 html body .bdw-x.bdw-x{width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;max-width:34px!important;max-height:34px!important;padding:0!important;margin:0!important;border-radius:50%!important;display:grid!important;place-items:center!important;flex:0 0 34px!important;align-self:center!important;box-sizing:border-box!important;line-height:0!important}
 html body .bdw-x.bdw-x svg{display:block;width:16px;height:16px}
 html body .bdw .bdw-h{align-items:center!important}
+
+/* Water glass: when no cups are logged there is no water at all (was a sliver of moving wave along the bottom that looked like the glass shaking on phone); the glass is drawn on its own layer so the waves never jiggle its outline */
+.wtile.wempty .wt-lvl{display:none!important}
+html.phone .wt-g{transform:translateZ(0);-webkit-transform:translateZ(0);will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+/* Macros: the eaten grams always in the macro's own colour (Carbs pink, Protein purple, Fiber brown, Fat yellow) */
+html body .mgb .mgb-v>b{color:var(--mc)!important}
+html body .nh-r>b .nh-e{color:var(--mc)!important;font-style:normal}
+html body .nh-r>b s{color:var(--muted)!important;text-decoration:none}
+html body .nh-r>b{font-variant-numeric:tabular-nums}
 </style>
 
 <div id="bgimg" class="on" aria-hidden="true"></div><div id="bgimg2" aria-hidden="true"></div><canvas id="bglive" aria-hidden="true"></canvas><div id="bgspin" aria-hidden="true"></div>
@@ -6339,7 +6348,7 @@ const MGT=78;/* was 68 *//* the goal tick sits at 68% of the track so going over
 /* bar scale: under the goal the full bar = the goal and there is no line; over the goal the full bar = what was eaten and the line marks the goal (e.g. 120 of 100 g → line at 100/120 = 83%) */
 function mgScale(e,gv){const ov=gv&&e>gv;return {f:gv?(ov?100:e/gv*100):(e?100:0),t:ov?gv/e*100:0,ov:ov?e-gv:0}}
 function mgRow(k,l,c,e){const gv=mgGoal(k),M=mgScale(e,gv),f=M.f,ov=M.ov;
-  return `<div class="mgb-r${ov?" mgb-ov":""}" data-mgb="${k}" style="--mc:${c}"><span class="mgb-n">${l}</span><span class="mgb-v"><b>${n0(e)}</b><span class="mgb-sl">/</span><input data-mgin="${k}" inputmode="numeric" enterkeyhint="done" placeholder="–" value="${gv||""}" style="width:${gv?String(gv).length+.4:2.2}ch" aria-label="${l} goal in grams"><span class="mgb-g">g</span></span><span class="mgb-x"></span><i class="mgb-t"><i class="mgb-f" style="width:${f.toFixed(1)}%;${mgFillBg(c,f,M.t)}"></i>${M.t?`<i class="mgb-k" style="left:${M.t.toFixed(1)}%"></i>`:""}</i></div>`}
+  return `<div class="mgb-r${ov?" mgb-ov":""}" data-mgb="${k}" style="--mc:${c}"><span class="mgb-n">${l}</span><span class="mgb-v"><b style="color:${c}">${n0(e)}</b><span class="mgb-sl">/</span><input data-mgin="${k}" inputmode="numeric" enterkeyhint="done" placeholder="–" value="${gv||""}" style="width:${gv?String(gv).length+.4:2.2}ch" aria-label="${l} goal in grams"><span class="mgb-g">g</span></span><span class="mgb-x"></span><i class="mgb-t"><i class="mgb-f" style="width:${f.toFixed(1)}%;${mgFillBg(c,f,M.t)}"></i>${M.t?`<i class="mgb-k" style="left:${M.t.toFixed(1)}%"></i>`:""}</i></div>`}
 /* over the goal: the macro's colour up to the tick, the heavier shade (62% colour, 38% black, as in Breakdown) for the part past it */
 function mgFillBg(c,f,t){if(!t)return `background:${c};`;const x=(+t).toFixed(1);return `background:linear-gradient(90deg,${c} 0 ${x}%,color-mix(in srgb,${c} 62%,#000) ${x}% 100%);`}
 function mgBars(V){const ph=false;/* was: short names on phone */return `<div class="mgb">${[["carbs",ph?"Carb":"Carbs"],["protein",ph?"Pro":"Protein"],["fiber",ph?"Fib":"Fiber"],["fat","Fat"]].map(([k,l],i)=>mgRow(k,l,MGCL[i],+V[i]||0)).join("")}</div>`}
@@ -6516,7 +6525,7 @@ function nWeekPhone(cells,lab,S,M,sum,bar){
       <div class="nh-ch"><b>${dt}</b>${""/* was the Bar/Donut switch: now swipe between them */}<span class="nh-dots" aria-hidden="true"><i class="${bar?"on":""}"></i><i class="${bar?"":"on"}"></i></span></div>
       ${""/* was: bar view showed the 2-column number legend; only the picked view was rendered, so the card changed height */}<div class="nh-vw" data-start="${nPro().macV==="target"?2:bar?0:1}" aria-label="Swipe for the bar or donut view">
       <div class="nh-bar${bar?"":" nh-off"}" aria-hidden="${!bar}">${""/* was: "Macro mix" heading with the total grams */}<div class="nh-st">${sum?M.filter(x=>x[1]>0).map(x=>{const pc=Math.round(x[1]/sum*100);return `<i style="flex:${x[1]};background:${x[2]}">${pc>=9?`<b>${pc}%</b>`:""}</i>`}).join(""):""}</div>
-        <div class="nh-mb">${M.map((x,i)=>{const gv=gl[i],e=x[1],pc=gv?Math.min(100,e/gv*100):0,ov=gv&&e>gv?(e-gv)/e*100:0;/* over the goal: its colour up to the goal, the heavier shade for the extra */return `<div class="nh-r" style="--mc:${x[2]}"><span>${x[0]}</span><i class="nh-t">${ov?`<i style="width:${(100-ov).toFixed(1)}%"></i><i style="width:${ov.toFixed(1)}%;background:color-mix(in srgb,${x[2]} 62%,#000)"></i>`:`<i style="width:${pc.toFixed(1)}%"></i>`}</i><b>${n0(e)}${gv?`<s> / ${n0(gv)}</s>`:""} g</b></div>`}).join("")}</div></div>
+        <div class="nh-mb">${M.map((x,i)=>{const gv=gl[i],e=x[1],pc=gv?Math.min(100,e/gv*100):0,ov=gv&&e>gv?(e-gv)/e*100:0;/* over the goal: its colour up to the goal, the heavier shade for the extra */return `<div class="nh-r" style="--mc:${x[2]}"><span>${x[0]}</span><i class="nh-t">${ov?`<i style="width:${(100-ov).toFixed(1)}%"></i><i style="width:${ov.toFixed(1)}%;background:color-mix(in srgb,${x[2]} 62%,#000)"></i>`:`<i style="width:${pc.toFixed(1)}%"></i>`}</i><b><em class="nh-e">${n0(e)}</em>${gv?`<s> / ${n0(gv)}</s>`:""} g</b></div>`}).join("")}</div></div>
       <div class="nh-don${bar?" nh-off":""}" aria-hidden="${bar}"><div class="nh-dl">${donut}<small>Outer · Goal<i></i>Inner · Logged</small></div><div class="nh-dr">${[0,1,2,3].map(leg).join("")}</div></div>
       </div>
       <div class="nh-w"><svg viewBox="0 0 24 30" width="16" height="20" aria-hidden="true"><path d="M3 2h18l-2.2 25a2 2 0 01-2 1.8H7.2a2 2 0 01-2-1.8z" fill="none" stroke="#4cc9ff" stroke-width="1.8" stroke-linejoin="round"/></svg><span>Water</span><i>·</i><b>${w} / ${G} cups</b></div>
@@ -6563,7 +6572,7 @@ function nCalc(S){const g=S.g,T=+g.kcal||0,P=+g.protein||0,tm=S.tm,E=+S.kcal||0,
 /* tile 3: water. A glass that fills with moving water as you drink; tap the tile for a cup, − takes one back */
 let nWatPrev=null;
 function nWaterTile(){const w=nWater(),G=nWGoal(),f=G?Math.min(1,w/G):0,top=96-f*84,y0=nWatPrev==null?top:nWatPrev,done=G&&w>=G;nWatPrev=top;
-  return `<div class="panel tile wtile${done?" wdone":""}" style="--c:#4cc9ff;--y0:${y0.toFixed(1)}px;--y1:${top.toFixed(1)}px" data-nwat="1" role="button" tabindex="0" aria-label="Water: ${w} of ${G} cups. Tap to add a cup">
+  return `<div class="panel tile wtile${done?" wdone":""}${w?"":" wempty"}" style="--c:#4cc9ff;--y0:${y0.toFixed(1)}px;--y1:${top.toFixed(1)}px" data-nwat="1" role="button" tabindex="0" aria-label="Water: ${w} of ${G} cups. Tap to add a cup">
     <button type="button" class="wt-m" data-nwat="-1" aria-label="Remove a cup"${w?"":" disabled"}>−</button>
     <small>Water${nD()===today()?"":" · "+nDayLbl(nD())}</small>
     <svg class="wt-g" viewBox="0 0 72 104" aria-hidden="true"><defs><clipPath id="wtClip"><path d="M10 6h52l-6 88a6 6 0 01-6 5.6H22a6 6 0 01-6-5.6z"/></clipPath>
@@ -11534,7 +11543,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1014",APPT="2026-11-28T17:35:00Z";   /* APPT: when this update was made */
+const APPV="1015",APPT="2026-11-28T17:40:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
