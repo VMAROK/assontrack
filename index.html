@@ -5445,6 +5445,18 @@ html.phone body #view#view#view#view#view#view#view .wahead .wk-tracks{padding-b
 html.phone body #view#view#view#view#view#view#view .wahead{padding-bottom:12px!important}
 /* phone Dashboard figure panel: its title strip spans the full panel width like Overview's */
 html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .holopanel>.ph{align-self:stretch!important}
+
+/* ===== Phone: settings gears in title strips — same on every tab: round 32px, inside the strip on the right, vertically centred, never over the title; strips holding one are 44px tall ===== */
+html.phone body #view#view#view#view#view#view#view .panel>:is(.ph,.bstrip):first-child:has(.gear){position:relative!important;min-height:44px!important;height:44px!important;padding-left:16px!important;padding-top:0!important;padding-bottom:0!important;align-items:center!important;box-sizing:border-box!important;padding-right:52px!important}
+html.phone body #view#view#view#view#view#view#view .panel>:is(.ph,.bstrip):first-child:has(.gear):not([style*="height:0"]) {}
+html.phone body #view#view#view#view#view#view#view .panel>:is(.ph,.bstrip):first-child .gear{position:absolute!important;top:50%!important;right:10px!important;left:auto!important;bottom:auto!important;transform:translateY(-50%)!important;width:32px!important;height:32px!important;min-width:32px!important;padding:0!important;margin:0!important;border-radius:50%!important;display:grid!important;place-items:center!important}
+html.phone body #view#view#view#view#view#view#view .panel>:is(.ph,.bstrip):first-child .gear svg{width:16px!important;height:16px!important}
+/* centred titles (Dashboard figure) keep equal room on both sides so the gear never touches them */
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .panel.holopanel>.ph.ph:first-child:has(.gear){padding-left:44px!important;padding-right:44px!important;justify-content:center!important;text-align:center!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="dash"] .holopanel>.ph>span{overflow:hidden;text-overflow:ellipsis}
+/* Passions "My passions": its title row is collapsed on phone, so the categories gear sits in the panel's top-right corner instead of hanging off the left edge */
+html.phone body #view#view#view#view#view#view#view[data-tab="pass"] .panel.pmine>.ph{position:static!important;min-height:0!important;padding-right:0!important}
+html.phone body #view#view#view#view#view#view#view[data-tab="pass"] .panel.pmine>.ph .gear{top:10px!important;right:10px!important;transform:none!important}
 </style>
 
 <div id="bgimg" class="on" aria-hidden="true"></div><div id="bgimg2" aria-hidden="true"></div><canvas id="bglive" aria-hidden="true"></canvas><div id="bgspin" aria-hidden="true"></div>
@@ -11453,7 +11465,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1004",APPT="2026-11-27T23:25:00Z";   /* APPT: when this update was made */
+const APPV="1005",APPT="2026-11-28T00:10:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
