@@ -4114,7 +4114,7 @@ html body #view .bpx-top{display:flex;justify-content:space-between;align-items:
 html body #view .bpx-tr{gap:6px;align-items:center}
 html body #view#view .bpx-top .bpx-plus{width:42px;height:36px;display:grid;place-items:center;border-radius:10px;border:0;background:#5584fc;color:#fff;cursor:pointer;padding:0;margin:0 0 0 4px!important}
 html body #view#view .bpx-sums-b{border-bottom:0;border-top:0;padding:6px 0 0;margin-top:0}
-html.phone body #view#view .panel.bpx{padding-bottom:64px!important}   /* last row clears the floating eye */
+html.phone body #view#view .panel.bpx{padding-bottom:16px!important}   /* last row clears the floating eye */
 html.phone body .phead .ph-per{margin-left:auto}
 html body #view .bpx-top>.bpx-tabs{justify-self:start}
 html body #view#view .bpx-top>*,html body #view#view .bpx-top .bvsw,html body #view#view .bpx-top .bper{margin:0!important;align-self:center!important}
@@ -11572,7 +11572,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1019",APPT="2026-11-28T18:15:00Z";   /* APPT: when this update was made */
+const APPV="1020",APPT="2026-11-28T18:20:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -12205,7 +12205,7 @@ function bPhone(S){const b=B(),CY=c=>((BCYC.find(x=>x[0]===c)||BCYC[1])[1]),chev
     sr=(k,nm,val,cls)=>sx[k]?`<button type="button" class="bpx-s off" data-bsumhide="${k}" title="Show ${nm}" aria-label="Show ${nm}">${EYEX}<span>${nm}</span></button>`:`<div class="bpx-s"><span>${nm}</span><b class="${cls}">${val}</b><button type="button" class="bpx-sh" data-bsumhide="${k}" title="Hide" aria-label="Hide ${nm}">${EYE}</button></div>`,
     so=(()=>{const x=bSecs(b).find(q=>q.sum);return x&&Array.isArray(x.o)&&x.o.length===2?x.o:["spent","left"]})(),
     S1={spent:()=>sr("spent","Spent "+P,(spY>0?"−":"")+bMoney(spY),spY>0?"neg":""),left:()=>sr("left",(lf<0?"Over ":"Left over ")+P,bMoney(lf),lf<0?"neg":"pos")},
-    sums=`<div class="bpx-sums">${S1[so[0]]()}</div>`,sumsB=`<div class="bpx-sums bpx-sums-b">${S1[so[1]]()}</div>`;   /* first one under the icons, the other closes the panel (same order as iPad / computer) */
+    sums=`<div class="bpx-sums">${S1[so[0]]()}${S1[so[1]]()}</div>`,sumsB="";   /* both together under the icons, Spent then Left over (same order as iPad / computer); was split with Left over at the very bottom, where it got lost */
   if(bPT==="ext"){const v=b.spView||"grp";
     return `<div class="panel bpan bpx bpx-ext">${top(`<button type="button" class="bpx-bud" data-bspv="${v==="what"?"grp":"what"}" aria-pressed="${v==="what"}" title="Budget" aria-label="Budget"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/></svg></button>`,'data-bpadd title="Add expense" aria-label="Add expense"')}${sums}
       <div class="bpx-vw" role="group" aria-label="View">${[["day","By day"],["grp","By group"],["grps","Groups"]].map(([k,n])=>`<button type="button" data-bspv="${k}" aria-pressed="${v===k}">${n}</button>`).join("")}</div>
