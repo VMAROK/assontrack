@@ -4110,6 +4110,20 @@ html.phone #view[data-tab="budget"] .bd-leg>button>i{border-radius:50%!important
 html body #view .mcal .mc .chips{overflow:hidden!important}}
 /* ===== phone Budget: one card with Recurring | Extras tabs (replaces the two long panels on phones only) ===== */
 .bpx{margin-top:18px;padding:14px 14px 16px!important}
+html body #view .bpx-top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;margin:0 0 6px}
+html body #view .bpx-top>.bpx-tabs{justify-self:start}
+html body #view#view .bpx-top>*,html body #view#view .bpx-top .bvsw,html body #view#view .bpx-top .bper{margin:0!important;align-self:center!important}
+html body #view .bpx-top>.bpx-tr{justify-self:end;display:flex}
+html body #view#view .bpx-top .bpx-bud{width:42px;height:36px;display:grid;place-items:center;border-radius:10px;border:1px solid rgba(85,132,252,.3);background:none;color:rgba(255,255,255,.8);cursor:pointer;padding:0}
+html body #view#view .bpx-top .bpx-bud[aria-pressed="true"]{background:#5584fc;border-color:#5584fc;color:#fff}
+html body #view .bpx-sums{display:flex;flex-wrap:wrap;gap:8px;padding:6px 0 10px;border-bottom:1px solid rgba(255,255,255,.09)}
+html body #view .bpx-s:not(.off){flex:1 0 100%;display:flex;align-items:center;gap:10px;padding:2px 0 2px 4px;font-size:15.5px}
+html body #view .bpx-s>span{flex:1;color:rgba(255,255,255,.82)}
+html body #view .bpx-s>b{font-family:var(--mono);font-size:16px}
+html body #view .bpx-s>b.neg{color:#ff7a86}
+html body #view .bpx-s>b.pos{color:#3ddc84}
+html body #view .bpx-sh{width:32px;height:32px;display:grid;place-items:center;border:0;border-radius:8px;background:none;color:rgba(255,255,255,.5);cursor:pointer;padding:0}
+html body #view .bpx-s.off{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:99px;border:1px dashed rgba(255,255,255,.22);background:none;color:rgba(255,255,255,.55);font:inherit;font-size:13.5px;cursor:pointer}
 .bpx-seg{display:grid;grid-template-columns:1fr 1fr;padding:3px;border-radius:12px;border:1px solid rgba(255,255,255,.16);margin-bottom:6px}
 .bpx-seg button{height:40px;border:0;border-radius:9px;background:none;color:rgba(255,255,255,.75);font:inherit;font-size:15.5px;font-weight:500;cursor:pointer}
 .bpx-seg button[aria-pressed="true"]{background:rgba(255,255,255,.12);color:#fff;font-weight:600}
@@ -11543,7 +11557,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1016",APPT="2026-11-28T17:39:00Z";   /* APPT: when this update was made */
+const APPV="1017",APPT="2026-11-28T17:55:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
@@ -12162,9 +12176,20 @@ document.addEventListener("change",e=>{const i=e.target.closest&&e.target.closes
 /* phone Budget card: Recurring | Extras. Rows open the same edit sheets as before; Extras reuses the existing list and add form */
 let bPT="rec",bPChip="all";
 function bPhone(S){const b=B(),CY=c=>((BCYC.find(x=>x[0]===c)||BCYC[1])[1]),chev='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
-  const seg=`<div class="bpx-seg" role="group" aria-label="Section">${[["rec","Recurring"],["ext","Extras"]].map(([k,n])=>`<button type="button" data-bpt="${k}" aria-pressed="${bPT===k}">${n}</button>`).join("")}</div>`;
+  /* Recurring | Extras as two small icons, top left; Monthly/Yearly in the middle; the tab's own controls top right (was a full-width two-button bar) */
+  const ICR='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 3v5h5"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 21v-5h-5"/></svg>',
+    ICE='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>';
+  const seg=`<div class="bmode bvsw bpx-tabs" role="group" aria-label="Section">${[["rec","Recurring",ICR],["ext","Extras",ICE]].map(([k,n,ic])=>`<button type="button" data-bpt="${k}" aria-pressed="${bPT===k}" title="${n}" aria-label="${n}">${ic}</button>`).join("")}</div>`,
+    top=right=>`<div class="bpx-top">${seg}${bPerBtn()}<div class="bpx-tr">${right}</div></div>`;
+  /* Spent and Left over, like iPad / computer: each can be hidden (same switch as there), and Monthly/Yearly changes both */
+  const yr=bPer(),YY=today().slice(0,4),spY=yr?b.spends.filter(s=>(s.d||"").slice(0,4)===YY).reduce((a,s)=>a+bSpAmt(s),0):S.spent,lf=yr?(S.inc-S.subs-S.bills)*12-spY:S.left,P=yr?"this year":"this month",
+    sx=(bSecs(b).find(q=>q.sum)||{}).h||{},
+    EYE='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+    EYEX='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.5 10.5 0 0112 5c6.5 0 10 7 10 7a17 17 0 01-3.2 4.1M6.1 6.1C3.5 7.9 2 12 2 12s3.5 7 10 7a10 10 0 004.9-1.3"/><path d="M9.9 9.9a3 3 0 004.2 4.2"/></svg>',
+    sr=(k,nm,val,cls)=>sx[k]?`<button type="button" class="bpx-s off" data-bsumhide="${k}" title="Show ${nm}" aria-label="Show ${nm}">${EYEX}<span>${nm}</span></button>`:`<div class="bpx-s"><span>${nm}</span><b class="${cls}">${val}</b><button type="button" class="bpx-sh" data-bsumhide="${k}" title="Hide" aria-label="Hide ${nm}">${EYE}</button></div>`,
+    sums=`<div class="bpx-sums">${sr("spent","Spent "+P,(spY>0?"−":"")+bMoney(spY),spY>0?"neg":"")}${sr("left",(lf<0?"Over ":"Left over ")+P,bMoney(lf),lf<0?"neg":"pos")}</div>`;
   if(bPT==="ext"){const v=b.spView||"grp";
-    return `<div class="panel bpan bpx bpx-ext">${seg}<div class="bpx-sum"><span>Extras total</span><b>${bMoney(S.spent)}</b><button type="button" class="bpx-bud" data-bspv="${v==="what"?"grp":"what"}" aria-pressed="${v==="what"}"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/></svg>Budget</button></div>
+    return `<div class="panel bpan bpx bpx-ext">${top(`<button type="button" class="bpx-bud" data-bspv="${v==="what"?"grp":"what"}" aria-pressed="${v==="what"}" title="Budget" aria-label="Budget"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/></svg></button>`)}${sums}
       <div class="bpx-vw" role="group" aria-label="View">${[["day","By day"],["grp","By group"],["grps","Groups"]].map(([k,n])=>`<button type="button" data-bspv="${k}" aria-pressed="${v===k}">${n}</button>`).join("")}</div>
       ${v==="grps"?`<button type="button" class="bpx-add" style="margin:0 0 12px;height:44px;font-size:15px" data-bsgnewbtn>＋ Add group</button>`:""}
       ${bSpend(S)}<button type="button" class="bpx-add" data-bpadd>＋ Add expense</button><div class="bpx-scrim" data-bpaddx></div><button type="button" class="bpx-shx" data-bpaddx aria-label="Close"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`}
@@ -12176,8 +12201,7 @@ function bPhone(S){const b=B(),CY=c=>((BCYC.find(x=>x[0]===c)||BCYC[1])[1]),chev
   const grp=(L,m,isInc)=>{let order=[];try{order=bCatsShown(S,m).map(c=>c.n)}catch(_){}const have=[...new Set(L.map(i=>bItCat(i)))];have.forEach(n=>{if(!order.includes(n))order.push(n)});
     return order.filter(n=>have.includes(n)).map(n=>{const G=L.filter(i=>bItCat(i)===n),t=G.filter(i=>!i.paused&&!i.muted).reduce((a,i)=>a+bMo(i),0),c=isInc?"#3ddc84":(bCol?bCol(n):"#888");
       return `<div class="bpx-ch" style="--cc:${c}"><i></i><span>${esc(n)}</span><b>${isInc?"+":"−"}${bMoney(bPX(t))}${bPU()}</b></div>${G.map(i=>row(i,isInc)).join("")}`}).join("")};
-  return `<div class="panel bpan bpx">${seg}<div class="bpx-sum"><span>Left over this month</span><b class="${S.left<0?"neg":"pos"}">${bMoney(S.left)}</b></div>
-    <div class="bpx-per">${bViewSw("data-bpview",pv)}${bPerBtn()}</div><div class="bpx-h"><span>Income</span><b>+${bMoney(bPX(S.inc))}${bPU()}</b></div>${pv!=="list"?`<div class="bpx-v">${pv==="cards"?bAll(S,null,"i"):bList(S,"i")}</div>`:inc.length?(new Set(inc.map(i=>bItCat(i))).size>1?grp(inc,"i",true):inc.map(i=>row(i,true)).join("")):`<div class="bpx-empty">No income yet</div>`}
+  return `<div class="panel bpan bpx">${top(bViewSw("data-bpview",pv))}${sums}<div class="bpx-h"><span>Income</span><b>+${bMoney(bPX(S.inc))}${bPU()}</b></div>${pv!=="list"?`<div class="bpx-v">${pv==="cards"?bAll(S,null,"i"):bList(S,"i")}</div>`:inc.length?(new Set(inc.map(i=>bItCat(i))).size>1?grp(inc,"i",true):inc.map(i=>row(i,true)).join("")):`<div class="bpx-empty">No income yet</div>`}
     <div class="bpx-h"><span>Expenses</span><b>−${bMoney(bPX(S.subs+S.bills))}${bPU()}</b></div>
     ${pv!=="list"?`<div class="bpx-v">${pv==="cards"?bAll(S):bList(S)}</div>`:""}${pv==="list"&&cats.length>1?`<div class="bpx-chips" role="group" aria-label="Expense group"><button type="button" data-bpchip="all" aria-pressed="${chip==="all"}">All</button>${cats.map(c=>`<button type="button" data-bpchip="${esc(c)}" aria-pressed="${chip===c}" style="--cc:${bCol?bCol(c):"#888"}"><i></i>${esc(c)}</button>`).join("")}</div>`:""}
     ${pv!=="list"?"":E.length?(chip==="all"?grp(E,"x",false):E.map(i=>row(i,false)).join("")):`<div class="bpx-empty">No expenses yet</div>`}
