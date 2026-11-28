@@ -5682,6 +5682,12 @@ async function save(){
   writing=false;lastLocal=Date.now();if(pending){pending=false;save()}
 }
 try{const s=localStorage.getItem("aot");if(s)data=Object.assign(EMPTY(),JSON.parse(s))}catch(e){}
+/* opening screen + sound: the choice lives with the account (data.prefs), and each device keeps a copy that the opening screen reads before anything else loads.
+   It used to live only on the device, so a choice made on the computer (or in Safari) never reached the phone's home-screen app */
+function applyPrefs(){try{const P=data.prefs||{},L=localStorage;
+  if(P.splash){if(L.getItem("aot-splash")!==P.splash)L.setItem("aot-splash",P.splash)}else{const v=L.getItem("aot-splash");if(v)data.prefs=Object.assign({},data.prefs,{splash:v})}
+  if(P.sound){if(L.getItem("aot-sound")!==P.sound)L.setItem("aot-sound",P.sound)}else{const v=L.getItem("aot-sound");if(v)data.prefs=Object.assign({},data.prefs,{sound:v})}}catch(e){}}
+applyPrefs();
 /* ---------- account sync (Supabase) ---------- */
 const CFG=window.AOT_CONFIG||{};
 const sb=(CFG.supabaseUrl&&CFG.supabaseAnonKey&&window.supabase&&supabase.createClient)?supabase.createClient(CFG.supabaseUrl,CFG.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,storageKey:"aot-auth"}}):null;
@@ -5703,7 +5709,7 @@ async function pull(){
       else if((data._rev||0)>(inc._rev||0)||syncDirty)save()}
     else if(!isEmpty(data))save();
     try{localStorage.setItem("aot-owner",sbUser.id)}catch(e){}
-    pulledOnce=true;
+    applyPrefs();pulledOnce=true;
   }catch(e){storeNote=navigator.onLine?"Couldn't reach your account. Changes are kept on this device and will sync later.":"You're offline. Changes are kept on this device and will sync when you're back online.";syncDirty=true}
   pulling=false;softRender();
 }
@@ -11264,9 +11270,9 @@ const splashNow=()=>{try{return localStorage.getItem("aot-splash")||"specks"}cat
 const SNDL=[["off","Off","No sound"],["pad","Pad","A warm chord that swells in"],["hum","Hum","Low drone with a faint shimmer"],["chime","Chime","Four soft bell notes"],["breath","Breath","An airy swell, like a breath"],["glass","Glass","Light glass sparkles"]];
 const soundNow=()=>{try{return localStorage.getItem("aot-sound")||"off"}catch(_){return "off"}};
 function soundPanel(){const cur=soundNow();return `<div class="panel splp" style="margin-top:18px"><div class="ph"><span>Opening sound</span><i>Plays on your first touch</i></div><div class="spl-row">${SNDL.map(([k,n,d])=>`<button type="button" class="spl-c" data-osound="${k}" aria-pressed="${cur===k}"><b>${n}</b><small>${d}</small></button>`).join("")}</div><p class="note" style="margin:10px 2px 0">iPhone and iPad only allow sound after a touch, so it plays the moment you first touch the screen. Turn the ringer on to hear it.</p></div>`}
-document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-osound]");if(!b)return;e.preventDefault();const k=b.dataset.osound;try{localStorage.setItem("aot-sound",k)}catch(_){}document.querySelectorAll("[data-osound]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.osound===k));if(k!=="off"&&window.aotSound)window.aotSound.play(k)},true);
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-osound]");if(!b)return;e.preventDefault();const k=b.dataset.osound;try{localStorage.setItem("aot-sound",k)}catch(_){}try{data.prefs=Object.assign({},data.prefs,{sound:k});save()}catch(_){}document.querySelectorAll("[data-osound]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.osound===k));if(k!=="off"&&window.aotSound)window.aotSound.play(k)},true);
 function splashPanel(){const cur=splashNow();return `<div class="panel splp" style="margin-top:18px"><div class="ph"><span>Opening screen</span><i>Shown when the app opens</i></div><div class="spl-row">${SPL.map(([k,n,d])=>`<button type="button" class="spl-c spl-${k}" data-splash="${k}" aria-pressed="${cur===k}"><b>${n}</b><small>${d}</small></button>`).join("")}</div><p class="note" style="margin:10px 2px 0">Tap one to choose it and see it play.</p></div>`}
-document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-splash]");if(!b)return;e.preventDefault();const k=b.dataset.splash;try{localStorage.setItem("aot-splash",k)}catch(_){}document.querySelectorAll("[data-splash]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.splash===k));if(k!=="off"&&window.aotSplash){window.aotSplash.play(k,{min:2600,manual:true});/* preview plays with your chosen opening sound */try{const sn=window.aotSound&&window.aotSound.pick();if(sn&&sn!=="off")window.aotSound.play(sn)}catch(_){}}},true);
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-splash]");if(!b)return;e.preventDefault();const k=b.dataset.splash;try{localStorage.setItem("aot-splash",k)}catch(_){}try{data.prefs=Object.assign({},data.prefs,{splash:k});save()}catch(_){}   /* kept with the account too, so the phone opens with the same screen */document.querySelectorAll("[data-splash]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.splash===k));if(k!=="off"&&window.aotSplash){window.aotSplash.play(k,{min:2600,manual:true});/* preview plays with your chosen opening sound */try{const sn=window.aotSound&&window.aotSound.pick();if(sn&&sn!=="off")window.aotSound.play(sn)}catch(_){}}},true);
 function tplPanel(){const T=tplOf();return `<div class="panel tplp" style="margin-top:18px"><div class="ph"><span>Templates</span><i>${T?esc(T.name)+" is on":"Whole-page looks"}</i></div>
   <p class="note" style="margin:-2px 0 12px">A template restyles the whole app at once: colours, glass, type and its own backdrop. Your wallpaper and Boxes settings stay saved and come back when you switch it off.</p>
   <div class="tpl-row"><button type="button" class="tpl-c tpl-none" data-tpl="" aria-pressed="${!T}"><span class="tpl-pv"><span>Your own setup</span></span><b>None</b><small>Wallpaper and Boxes as you set them</small></button>${TEMPLATES.filter(t=>!t.visual).map(t=>`<button type="button" class="tpl-c" data-tpl="${t.id}" aria-pressed="${!!T&&T.id===t.id}"><span class="tpl-pv tpl-pv-${t.id}"><i></i><i></i><i></i><em></em><em></em>${t.id==="midnight"?'<s class="tpl-def">Default</s>':""}</span><b>${esc(t.name)}</b><small>${esc(t.sub)}</small></button>`).join("")}</div>
@@ -11609,7 +11615,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1025",APPT="2026-11-28T19:10:00Z";   /* APPT: when this update was made */
+const APPV="1026",APPT="2026-11-28T19:20:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
