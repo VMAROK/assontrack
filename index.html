@@ -4894,7 +4894,10 @@ html.phone #bdArr{width:44px;height:56px;bottom:calc(var(--navh,84px) + 16px)}
 .bc-mk.late{color:#ffa630;background:rgba(255,166,48,.14);box-shadow:0 0 0 1.5px rgba(255,166,48,.6),0 0 14px rgba(255,166,48,.35)}
 .bc-mk.part{width:auto;min-width:58px;height:36px;padding:0 12px;border-radius:18px;font-family:var(--mono);font-size:17px;color:#3ddc84}
 .bc-mk.part.no{background:rgba(255,77,94,.16);color:#ff5e6c}.bc-mk.part.late{background:rgba(255,166,48,.16);color:#ffa630}
-html.phone .bc-mk{top:64%;width:26px;height:26px;font-size:16px}html.phone .bc-mk svg{width:16px;height:16px}html.phone .bc-mk.part{min-width:32px;height:20px;padding:0 5px;font-size:11px}   /* the date stays sharp above the glass */
+html.phone .bc-mk{top:64%;width:26px;height:26px;font-size:16px}html.phone .bc-mk svg{width:16px;height:16px}html.phone .bc-mk.part{min-width:32px;height:20px;padding:0 5px;font-size:11px}
+html.phone body #view#view .bc-mk,html.phone body #view#view .bc-mk.ok,html.phone body #view#view .bc-mk.no,html.phone body #view#view .bc-mk.late{background:none!important;box-shadow:none!important}
+html.phone body #view#view .bc-mk.part{min-width:0;padding:0;font-size:14px;font-weight:700}
+html.phone body #view#view .bc-mk svg{width:20px;height:20px}   /* phone: just the fraction or the tick / cross, no bubble behind it */   /* the date stays sharp above the glass */
 /* past days grey */
 /* grey now comes from the glass layer: .bc-grid .bc-d.past:not(.sel){background:rgba(130,134,144,.2)} */.bc-grid .bc-d.past .bc-n{color:#a3a7b0;opacity:1}
 .bc-grid .bc-d.past>*{position:relative;z-index:1}
@@ -8386,7 +8389,7 @@ function bCal(){const b=B(),T=today(),x=bDate(T);x.setDate(1);x.setMonth(x.getMo
   const ev=bEvMap(b,from,to,T);   /* was: each occurrence on its own date only (no grace periods) */const spd={},spn={};b.spends.forEach(s=>{if(s.d>=from&&s.d<=to){spd[s.d]=(spd[s.d]||0)+bSpAmt(s);spn[s.d]=(spn[s.d]||0)+1}});
   if(!bSel||bSel.slice(0,7)!==from.slice(0,7))bSel=from.slice(0,7)===T.slice(0,7)?T:from;
   let cells="";for(let i=0;i<lead;i++)cells+=`<span class="bc-d pad"></span>`;
-  for(let d=1;d<=nd;d++){const ds=ymd(new Date(y,m,d,12)),E=ev[ds]||[];cells+=`<button type="button" class="bc-d${ds===T?" td":""}${ds===bSel&&!bNoSel?" sel":""}${ds<T?" past":""}" data-bday="${ds}"><span class="bc-n">${d}</span>${bDayMark(b,ds,E,T)}<span class="bc-ev">${E.slice(0,3).map(i=>`<i class="${i.kind==="inc"?"inc":""}${i.muted?" mu":""}" style="--cc:${i.kind==="inc"?"#3ddc84":bCol(bItCat(i))}">${esc(bTitle(i))}</i>`).join("")}${E.length>3?`<i class="more">+${E.length-3}</i>`:""}</span>${spd[ds]?`<span class="bc-sp">${bMoney(spd[ds],0)}</span>`:""}${E.length+(spn[ds]||0)?`<span class="bc-cnt">${E.length+(spn[ds]||0)}</span>`:""/* phone: how many things that day */}</button>`}
+  for(let d=1;d<=nd;d++){const ds=ymd(new Date(y,m,d,12)),E=ev[ds]||[],mk=bDayMark(b,ds,E,T);cells+=`<button type="button" class="bc-d${ds===T?" td":""}${ds===bSel&&!bNoSel?" sel":""}${ds<T?" past":""}" data-bday="${ds}"><span class="bc-n">${d}</span>${mk}<span class="bc-ev">${E.slice(0,3).map(i=>`<i class="${i.kind==="inc"?"inc":""}${i.muted?" mu":""}" style="--cc:${i.kind==="inc"?"#3ddc84":bCol(bItCat(i))}">${esc(bTitle(i))}</i>`).join("")}${E.length>3?`<i class="more">+${E.length-3}</i>`:""}</span>${spd[ds]?`<span class="bc-sp">${bMoney(spd[ds],0)}</span>`:""}${!mk&&E.length+(spn[ds]||0)?`<span class="bc-cnt">${E.length+(spn[ds]||0)}</span>`:""/* phone: how many things that day — not when the day already shows its paid mark (3/4, ✓, ✗): one number per day */}</button>`}
   const tail=(7-(lead+nd)%7)%7;for(let i=0;i<tail;i++)cells+=`<span class="bc-d pad"></span>`;
   const SE=(ev[bSel]||[]),SS=b.spends.filter(s=>s.d===bSel),tot=SE.filter(i=>i.kind!=="inc").reduce((a,i)=>a+fxc(+i.amt||0,i.cur,bHome()),0)+SS.reduce((a,s)=>a+bSpAmt(s),0);
   /* old list under the calendar (before the overview moved here):
@@ -11606,7 +11609,7 @@ const num=id=>{const v=$(id).value;return v===""?null:+v};
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("[data-selp]");if(r&&e.target===r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 let wSavedAt=0,wFlash=null;
 document.addEventListener("click",e=>{const w=e.target.closest&&e.target.closest("[data-waslot]");if(!w)return;const [pid,sid,ds]=w.dataset.waslot.split(":");if(demoOn()&&!data.passions.some(p=>p.id===pid))return;selP=pid;pTab="schedule";selSlot={id:sid,ds};editSlot=null;go("pass");setTimeout(()=>{const el=$("#slotDetail");el&&el.scrollIntoView({behavior:"smooth",block:"center"})},350)});
-const APPV="1024",APPT="2026-11-28T18:55:00Z";   /* APPT: when this update was made */
+const APPV="1025",APPT="2026-11-28T19:10:00Z";   /* APPT: when this update was made */
 setTimeout(()=>{const b=document.getElementById("updTop");if(b){b.textContent=updStamp();b.title="Updated "+updStamp()+" (version "+APPV+"). Tap to get the newest version"}},0);
 const updStamp=()=>{try{return new Date(APPT).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){return APPT.slice(0,16).replace("T"," ")}};if(/[?&]u=\d/.test(location.search))try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
 /* pick up a new version without being asked: check when the app opens, when you come back to it, and every few minutes */
